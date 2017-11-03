@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{98629170-06EA-4509-BA46-6725EA2764C4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Modding</RootNamespace>
+    <AssemblyName>Modding</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Modding\AfterAttackHandler.cs" />
+    <Compile Include="Modding\AfterSavegameLoadHandler.cs" />
+    <Compile Include="Modding\ApplicationQuitHandler.cs" />
+    <Compile Include="Modding\AttackHandler.cs" />
+    <Compile Include="Modding\BeforeSavegameSaveHandler.cs" />
+    <Compile Include="Modding\BeforeSceneLoadHandler.cs" />
+    <Compile Include="Modding\CharmUpdateHandler.cs" />
+    <Compile Include="Modding\ClearSaveGameHandler.cs" />
+    <Compile Include="Modding\ColliderCreateHandler.cs" />
+    <Compile Include="Modding\DashPressedHandler.cs" />
+    <Compile Include="Modding\DashVelocityHandler.cs" />
+    <Compile Include="Modding\GetBoolProxy.cs" />
+    <Compile Include="Modding\GetIntProxy.cs" />
+    <Compile Include="Modding\HeroUpdateHandler.cs" />
+    <Compile Include="Modding\HookInfoAttribute.cs" />
+    <Compile Include="Modding\IMod.2.cs" />
+    <Compile Include="Modding\IMod.cs" />
+    <Compile Include="Modding\LanguageGetHandler.cs" />
+    <Compile Include="Modding\Mod.2.cs" />
+    <Compile Include="Modding\Mod.cs" />
+    <Compile Include="Modding\ModData.cs" />
+    <Compile Include="Modding\ModHooks.cs" />
+    <Compile Include="Modding\ModLoader.cs" />
+    <Compile Include="Modding\ModSettingsKeyValue.cs" />
+    <Compile Include="Modding\ModVersionDraw.cs" />
+    <Compile Include="Modding\NewGameHandler.cs" />
+    <Compile Include="Modding\NewPlayerDataHandler.cs" />
+    <Compile Include="Modding\SavegameLoadHandler.cs" />
+    <Compile Include="Modding\SavegameSaveHandler.cs" />
+    <Compile Include="Modding\SceneChangedHandler.cs" />
+    <Compile Include="Modding\SetBoolProxy.cs" />
+    <Compile Include="Modding\SetIntProxy.cs" />
+    <Compile Include="Modding\TakeDamageProxy.cs" />
+    <Compile Include="Modding\TakeHealthProxy.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Test\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\content\app_367520\depot_367521\hollow_knight_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="GalaxyCSharp, Version=3.133.7.0, Culture=neutral, PublicKeyToken=c78c4b7d4be3eaf9, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\content\app_367520\depot_367521\hollow_knight_Data\Managed\GalaxyCSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Security, Version=2.0.5.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\content\app_367520\depot_367521\hollow_knight_Data\Managed\Mono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\PlayMaker.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\System.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\content\app_367520\depot_367521\hollow_knight_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\content\app_367520\depot_367521\hollow_knight_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
