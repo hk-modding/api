@@ -3,8 +3,15 @@ using UnityEngine;
 
 namespace Modding
 {
+    /// <inheritdoc />
+    /// <summary>
+    /// Class to draw the version information for the mods on the main menu.
+    /// </summary>
 	public class ModVersionDraw : MonoBehaviour
 	{
+        /// <summary>
+        /// Run When Gui is shown.
+        /// </summary>
 		public void OnGUI()
 		{
 			if (drawString != null && UIManager.instance.uiState == UIState.MAIN_MENU_HOME)

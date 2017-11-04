@@ -43,7 +43,6 @@
     <Compile Include="ModData.cs" />
     <Compile Include="ModHooks.cs" />
     <Compile Include="ModLoader.cs" />
-    <Compile Include="ModSettingsKeyValue.cs" />
     <Compile Include="ModVersionDraw.cs" />
     <Compile Include="Proxies.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

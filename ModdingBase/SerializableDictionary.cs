@@ -4,7 +4,12 @@ using UnityEngine;
 
 namespace Modding
 {
-	[Serializable]
+    /// <inheritdoc cref="Dictionary{TKey,TValue}" />
+    /// <inheritdoc cref="ISerializationCallbackReceiver"/>
+    /// <summary>
+    /// Represents a Dictionary of &lt;<see cref="!:TKey" />,<see cref="!:TValue" />&gt; that can be serialized with Unity's JsonUtil
+    /// </summary>
+    [Serializable]
 	public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
 	{
 		public void OnBeforeSerialize()
