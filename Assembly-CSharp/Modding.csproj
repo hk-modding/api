@@ -36,40 +36,16 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Modding\AfterAttackHandler.cs" />
-    <Compile Include="Modding\AfterSavegameLoadHandler.cs" />
-    <Compile Include="Modding\ApplicationQuitHandler.cs" />
-    <Compile Include="Modding\AttackHandler.cs" />
-    <Compile Include="Modding\BeforeSavegameSaveHandler.cs" />
-    <Compile Include="Modding\BeforeSceneLoadHandler.cs" />
-    <Compile Include="Modding\CharmUpdateHandler.cs" />
-    <Compile Include="Modding\ClearSaveGameHandler.cs" />
-    <Compile Include="Modding\ColliderCreateHandler.cs" />
-    <Compile Include="Modding\DashPressedHandler.cs" />
-    <Compile Include="Modding\DashVelocityHandler.cs" />
-    <Compile Include="Modding\GetBoolProxy.cs" />
-    <Compile Include="Modding\GetIntProxy.cs" />
-    <Compile Include="Modding\HeroUpdateHandler.cs" />
-    <Compile Include="Modding\HookInfoAttribute.cs" />
-    <Compile Include="Modding\IMod.2.cs" />
-    <Compile Include="Modding\IMod.cs" />
-    <Compile Include="Modding\LanguageGetHandler.cs" />
-    <Compile Include="Modding\Mod.2.cs" />
-    <Compile Include="Modding\Mod.cs" />
-    <Compile Include="Modding\ModData.cs" />
-    <Compile Include="Modding\ModHooks.cs" />
-    <Compile Include="Modding\ModLoader.cs" />
-    <Compile Include="Modding\ModSettingsKeyValue.cs" />
-    <Compile Include="Modding\ModVersionDraw.cs" />
-    <Compile Include="Modding\NewGameHandler.cs" />
-    <Compile Include="Modding\NewPlayerDataHandler.cs" />
-    <Compile Include="Modding\SavegameLoadHandler.cs" />
-    <Compile Include="Modding\SavegameSaveHandler.cs" />
-    <Compile Include="Modding\SceneChangedHandler.cs" />
-    <Compile Include="Modding\SetBoolProxy.cs" />
-    <Compile Include="Modding\SetIntProxy.cs" />
-    <Compile Include="Modding\TakeDamageProxy.cs" />
-    <Compile Include="Modding\TakeHealthProxy.cs" />
+    <Compile Include="Handlers.cs" />
+    <Compile Include="HookInfoAttribute.cs" />
+    <Compile Include="IMod.cs" />
+    <Compile Include="Mod.cs" />
+    <Compile Include="ModData.cs" />
+    <Compile Include="ModHooks.cs" />
+    <Compile Include="ModLoader.cs" />
+    <Compile Include="ModSettingsKeyValue.cs" />
+    <Compile Include="ModVersionDraw.cs" />
+    <Compile Include="Proxies.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
