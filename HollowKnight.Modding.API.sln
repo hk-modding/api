@@ -5,28 +5,20 @@ VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modding", "Assembly-CSharp\Modding.csproj", "{98629170-06EA-4509-BA46-6725EA2764C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.facade\Assembly-CSharp.csproj", "{1A1F2FB6-FD09-46A0-8380-5CA51D08FD59}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModdingBase", "ModdingBase\ModdingBase.csproj", "{1CACEA6A-D114-46B1-8C47-F2F92062B844}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		FirstPass|Any CPU = FirstPass|Any CPU
+		SecondPass|Any CPU = SecondPass|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{98629170-06EA-4509-BA46-6725EA2764C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{98629170-06EA-4509-BA46-6725EA2764C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{98629170-06EA-4509-BA46-6725EA2764C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{98629170-06EA-4509-BA46-6725EA2764C4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1A1F2FB6-FD09-46A0-8380-5CA51D08FD59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1A1F2FB6-FD09-46A0-8380-5CA51D08FD59}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1A1F2FB6-FD09-46A0-8380-5CA51D08FD59}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1A1F2FB6-FD09-46A0-8380-5CA51D08FD59}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1CACEA6A-D114-46B1-8C47-F2F92062B844}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1CACEA6A-D114-46B1-8C47-F2F92062B844}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1CACEA6A-D114-46B1-8C47-F2F92062B844}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1CACEA6A-D114-46B1-8C47-F2F92062B844}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98629170-06EA-4509-BA46-6725EA2764C4}.FirstPass|Any CPU.ActiveCfg = Release|Any CPU
+		{98629170-06EA-4509-BA46-6725EA2764C4}.SecondPass|Any CPU.ActiveCfg = Release|Any CPU
+		{98629170-06EA-4509-BA46-6725EA2764C4}.SecondPass|Any CPU.Build.0 = Release|Any CPU
+		{1CACEA6A-D114-46B1-8C47-F2F92062B844}.FirstPass|Any CPU.ActiveCfg = Release|Any CPU
+		{1CACEA6A-D114-46B1-8C47-F2F92062B844}.FirstPass|Any CPU.Build.0 = Release|Any CPU
+		{1CACEA6A-D114-46B1-8C47-F2F92062B844}.SecondPass|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

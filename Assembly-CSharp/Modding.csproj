@@ -75,7 +75,7 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Test\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\Output1\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -106,4 +106,12 @@
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y "$(SolutionDir)Output1\*" "$(SolutionDir)OutputFinal\"
+"$(SolutionDir)packages/ILMerge.2.14.1208/tools/ILMerge.exe" /targetPlatform:v2 /out:$(SolutionDir)OutputFinal\Assembly-CSharp.dll "$(SolutionDir)Output1/Assembly-CSharp.dll" "$(ProjectDir)$(OutputPath)Modding.dll"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

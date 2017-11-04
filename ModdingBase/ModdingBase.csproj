@@ -41,12 +41,32 @@
     <Compile Include="SerializableStringDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\System.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>..\Vanilla\System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>..\Vanilla\System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Vanilla\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ilmerge">
+      <Version>2.14.1208</Version>
+    </PackageReference>
+  </ItemGroup>
+  <Target Name="ILMerge">
+    <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
+    <Exec Command="$(ILMergeConsolePath) /out:$(SolutionDir)/Output/Assembly-CSharp.dll Assembly-CSharp.dll ModdingBase.dll" />
+  </Target>
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(SolutionDir)Vanilla\*" "$(SolutionDir)Output1\"
+"$(SolutionDir)packages/ILMerge.2.14.1208/tools/ILMerge.exe" /targetPlatform:v2 /out:$(SolutionDir)Output1\Assembly-CSharp.dll "$(SolutionDir)Vanilla/Assembly-CSharp.dll" "$(ProjectDir)$(OutputPath)ModdingBase.dll"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
