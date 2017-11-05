@@ -11,9 +11,25 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
+        public List<string> LoadedMods = new List<string>();
+        public string ModVersion;
+
+        private static int _modVersion = 2;
+
+        public GameVersionData version;
+
         private ModHooks()
         {
             _newLogfile = true;
+
+            GameVersion gameVersion;
+            gameVersion.major = 1;
+            gameVersion.minor = 2;
+            gameVersion.revision = 1;
+            gameVersion.package = 4;
+            version = new GameVersionData {gameVersion = gameVersion};
+
+            ModVersion = version.GetGameVersionString() + "-" + _modVersion;
         }
 
         /// <summary>
@@ -424,6 +440,6 @@ namespace Modding
 
         private static ModHooks _instance;
         private bool _newLogfile;
-        public List<string> LoadedMods = new List<string>();
+        
     }
 }
