@@ -20,18 +20,18 @@ namespace Modding
 			{
 				return;
 			}
-			ModHooks.ModLog("Trying to load mods");
+			ModHooks.Logger.Log("Trying to load mods");
 			string text = "";
 			foreach (string text2 in Directory.GetFiles("hollow_knight_Data\\Managed\\Mods"))
 			{
-				ModHooks.ModLog("Loading assembly: " + text2);
+				ModHooks.Logger.LogDebug("Loading assembly: " + text2);
 				try
 				{
 					foreach (Type type in Assembly.LoadFile(text2).GetExportedTypes())
 					{
 						if (IsSubclassOfRawGeneric(typeof(Mod<>), type))
 						{
-							ModHooks.ModLog("Trying to instantiate mod<T>: " + type);
+							ModHooks.Logger.LogDebug("Trying to instantiate mod<T>: " + type);
 							IMod mod = Activator.CreateInstance(type) as IMod;
 							LoadedMods.Add((Mod)mod);
 							ModHooks.Instance.LoadedMods.Add(type.Name);
@@ -42,7 +42,7 @@ namespace Modding
 						}
 						else if (!type.IsGenericType && type.IsClass && type.IsSubclassOf(typeof(Mod)))
 						{
-							ModHooks.ModLog("Trying to instantiate mod: " + type);
+							ModHooks.Logger.LogDebug("Trying to instantiate mod: " + type);
 							Mod mod2 = type.GetConstructor(new Type[0])?.Invoke(new object[0]) as Mod;
 							LoadedMods.Add(mod2);
 							ModHooks.Instance.LoadedMods.Add(type.Name);
@@ -55,7 +55,7 @@ namespace Modding
 				}
 				catch (Exception ex)
 				{
-					ModHooks.ModLog("Error: " + ex);
+					ModHooks.Logger.LogError("Error: " + ex);
 				}
 			}
 			GameObject gameObject = new GameObject();

@@ -11,9 +11,19 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
+        private static readonly string LogPath = Application.persistentDataPath + "\\ModLog.txt";
+
+        /// <summary>
+        /// Provides access to logging system.
+        /// </summary>
+        public static Logger Logger => _logger ?? (_logger = new Logger(LogLevel.Debug, LogPath));
+
+        private static Logger _logger;
+
         private ModHooks()
         {
-            _newLogfile = true;
+            if (File.Exists(LogPath))
+                File.Delete(LogPath);
         }
 
         /// <summary>
@@ -25,18 +35,10 @@ namespace Modding
         /// Logs the message to ModLog.txt in the save file path.
         /// </summary>
         /// <param name="info">Message To Log</param>
+        [Obsolete("This method is obsolete and will be removed in future Mod API Versions. Use ModHooks.Instance.Logger instead.")]
         public static void ModLog(string info)
         {
-            if (!ModLoader.Debug) return;
-
-            using (StreamWriter streamWriter = new StreamWriter(Application.persistentDataPath + "\\ModLog.txt", !Instance._newLogfile))
-            {
-                streamWriter.WriteLine(info);
-            }
-            if (Instance._newLogfile)
-            {
-                Instance._newLogfile = false;
-            }
+            Logger.Log(info);
         }
 
         #region PlayerManagementHandling
@@ -423,7 +425,6 @@ namespace Modding
 
 
         private static ModHooks _instance;
-        private bool _newLogfile;
         public List<string> LoadedMods = new List<string>();
     }
 }

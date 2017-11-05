@@ -30,7 +30,7 @@ namespace Modding
 		public Mod()
 		{
 			string name = GetType().Name;
-			ModHooks.ModLog($"[{name}] - Instantiating Mod.");
+			ModHooks.Logger.Log($"[{name}] - Instantiating Mod.");
 			ModHooks.Instance.BeforeSavegameSaveHook += SaveSettings;
 			ModHooks.Instance.AfterSavegameLoadHook += LoadSettings;
 		}
@@ -42,7 +42,7 @@ namespace Modding
 		private void LoadSettings(SaveGameData data)
 		{
 			string name = GetType().Name;
-			ModHooks.ModLog($"[{name}] - Loading Mod Settings from Save.");
+			ModHooks.Logger.Log($"[{name}] - Loading Mod Settings from Save.");
 			if (data?.modData != null && data.modData.ContainsKey(name))
 			{
                 Settings = data.modData[name];
@@ -56,7 +56,7 @@ namespace Modding
 		private void SaveSettings(SaveGameData data)
 		{
 			string name = GetType().Name;
-			ModHooks.ModLog($"[{name}] - Adding Settings to Save file");
+			ModHooks.Logger.Log($"[{name}] - Adding Settings to Save file");
 			if (data.modData == null)
 			{
 				data.modData = new ModSettingsDictionary();
