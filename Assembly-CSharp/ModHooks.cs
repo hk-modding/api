@@ -20,8 +20,23 @@ namespace Modding
 
         private static Logger _logger;
 
+        public List<string> LoadedMods = new List<string>();
+        public string ModVersion;
+
+        private static int _modVersion = 2;
+
+        public GameVersionData version;
+
         private ModHooks()
         {
+            GameVersion gameVersion;
+            gameVersion.major = 1;
+            gameVersion.minor = 2;
+            gameVersion.revision = 1;
+            gameVersion.package = 4;
+            version = new GameVersionData {gameVersion = gameVersion};
+
+            ModVersion = version.GetGameVersionString() + "-" + _modVersion;
             if (File.Exists(LogPath))
                 File.Delete(LogPath);
         }
@@ -425,6 +440,5 @@ namespace Modding
 
 
         private static ModHooks _instance;
-        public List<string> LoadedMods = new List<string>();
     }
 }
