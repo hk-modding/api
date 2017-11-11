@@ -33,10 +33,23 @@ namespace Modding
     public delegate void AfterSavegameLoadHandler(SaveGameData data);
 
     /// <summary>
-    /// Called after game save is cleared.
+    /// Called before game save is cleared.
     /// </summary>
     /// <param name="save">Save slot location</param>
     public delegate void ClearSaveGameHandler(int save);
+
+    /// <summary>
+    /// Called after the game save is cleared.
+    /// </summary>
+    /// <param name="slot">Save slot Location</param>
+    public delegate void AfterClearSaveGameHandler(int slot);
+
+    /// <summary>
+    /// Overrides the save file name.
+    /// </summary>
+    /// <param name="slot">Save File Slot Id</param>
+    /// <returns>Filename to use or null to use vanilla</returns>
+    public delegate string GetSaveFileNameHandler(int slot);
 
     /// <summary>
     /// Called after a new game save is started.
@@ -97,6 +110,49 @@ namespace Modding
     public delegate void AfterAttackHandler(AttackDirection dir);
 
     /// <summary>
+    /// Called at the end of the take damage function
+    /// </summary>
+    /// <param name="hazardType"></param>
+    /// <param name="damageAmount"></param>
+    public delegate void AfterTakeDamageHandler(int hazardType, int damageAmount);
+
+    /// <summary>
+    /// Called whenever blue health is updated
+    /// </summary>
+    /// <returns></returns>
+    public delegate int BlueHealthHandler();
+
+    /// <summary>
+    /// Called whenever game tries to show cursor
+    /// </summary>
+    public delegate void CursorHandler();
+
+    /// <summary>
+    /// Called at the start of the DoAttack function
+    /// </summary>
+    public delegate void DoAttackHandler();
+
+    /// <summary>
+    /// Called whenever focus cost is calculated
+    /// </summary>
+    /// <returns></returns>
+    public delegate int FocusCostHandler();
+
+    /// <summary>
+    /// Called whenever nail strikes something
+    /// </summary>
+    /// <param name="otherCollider"></param>
+    /// <param name="gameObject"></param>
+    public delegate void SlashHitHandler(Collider2D otherCollider, GameObject gameObject);
+
+    /// <summary>
+    /// Called when Hero recovers Soul from hitting enemies
+    /// </summary>
+    /// <param name="num"></param>
+    /// <returns></returns>
+    public delegate int SoulGainHandler(int num);
+
+    /// <summary>
     /// Called during dash function to change velocity
     /// </summary>
     /// <returns>New vector for velocity</returns>
@@ -113,5 +169,7 @@ namespace Modding
     /// <param name="go"></param>
     public delegate void ColliderCreateHandler(GameObject go);
     
+
+
     
 }

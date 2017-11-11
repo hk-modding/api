@@ -23,7 +23,7 @@ namespace Modding
         public List<string> LoadedMods = new List<string>();
         public string ModVersion;
 
-        private static int _modVersion = 2;
+        private static int _modVersion = 1;
 
         public GameVersionData version;
 
@@ -158,10 +158,30 @@ namespace Modding
         }
 
         /// <summary>
+        /// Called whenever blue health is updated
+        /// </summary>
+        [HookInfo("Called whenever blue health is updated", "PlayerData.UpdateBlueHealth")]
+        public event BlueHealthHandler BlueHealthHook;
+
+        public int OnBlueHealth()
+        {
+            int result = 0;
+            if (BlueHealthHook == null) return result;
+
+            Delegate[] invocationList = BlueHealthHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                result = (int)toInvoke.DynamicInvoke();
+            }
+            return result;
+        }
+
+
+        /// <summary>
         /// Called when health is taken from the player
         /// </summary>
         /// <remarks>HeroController.TakeHealth</remarks>
-        [HookInfo("Called when health is taken from the player", "HeroController.TakeHealth")]
+        [HookInfo("Called when health is taken from the player", "PlayerData.TakeHealth")]
         public event TakeHealthProxy TakeHealthHook;
 
         public int OnTakeHealth(int damage)
@@ -196,6 +216,18 @@ namespace Modding
         }
 
         /// <summary>
+        /// Called at the end of the take damage function
+        /// </summary>
+        [HookInfo("Called at the end of the take damage function", "HeroController.TakeDamage")]
+        public event AfterTakeDamageHandler AfterTakeDamageHook;
+
+        public void AfterTakeDamage(int hazardType, int damageAmount)
+        {
+            AfterTakeDamageHook?.Invoke(hazardType, damageAmount);
+        }
+        
+
+        /// <summary>
         /// Called whenever the player attacks
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
@@ -206,6 +238,18 @@ namespace Modding
         {
             AttackHook?.Invoke(dir);
         }
+
+        /// <summary>
+        /// Called at the start of the DoAttack function
+        /// </summary>
+        [HookInfo("Called at the start of the DoAttack function", "HeroController.DoAttack")]
+        public event DoAttackHandler DoAttackHook;
+
+        public void OnDoAttack()
+        {
+            DoAttackHook?.Invoke();
+        }
+        
 
         /// <summary>
         /// Called at the end of the attack function
@@ -219,8 +263,17 @@ namespace Modding
             AfterAttackHook?.Invoke(dir);
         }
 
+        /// <summary>
+        /// Called whenever nail strikes something
+        /// </summary>
+        [HookInfo("Called whenever nail strikes something", "NailSlash.OnTriggerEnter2D")]
+        public event SlashHitHandler SlashHitHook;
 
-
+        public void OnSlashHit(Collider2D otherCollider, GameObject gameObject)
+        {
+            SlashHitHook?.Invoke(otherCollider, gameObject);
+        }
+        
         /// <summary>
         /// Called after player values for charms have been set
         /// </summary>
@@ -244,6 +297,44 @@ namespace Modding
         {
             HeroUpdateHook?.Invoke();
         }
+
+        /// <summary>
+        /// Called whenever focus cost is calculated
+        /// </summary>
+        [HookInfo("Called whenever focus cost is calculated", "HeroController.StartMPDrain")]
+        public event FocusCostHandler FocusCostHook;
+
+        public int OnFocusCost()
+        {
+            int result = 1;
+            if (FocusCostHook == null) return result;
+
+            Delegate[] invocationList = FocusCostHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                result = (int)toInvoke.DynamicInvoke();
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Called when Hero recovers Soul from hitting enemies
+        /// </summary>
+        [HookInfo("Called when Hero recovers Soul from hitting enemies", "HeroController.SoulGain")]
+        public event SoulGainHandler SoulGainHook;
+
+        public int OnSoulGain(int num)
+        {
+            if (SoulGainHook == null) return num;
+
+            Delegate[] invocationList = this.SoulGainHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                num = (int)toInvoke.DynamicInvoke(num);
+            }
+            return num;
+        }
+
 
         /// <summary>
         /// Called during dash function to change velocity
@@ -315,7 +406,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// Called whenever a save file is deleted
+        /// Called before a save file is deleted
         /// </summary>
         /// <remarks>GameManager.ClearSaveFile</remarks>
         [HookInfo("Called whenever a save file is deleted", "GameManager.ClearSaveFile")]
@@ -350,6 +441,28 @@ namespace Modding
             BeforeSavegameSaveHook?.Invoke(data);
         }
 
+        /// <summary>
+        /// Overrides the filename to load for a given slot.  Return null to use vanilla names.
+        /// </summary>
+        [HookInfo("Overrides the filename for a slot.", "GameManager.SaveGameClear")]
+        public event GetSaveFileNameHandler GetSaveFileNameHook;
+
+        public string GetSaveFileName(int saveSlot)
+        {
+            return GetSaveFileNameHook?.Invoke(saveSlot);
+        }
+
+        /// <summary>
+        /// Called after a game has been cleared from a slot.
+        /// </summary>
+        [HookInfo("Called after a savegame has been cleared.", "GameManager.GetSaveFilename")]
+        public event AfterClearSaveGameHandler AfterSaveGameClearHook;
+
+        public void OnAfterSaveGameClear(int saveSlot)
+        {
+            AfterSaveGameClearHook?.Invoke(saveSlot);
+        }
+        
         #endregion
 
         /// <summary>
@@ -384,7 +497,7 @@ namespace Modding
         /// Called after a new Scene has been loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        [HookInfo("Called after a new Scene has been loaded", "N/A")]
+        [HookInfo("Called after a new Scene has been loaded", "GameManager.LoadScene")]
         public event SceneChangedHandler SceneChanged;
 
         public void OnSceneChanged(string targetScene)
@@ -396,7 +509,7 @@ namespace Modding
         /// Called right before a scene gets loaded, can change which scene gets loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        [HookInfo("Called right before a scene gets loaded, can change which scene gets loaded", "N/A")]
+        [HookInfo("Called right before a scene gets loaded, can change which scene gets loaded", "GameManager.LoadScene")]
         public event BeforeSceneLoadHandler BeforeSceneLoadHook;
 
         public string BeforeSceneLoad(string sceneName)
@@ -413,6 +526,27 @@ namespace Modding
 
         #endregion
 
+        /// <summary>
+        /// Called whenever game tries to show cursor
+        /// </summary>
+        [HookInfo("Called whenever game tries to show cursor", "InputHandler.OnGUI")]
+        public event CursorHandler CursorHook;
+
+        public void OnCursor()
+        {
+            if (CursorHook != null)
+            {
+                CursorHook();
+                return;
+            }
+            if (!GameManager.instance.isPaused)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                return;
+            }
+            Cursor.lockState = CursorLockMode.None;
+        }
+        
 
         /// <summary>
         /// Called whenever a new gameobject is created with a collider and playmaker2d
