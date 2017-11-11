@@ -14,7 +14,7 @@ namespace Modding
         /// </summary>
 		public void OnGUI()
 		{
-			if (drawString != null && UIManager.instance.uiState == UIState.MAIN_MENU_HOME)
+			if (drawString != null && (UIManager.instance.uiState == UIState.MAIN_MENU_HOME || UIManager.instance.uiState == UIState.PAUSED))
 			{
 				Color backgroundColor = GUI.backgroundColor;
 				Color contentColor = GUI.contentColor;

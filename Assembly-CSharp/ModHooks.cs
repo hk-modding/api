@@ -23,7 +23,7 @@ namespace Modding
         public List<string> LoadedMods = new List<string>();
         public string ModVersion;
 
-        private static int _modVersion = 1;
+        private static int _modVersion = 4;
 
         public GameVersionData version;
 
@@ -327,7 +327,7 @@ namespace Modding
         {
             if (SoulGainHook == null) return num;
 
-            Delegate[] invocationList = this.SoulGainHook.GetInvocationList();
+            Delegate[] invocationList = SoulGainHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 num = (int)toInvoke.DynamicInvoke(num);
@@ -534,17 +534,18 @@ namespace Modding
 
         public void OnCursor()
         {
+            Cursor.lockState = CursorLockMode.None;
             if (CursorHook != null)
             {
                 CursorHook();
                 return;
             }
-            if (!GameManager.instance.isPaused)
+            if (GameManager.instance.isPaused)
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = true;
                 return;
             }
-            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = false;
         }
         
 

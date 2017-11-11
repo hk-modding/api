@@ -22,7 +22,7 @@ namespace Modding
 			}
 			ModHooks.Logger.Log("Trying to load mods");
 		    string text = "Modding API: " + ModHooks.Instance.ModVersion + "\n";
-			foreach (string text2 in Directory.GetFiles("hollow_knight_Data\\Managed\\Mods"))
+			foreach (string text2 in Directory.GetFiles("hollow_knight_Data\\Managed\\Mods", "*.dll"))
 			{
 				ModHooks.Logger.LogDebug("Loading assembly: " + text2);
 				try
