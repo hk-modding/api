@@ -221,9 +221,16 @@ namespace Modding
         [HookInfo("Called at the end of the take damage function", "HeroController.TakeDamage")]
         public event AfterTakeDamageHandler AfterTakeDamageHook;
 
-        public void AfterTakeDamage(int hazardType, int damageAmount)
+        public int AfterTakeDamage(int hazardType, int damageAmount)
         {
-            AfterTakeDamageHook?.Invoke(hazardType, damageAmount);
+            if (AfterTakeDamageHook == null) return damageAmount;
+
+            Delegate[] invocationList = AfterTakeDamageHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                damageAmount = (int)toInvoke.DynamicInvoke(hazardType, damageAmount);
+            }
+            return damageAmount;
         }
         
 

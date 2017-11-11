@@ -114,7 +114,7 @@ namespace Modding
     /// </summary>
     /// <param name="hazardType"></param>
     /// <param name="damageAmount"></param>
-    public delegate void AfterTakeDamageHandler(int hazardType, int damageAmount);
+    public delegate int AfterTakeDamageHandler(int hazardType, int damageAmount);
 
     /// <summary>
     /// Called whenever blue health is updated
