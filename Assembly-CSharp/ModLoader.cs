@@ -20,18 +20,18 @@ namespace Modding
 			{
 				return;
 			}
-			ModHooks.Logger.Log("Trying to load mods");
+			ModHooks.Logger.Log("[API] - Trying to load mods");
 		    string text = "Modding API: " + ModHooks.Instance.ModVersion + "\n";
 			foreach (string text2 in Directory.GetFiles("hollow_knight_Data\\Managed\\Mods", "*.dll"))
 			{
-				ModHooks.Logger.LogDebug("Loading assembly: " + text2);
+				ModHooks.Logger.LogDebug("[API] - Loading assembly: " + text2);
 				try
 				{
 					foreach (Type type in Assembly.LoadFile(text2).GetExportedTypes())
 					{
 						if (IsSubclassOfRawGeneric(typeof(Mod<>), type))
 						{
-							ModHooks.Logger.LogDebug("Trying to instantiate mod<T>: " + type);
+							ModHooks.Logger.LogDebug("[API] - Trying to instantiate mod<T>: " + type);
 							IMod mod = Activator.CreateInstance(type) as IMod;
 							LoadedMods.Add((Mod)mod);
 							ModHooks.Instance.LoadedMods.Add(type.Name);
@@ -42,7 +42,7 @@ namespace Modding
 						}
 						else if (!type.IsGenericType && type.IsClass && type.IsSubclassOf(typeof(Mod)))
 						{
-							ModHooks.Logger.LogDebug("Trying to instantiate mod: " + type);
+							ModHooks.Logger.LogDebug("[API] - Trying to instantiate mod: " + type);
 							Mod mod2 = type.GetConstructor(new Type[0])?.Invoke(new object[0]) as Mod;
 							LoadedMods.Add(mod2);
 							ModHooks.Instance.LoadedMods.Add(type.Name);
@@ -55,13 +55,14 @@ namespace Modding
 				}
 				catch (Exception ex)
 				{
-					ModHooks.Logger.LogError("Error: " + ex);
+					ModHooks.Logger.LogError("[API] - Error: " + ex);
 				}
 			}
 			GameObject gameObject = new GameObject();
 			gameObject.AddComponent<ModVersionDraw>().drawString = text;
 			UnityEngine.Object.DontDestroyOnLoad(gameObject);
 			Loaded = true;
+		    ModHooks.SaveGlobalSettings();
 		}
 
 		static ModLoader()

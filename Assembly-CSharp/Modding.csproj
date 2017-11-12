@@ -44,10 +44,12 @@
     <Compile Include="Mod.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModHooks.cs" />
+    <Compile Include="ModHooksGlobalSettings.cs" />
     <Compile Include="ModLoader.cs" />
     <Compile Include="ModVersionDraw.cs" />
     <Compile Include="Proxies.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VoidModSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">

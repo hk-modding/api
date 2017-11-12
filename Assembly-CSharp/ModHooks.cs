@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using GlobalEnums;
 using UnityEngine;
 
@@ -12,18 +13,37 @@ namespace Modding
 	public class ModHooks
     {
         private static readonly string LogPath = Application.persistentDataPath + "\\ModLog.txt";
+        private static readonly string SettingsPath = Application.persistentDataPath + "\\ModdingApi.GlobalSettings.json";
+        private static ModHooks _instance;
+
+        private static ModHooksGlobalSettings _globalSettings;
+
+        private static ModHooksGlobalSettings GlobalSettings
+        {
+            get
+            {
+                if (_globalSettings == null)
+                    LoadGlobalSettings();
+                return _globalSettings;
+            }
+            set
+            {
+                _globalSettings = value;
+                SaveGlobalSettings();
+            }
+        }
 
         /// <summary>
         /// Provides access to logging system.
         /// </summary>
-        public static Logger Logger => _logger ?? (_logger = new Logger(LogLevel.Debug, LogPath));
+        public static Logger Logger => _logger ?? (_logger = new Logger(GlobalSettings.LoggingLevel, LogPath));
 
         private static Logger _logger;
 
         public List<string> LoadedMods = new List<string>();
         public string ModVersion;
 
-        private static int _modVersion = 4;
+        private static int _modVersion = 7;
 
         public GameVersionData version;
 
@@ -39,7 +59,9 @@ namespace Modding
             ModVersion = version.GetGameVersionString() + "-" + _modVersion;
             if (File.Exists(LogPath))
                 File.Delete(LogPath);
+
         }
+
 
         /// <summary>
         /// Current instance of Modhooks.
@@ -580,7 +602,49 @@ namespace Modding
             ApplicationQuitHook?.Invoke();
         }
 
+        /// <summary>
+        /// Save GlobalSettings to disk. (backs up the current global settings if it exists)
+        /// </summary>
+        internal static void SaveGlobalSettings()
+        {
+            Logger.Log("Saving Global Settings");
+            if (File.Exists(SettingsPath + ".bak"))
+                File.Delete(SettingsPath + ".bak");
 
-        private static ModHooks _instance;
+            if (File.Exists(SettingsPath))
+                File.Move(SettingsPath, SettingsPath + ".bak");
+
+            using (FileStream fileStream = File.Create(SettingsPath))
+            {
+                using (StreamWriter writer = new StreamWriter(fileStream))
+                {
+                    string text4 = JsonUtility.ToJson(GlobalSettings, true);
+                    writer.Write(text4);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads global settings from disk (if they exist)
+        /// </summary>
+        public static void LoadGlobalSettings()
+        {
+            if (!File.Exists(SettingsPath))
+            {
+                _globalSettings = new ModHooksGlobalSettings {LoggingLevel = LogLevel.Info};
+                return;
+            }
+
+            Logger.Log("[API] - Loading Global Settings");
+            using (FileStream fileStream = File.OpenRead(SettingsPath))
+            {
+                using (StreamReader reader = new StreamReader(fileStream))
+                {
+                    string json = reader.ReadToEnd();
+                    _globalSettings = JsonUtility.FromJson<ModHooksGlobalSettings>(json);
+                }
+            }
+        }
+
     }
 }
