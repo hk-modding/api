@@ -104,7 +104,8 @@ namespace Modding
 			Log("Loading Mod Settings from Save.");
 			if (data?.modData != null && data.modData.ContainsKey(name))
 			{
-                Settings = data.modData[name];
+			    Settings = new TSaveSettings();
+                Settings.SetSettings(data.modData[name]);
 			}
 		}
 
@@ -131,13 +132,13 @@ namespace Modding
         /// <summary>
         /// Mod's Settings
         /// </summary>
-		public IModSettings Settings
+		public TSaveSettings Settings
 		{
 			get => _settings ?? (_settings = Activator.CreateInstance<TSaveSettings>());
 		    set => _settings = value;
 		}
 
-		private IModSettings _settings;
+		private TSaveSettings _settings;
 	}
 
     /// <inheritdoc />

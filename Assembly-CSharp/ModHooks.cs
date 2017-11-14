@@ -52,8 +52,8 @@ namespace Modding
             GameVersion gameVersion;
             gameVersion.major = 1;
             gameVersion.minor = 2;
-            gameVersion.revision = 1;
-            gameVersion.package = 4;
+            gameVersion.revision = 2;
+            gameVersion.package = 1;
             version = new GameVersionData {gameVersion = gameVersion};
 
             ModVersion = version.GetGameVersionString() + "-" + _modVersion;

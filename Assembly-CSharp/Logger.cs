@@ -14,12 +14,13 @@ namespace Modding
         private static readonly object Locker = new object();
 
         private readonly LogLevel _logLevel;
-        private readonly string _logPath;
 
         public Logger(LogLevel loglevel, string path)
         {
             _logLevel = loglevel;
-            _logPath = path;
+
+            FileStream fileStream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Read);
+            _writer = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
         }
 
         /// <summary>
@@ -71,12 +72,10 @@ namespace Modding
         {
             lock (Locker)
             {
-                using (FileStream file = new FileStream(_logPath, FileMode.Append, FileAccess.Write, FileShare.Read))
-                using (StreamWriter writer = new StreamWriter(file, Encoding.Unicode))
-                {
-                    writer.Write(text);
-                }
+                _writer.Write(text);
             }
         }
+
+        private readonly StreamWriter _writer;
     }
 }

@@ -20,6 +20,15 @@ namespace Modding
 			FloatValues = new SerializableFloatDictionary();
 		}
 
+	    
+	    public void SetSettings(IModSettings incommingSettings)
+	    {
+	        StringValues = incommingSettings.StringValues;
+	        IntValues = incommingSettings.IntValues;
+	        BoolValues = incommingSettings.BoolValues;
+	        FloatValues = incommingSettings.FloatValues;
+	    }
+
         /// <inheritdoc />
 		public void OnBeforeSerialize()
 		{
