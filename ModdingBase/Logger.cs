@@ -19,7 +19,7 @@ namespace Modding
         {
             _logLevel = loglevel;
 
-            FileStream fileStream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Read);
+            FileStream fileStream = new FileStream(path, FileMode.Append, FileAccess.ReadWrite, FileShare.ReadWrite);
             _writer = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
         }
 

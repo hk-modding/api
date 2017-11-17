@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using GlobalEnums;
+﻿using GlobalEnums;
 using UnityEngine;
 
 namespace Modding

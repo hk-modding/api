@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using GlobalEnums;
+using MonoMod;
 using UnityEngine;
-using PlayerData = Modding.Patches.PlayerData;
 
 
 namespace Modding
@@ -25,7 +24,10 @@ namespace Modding
             get
             {
                 if (_globalSettings == null)
+                {
                     LoadGlobalSettings();
+                    SaveGlobalSettings();
+                }
                 return _globalSettings;
             }
             set
@@ -51,6 +53,7 @@ namespace Modding
 
         private ModHooks()
         {
+            
             GameVersion gameVersion;
             gameVersion.major = 1;
             gameVersion.minor = 2;
@@ -169,16 +172,32 @@ namespace Modding
             return result;
         }
 
+        private event NewPlayerDataHandler _newPlayerDataHook;
+
         /// <summary>
         /// Called after setting up a new PlayerData
         /// </summary>
         /// <remarks>PlayerData.SetupNewPlayerData</remarks>
         [HookInfo("Called after setting up a new PlayerData", "PlayerData.SetupNewPlayerData")]
-        public event NewPlayerDataHandler NewPlayerDataHook;
+        public event NewPlayerDataHandler NewPlayerDataHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding NewPlayerDataHook");
+                _newPlayerDataHook += value;
+                
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing NewPlayerDataHook");
+                _newPlayerDataHook -= value;
+            }
+        }
 
         public void AfterNewPlayerData()
         {
-            NewPlayerDataHook?.Invoke(global::PlayerData.instance);
+            Logger.LogFine("[API] - AfterNewPlayerData Invoked");
+            _newPlayerDataHook?.Invoke(global::PlayerData.instance);
         }
 
         /// <summary>
@@ -287,6 +306,7 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
         [HookInfo("Called at the end of the attack function", "HeroController.Attack")]
+        [MonoModPublic]
         public event AfterAttackHandler AfterAttackHook;
 
         public void AfterAttack(AttackDirection dir)
@@ -376,7 +396,7 @@ namespace Modding
         [HookInfo("Called during dash function to change velocity", "HeroController.Dash")]
         public event DashVelocityHandler DashVectorHook;
 
-        public Vector2 DashVelocityChange()
+        public Vector2? DashVelocityChange()
         {
             return DashVectorHook?.Invoke() ?? Vector2.zero;
         }

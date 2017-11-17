@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Modding
+﻿namespace Modding
 {
     /// <summary>
     /// Empty Unused Settings.

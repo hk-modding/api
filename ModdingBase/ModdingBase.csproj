@@ -29,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Assembly-CSharp.dll.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Handlers.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="Patches\HeroController.cs" />
     <Compile Include="Patches\InputHandler.cs" />
     <Compile Include="Patches\Language.cs" />
+    <Compile Include="Patches\MonoModRules.cs" />
     <Compile Include="Patches\OnScreenDebugInfo.cs" />
     <Compile Include="Patches\OnTriggerEnter2D.cs" />
     <Compile Include="Patches\PlayerData.cs" />
@@ -70,6 +72,10 @@
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Vanilla\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\MonoMod\bin\Debug\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod">
       <HintPath>..\..\MonoMod\bin\Debug\MonoMod.exe</HintPath>
