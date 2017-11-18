@@ -264,7 +264,13 @@ Vanilla/
 Output1/
 OutputFinal/
 
-_site/*
-api/*
-apidoc/*
-obj/*
+###############
+#    folder   #
+###############
+/**/DROP/
+/**/TEMP/
+/**/packages/
+/**/bin/
+/**/obj/
+_site
+Source/
