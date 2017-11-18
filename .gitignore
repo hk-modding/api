@@ -263,3 +263,8 @@ __pycache__/
 Vanilla/
 Output1/
 OutputFinal/
+
+_site/*
+api/*
+apidoc/*
+obj/*
