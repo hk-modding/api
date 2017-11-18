@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Modding</RootNamespace>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Assembly-CSharp.mm</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
@@ -25,7 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Assembly-CSharp.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -35,7 +35,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Assembly-CSharp.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Assembly-CSharp.mm.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
@@ -109,13 +109,14 @@
     <Exec Command="$(ILMergeConsolePath) /out:$(SolutionDir)/Output/Assembly-CSharp.dll Assembly-CSharp.dll ModdingBase.dll" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.dll"
-move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.pdb" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.pdb"
+    <PostBuildEvent>move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.dll" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.dll"
+move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.pdb" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.pdb"
 copy /Y "$(SolutionDir)Vanilla\*" "$(ProjectDir)$(OutputPath)\"
 copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
 cd "$(ProjectDir)$(OutputPath)"
 MonoMod.exe Assembly-CSharp.dll
 copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinal\Assembly-CSharp.dll"
+powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
 copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)OutputFinal\"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

@@ -168,7 +168,9 @@ namespace Modding
         /// </summary>
         public Mod()
         {
-            _globalSettingsFilename = Application.persistentDataPath + GetType().Name + ".GlobalSettings.json";
+            _globalSettingsFilename = Application.persistentDataPath + "\\" + GetType().Name + ".GlobalSettings.json";
+            LoadGlobalSettings();
+
         }
 
         /// <inheritdoc />
@@ -177,7 +179,6 @@ namespace Modding
         /// </summary>
         public override void Initialize()
         {
-            LoadGlobalSettings();
             base.Initialize();
         }
 
@@ -208,9 +209,9 @@ namespace Modding
         /// </summary>
         public void LoadGlobalSettings()
         {
+            Log("Loading Global Settings");
             if (!File.Exists(_globalSettingsFilename)) return;
 
-            Log("Loading Global Settings");
             using (FileStream fileStream = File.OpenRead(_globalSettingsFilename))
             {
                 using (StreamReader reader = new StreamReader(fileStream))
