@@ -55,7 +55,7 @@ namespace Modding.Patches
         }
        
 
-
+        /*
         private void orig_TakeDamage(GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
         {
         }
@@ -66,6 +66,7 @@ namespace Modding.Patches
             orig_TakeDamage(go, damageSide, damageAmount, hazardType);
             //TODO: Add damageAmount = Modding.ModHooks.Instance.AfterTakeDamage(hazardType, damageAmount); before if (this.playerData.equippedCharm_5 && this.playerData.blockerHits > 0 && hazardType == 1 && this.cState.focusing && !flag)
         }
+        */
 
         private void orig_Update()
         {
@@ -125,6 +126,8 @@ namespace Modding.Patches
             playerData.UpdateBlueHealth();
         }
         #endregion
+
+        
 
         [MonoModIgnore]
         private extern void orig_DoAttack();
