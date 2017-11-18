@@ -145,13 +145,17 @@ namespace Modding.Patches
             ModHooks.Instance.AfterNewPlayerData(this);
         }
 
-        [MonoModOriginalName("UpdateBlueHealth")]
-        public void orig_UpdateBlueHealth() { }
-
         public void UpdateBlueHealth()
         {
             healthBlue = ModHooks.Instance.OnBlueHealth();
-            orig_UpdateBlueHealth();
+            if (equippedCharm_8)
+            {
+                healthBlue += 2;
+            }
+            if (equippedCharm_9)
+            {
+                healthBlue += 4;
+            }
         }
     }
 }
