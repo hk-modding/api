@@ -97,6 +97,9 @@ namespace Modding.Patches
                     {
                         try
                         {
+                            if (File.Exists(text2 + num2))
+                                File.Delete(text2 + num2);
+
                             File.Move(text, text2 + num2);
                         }
                         catch (Exception arg)
@@ -202,6 +205,8 @@ namespace Modding.Patches
 
         #endregion
 
+        #region LoadSceneAdditive
+
         [MonoModIgnore] private bool tilemapDirty;
         [MonoModIgnore] private bool waitForManualLevelStart;
         [MonoModIgnore] public event GameManager.DestroyPooledObjects DestroyPersonalPools;
@@ -243,6 +248,10 @@ namespace Modding.Patches
             yield break;
         }
 
+
+        #endregion
+
+        #region LoadFirstScene
         [MonoModReplace]
         public IEnumerator LoadFirstScene()
         {
@@ -255,5 +264,8 @@ namespace Modding.Patches
             yield break;
             yield break;
         }
+        
+        #endregion
+
     }
 }
