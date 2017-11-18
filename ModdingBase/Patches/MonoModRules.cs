@@ -4,7 +4,9 @@ using MonoMod.InlineRT;
 
 namespace MonoMod
 {
-
+    /// <summary>
+    /// Class for controlling some of the adjustments needed for monomod transformations
+    /// </summary>
     public static partial class MonoModRules
     {
 
@@ -26,12 +28,13 @@ namespace MonoMod
                 return true;
 
             return false;
+            /*
             TypeDefinition type = holder as TypeDefinition ??
                                   (holder as MethodDefinition)?.DeclaringType ??
                                   (holder as FieldDefinition)?.DeclaringType ??
                                   (holder as PropertyDefinition)?.DeclaringType;
             // If the holding type (or the holding method's type) is inside the Modding namespace, return true.
-            return type == null || type.FullName.StartsWith("Modding.");
+            return type == null || type.FullName.StartsWith("Modding.");*/
         }
 
         /// <summary>

@@ -1,35 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GlobalEnums;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+﻿using GlobalEnums;
 using MonoMod;
 using UnityEngine;
-
+//We disable a bunch of warnings here because they don't mean anything.  They all relate to not finding proper stuff for methods/properties/fields that are stubs to make the new methods work.
+//We don't care about XML docs for these as they are being patched into the original code
+// ReSharper disable All
+#pragma warning disable 1591, 0108, 0169, 0649, 0626
 namespace Modding.Patches
 {
 
 
     [MonoModPatch("global::HeroController")]
-    public class HeroController : global::HeroController
+    public partial class HeroController : global::HeroController
     {
         [MonoModIgnore] private NailSlash slashComponent;
 
         [MonoModIgnore] private float focusMP_amount;
 
-        
-        /*TODO: Dash() before float num; then end the else block right before this.dash_timer += Time.deltaTime;
-        		Vector2 vector = Modding.ModHooks.Instance.DashVelocityChange();
-		        if (vector.x != 0f || vector.y != 0f)
-		        {
-			        this.rb2d.velocity = vector;
-		        }
-		        else
-		        {
-        */
-        
-        /*TODO: LookForQueueInput Changes:
+        /*DRMDONE: LookForQueueInput Changes:
          * change 
                 if (this.inputHandler.inputActions.dash.WasPressed)
             to
@@ -41,8 +28,9 @@ namespace Modding.Patches
             	if (this.inputHandler.inputActions.dash.IsPressed && this.dashQueueSteps <= this.DASH_QUEUE_STEPS && this.CanDash() && this.dashQueuing && !Modding.ModHooks.Instance.OnDashPressed() && this.CanDash())
         */
 
-        //TODO: SoulGain: Add num = Modding.ModHooks.Instance.OnSoulGain(num); before this.playerData.AddMPCharge(num); 
+        //DRMDONE: SoulGain: Add num = Modding.ModHooks.Instance.OnSoulGain(num); before this.playerData.AddMPCharge(num); 
 
+            /*
         [UpdateHeroControllerAttack]
         public void orig_Attack(AttackDirection attackDir) { }
         
@@ -50,11 +38,11 @@ namespace Modding.Patches
         {
             ModHooks.Instance.OnAttack(attackDir);
             orig_Attack(attackDir);
-            /*TODO: Make sure to add before this.SlashComponent.StartSlash();
-                Modding.ModHooks.Instance.AfterAttack(attackDir);
-		        if (!this.cState.attacking) return; 
-            */
-        }
+            //DRMDONE: Make sure to add before this.SlashComponent.StartSlash();
+            //    Modding.ModHooks.Instance.AfterAttack(attackDir);
+		    //    if (!this.cState.attacking) return; 
+            //
+        }*/
 
         private void orig_StartMPDrain(float time)
         {
@@ -65,6 +53,8 @@ namespace Modding.Patches
             orig_StartMPDrain(time);
             focusMP_amount *= ModHooks.Instance.OnFocusCost();
         }
+       
+
 
         private void orig_TakeDamage(GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
         {
@@ -136,21 +126,30 @@ namespace Modding.Patches
         }
         #endregion
 
-
-        //Done: DoAttack: Add Modding.ModHooks.Instance.OnDoAttack(); after this.cState.recoiling=false;
         [MonoModIgnore]
-        [UpdateHeroControllerDoAttack]
-        public void DoAttack() { }
+        private extern void orig_DoAttack();
+
+        public void DoAttack()
+        {
+    		ModHooks.Instance.OnDoAttack();
+            orig_DoAttack();
+        }
+
+        //Note, moved the OnDoAttack call a little to make it easier to merge.
+        //Done: DoAttack: Add Modding.ModHooks.Instance.OnDoAttack(); after this.cState.recoiling=false; 
+        //[MonoModIgnore]
+        //[UpdateHeroControllerDoAttack]
+        //public void DoAttack() { }
     }
 
     //[MonoModCustomAttribute("UpdateHeroController_CharmUpdate")]
     //public class UpdateHeroControllerCharmUpdate : Attribute { }
 
-    [MonoModCustomAttribute("UpdateHeroController_Attack")]
-    public class UpdateHeroControllerAttack : Attribute { }
+    //[MonoModCustomAttribute("UpdateHeroController_Attack")]
+    //public class UpdateHeroControllerAttack : Attribute { }
 
-    [MonoModCustomAttribute("UpdateHeroController_DoAttack")]
-    public class UpdateHeroControllerDoAttack : Attribute { }
+    //[MonoModCustomAttribute("UpdateHeroController_DoAttack")]
+    //public class UpdateHeroControllerDoAttack : Attribute { }
 }
 
 namespace MonoMod { 
@@ -158,13 +157,13 @@ namespace MonoMod {
     public static partial class MonoModRules
     {
 
-
+        /*
         /// <summary>
         /// This method rewrites the CharmUpdate function.  It alters it to injects Modding.ModHooks.Instance.OnCharmUpdate() right before PlayerData.Instance.UpdateBlueHealth();
         /// </summary>
         /// <param name="method"></param>
         /// <param name="attrib"></param>
-        /*
+        
         public static void UpdateHeroController_CharmUpdate(MethodDefinition method, CustomAttribute attrib)
         {
             try
@@ -263,130 +262,133 @@ namespace MonoMod {
         }
         */
 
-        /// <summary>
-        /// This method rewrites the Attack function.  It alters it to injects Modding.ModHooks.Instance.AfterAttack(AttackDirection) and a check to return if attacking is false right before this.slashComponent.StartSlash();
-        /// </summary>
-        /// <param name="method"></param>
-        /// <param name="attrib"></param>
-        public static void UpdateHeroController_Attack(MethodDefinition method, CustomAttribute attrib)
+        /*
+    /// <summary>
+    /// This method rewrites the Attack function.  It alters it to injects Modding.ModHooks.Instance.AfterAttack(AttackDirection) and a check to return if attacking is false right before this.slashComponent.StartSlash();
+    /// </summary>
+    /// <param name="method"></param>
+    /// <param name="attrib"></param>
+    public static void UpdateHeroController_Attack(MethodDefinition method, CustomAttribute attrib)
+    {
+        try
         {
-            try
+            // The method must have a body, otherwise there's nothing to replace!
+            if (!method.HasBody)
+                return;
+
+            Console.WriteLine("Modifying IL code for " + method.DeclaringType.Name + "." + method.Name);
+
+            ILProcessor ilProcessor = method.Body.GetILProcessor();
+
+            MethodDefinition def = ModHooksInstance(method);
+
+            // Iterate through the method body. Need to figure out where to start the injection
+            Instruction temp = null;
+            foreach (Instruction instr in method.Body.Instructions)
             {
-                // The method must have a body, otherwise there's nothing to replace!
-                if (!method.HasBody)
-                    return;
-
-                Console.WriteLine("Modifying IL code for " + method.DeclaringType.Name + "." + method.Name);
-
-                ILProcessor ilProcessor = method.Body.GetILProcessor();
-
-                MethodDefinition def = ModHooksInstance(method);
-
-                // Iterate through the method body. Need to figure out where to start the injection
-                Instruction temp = null;
-                foreach (Instruction instr in method.Body.Instructions)
+                // Check if the instruction is a ldstr instruction (load constant string literal).
+                if (instr.OpCode == OpCodes.Stfld && instr.Operand?.ToString() == "System.float32 HeroController::altAttackTime")
                 {
-                    // Check if the instruction is a ldstr instruction (load constant string literal).
-                    if (instr.OpCode == OpCodes.Stfld && instr.Operand?.ToString() == "System.float32 HeroController::altAttackTime")
-                    {
-                        temp = instr;
-                        break;
-                    }
-                }
-
-                if (temp != null)
-                {
-                    Instruction ldarg_0 = ilProcessor.Create(OpCodes.Ldarg_0);
-
-                    List<Instruction> instructionsToAdd = new List<Instruction>()
-                    {
-                        ilProcessor.Create(OpCodes.Call, def),
-                        ilProcessor.Create(OpCodes.Ldarg_1),
-                        ilProcessor.Create(OpCodes.Callvirt, ModHooksHook(method, "AfterAttack")),
-                        ilProcessor.Create(OpCodes.Ldarg_0),
-                        ilProcessor.Create(OpCodes.Ldfld, GetClassField(method, "cstate")),
-                        ilProcessor.Create(OpCodes.Ldfld, GetClassField(method, "HeroControllerStates", "attacking")),
-                        ilProcessor.Create(OpCodes.Ldfld, GetClassField(method, "cstate")),
-                        ilProcessor.Create(OpCodes.Brtrue_S, ldarg_0),
-                        ilProcessor.Create(OpCodes.Ret),
-                        ldarg_0
-                    };
-
-                    Instruction last = temp;
-                    while (instructionsToAdd.Any())
-                    {
-                        Instruction next = instructionsToAdd[0];
-                        instructionsToAdd.RemoveAt(0);
-                        ilProcessor.InsertAfter(last, next);
-                        last = next;
-                    }
-                    
+                    temp = instr;
+                    break;
                 }
             }
-            catch (Exception ex)
+
+            if (temp != null)
             {
-                Console.WriteLine(ex);
+                Instruction ldarg_0 = ilProcessor.Create(OpCodes.Ldarg_0);
+
+                List<Instruction> instructionsToAdd = new List<Instruction>()
+                {
+                    ilProcessor.Create(OpCodes.Call, def),
+                    ilProcessor.Create(OpCodes.Ldarg_1),
+                    ilProcessor.Create(OpCodes.Callvirt, ModHooksHook(method, "AfterAttack")),
+                    ilProcessor.Create(OpCodes.Ldarg_0),
+                    ilProcessor.Create(OpCodes.Ldfld, GetClassField(method, "cstate")),
+                    ilProcessor.Create(OpCodes.Ldfld, GetClassField(method, "HeroControllerStates", "attacking")),
+                    ilProcessor.Create(OpCodes.Ldfld, GetClassField(method, "cstate")),
+                    ilProcessor.Create(OpCodes.Brtrue_S, ldarg_0),
+                    ilProcessor.Create(OpCodes.Ret),
+                    ldarg_0
+                };
+
+                Instruction last = temp;
+                while (instructionsToAdd.Any())
+                {
+                    Instruction next = instructionsToAdd[0];
+                    instructionsToAdd.RemoveAt(0);
+                    ilProcessor.InsertAfter(last, next);
+                    last = next;
+                }
+
             }
         }
-
-        /// <summary>
-        /// This method rewrites the DoAttack function.  It alters it to injects Modding.ModHooks.Instance.DoAttack() after this.cstate.recoiling = false;
-        /// </summary>
-        /// <param name="method"></param>
-        /// <param name="attrib"></param>
-        public static void UpdateHeroController_DoAttack(MethodDefinition method, CustomAttribute attrib)
+        catch (Exception ex)
         {
-            try
+            Console.WriteLine(ex);
+        }
+    }
+    */
+
+        /*
+    /// <summary>
+    /// This method rewrites the DoAttack function.  It alters it to injects Modding.ModHooks.Instance.DoAttack() after this.cstate.recoiling = false;
+    /// </summary>
+    /// <param name="method"></param>
+    /// <param name="attrib"></param>
+    public static void UpdateHeroController_DoAttack(MethodDefinition method, CustomAttribute attrib)
+    {
+        try
+        {
+            // The method must have a body, otherwise there's nothing to replace!
+            if (!method.HasBody)
+                return;
+
+            Console.WriteLine("Modifying IL code for " + method.DeclaringType.Name + "." + method.Name);
+
+            ILProcessor ilProcessor = method.Body.GetILProcessor();
+
+            MethodDefinition def = ModHooksInstance(method);
+
+            // Iterate through the method body. Need to figure out where to start the injection
+            Instruction temp = null;
+            foreach (Instruction instr in method.Body.Instructions)
             {
-                // The method must have a body, otherwise there's nothing to replace!
-                if (!method.HasBody)
-                    return;
-
-                Console.WriteLine("Modifying IL code for " + method.DeclaringType.Name + "." + method.Name);
-
-                ILProcessor ilProcessor = method.Body.GetILProcessor();
-
-                MethodDefinition def = ModHooksInstance(method);
-
-                // Iterate through the method body. Need to figure out where to start the injection
-                Instruction temp = null;
-                foreach (Instruction instr in method.Body.Instructions)
+                // Check if the instruction is a ldstr instruction (load constant string literal).
+                if (instr.OpCode == OpCodes.Stfld && instr.Operand?.ToString() == "System.Boolean HeroControllerStates::recoiling")
                 {
-                    // Check if the instruction is a ldstr instruction (load constant string literal).
-                    if (instr.OpCode == OpCodes.Stfld && instr.Operand?.ToString() == "System.Boolean HeroControllerStates::recoiling")
-                    {
-                        temp = instr;
-                        break;
-                    }
-                }
-
-                if (temp != null)
-                {
-                    Instruction ldarg_0 = ilProcessor.Create(OpCodes.Ldarg_0);
-
-                    List<Instruction> instructionsToAdd = new List<Instruction>()
-                    {
-                        ilProcessor.Create(OpCodes.Call, def),
-                        ilProcessor.Create(OpCodes.Callvirt, ModHooksHook(method, "OnDoAttack")),
-                        ilProcessor.Create(OpCodes.Ldarg_0)
-                    };
-
-                    Instruction last = temp;
-                    while (instructionsToAdd.Any())
-                    {
-                        Instruction next = instructionsToAdd[0];
-                        instructionsToAdd.RemoveAt(0);
-                        ilProcessor.InsertAfter(last, next);
-                        last = next;
-                    }
-
+                    temp = instr;
+                    break;
                 }
             }
-            catch (Exception ex)
+
+            if (temp != null)
             {
-                Console.WriteLine(ex);
+                Instruction ldarg_0 = ilProcessor.Create(OpCodes.Ldarg_0);
+
+                List<Instruction> instructionsToAdd = new List<Instruction>()
+                {
+                    ilProcessor.Create(OpCodes.Call, def),
+                    ilProcessor.Create(OpCodes.Callvirt, ModHooksHook(method, "OnDoAttack")),
+                    ilProcessor.Create(OpCodes.Ldarg_0)
+                };
+
+                Instruction last = temp;
+                while (instructionsToAdd.Any())
+                {
+                    Instruction next = instructionsToAdd[0];
+                    instructionsToAdd.RemoveAt(0);
+                    ilProcessor.InsertAfter(last, next);
+                    last = next;
+                }
+
             }
         }
-
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+    */
     }
 }

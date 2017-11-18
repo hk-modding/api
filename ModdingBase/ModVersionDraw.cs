@@ -1,5 +1,7 @@
 ﻿using GlobalEnums;
 using UnityEngine;
+// ReSharper disable All
+#pragma warning disable 1591
 
 namespace Modding
 {
@@ -34,6 +36,10 @@ namespace Modding
 				GUI.matrix = matrix;
 			}
 		}
+
+        /// <summary>
+        /// String to Draw
+        /// </summary>
 		public string drawString;
 
 	    private static GUIStyle style;

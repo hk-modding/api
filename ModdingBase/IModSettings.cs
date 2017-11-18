@@ -21,6 +21,10 @@ namespace Modding
 		}
 
 	    
+        /// <summary>
+        /// Hydrates the classes dictionaries with incoming data.
+        /// </summary>
+        /// <param name="incommingSettings">Incoming Settings</param>
 	    public void SetSettings(IModSettings incommingSettings)
 	    {
 	        StringValues = incommingSettings.StringValues;

@@ -1,6 +1,9 @@
 ﻿using MonoMod;
 using UnityEngine;
-
+//We don't care about XML docs for these as they are being patched into the original code
+// ReSharper disable All
+#pragma warning disable 1591
+#pragma warning disable CS0649
 namespace Modding.Patches
 {
 
@@ -17,6 +20,7 @@ namespace Modding.Patches
         private bool controllerPressed;
 
         //Reverted cursor behavior
+        [MonoModReplace]
         private void OnGUI()
         {
             Cursor.lockState = CursorLockMode.None;

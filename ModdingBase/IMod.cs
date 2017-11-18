@@ -29,6 +29,9 @@
     /// <typeparam name="T">Implementation of <see cref="IModSettings"/></typeparam>
     public interface IMod<T> : IMod where T : IModSettings
 	{
+		/// <summary>
+		/// Settings For the Mod that would be saved with the save file.
+		/// </summary>
 		T Settings { get; set; }
 	}
 }

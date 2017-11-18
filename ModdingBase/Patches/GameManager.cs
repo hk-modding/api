@@ -1,13 +1,16 @@
 ﻿using MonoMod;
+//We don't care about XML docs for these as they are being patched into the original code
+#pragma warning disable 1591
+#pragma warning disable CS0108
 
 namespace Modding.Patches
 {
 
     [MonoModPatch("global::GameManager")]
-    public class GameManager : global::GameManager
+    public partial class GameManager : global::GameManager
     {
 
-        /*TODO: SaveGame(int)
+        /*DRMDONE: SaveGame(int)
             Change string text4 = JsonUtility.ToJson(new SaveGameData(this.playerData, this.sceneData), !this.gameConfig.useSaveEncryption);
 					SaveGameData saveGameData = new SaveGameData(this.playerData, this.sceneData);
             		Modding.ModHooks.Instance.OnBeforeSaveGameSave(saveGameData);
@@ -18,7 +21,7 @@ namespace Modding.Patches
       			Modding.ModHooks.Instance.OnSavegameSave(saveSlot);
         */
 
-        /*TODO: LoadGame(int)
+        /*DRMDONE: LoadGame(int)
            Add this right after SceneData instance2 = saveGameData.sceneData;
                 Modding.ModHooks.Instance.OnAfterSaveGameLoad(saveGameData);
            Add this right after this.inputHandler.RefreshPlayerData();
@@ -61,6 +64,7 @@ namespace Modding.Patches
             orig_ClearSaveFile(saveSlot);
             ModHooks.Instance.OnAfterSaveGameClear(saveSlot);
         }
+
 
 
     }

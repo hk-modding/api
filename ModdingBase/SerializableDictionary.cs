@@ -12,6 +12,9 @@ namespace Modding
     [Serializable]
 	public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
 	{
+        /// <summary>
+        /// Occurse before something isserialized.
+        /// </summary>
 		public void OnBeforeSerialize()
 		{
 			keys.Clear();
@@ -22,6 +25,10 @@ namespace Modding
 			    values.Add(pair.Value);
 			}
 		}
+
+        /// <summary>
+        /// Occurs after the object was deserialized
+        /// </summary>
 		public void OnAfterDeserialize()
 		{
 			Clear();

@@ -1,5 +1,7 @@
 ﻿using MonoMod;
-
+//We don't care about XML docs for these as they are being patched into the original code
+// ReSharper disable All
+#pragma warning disable 1591
 namespace Modding.Patches
 {
     [MonoModPatch("global::OnScreenDebugInfo")]

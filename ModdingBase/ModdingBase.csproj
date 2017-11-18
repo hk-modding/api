@@ -8,10 +8,12 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Modding</RootNamespace>
-    <AssemblyName>Assembly-CSharp.dll.mm</AssemblyName>
+    <AssemblyName>Assembly-CSharp.mm</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <NoStdLib>True</NoStdLib>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,9 +31,10 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Assembly-CSharp.dll.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Assembly-CSharp.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Handlers.cs" />
     <Compile Include="HookInfoAttribute.cs" />
     <Compile Include="IMod.cs" />
@@ -45,6 +48,8 @@
     <Compile Include="ModLoader.cs" />
     <Compile Include="ModSettingsDictionary.cs" />
     <Compile Include="ModVersionDraw.cs" />
+    <Compile Include="Patches\DRM\GameManager.cs" />
+    <Compile Include="Patches\DRM\HeroController.cs" />
     <Compile Include="Patches\GameManager.cs" />
     <Compile Include="Patches\HeroController.cs" />
     <Compile Include="Patches\InputHandler.cs" />
@@ -64,9 +69,6 @@
     <Compile Include="SerializableStringDictionary.cs" />
     <Compile Include="VoidModSettings.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -75,12 +77,16 @@
     </Reference>
     <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MonoMod\bin\Debug\Mono.Cecil.dll</HintPath>
+      <HintPath>..\MonoMod\Mono.Cecil.dll</HintPath>
     </Reference>
-    <Reference Include="MonoMod">
-      <HintPath>..\..\MonoMod\bin\Debug\MonoMod.exe</HintPath>
+    <Reference Include="MonoMod, Version=17.4.6530.30093, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\MonoMod\MonoMod.exe</HintPath>
     </Reference>
-    <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Vanilla\PlayMaker.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <HintPath>..\Vanilla\System.dll</HintPath>
     </Reference>
@@ -91,11 +97,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Vanilla\UnityEngine.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="ilmerge">
-      <Version>2.14.1208</Version>
-    </PackageReference>
+    <Reference Include="mscorlib.dll">
+      <HintPath>..\Vanilla\mscorlib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup />
   <Target Name="ILMerge">
@@ -103,7 +107,16 @@
     <Exec Command="$(ILMergeConsolePath) /out:$(SolutionDir)/Output/Assembly-CSharp.dll Assembly-CSharp.dll ModdingBase.dll" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(SolutionDir)Vanilla\*" "$(SolutionDir)Output1\"
-rem "$(SolutionDir)packages/ILMerge.2.14.1208/tools/ILMerge.exe" /targetPlatform:v2 /out:$(SolutionDir)Output1\Assembly-CSharp.dll "$(SolutionDir)Vanilla/Assembly-CSharp.dll" "$(ProjectDir)$(OutputPath)ModdingBase.dll"</PostBuildEvent>
+    <PostBuildEvent>rem move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.dll"
+rem move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.pdb" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.pdb"
+copy /Y "$(SolutionDir)Vanilla\*" "$(ProjectDir)$(OutputPath)\"
+copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
+cd "$(ProjectDir)$(OutputPath)"
+MonoMod.exe Assembly-Csharp.dll
+copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinal\Assembly-CSharp.dll"
+copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)OutputFinal\"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>rd "$(ProjectDir)$(OutputPath)" /s /q</PreBuildEvent>
   </PropertyGroup>
 </Project>

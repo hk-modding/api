@@ -15,11 +15,16 @@ namespace Modding
 
         private readonly LogLevel _logLevel;
 
+        /// <summary>
+        /// Logger Constructor.  Initializes file to write to.
+        /// </summary>
+        /// <param name="loglevel"></param>
+        /// <param name="path"></param>
         public Logger(LogLevel loglevel, string path)
         {
             _logLevel = loglevel;
 
-            FileStream fileStream = new FileStream(path, FileMode.Append, FileAccess.ReadWrite, FileShare.ReadWrite);
+            FileStream fileStream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
             _writer = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
         }
 
