@@ -8,12 +8,14 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Modding</RootNamespace>
-    <AssemblyName>Assembly-CSharp.mm</AssemblyName>
+    <AssemblyName>Assembly-CSharp</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
-    <NoStdLib>True</NoStdLib>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <!-- <NoStdLib>True</NoStdLib>-->
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,6 +25,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Assembly-CSharp.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,8 +36,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Assembly-CSharp.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CallerMemberName.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Handlers.cs" />
     <Compile Include="HookInfoAttribute.cs" />
@@ -97,22 +103,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Vanilla\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="mscorlib.dll">
-      <HintPath>..\Vanilla\mscorlib.dll</HintPath>
-    </Reference>
   </ItemGroup>
-  <ItemGroup />
   <Target Name="ILMerge">
     <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
     <Exec Command="$(ILMergeConsolePath) /out:$(SolutionDir)/Output/Assembly-CSharp.dll Assembly-CSharp.dll ModdingBase.dll" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>rem move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.dll"
-rem move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.pdb" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.pdb"
+    <PostBuildEvent>move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.dll"
+move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.pdb" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.pdb"
 copy /Y "$(SolutionDir)Vanilla\*" "$(ProjectDir)$(OutputPath)\"
 copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
 cd "$(ProjectDir)$(OutputPath)"
-MonoMod.exe Assembly-Csharp.dll
+MonoMod.exe Assembly-CSharp.dll
 copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinal\Assembly-CSharp.dll"
 copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)OutputFinal\"</PostBuildEvent>
   </PropertyGroup>

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using GlobalEnums;
+using MonoMod;
 using UnityEngine;
+
 
 namespace Modding
 {
@@ -12,6 +13,11 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
+        private static int _modVersion = 13;
+
+
+
+
         private static readonly string LogPath = Application.persistentDataPath + "\\ModLog.txt";
         private static readonly string SettingsPath = Application.persistentDataPath + "\\ModdingApi.GlobalSettings.json";
         private static ModHooks _instance;
@@ -23,7 +29,10 @@ namespace Modding
             get
             {
                 if (_globalSettings == null)
+                {
                     LoadGlobalSettings();
+                    SaveGlobalSettings();
+                }
                 return _globalSettings;
             }
             set
@@ -40,21 +49,31 @@ namespace Modding
 
         private static Logger _logger;
 
+        /// <summary>
+        /// Currently Loaded Mods
+        /// </summary>
         public List<string> LoadedMods = new List<string>();
+
+        /// <summary>
+        /// The Version of the Modding API
+        /// </summary>
         public string ModVersion;
 
-        private static int _modVersion = 7;
 
+        /// <summary>
+        /// Version of the Game
+        /// </summary>
         public GameVersionData version;
 
         private ModHooks()
         {
+
             GameVersion gameVersion;
             gameVersion.major = 1;
             gameVersion.minor = 2;
             gameVersion.revision = 2;
             gameVersion.package = 1;
-            version = new GameVersionData {gameVersion = gameVersion};
+            version = new GameVersionData { gameVersion = gameVersion };
 
             ModVersion = version.GetGameVersionString() + "-" + _modVersion;
             if (File.Exists(LogPath))
@@ -66,7 +85,17 @@ namespace Modding
         /// <summary>
         /// Current instance of Modhooks.
         /// </summary>
-	    public static ModHooks Instance => _instance ?? (_instance = new ModHooks());
+	    public static ModHooks Instance
+        {
+            get
+            {
+                if (_instance != null) return _instance;
+
+                _instance = new ModHooks();
+                _instance.ApplicationQuitHook += SaveGlobalSettings;
+                return _instance;
+            }
+        }
 
         /// <summary>
         /// Logs the message to ModLog.txt in the save file path.
@@ -85,16 +114,36 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.SetBool</remarks>
         [HookInfo("Called when anything in the game tries to set a bool in player data", "PlayerData.SetBool")]
-        public event SetBoolProxy SetPlayerBoolHook;
+        public event SetBoolProxy SetPlayerBoolHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerBoolHook");
+                _SetPlayerBoolHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerBoolHook");
+                _SetPlayerBoolHook -= value;
+            }
+        }
+
+        private event SetBoolProxy _SetPlayerBoolHook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.SetBool 
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
+        /// <param name="val">Value to set</param>
         public void SetPlayerBool(string target, bool val)
         {
-            if (SetPlayerBoolHook != null)
+            if (_SetPlayerBoolHook != null)
             {
-                SetPlayerBoolHook(target, val);
+                _SetPlayerBoolHook(target, val);
                 return;
             }
-            PlayerData.instance.SetBoolInternal(target, val);
+            Patches.PlayerData.instance.SetBoolInternal(target, val);
         }
 
 
@@ -103,16 +152,37 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.GetBool</remarks>
         [HookInfo("Called when anything in the game tries to get a bool from player data", "PlayerData.GetBool")]
-        public event GetBoolProxy GetPlayerBoolHook;
+        public event GetBoolProxy GetPlayerBoolHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerBoolHook");
+                _GetPlayerBoolHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerBoolHook");
+                _GetPlayerBoolHook -= value;
+            }
+        }
+
+        private event GetBoolProxy _GetPlayerBoolHook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.GetBool
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
         public bool GetPlayerBool(string target)
         {
-            bool boolInternal = PlayerData.instance.GetBoolInternal(target);
+            //Logger.LogFine("[API] - GetPlayerbool Invoked"); //Probably not going to enable this, even in Fine, Likely going to produce far too much 
+
+            bool boolInternal = Patches.PlayerData.instance.GetBoolInternal(target);
             bool result = boolInternal;
             bool flag = false;
-            if (GetPlayerBoolHook == null) return result;
+            if (_GetPlayerBoolHook == null) return result;
 
-            Delegate[] invocationList = GetPlayerBoolHook.GetInvocationList();
+            Delegate[] invocationList = _GetPlayerBoolHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 bool flag2 = (bool)toInvoke.DynamicInvoke(target);
@@ -129,16 +199,36 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.SetInt</remarks>
         [HookInfo("Called when anything in the game tries to set an int in player data", "PlayerData.SetInt")]
-        public event SetIntProxy SetPlayerIntHook;
+        public event SetIntProxy SetPlayerIntHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerIntHook");
+                _SetPlayerIntHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerIntHook");
+                _SetPlayerIntHook -= value;
+            }
+        }
+
+        private event SetIntProxy _SetPlayerIntHook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.SetInt 
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
+        /// <param name="val">Value to set</param>
         public void SetPlayerInt(string target, int val)
         {
-            if (SetPlayerIntHook != null)
+            if (_SetPlayerIntHook != null)
             {
-                SetPlayerIntHook(target, val);
+                _SetPlayerIntHook(target, val);
                 return;
             }
-            PlayerData.instance.SetIntInternal(target, val);
+            Patches.PlayerData.instance.SetIntInternal(target, val);
         }
 
         /// <summary>
@@ -146,16 +236,37 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.GetInt</remarks>
         [HookInfo("Called when anything in the game tries to get an int from player data", "PlayerData.GetInt")]
-        public event GetIntProxy GetPlayerIntHook;
+        public event GetIntProxy GetPlayerIntHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerIntHook");
+                _GetPlayerIntHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerIntHook");
+                _GetPlayerIntHook -= value;
+            }
+        }
+
+        private event GetIntProxy _GetPlayerIntHook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.GetInt 
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
         public int GetPlayerInt(string target)
         {
-            int intInternal = PlayerData.instance.GetIntInternal(target);
+            //Logger.LogFine("[API] - GetPlayerInt Invoked"); //Probably not going to enable this, even in Fine, Likely going to produce far too much 
+
+            int intInternal = Patches.PlayerData.instance.GetIntInternal(target);
             int result = intInternal;
             bool flag = false;
-            if (GetPlayerIntHook == null) return result;
+            if (_GetPlayerIntHook == null) return result;
 
-            Delegate[] invocationList = GetPlayerIntHook.GetInvocationList();
+            Delegate[] invocationList = _GetPlayerIntHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 int num = (int)toInvoke.DynamicInvoke(target);
@@ -167,30 +278,69 @@ namespace Modding
             return result;
         }
 
+        private event NewPlayerDataHandler _NewPlayerDataHook;
+
         /// <summary>
         /// Called after setting up a new PlayerData
         /// </summary>
         /// <remarks>PlayerData.SetupNewPlayerData</remarks>
         [HookInfo("Called after setting up a new PlayerData", "PlayerData.SetupNewPlayerData")]
-        public event NewPlayerDataHandler NewPlayerDataHook;
-
-        public void AfterNewPlayerData()
+        public event NewPlayerDataHandler NewPlayerDataHook
         {
-            NewPlayerDataHook?.Invoke(PlayerData.instance);
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding NewPlayerDataHook");
+                _NewPlayerDataHook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing NewPlayerDataHook");
+                _NewPlayerDataHook -= value;
+            }
+        }
+
+        /// <summary>
+        /// Called after setting up a new PlayerData.SetupNewPlayerData
+        /// </summary>
+        public void AfterNewPlayerData(PlayerData instance)
+        {
+            Logger.LogFine("[API] - AfterNewPlayerData Invoked");
+            _NewPlayerDataHook?.Invoke(instance);
         }
 
         /// <summary>
         /// Called whenever blue health is updated
         /// </summary>
         [HookInfo("Called whenever blue health is updated", "PlayerData.UpdateBlueHealth")]
-        public event BlueHealthHandler BlueHealthHook;
+        public event BlueHealthHandler BlueHealthHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding BlueHealthHook");
+                _BlueHealthHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing BlueHealthHook");
+                _BlueHealthHook -= value;
+            }
+        }
+
+        private event BlueHealthHandler _BlueHealthHook;
+
+        /// <summary>
+        /// Called whenever blue health is updated
+        /// </summary>
         public int OnBlueHealth()
         {
-            int result = 0;
-            if (BlueHealthHook == null) return result;
+            Logger.LogFine("[API] - OnBlueHealth Invoked");
 
-            Delegate[] invocationList = BlueHealthHook.GetInvocationList();
+            int result = 0;
+            if (_BlueHealthHook == null) return result;
+
+            Delegate[] invocationList = _BlueHealthHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 result = (int)toInvoke.DynamicInvoke();
@@ -204,13 +354,34 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.TakeHealth</remarks>
         [HookInfo("Called when health is taken from the player", "PlayerData.TakeHealth")]
-        public event TakeHealthProxy TakeHealthHook;
+        public event TakeHealthProxy TakeHealthHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding TakeHealthHook");
+                _TakeHealthHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing TakeHealthHook");
+                _TakeHealthHook -= value;
+            }
+        }
+
+        private event TakeHealthProxy _TakeHealthHook;
+
+        /// <summary>
+        /// Called when health is taken from the player
+        /// </summary>
+        /// <remarks>HeroController.TakeHealth</remarks>
         public int OnTakeHealth(int damage)
         {
-            if (TakeHealthHook == null) return damage;
+            Logger.LogFine("[API] - OnTakeHealth Invoked");
 
-            Delegate[] invocationList = TakeHealthHook.GetInvocationList();
+            if (_TakeHealthHook == null) return damage;
+
+            Delegate[] invocationList = _TakeHealthHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 damage = (int)toInvoke.DynamicInvoke(damage);
@@ -223,13 +394,34 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.TakeDamage</remarks>
         [HookInfo("Called when damage is dealt to the player", "HeroController.TakeDamage")]
-        public event TakeDamageProxy TakeDamageHook;
+        public event TakeDamageProxy TakeDamageHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding TakeDamageHook");
+                _TakeDamageHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing TakeDamageHook");
+                _TakeDamageHook -= value;
+            }
+        }
+
+        private event TakeDamageProxy _TakeDamageHook;
+
+        /// <summary>
+        /// Called when damage is dealt to the player
+        /// </summary>
+        /// <remarks>HeroController.TakeDamage</remarks>
         public int OnTakeDamage(ref int hazardType, int damage)
         {
-            if (TakeDamageHook == null) return damage;
+            Logger.LogFine("[API] - OnTakeDamage Invoked");
 
-            Delegate[] invocationList = TakeDamageHook.GetInvocationList();
+            if (_TakeDamageHook == null) return damage;
+
+            Delegate[] invocationList = _TakeDamageHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 damage = (int)toInvoke.DynamicInvoke(hazardType, damage);
@@ -241,78 +433,206 @@ namespace Modding
         /// Called at the end of the take damage function
         /// </summary>
         [HookInfo("Called at the end of the take damage function", "HeroController.TakeDamage")]
-        public event AfterTakeDamageHandler AfterTakeDamageHook;
+        public event AfterTakeDamageHandler AfterTakeDamageHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AfterTakeDamageHook");
+                _AfterTakeDamageHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AfterTakeDamageHook");
+                _AfterTakeDamageHook -= value;
+            }
+        }
+
+        private event AfterTakeDamageHandler _AfterTakeDamageHook;
+
+        /// <summary>
+        /// Called at the end of the take damage function
+        /// </summary>
         public int AfterTakeDamage(int hazardType, int damageAmount)
         {
-            if (AfterTakeDamageHook == null) return damageAmount;
+            Logger.LogFine("[API] - AfterTakeDamage Invoked");
 
-            Delegate[] invocationList = AfterTakeDamageHook.GetInvocationList();
+            if (_AfterTakeDamageHook == null) return damageAmount;
+
+            Delegate[] invocationList = _AfterTakeDamageHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 damageAmount = (int)toInvoke.DynamicInvoke(hazardType, damageAmount);
             }
             return damageAmount;
         }
-        
+
 
         /// <summary>
         /// Called whenever the player attacks
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
         [HookInfo("Called whenever the player attacks", "HeroController.Attack")]
-        public event AttackHandler AttackHook;
+        public event AttackHandler AttackHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AttackHook");
+                _AttackHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AttackHook");
+                _AttackHook -= value;
+            }
+        }
+
+        private event AttackHandler _AttackHook;
+
+        /// <summary>
+        /// Called whenever the player attacks
+        /// </summary>
+        /// <remarks>HeroController.Attack</remarks>
         public void OnAttack(AttackDirection dir)
         {
-            AttackHook?.Invoke(dir);
+            Logger.LogFine("[API] - OnAttack Invoked");
+
+            _AttackHook?.Invoke(dir);
         }
 
         /// <summary>
         /// Called at the start of the DoAttack function
         /// </summary>
         [HookInfo("Called at the start of the DoAttack function", "HeroController.DoAttack")]
-        public event DoAttackHandler DoAttackHook;
+        public event DoAttackHandler DoAttackHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding DoAttackHook");
+                _DoAttackHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing DoAttackHook");
+                _DoAttackHook -= value;
+            }
+        }
+
+        private event DoAttackHandler _DoAttackHook;
+
+
+        /// <summary>
+        /// Called at the start of the DoAttack function
+        /// </summary>
         public void OnDoAttack()
         {
-            DoAttackHook?.Invoke();
+            Logger.LogFine("[API] - OnDoAttack Invoked");
+
+            _DoAttackHook?.Invoke();
         }
-        
+
 
         /// <summary>
         /// Called at the end of the attack function
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
         [HookInfo("Called at the end of the attack function", "HeroController.Attack")]
-        public event AfterAttackHandler AfterAttackHook;
+        [MonoModPublic]
+        public event AfterAttackHandler AfterAttackHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AfterAttackHook");
+                _AfterAttackHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AfterAttackHook");
+                _AfterAttackHook -= value;
+            }
+        }
+
+        private event AfterAttackHandler _AfterAttackHook;
+
+        /// <summary>
+        /// Called at the end of the attack function
+        /// </summary>
+        /// <remarks>HeroController.Attack</remarks>
         public void AfterAttack(AttackDirection dir)
         {
-            AfterAttackHook?.Invoke(dir);
+            Logger.LogFine("[API] - AfterAttack Invoked");
+
+            _AfterAttackHook?.Invoke(dir);
         }
 
         /// <summary>
         /// Called whenever nail strikes something
         /// </summary>
         [HookInfo("Called whenever nail strikes something", "NailSlash.OnTriggerEnter2D")]
-        public event SlashHitHandler SlashHitHook;
+        public event SlashHitHandler SlashHitHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SlashHitHook");
+                _SlashHitHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SlashHitHook");
+                _SlashHitHook -= value;
+            }
+        }
+
+        private event SlashHitHandler _SlashHitHook;
+
+        /// <summary>
+        /// Called whenever nail strikes something
+        /// </summary>
         public void OnSlashHit(Collider2D otherCollider, GameObject gameObject)
         {
-            SlashHitHook?.Invoke(otherCollider, gameObject);
+            Logger.LogFine("[API] - OnSlashHit Invoked");
+
+            if (otherCollider == null) return;
+
+            _SlashHitHook?.Invoke(otherCollider, gameObject);
         }
-        
+
         /// <summary>
         /// Called after player values for charms have been set
         /// </summary>
         /// <remarks>HeroController.CharmUpdate</remarks>
         [HookInfo("Called after player values for charms have been set", "HeroController.CharmUpdate")]
-        public event CharmUpdateHandler CharmUpdateHook;
+        public event CharmUpdateHandler CharmUpdateHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding CharmUpdateHook");
+                _CharmUpdateHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing CharmUpdateHook");
+                _CharmUpdateHook -= value;
+            }
+        }
+
+        private event CharmUpdateHandler _CharmUpdateHook;
+
+
+        /// <summary>
+        /// Called after player values for charms have been set
+        /// </summary>
+        /// <remarks>HeroController.CharmUpdate</remarks>
         public void OnCharmUpdate()
         {
-            CharmUpdateHook?.Invoke(PlayerData.instance, HeroController.instance);
+            Logger.LogFine("[API] - OnCharmUpdate Invoked");
+
+            _CharmUpdateHook?.Invoke(PlayerData.instance, HeroController.instance);
         }
 
         /// <summary>
@@ -320,25 +640,67 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.Update</remarks>
         [HookInfo("Called whenever the hero updates", "HeroController.Update")]
-        public event HeroUpdateHandler HeroUpdateHook;
+        public event HeroUpdateHandler HeroUpdateHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding HeroUpdateHook");
+                _HeroUpdateHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing HeroUpdateHook");
+                _HeroUpdateHook -= value;
+            }
+        }
+
+        private event HeroUpdateHandler _HeroUpdateHook;
+
+
+        /// <summary>
+        /// Called whenever the hero updates
+        /// </summary>
+        /// <remarks>HeroController.Update</remarks>
         public void OnHeroUpdate()
         {
-            HeroUpdateHook?.Invoke();
+            //Logger.LogFine("[API] - OnHeroUpdate Invoked");
+
+            _HeroUpdateHook?.Invoke();
         }
 
         /// <summary>
         /// Called whenever focus cost is calculated
         /// </summary>
         [HookInfo("Called whenever focus cost is calculated", "HeroController.StartMPDrain")]
-        public event FocusCostHandler FocusCostHook;
+        public event FocusCostHandler FocusCostHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding FocusCostHook");
+                _FocusCostHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing FocusCostHook");
+                _FocusCostHook -= value;
+            }
+        }
+
+        private event FocusCostHandler _FocusCostHook;
+
+        /// <summary>
+        /// Called whenever focus cost is calculated
+        /// </summary>
         public int OnFocusCost()
         {
-            int result = 1;
-            if (FocusCostHook == null) return result;
+            Logger.LogFine("[API] - OnFocusCost Invoked");
 
-            Delegate[] invocationList = FocusCostHook.GetInvocationList();
+            int result = 1;
+            if (_FocusCostHook == null) return result;
+
+            Delegate[] invocationList = _FocusCostHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 result = (int)toInvoke.DynamicInvoke();
@@ -350,13 +712,34 @@ namespace Modding
         /// Called when Hero recovers Soul from hitting enemies
         /// </summary>
         [HookInfo("Called when Hero recovers Soul from hitting enemies", "HeroController.SoulGain")]
-        public event SoulGainHandler SoulGainHook;
+        public event SoulGainHandler SoulGainHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SoulGainHook");
+                _SoulGainHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SoulGainHook");
+                _SoulGainHook -= value;
+            }
+        }
+
+        private event SoulGainHandler _SoulGainHook;
+
+
+        /// <summary>
+        /// Called when Hero recovers Soul from hitting enemies
+        /// </summary>
         public int OnSoulGain(int num)
         {
-            if (SoulGainHook == null) return num;
+            Logger.LogFine("[API] - OnSoulGain Invoked");
 
-            Delegate[] invocationList = SoulGainHook.GetInvocationList();
+            if (_SoulGainHook == null) return num;
+
+            Delegate[] invocationList = _SoulGainHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 num = (int)toInvoke.DynamicInvoke(num);
@@ -370,11 +753,32 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.Dash</remarks>
         [HookInfo("Called during dash function to change velocity", "HeroController.Dash")]
-        public event DashVelocityHandler DashVectorHook;
-
-        public Vector2 DashVelocityChange()
+        public event DashVelocityHandler DashVectorHook
         {
-            return DashVectorHook?.Invoke() ?? Vector2.zero;
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding DashVectorHook");
+                _DashVectorHook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing DashVectorHook");
+                _DashVectorHook -= value;
+            }
+        }
+
+        private event DashVelocityHandler _DashVectorHook;
+
+        /// <summary>
+        /// Called during dash function to change velocity
+        /// </summary>
+        /// <remarks>HeroController.Dash</remarks>
+        public Vector2? DashVelocityChange()
+        {
+            Logger.LogFine("[API] - DashVelocityChange Invoked");
+
+            return _DashVectorHook?.Invoke() ?? Vector2.zero;
         }
 
         /// <summary>
@@ -382,13 +786,34 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.LookForQueueInput</remarks>
         [HookInfo("Called whenever the dash key is pressed. Overrides normal dash functionality", "HeroController.LookForQueueInput")]
-        public event DashPressedHandler DashPressedHook;
+        public event DashPressedHandler DashPressedHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding DashPressedHook");
+                _DashPressedHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing DashPressedHook");
+                _DashPressedHook -= value;
+            }
+        }
+
+        private event DashPressedHandler _DashPressedHook;
+
+        /// <summary>
+        /// Called whenever the dash key is pressed. Overrides normal dash functionality
+        /// </summary>
+        /// <remarks>HeroController.LookForQueueInput</remarks>
         public bool OnDashPressed()
         {
-            if (DashPressedHook == null) return false;
+            Logger.LogFine("[API] - OnDashPressed Invoked");
 
-            DashPressedHook();
+            if (_DashPressedHook == null) return false;
+
+            _DashPressedHook();
             return true;
         }
 
@@ -403,11 +828,33 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
         [HookInfo("Called directly after a save has been loaded", "GameManager.LoadGame")]
-        public event SavegameLoadHandler SavegameLoadHook;
+        public event SavegameLoadHandler SavegameLoadHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SavegameLoadHook");
+                _SavegameLoadHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SavegameLoadHook");
+                _SavegameLoadHook -= value;
+            }
+        }
+
+        private event SavegameLoadHandler _SavegameLoadHook;
+
+
+        /// <summary>
+        /// Called directly after a save has been loaded
+        /// </summary>
+        /// <remarks>GameManager.LoadGame</remarks>
         public void OnSavegameLoad(int id)
         {
-            SavegameLoadHook?.Invoke(id);
+            Logger.LogFine("[API] - OnSavegameLoad Invoked");
+
+            _SavegameLoadHook?.Invoke(id);
         }
 
         /// <summary>
@@ -415,11 +862,32 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
         [HookInfo("Called directly after a save has been saved", "GameManager.SaveGame")]
-        public event SavegameSaveHandler SavegameSaveHook;
+        public event SavegameSaveHandler SavegameSaveHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SavegameSaveHook");
+                _SavegameSaveHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SavegameSaveHook");
+                _SavegameSaveHook -= value;
+            }
+        }
+
+        private event SavegameSaveHandler _SavegameSaveHook;
+
+        /// <summary>
+        /// Called directly after a save has been saved
+        /// </summary>
+        /// <remarks>GameManager.SaveGame</remarks>
         public void OnSavegameSave(int id)
         {
-            SavegameSaveHook?.Invoke(id);
+            Logger.LogFine("[API] - OnSavegameSave Invoked");
+
+            _SavegameSaveHook?.Invoke(id);
         }
 
         /// <summary>
@@ -427,11 +895,32 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.LoadFirstScene</remarks>
         [HookInfo("Called whenever a new game is started", "GameManager.LoadFirstScene")]
-        public event NewGameHandler NewGameHook;
+        public event NewGameHandler NewGameHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding NewGameHook");
+                _NewGameHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing NewGameHook");
+                _NewGameHook -= value;
+            }
+        }
+
+        private event NewGameHandler _NewGameHook;
+
+        /// <summary>
+        /// Called whenever a new game is started
+        /// </summary>
+        /// <remarks>GameManager.LoadFirstScene</remarks>
         public void OnNewGame()
         {
-            NewGameHook?.Invoke();
+            Logger.LogFine("[API] - OnNewGame Invoked");
+
+            _NewGameHook?.Invoke();
         }
 
         /// <summary>
@@ -439,11 +928,32 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.ClearSaveFile</remarks>
         [HookInfo("Called whenever a save file is deleted", "GameManager.ClearSaveFile")]
-        public event ClearSaveGameHandler SavegameClearHook;
+        public event ClearSaveGameHandler SavegameClearHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SavegameClearHook");
+                _SavegameClearHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SavegameClearHook");
+                _SavegameClearHook -= value;
+            }
+        }
+
+        private event ClearSaveGameHandler _SavegameClearHook;
+
+        /// <summary>
+        /// Called before a save file is deleted
+        /// </summary>
+        /// <remarks>GameManager.ClearSaveFile</remarks>
         public void OnSavegameClear(int id)
         {
-            SavegameClearHook?.Invoke(id);
+            Logger.LogFine("[API] - OnSavegameClear Invoked");
+
+            _SavegameClearHook?.Invoke(id);
         }
 
         /// <summary>
@@ -451,11 +961,32 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
         [HookInfo("Called directly after a save has been loaded.  Allows for accessing SaveGame instance.", "GameManager.LoadGame")]
-        public event AfterSavegameLoadHandler AfterSavegameLoadHook;
-
-        public void OnAfterSaveGameLoad(SaveGameData data)
+        public event AfterSavegameLoadHandler AfterSavegameLoadHook
         {
-            AfterSavegameLoadHook?.Invoke(data);
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AfterSavegameLoadHook");
+                _AfterSavegameLoadHook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AfterSavegameLoadHook");
+                _AfterSavegameLoadHook -= value;
+            }
+        }
+
+        private event AfterSavegameLoadHandler _AfterSavegameLoadHook;
+
+        /// <summary>
+        /// Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
+        /// </summary>
+        /// <remarks>GameManager.LoadGame</remarks>
+        public void OnAfterSaveGameLoad(Patches.SaveGameData data)
+        {
+            Logger.LogFine("[API] - OnAfterSaveGameLoad Invoked");
+
+            _AfterSavegameLoadHook?.Invoke(data);
         }
 
         /// <summary>
@@ -463,35 +994,96 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
         [HookInfo("Called directly before save has been saved to allow for changes to the data before persisted.", "GameManager.SaveGame")]
-        public event BeforeSavegameSaveHandler BeforeSavegameSaveHook;
-
-        public void OnBeforeSaveGameSave(SaveGameData data)
+        public event BeforeSavegameSaveHandler BeforeSavegameSaveHook
         {
-            BeforeSavegameSaveHook?.Invoke(data);
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding BeforeSavegameSaveHook");
+                _BeforeSavegameSaveHook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing BeforeSavegameSaveHook");
+                _BeforeSavegameSaveHook -= value;
+            }
+        }
+
+        private event BeforeSavegameSaveHandler _BeforeSavegameSaveHook;
+
+        /// <summary>
+        /// Called directly before save has been saved to allow for changes to the data before persisted.
+        /// </summary>
+        /// <remarks>GameManager.SaveGame</remarks>
+        public void OnBeforeSaveGameSave(Patches.SaveGameData data)
+        {
+            Logger.LogFine("[API] - OnBeforeSaveGameSave Invoked");
+
+            _BeforeSavegameSaveHook?.Invoke(data);
         }
 
         /// <summary>
         /// Overrides the filename to load for a given slot.  Return null to use vanilla names.
         /// </summary>
         [HookInfo("Overrides the filename for a slot.", "GameManager.SaveGameClear")]
-        public event GetSaveFileNameHandler GetSaveFileNameHook;
+        public event GetSaveFileNameHandler GetSaveFileNameHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetSaveFileNameHook");
+                _GetSaveFileNameHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetSaveFileNameHook");
+                _GetSaveFileNameHook -= value;
+            }
+        }
+
+        private event GetSaveFileNameHandler _GetSaveFileNameHook;
+
+        /// <summary>
+        /// Overrides the filename to load for a given slot.  Return null to use vanilla names.
+        /// </summary>
         public string GetSaveFileName(int saveSlot)
         {
-            return GetSaveFileNameHook?.Invoke(saveSlot);
+            Logger.LogFine("[API] - GetSaveFileName Invoked");
+
+            return _GetSaveFileNameHook?.Invoke(saveSlot);
         }
 
         /// <summary>
         /// Called after a game has been cleared from a slot.
         /// </summary>
         [HookInfo("Called after a savegame has been cleared.", "GameManager.GetSaveFilename")]
-        public event AfterClearSaveGameHandler AfterSaveGameClearHook;
+        public event AfterClearSaveGameHandler AfterSaveGameClearHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AfterSaveGameClearHook");
+                _AfterSaveGameClearHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AfterSaveGameClearHook");
+                _AfterSaveGameClearHook -= value;
+            }
+        }
+
+        private event AfterClearSaveGameHandler _AfterSaveGameClearHook;
+
+        /// <summary>
+        /// Called after a game has been cleared from a slot.
+        /// </summary>
         public void OnAfterSaveGameClear(int saveSlot)
         {
-            AfterSaveGameClearHook?.Invoke(saveSlot);
+            Logger.LogFine("[API] - OnAfterSaveGameClear Invoked");
+
+            _AfterSaveGameClearHook?.Invoke(saveSlot);
         }
-        
+
         #endregion
 
         /// <summary>
@@ -499,16 +1091,35 @@ namespace Modding
         /// </summary>
         /// <remarks>N/A</remarks>
         [HookInfo("Called whenever localization specific strings are requested", "N/A")]
-        public event LanguageGetHandler LanguageGetHook;
+        public event LanguageGetHandler LanguageGetHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding LanguageGetHook");
+                _LanguageGetHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing LanguageGetHook");
+                _LanguageGetHook -= value;
+            }
+        }
+
+        private event LanguageGetHandler _LanguageGetHook;
+
+        /// <summary>
+        /// Called whenever localization specific strings are requested
+        /// </summary>
+        /// <remarks>N/A</remarks>
         public string LanguageGet(string key, string sheet)
         {
-            string @internal = Language.Language.GetInternal(key, sheet);
+            string @internal = Patches.Language.GetInternal(key, sheet);
             string result = @internal;
             bool flag = false;
-            if (LanguageGetHook == null) return result;
+            if (_LanguageGetHook == null) return result;
 
-            Delegate[] invocationList = LanguageGetHook.GetInvocationList();
+            Delegate[] invocationList = _LanguageGetHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 string text = (string)toInvoke.DynamicInvoke(key, sheet);
@@ -527,11 +1138,32 @@ namespace Modding
         /// </summary>
         /// <remarks>N/A</remarks>
         [HookInfo("Called after a new Scene has been loaded", "GameManager.LoadScene")]
-        public event SceneChangedHandler SceneChanged;
+        public event SceneChangedHandler SceneChanged
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SceneChanged");
+                _SceneChanged += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SceneChanged");
+                _SceneChanged -= value;
+            }
+        }
+
+        private event SceneChangedHandler _SceneChanged;
+
+        /// <summary>
+        /// Called after a new Scene has been loaded
+        /// </summary>
+        /// <remarks>N/A</remarks>
         public void OnSceneChanged(string targetScene)
         {
-            SceneChanged?.Invoke(targetScene);
+            Logger.LogFine("[API] - OnSceneChanged Invoked");
+
+            _SceneChanged?.Invoke(targetScene);
         }
 
         /// <summary>
@@ -539,13 +1171,34 @@ namespace Modding
         /// </summary>
         /// <remarks>N/A</remarks>
         [HookInfo("Called right before a scene gets loaded, can change which scene gets loaded", "GameManager.LoadScene")]
-        public event BeforeSceneLoadHandler BeforeSceneLoadHook;
+        public event BeforeSceneLoadHandler BeforeSceneLoadHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding BeforeSceneLoadHook");
+                _BeforeSceneLoadHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing BeforeSceneLoadHook");
+                _BeforeSceneLoadHook -= value;
+            }
+        }
+
+        private event BeforeSceneLoadHandler _BeforeSceneLoadHook;
+
+        /// <summary>
+        /// Called right before a scene gets loaded, can change which scene gets loaded
+        /// </summary>
+        /// <remarks>N/A</remarks>
         public string BeforeSceneLoad(string sceneName)
         {
-            if (BeforeSceneLoadHook == null) return sceneName;
+            Logger.LogFine("[API] - BeforeSceneLoad Invoked");
 
-            Delegate[] invocationList = BeforeSceneLoadHook.GetInvocationList();
+            if (_BeforeSceneLoadHook == null) return sceneName;
+
+            Delegate[] invocationList = _BeforeSceneLoadHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
                 sceneName = (string)toInvoke.DynamicInvoke(sceneName);
@@ -559,14 +1212,34 @@ namespace Modding
         /// Called whenever game tries to show cursor
         /// </summary>
         [HookInfo("Called whenever game tries to show cursor", "InputHandler.OnGUI")]
-        public event CursorHandler CursorHook;
+        public event CursorHandler CursorHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding CursorHook");
+                _CursorHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing CursorHook");
+                _CursorHook -= value;
+            }
+        }
+
+        private event CursorHandler _CursorHook;
+
+        /// <summary>
+        /// Called whenever game tries to show cursor
+        /// </summary>
         public void OnCursor()
         {
+            //Logger.LogFine("[API] - OnCursor Invoked"); // Too Spammy
+
             Cursor.lockState = CursorLockMode.None;
-            if (CursorHook != null)
+            if (_CursorHook != null)
             {
-                CursorHook();
+                _CursorHook();
                 return;
             }
             if (GameManager.instance.isPaused)
@@ -576,18 +1249,39 @@ namespace Modding
             }
             Cursor.visible = false;
         }
-        
+
 
         /// <summary>
         /// Called whenever a new gameobject is created with a collider and playmaker2d
         /// </summary>
         /// <remarks>PlayMakerUnity2DProxy.Start</remarks>
         [HookInfo("Called whenever a new gameobject is created with a collider and playmaker2d", "PlayMakerUnity2DProxy.Start")]
-        public event ColliderCreateHandler ColliderCreateHook;
+        public event ColliderCreateHandler ColliderCreateHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding ColliderCreateHook");
+                _ColliderCreateHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing ColliderCreateHook");
+                _ColliderCreateHook -= value;
+            }
+        }
+
+        private event ColliderCreateHandler _ColliderCreateHook;
+
+        /// <summary>
+        /// Called whenever a new gameobject is created with a collider and playmaker2d
+        /// </summary>
+        /// <remarks>PlayMakerUnity2DProxy.Start</remarks>
         public void OnColliderCreate(GameObject go)
         {
-            ColliderCreateHook?.Invoke(go);
+            Logger.LogFine("[API] - OnColliderCreate Invoked");
+
+            _ColliderCreateHook?.Invoke(go);
         }
 
         /// <summary>
@@ -595,11 +1289,32 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.OnApplicationQuit</remarks>
         [HookInfo("Called when the game is fully closed", "GameManager.OnApplicationQuit")]
-        public event ApplicationQuitHandler ApplicationQuitHook;
+        public event ApplicationQuitHandler ApplicationQuitHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding ApplicationQuitHook");
+                _ApplicationQuitHook += value;
 
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing ApplicationQuitHook");
+                _ApplicationQuitHook -= value;
+            }
+        }
+
+        private event ApplicationQuitHandler _ApplicationQuitHook;
+
+        /// <summary>
+        /// Called when the game is fully closed
+        /// </summary>
+        /// <remarks>GameManager.OnApplicationQuit</remarks>
         public void OnApplicationQuit()
         {
-            ApplicationQuitHook?.Invoke();
+            Logger.LogFine("[API] - OnApplicationQuit Invoked");
+
+            _ApplicationQuitHook?.Invoke();
         }
 
         /// <summary>
@@ -631,11 +1346,11 @@ namespace Modding
         {
             if (!File.Exists(SettingsPath))
             {
-                _globalSettings = new ModHooksGlobalSettings {LoggingLevel = LogLevel.Info};
+                _globalSettings = new ModHooksGlobalSettings { LoggingLevel = LogLevel.Info };
                 return;
             }
 
-            Logger.Log("[API] - Loading Global Settings");
+            //Logger.Log("[API] - Loading Global Settings");
             using (FileStream fileStream = File.OpenRead(SettingsPath))
             {
                 using (StreamReader reader = new StreamReader(fileStream))

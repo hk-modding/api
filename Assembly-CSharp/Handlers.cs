@@ -1,4 +1,5 @@
 ﻿using GlobalEnums;
+using Modding.Patches;
 using UnityEngine;
 
 namespace Modding
@@ -12,7 +13,7 @@ namespace Modding
     /// Called After SaveGameData is created, but before it is serialized and saved to disk.  Usually not called directly in Mods.
     /// </summary>
     /// <param name="data">SaveGameData before serialization</param>
-    public delegate void BeforeSavegameSaveHandler(SaveGameData data);
+    public delegate void BeforeSavegameSaveHandler(Patches.SaveGameData data);
 
     /// <summary>
     /// Called just after the game has been saved to disk
@@ -30,7 +31,7 @@ namespace Modding
     /// Called after the game was loaded from disk, but before the data is loaded into PlayerData and SceneData.  Populates Mod's Settings
     /// </summary>
     /// <param name="data">SaveGameData right after deserialization</param>
-    public delegate void AfterSavegameLoadHandler(SaveGameData data);
+    public delegate void AfterSavegameLoadHandler(Patches.SaveGameData data);
 
     /// <summary>
     /// Called before game save is cleared.

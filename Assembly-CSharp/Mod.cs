@@ -12,10 +12,19 @@ namespace Modding
     /// <remarks>Does not provide method to store mod settings in the save file.</remarks>
     public class Mod : IMod
     {
+        /// <summary>
+        /// The Current Mod's Instance.
+        /// </summary>
         public static Mod Instance { get; private set; }
 
+        /// <summary>
+        /// The Mods Name
+        /// </summary>
         public readonly string Name;
 
+        /// <summary>
+        /// Constrcuts the mod, assignes the instance and sets the name.
+        /// </summary>
         public Mod()
         {
             Instance = this;
@@ -98,7 +107,7 @@ namespace Modding
         /// Loads settings from a save file.
         /// </summary>
         /// <param name="data"></param>
-		private void LoadSettings(SaveGameData data)
+		private void LoadSettings(Patches.SaveGameData data)
 		{
 			string name = GetType().Name;
 			Log("Loading Mod Settings from Save.");
@@ -113,7 +122,7 @@ namespace Modding
         /// Updates SaveGameData before it's saved to disk.
         /// </summary>
         /// <param name="data"></param>
-		private void SaveSettings(SaveGameData data)
+		private void SaveSettings(Patches.SaveGameData data)
 		{
 			string name = GetType().Name;
 			Log("Adding Settings to Save file");
@@ -153,6 +162,10 @@ namespace Modding
     {
         private readonly string _globalSettingsFilename;
 
+        /// <inheritdoc />
+        /// <summary>
+        /// Basic Constructor for the Mod.  
+        /// </summary>
         public Mod()
         {
             _globalSettingsFilename = Application.persistentDataPath + GetType().Name + ".GlobalSettings.json";

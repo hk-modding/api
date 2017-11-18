@@ -11,7 +11,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 //We don't care about XML docs for these as they are being patched into the original code
-#pragma warning disable 1591, 0108, 0169, 0649, 114
+#pragma warning disable 1591, 0108, 0169, 0649, 114, 0414,0162, 1005, 1006
 namespace Modding.Patches
 {
     //These are flat out copied from the game's decompiled source.  We tried doing IL edits, but it was so complicated as to make it not worth it.  If there ever is an easy way to decompile a method, get it as c#, edit, and recompile in monomod, we can remove this.
