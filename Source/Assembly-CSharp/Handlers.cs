@@ -118,7 +118,8 @@ namespace Modding
     public delegate int AfterTakeDamageHandler(int hazardType, int damageAmount);
 
     /// <summary>
-    /// Called whenever blue health is updated
+    /// Called whenever 
+    ///  health is updated
     /// </summary>
     /// <returns></returns>
     public delegate int BlueHealthHandler();
@@ -137,7 +138,7 @@ namespace Modding
     /// Called whenever focus cost is calculated
     /// </summary>
     /// <returns></returns>
-    public delegate int FocusCostHandler();
+    public delegate float FocusCostHandler();
 
     /// <summary>
     /// Called whenever nail strikes something

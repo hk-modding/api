@@ -13,7 +13,7 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private static int _modVersion = 13;
+        private static int _modVersion = 15;
 
 
 
@@ -693,11 +693,11 @@ namespace Modding
         /// <summary>
         /// Called whenever focus cost is calculated
         /// </summary>
-        public int OnFocusCost()
+        public float OnFocusCost()
         {
             Logger.LogFine("[API] - OnFocusCost Invoked");
 
-            int result = 1;
+            float result = 1f;
             if (_FocusCostHook == null) return result;
 
             Delegate[] invocationList = _FocusCostHook.GetInvocationList();
@@ -778,7 +778,7 @@ namespace Modding
         {
             Logger.LogFine("[API] - DashVelocityChange Invoked");
 
-            return _DashVectorHook?.Invoke() ?? Vector2.zero;
+            return _DashVectorHook?.Invoke();
         }
 
         /// <summary>
