@@ -1,0 +1,7 @@
+apiRules:
+- exclude:
+      uidRegex: ^Modding\.Patches
+- exclude:
+      uidRegex: ^MonoMod
+- exclude:
+      uidRegex: ^System\.Runtime\.CompilerServices
