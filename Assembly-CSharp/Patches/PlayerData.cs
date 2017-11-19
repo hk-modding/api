@@ -136,14 +136,19 @@ namespace Modding.Patches
             orig_TakeHealth(amount);
         }
 
+        /*
         [MonoModOriginalName("SetupNewPlayerData")]
         public void orig_SetupNewPlayerData() { }
+
+        public bool ModDoHook = false;
 
         public void SetupNewPlayerData()
         {
             orig_SetupNewPlayerData();
-            ModHooks.Instance.AfterNewPlayerData(this);
+            if (ModDoHook)
+                ModHooks.Instance.AfterNewPlayerData(instance);
         }
+        */
 
         public void UpdateBlueHealth()
         {

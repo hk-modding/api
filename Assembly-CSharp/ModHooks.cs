@@ -13,7 +13,7 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private static int _modVersion = 15;
+        private static int _modVersion = 17;
 
 
 
@@ -285,6 +285,7 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.SetupNewPlayerData</remarks>
         [HookInfo("Called after setting up a new PlayerData", "PlayerData.SetupNewPlayerData")]
+        [Obsolete("Do Not Use - This is called too often due to a bug in the vanilla game's FSM handling.", true)]
         public event NewPlayerDataHandler NewPlayerDataHook
         {
             add
@@ -703,7 +704,7 @@ namespace Modding
             Delegate[] invocationList = _FocusCostHook.GetInvocationList();
             foreach (Delegate toInvoke in invocationList)
             {
-                result = (int)toInvoke.DynamicInvoke();
+                result = (float)toInvoke.DynamicInvoke();
             }
             return result;
         }

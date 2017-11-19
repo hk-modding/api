@@ -4,7 +4,7 @@
       "src": [
         {
           "files": [
-            "Source/Assembly-CSharp/**.csproj"
+            "Assembly-CSharp/**.csproj"
           ],
           "exclude": [
             "**/obj/**",
@@ -64,7 +64,7 @@
       "_appTitle": "Hollow Knight Modding API",
       "_gitContribute": {
         "repo": "https://github.com/seanpr96/HollowKnight.Modding",
-        "branch": "gh-pages"
+        "branch": "master"
       }
     },
     "dest": "_site",
