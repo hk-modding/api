@@ -115,11 +115,21 @@ copy /Y "$(SolutionDir)Vanilla\*" "$(ProjectDir)$(OutputPath)\"
 copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
 cd "$(ProjectDir)$(OutputPath)"
 MonoMod.exe Assembly-CSharp.dll
-copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinal\Assembly-CSharp.dll"
+rem "Create the folder structure prefered by mods"
+md "$(SolutionDir)OutputFinal\hollow_knight_Data\Managed\Mods"
+rem "Copy the Mod's dll into the Mods folder"
+copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinal\readme.md"
+copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinal\hollow_knight_Data\Managed\Assembly-CSharp.dll"
 powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
-copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)OutputFinal\"</PostBuildEvent>
+copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinal\hollow_knight_Data\Managed\"
+
+rem "Zip the Distribution Folder"
+powershell.exe -nologo -noprofile -command "&amp; { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('$(SolutionDir)\OutputFinal', '$(SolutionDir)\ModdingAPI.zip'); }"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>rd "$(ProjectDir)$(OutputPath)" /s /q</PreBuildEvent>
+    <PreBuildEvent>rd "$(ProjectDir)$(OutputPath)" /s /q
+rem "If Distribution exists, delete it"
+rd /q /s "$(SolutionDir)OutputFinal\" 2&gt;nul
+del "$(SolutionDir)ModdingAPI.zip" 2&gt;nul</PreBuildEvent>
   </PropertyGroup>
 </Project>
