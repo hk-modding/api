@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E3E4D0B7-656C-6C50-7567-696E2E57696E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>ExampleMod3</RootNamespace>
+    <AssemblyName>ExampleMod3</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <NoWarn>
+    </NoWarn>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <OutputPath>bin\Debug\</OutputPath>
+    <IntermediateOutputPath>obj\Windows\AnyCPU\Debug</IntermediateOutputPath>
+    <DocumentationFile>bin\Debug\ExampleMod3.xml</DocumentationFile>
+    <DefineConstants>DEBUG;PLATFORM_WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>default</LangVersion>
+    <NoWarn>1591</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <OutputPath>bin\Windows\AnyCPU\Release</OutputPath>
+    <IntermediateOutputPath>obj\Windows\AnyCPU\Release</IntermediateOutputPath>
+    <DocumentationFile>bin\Windows\AnyCPU\Release\ExampleMod3.xml</DocumentationFile>
+    <DefineConstants>PLATFORM_WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-Csharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\Assembly-Csharp.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SaveSettings.cs" />
+    <Reference Include="UnityEngine">
+      <HintPath>UnityEngine.dll</HintPath>
+    </Reference>
+    <Compile Include="ExampleGlobalModSettings.cs" />
+    <Compile Include="ExampleMod3.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <_PostBuildHookTimestamp>@(IntermediateAssembly->'%(FullPath).timestamp')</_PostBuildHookTimestamp>
+    <_PostBuildHookHostPlatform>$(Platform)</_PostBuildHookHostPlatform>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>rem "If Distribution exists, delete it"
+rd /q /s "$(ProjectDir)Distribution\" 2&gt;nul
+del "$(ProjectDir)$(ProjectName).zip" 2&gt;nul</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>rem "Create the folder structure prefered by mods"
+md "$(ProjectDir)Distribution\hollow_knight_Data\Managed\Mods"
+rem "Copy the Mod's dll into tthe Mods folder"
+copy "$(ProjectDir)$(OutputPath)\$(ProjectName).dll" "$(ProjectDir)Distribution\hollow_knight_Data\Managed\Mods\$(ProjectName).dll"
+rem "Copy the readme into the Distribution folder"
+copy "$(ProjectDir)\readme.md" "$(ProjectDir)Distribution\readme.$(ProjectName).md"
+rem "Zip the Distribution Folder"
+powershell.exe -nologo -noprofile -command "&amp; { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('$(ProjectDir)Distribution', '$(ProjectDir)$(ProjectName).zip'); }"
+</PostBuildEvent>
+  </PropertyGroup>
+  <Target Name="PostBuildHooks" Inputs="@(IntermediateAssembly);@(ReferencePath)" Outputs="@(IntermediateAssembly);$(_PostBuildHookTimestamp)" AfterTargets="CoreCompile" BeforeTargets="AfterCompile">
+    <Touch Files="$(_PostBuildHookTimestamp)" AlwaysCreate="True" />
+  </Target>
+  <ItemGroup />
+</Project>

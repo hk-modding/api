@@ -260,18 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 
-Vanilla/
-Output1/
-OutputFinal/
-
-###############
-#    folder   #
-###############
-/**/DROP/
-/**/TEMP/
-/**/packages/
-/**/bin/
-/**/obj/
-_site
-ExampleMods/**/*.zip
-ExampleMods/**/Distribution/*
+Distribution/
+*.zip
