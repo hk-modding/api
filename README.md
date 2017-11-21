@@ -7,15 +7,10 @@ We use the MonoMod patcher to greatly reduce the effort in patching the assembly
 
 Building The API
 ================
-Building the API has 1 main step and 1 minor step.  
+Building the API is fairly straightforward.
 
 1. Clone this!
 2. Go to `%HollowKnightGameInstallPath%/hollow_knight_Data/Managed/` and copy it's contents to the `Vanilla` folder in this repository. 
 3. Open the solution in Visual Studio
-4. Build.  The patched assembly should be in `RepoPath/OutputFinal/`
+4. Build.  The patched assembly should be in `RepoPath/OutputFinal/hollow_knight_Data/Managed/` (There is also a zip file in `RepoPath/ModdingAPI.zip` ready to upload to Google Drive)
 5. Copy Assembly-CSharp.* to `%HollowKnightGameInstallPath%/hollow_knight_Data/Managed/`
-6. Open dnspy and drag Assembly-CSharp.dll in. *Note: I'm hoping we can eliminate this, waiting to see if the MonoMod author can fix this.*
-    1. Delete the MonoMod namespace
-    2. Save the Module.
-    3. Close the module.
-7. And you're done.
