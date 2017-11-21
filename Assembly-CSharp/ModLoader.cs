@@ -34,10 +34,12 @@ namespace Modding
 							ModHooks.Logger.LogDebug("[API] - Trying to instantiate mod<T>: " + type);
 							IMod mod = Activator.CreateInstance(type) as IMod;
 							LoadedMods.Add((Mod)mod);
-							ModHooks.Instance.LoadedMods.Add(type.Name);
 						    if (mod == null) continue;
-
 						    mod.Initialize();
+
+                            ModHooks.Instance.LoadedModsWithVersions.Add(type.Name, mod.GetVersion());
+						    ModHooks.Instance.LoadedMods.Add(type.Name);
+
 						    text = string.Concat(text, type.Name, ": ", mod.GetVersion(), "\n");
 						}
 						else if (!type.IsGenericType && type.IsClass && type.IsSubclassOf(typeof(Mod)))
@@ -45,10 +47,12 @@ namespace Modding
 							ModHooks.Logger.LogDebug("[API] - Trying to instantiate mod: " + type);
 							Mod mod2 = type.GetConstructor(new Type[0])?.Invoke(new object[0]) as Mod;
 							LoadedMods.Add(mod2);
-							ModHooks.Instance.LoadedMods.Add(type.Name);
 						    if (mod2 == null) continue;
-
 						    mod2.Initialize();
+
+                            ModHooks.Instance.LoadedModsWithVersions.Add(type.Name, mod2.GetVersion());
+						    ModHooks.Instance.LoadedMods.Add(type.Name);
+
 						    text = string.Concat(text, type.Name, ": ", mod2.GetVersion(), "\n");
 						}
 					}

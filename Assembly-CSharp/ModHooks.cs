@@ -13,7 +13,7 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private static int _modVersion = 17;
+        private static int _modVersion = 18;
 
 
 
@@ -53,6 +53,11 @@ namespace Modding
         /// Currently Loaded Mods
         /// </summary>
         public List<string> LoadedMods = new List<string>();
+
+        /// <summary>
+        /// Dictionary of mods and their version #s
+        /// </summary>
+        public SerializableStringDictionary LoadedModsWithVersions = new SerializableStringDictionary();
 
         /// <summary>
         /// The Version of the Modding API
@@ -1019,7 +1024,7 @@ namespace Modding
         public void OnBeforeSaveGameSave(Patches.SaveGameData data)
         {
             Logger.LogFine("[API] - OnBeforeSaveGameSave Invoked");
-
+            data.LoadedMods = LoadedModsWithVersions;
             _BeforeSavegameSaveHook?.Invoke(data);
         }
 

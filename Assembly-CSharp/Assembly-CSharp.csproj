@@ -66,6 +66,7 @@
     <Compile Include="Patches\PlayerData.cs" />
     <Compile Include="Patches\PlayMakerUnity2DProxy.cs" />
     <Compile Include="Patches\SaveGameData.cs" />
+    <Compile Include="Patches\SaveStats.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxies.cs" />
     <Compile Include="SerializableBoolDictionary.cs" />

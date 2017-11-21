@@ -173,6 +173,7 @@ namespace Modding.Patches
                         {
                             json = StringEncrypt.DecryptData(toDecrypt);
                         }
+                        ModHooks.Logger.LogFine("[API] - Loading Game:" + json);
                         SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
                         global::PlayerData instance = saveGameData.playerData;
                         SceneData instance2 = saveGameData.sceneData;
@@ -203,6 +204,64 @@ namespace Modding.Patches
             return false;
         }
 
+        #endregion
+
+        #region GetSaveStatsForSlot
+        [MonoModReplace]
+        public SaveStats GetSaveStatsForSlot(int saveSlot)
+        {
+            if (saveSlot > 0)
+            {
+                string saveFilename = this.GetSaveFilename(saveSlot);
+                if (!string.IsNullOrEmpty(saveFilename) && File.Exists(Application.persistentDataPath + saveFilename))
+                {
+                    try
+                    {
+                        string toDecrypt = string.Empty;
+                        string json = string.Empty;
+                        BinaryFormatter binaryFormatter = new BinaryFormatter();
+                        FileStream fileStream = File.Open(Application.persistentDataPath + saveFilename, FileMode.Open);
+                        if (this.gameConfig.useSaveEncryption)
+                        {
+                            toDecrypt = (string)binaryFormatter.Deserialize(fileStream);
+                        }
+                        else
+                        {
+                            json = (string)binaryFormatter.Deserialize(fileStream);
+                        }
+                        fileStream.Close();
+                        if (this.gameConfig.useSaveEncryption)
+                        {
+                            json = StringEncrypt.DecryptData(toDecrypt);
+                        }
+                        SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
+                        global::PlayerData playerData = saveGameData.playerData;
+                        SaveStats stats = new SaveStats(playerData.maxHealthBase, playerData.geo, playerData.mapZone,
+                            playerData.playTime, playerData.MPReserveMax, playerData.permadeathMode,
+                            playerData.completionPercentage, playerData.unlockedCompletionRate)
+                        {
+                            Name = saveGameData.Name,
+                            LoadedMods = saveGameData.LoadedMods
+                        };
+                        return stats;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError(string.Concat(new object[]
+                        {
+                            "Error while loading save file for slot ",
+                            saveSlot,
+                            " Exception: ",
+                            ex
+                        }));
+                        return null;
+                    }
+                }
+                return null;
+            }
+            Debug.LogError("Save game slot not valid: " + saveSlot);
+            return null;
+        }
         #endregion
 
         #region LoadSceneAdditive
