@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using GlobalEnums;
 using MonoMod;
 using UnityEngine;
@@ -13,10 +14,8 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private static int _modVersion = 18;
-
-
-
+        private static int _modVersion = 19;
+        
 
         private static readonly string LogPath = Application.persistentDataPath + "\\ModLog.txt";
         private static readonly string SettingsPath = Application.persistentDataPath + "\\ModdingApi.GlobalSettings.json";
@@ -1288,6 +1287,82 @@ namespace Modding
             Logger.LogFine("[API] - OnColliderCreate Invoked");
 
             _ColliderCreateHook?.Invoke(go);
+        }
+
+
+        /// <summary>
+        /// Called whenever game tries to create a new gameobject.  This happens often, care should be taken.
+        /// </summary>
+        [HookInfo("Called whenever game tries to create a new gameobject.  This happens often, care should be taken.", "ObjectPool.Spawn")]
+        public event GameObjectHandler ObjectPoolSpawnHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding ObjectPoolSpawnHook");
+                _ObjectPoolSpawnHook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing ObjectPoolSpawnHook");
+                _ObjectPoolSpawnHook -= value;
+            }
+        }
+
+        private event GameObjectHandler _ObjectPoolSpawnHook;
+
+        /// <summary>
+        /// Called whenever game tries to show cursor
+        /// </summary>
+        public GameObject OnObjectPoolSpawn(GameObject go)
+        {
+            //Logger.LogFine("[API] - OnObjectPool Invoked"); // Too Spammy
+            if (_ObjectPoolSpawnHook == null) return go;
+
+            Delegate[] invocationList = _ObjectPoolSpawnHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                go = (GameObject)toInvoke.DynamicInvoke(go);
+            }
+            return go;
+        }
+
+
+        /// <summary>
+        /// Called whenever game sends GetEventSender. 
+        /// </summary>
+        /// <remarks>HutongGames.PlayMaker.Actions.GetEventSender</remarks>
+        [HookInfo("Called whenever game sends GetEventSender. ", "HutongGames.PlayMaker.Actions.GetEventSender")]
+        public event GameObjectHandler OnGetEventSenderHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnGetEventSenderHook");
+                _OnGetEventSenderHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnGetEventSenderHook");
+                _OnGetEventSenderHook -= value;
+            }
+        }
+
+        private event GameObjectHandler _OnGetEventSenderHook;
+
+        /// <summary>
+        /// Called whenever the FSM OnGetEvent is ran (only done during attacks/spells right now).  
+        /// </summary>
+        public GameObject OnGetEventSender(GameObject go)
+        {
+            Logger.LogFine("[API] - OnGetEventSendr Invoked"); 
+            if (_OnGetEventSenderHook == null) return go;
+
+            Delegate[] invocationList = _OnGetEventSenderHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                go = (GameObject)toInvoke.DynamicInvoke(go);
+            }
+            return go;
         }
 
         /// <summary>

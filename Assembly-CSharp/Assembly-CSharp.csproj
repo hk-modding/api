@@ -54,8 +54,11 @@
     <Compile Include="ModLoader.cs" />
     <Compile Include="ModSettingsDictionary.cs" />
     <Compile Include="ModVersionDraw.cs" />
+    <Compile Include="NotifyDictionary.cs" />
     <Compile Include="Patches\DRM\GameManager.cs" />
     <Compile Include="Patches\DRM\HeroController.cs" />
+    <Compile Include="Patches\DRM\GetEventSender.cs" />
+    <Compile Include="Patches\ObjectPool.cs" />
     <Compile Include="Patches\GameManager.cs" />
     <Compile Include="Patches\HeroController.cs" />
     <Compile Include="Patches\InputHandler.cs" />

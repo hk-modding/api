@@ -40,7 +40,7 @@ namespace Modding.Patches
                     GameObject gameObject = GameObject.FindGameObjectWithTag("Save Icon");
                     if (gameObject != null)
                     {
-                        PlayMakerFSM playMakerFSM = FSMUtility.LocateFSM(gameObject, "Checkpoint Control");
+                        PlayMakerFSM playMakerFSM = global::FSMUtility.LocateFSM(gameObject, "Checkpoint Control");
                         if (playMakerFSM != null)
                         {
                             playMakerFSM.SendEvent("GAME SAVED");

@@ -170,8 +170,13 @@ namespace Modding
     /// </summary>
     /// <param name="go"></param>
     public delegate void ColliderCreateHandler(GameObject go);
-    
 
 
-    
+    /// <summary>
+    /// Handle for events that accept a GameObject and return a GameObject
+    /// </summary>
+    /// <param name="go"></param>
+    /// <returns></returns>
+    public delegate GameObject GameObjectHandler(GameObject go);
+
 }
