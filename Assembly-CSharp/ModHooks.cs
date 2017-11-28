@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
 using GlobalEnums;
 using MonoMod;
 using UnityEngine;
@@ -27,17 +26,11 @@ namespace Modding
         {
             get
             {
-                if (_globalSettings == null)
-                {
-                    LoadGlobalSettings();
-                    SaveGlobalSettings();
-                }
-                return _globalSettings;
-            }
-            set
-            {
-                _globalSettings = value;
+                if (_globalSettings != null) return _globalSettings;
+
+                LoadGlobalSettings();
                 SaveGlobalSettings();
+                return _globalSettings;
             }
         }
 
@@ -140,7 +133,7 @@ namespace Modding
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="val">Value to set</param>
-        public void SetPlayerBool(string target, bool val)
+        internal void SetPlayerBool(string target, bool val)
         {
             if (_SetPlayerBoolHook != null)
             {
@@ -177,7 +170,7 @@ namespace Modding
         /// Called by the game in PlayerData.GetBool
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        public bool GetPlayerBool(string target)
+        internal bool GetPlayerBool(string target)
         {
             //Logger.LogFine("[API] - GetPlayerbool Invoked"); //Probably not going to enable this, even in Fine, Likely going to produce far too much 
 
@@ -225,7 +218,7 @@ namespace Modding
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="val">Value to set</param>
-        public void SetPlayerInt(string target, int val)
+        internal void SetPlayerInt(string target, int val)
         {
             if (_SetPlayerIntHook != null)
             {
@@ -261,7 +254,7 @@ namespace Modding
         /// Called by the game in PlayerData.GetInt 
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        public int GetPlayerInt(string target)
+        internal int GetPlayerInt(string target)
         {
             //Logger.LogFine("[API] - GetPlayerInt Invoked"); //Probably not going to enable this, even in Fine, Likely going to produce far too much 
 
@@ -308,7 +301,7 @@ namespace Modding
         /// <summary>
         /// Called after setting up a new PlayerData.SetupNewPlayerData
         /// </summary>
-        public void AfterNewPlayerData(PlayerData instance)
+        internal void AfterNewPlayerData(PlayerData instance)
         {
             Logger.LogFine("[API] - AfterNewPlayerData Invoked");
             _NewPlayerDataHook?.Invoke(instance);
@@ -338,7 +331,7 @@ namespace Modding
         /// <summary>
         /// Called whenever blue health is updated
         /// </summary>
-        public int OnBlueHealth()
+        internal int OnBlueHealth()
         {
             Logger.LogFine("[API] - OnBlueHealth Invoked");
 
@@ -380,7 +373,7 @@ namespace Modding
         /// Called when health is taken from the player
         /// </summary>
         /// <remarks>HeroController.TakeHealth</remarks>
-        public int OnTakeHealth(int damage)
+        internal int OnTakeHealth(int damage)
         {
             Logger.LogFine("[API] - OnTakeHealth Invoked");
 
@@ -420,7 +413,7 @@ namespace Modding
         /// Called when damage is dealt to the player
         /// </summary>
         /// <remarks>HeroController.TakeDamage</remarks>
-        public int OnTakeDamage(ref int hazardType, int damage)
+        internal int OnTakeDamage(ref int hazardType, int damage)
         {
             Logger.LogFine("[API] - OnTakeDamage Invoked");
 
@@ -458,7 +451,7 @@ namespace Modding
         /// <summary>
         /// Called at the end of the take damage function
         /// </summary>
-        public int AfterTakeDamage(int hazardType, int damageAmount)
+        internal int AfterTakeDamage(int hazardType, int damageAmount)
         {
             Logger.LogFine("[API] - AfterTakeDamage Invoked");
 
@@ -499,7 +492,7 @@ namespace Modding
         /// Called whenever the player attacks
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
-        public void OnAttack(AttackDirection dir)
+        internal void OnAttack(AttackDirection dir)
         {
             Logger.LogFine("[API] - OnAttack Invoked");
 
@@ -531,7 +524,7 @@ namespace Modding
         /// <summary>
         /// Called at the start of the DoAttack function
         /// </summary>
-        public void OnDoAttack()
+        internal void OnDoAttack()
         {
             Logger.LogFine("[API] - OnDoAttack Invoked");
 
@@ -566,7 +559,7 @@ namespace Modding
         /// Called at the end of the attack function
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
-        public void AfterAttack(AttackDirection dir)
+        internal void AfterAttack(AttackDirection dir)
         {
             Logger.LogFine("[API] - AfterAttack Invoked");
 
@@ -597,7 +590,7 @@ namespace Modding
         /// <summary>
         /// Called whenever nail strikes something
         /// </summary>
-        public void OnSlashHit(Collider2D otherCollider, GameObject gameObject)
+        internal void OnSlashHit(Collider2D otherCollider, GameObject gameObject)
         {
             Logger.LogFine("[API] - OnSlashHit Invoked");
 
@@ -633,7 +626,7 @@ namespace Modding
         /// Called after player values for charms have been set
         /// </summary>
         /// <remarks>HeroController.CharmUpdate</remarks>
-        public void OnCharmUpdate()
+        internal void OnCharmUpdate()
         {
             Logger.LogFine("[API] - OnCharmUpdate Invoked");
 
@@ -667,7 +660,7 @@ namespace Modding
         /// Called whenever the hero updates
         /// </summary>
         /// <remarks>HeroController.Update</remarks>
-        public void OnHeroUpdate()
+        internal void OnHeroUpdate()
         {
             //Logger.LogFine("[API] - OnHeroUpdate Invoked");
 
@@ -698,7 +691,7 @@ namespace Modding
         /// <summary>
         /// Called whenever focus cost is calculated
         /// </summary>
-        public float OnFocusCost()
+        internal float OnFocusCost()
         {
             Logger.LogFine("[API] - OnFocusCost Invoked");
 
@@ -738,7 +731,7 @@ namespace Modding
         /// <summary>
         /// Called when Hero recovers Soul from hitting enemies
         /// </summary>
-        public int OnSoulGain(int num)
+        internal int OnSoulGain(int num)
         {
             Logger.LogFine("[API] - OnSoulGain Invoked");
 
@@ -779,7 +772,7 @@ namespace Modding
         /// Called during dash function to change velocity
         /// </summary>
         /// <remarks>HeroController.Dash</remarks>
-        public Vector2? DashVelocityChange()
+        internal Vector2? DashVelocityChange()
         {
             Logger.LogFine("[API] - DashVelocityChange Invoked");
 
@@ -812,7 +805,7 @@ namespace Modding
         /// Called whenever the dash key is pressed. Overrides normal dash functionality
         /// </summary>
         /// <remarks>HeroController.LookForQueueInput</remarks>
-        public bool OnDashPressed()
+        internal bool OnDashPressed()
         {
             Logger.LogFine("[API] - OnDashPressed Invoked");
 
@@ -855,7 +848,7 @@ namespace Modding
         /// Called directly after a save has been loaded
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        public void OnSavegameLoad(int id)
+        internal void OnSavegameLoad(int id)
         {
             Logger.LogFine("[API] - OnSavegameLoad Invoked");
 
@@ -888,7 +881,7 @@ namespace Modding
         /// Called directly after a save has been saved
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        public void OnSavegameSave(int id)
+        internal void OnSavegameSave(int id)
         {
             Logger.LogFine("[API] - OnSavegameSave Invoked");
 
@@ -921,7 +914,7 @@ namespace Modding
         /// Called whenever a new game is started
         /// </summary>
         /// <remarks>GameManager.LoadFirstScene</remarks>
-        public void OnNewGame()
+        internal void OnNewGame()
         {
             Logger.LogFine("[API] - OnNewGame Invoked");
 
@@ -954,7 +947,7 @@ namespace Modding
         /// Called before a save file is deleted
         /// </summary>
         /// <remarks>GameManager.ClearSaveFile</remarks>
-        public void OnSavegameClear(int id)
+        internal void OnSavegameClear(int id)
         {
             Logger.LogFine("[API] - OnSavegameClear Invoked");
 
@@ -987,7 +980,7 @@ namespace Modding
         /// Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        public void OnAfterSaveGameLoad(Patches.SaveGameData data)
+        internal void OnAfterSaveGameLoad(Patches.SaveGameData data)
         {
             Logger.LogFine("[API] - OnAfterSaveGameLoad Invoked");
 
@@ -1020,7 +1013,7 @@ namespace Modding
         /// Called directly before save has been saved to allow for changes to the data before persisted.
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        public void OnBeforeSaveGameSave(Patches.SaveGameData data)
+        internal void OnBeforeSaveGameSave(Patches.SaveGameData data)
         {
             Logger.LogFine("[API] - OnBeforeSaveGameSave Invoked");
             data.LoadedMods = LoadedModsWithVersions;
@@ -1051,7 +1044,7 @@ namespace Modding
         /// <summary>
         /// Overrides the filename to load for a given slot.  Return null to use vanilla names.
         /// </summary>
-        public string GetSaveFileName(int saveSlot)
+        internal string GetSaveFileName(int saveSlot)
         {
             Logger.LogFine("[API] - GetSaveFileName Invoked");
 
@@ -1082,7 +1075,7 @@ namespace Modding
         /// <summary>
         /// Called after a game has been cleared from a slot.
         /// </summary>
-        public void OnAfterSaveGameClear(int saveSlot)
+        internal void OnAfterSaveGameClear(int saveSlot)
         {
             Logger.LogFine("[API] - OnAfterSaveGameClear Invoked");
 
@@ -1117,7 +1110,7 @@ namespace Modding
         /// Called whenever localization specific strings are requested
         /// </summary>
         /// <remarks>N/A</remarks>
-        public string LanguageGet(string key, string sheet)
+        internal string LanguageGet(string key, string sheet)
         {
             string @internal = Patches.Language.GetInternal(key, sheet);
             string result = @internal;
@@ -1164,7 +1157,7 @@ namespace Modding
         /// Called after a new Scene has been loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        public void OnSceneChanged(string targetScene)
+        internal void OnSceneChanged(string targetScene)
         {
             Logger.LogFine("[API] - OnSceneChanged Invoked");
 
@@ -1197,7 +1190,7 @@ namespace Modding
         /// Called right before a scene gets loaded, can change which scene gets loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        public string BeforeSceneLoad(string sceneName)
+        internal string BeforeSceneLoad(string sceneName)
         {
             Logger.LogFine("[API] - BeforeSceneLoad Invoked");
 
@@ -1237,7 +1230,7 @@ namespace Modding
         /// <summary>
         /// Called whenever game tries to show cursor
         /// </summary>
-        public void OnCursor()
+        internal void OnCursor()
         {
             //Logger.LogFine("[API] - OnCursor Invoked"); // Too Spammy
 
@@ -1282,7 +1275,7 @@ namespace Modding
         /// Called whenever a new gameobject is created with a collider and playmaker2d
         /// </summary>
         /// <remarks>PlayMakerUnity2DProxy.Start</remarks>
-        public void OnColliderCreate(GameObject go)
+        internal void OnColliderCreate(GameObject go)
         {
             Logger.LogFine("[API] - OnColliderCreate Invoked");
 
@@ -1314,7 +1307,7 @@ namespace Modding
         /// <summary>
         /// Called whenever game tries to show cursor
         /// </summary>
-        public GameObject OnObjectPoolSpawn(GameObject go)
+        internal GameObject OnObjectPoolSpawn(GameObject go)
         {
             //Logger.LogFine("[API] - OnObjectPool Invoked"); // Too Spammy
             if (_ObjectPoolSpawnHook == null) return go;
@@ -1352,7 +1345,7 @@ namespace Modding
         /// <summary>
         /// Called whenever the FSM OnGetEvent is ran (only done during attacks/spells right now).  
         /// </summary>
-        public GameObject OnGetEventSender(GameObject go)
+        internal GameObject OnGetEventSender(GameObject go)
         {
             Logger.LogFine("[API] - OnGetEventSendr Invoked"); 
             if (_OnGetEventSenderHook == null) return go;
@@ -1391,7 +1384,7 @@ namespace Modding
         /// Called when the game is fully closed
         /// </summary>
         /// <remarks>GameManager.OnApplicationQuit</remarks>
-        public void OnApplicationQuit()
+        internal void OnApplicationQuit()
         {
             Logger.LogFine("[API] - OnApplicationQuit Invoked");
 
@@ -1423,7 +1416,7 @@ namespace Modding
         /// <summary>
         /// Loads global settings from disk (if they exist)
         /// </summary>
-        public static void LoadGlobalSettings()
+        internal static void LoadGlobalSettings()
         {
             if (!File.Exists(SettingsPath))
             {
