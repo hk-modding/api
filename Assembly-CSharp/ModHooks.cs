@@ -13,7 +13,7 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private static int _modVersion = 19;
+        private static int _modVersion = 20;
         
 
         private static readonly string LogPath = Application.persistentDataPath + "\\ModLog.txt";
