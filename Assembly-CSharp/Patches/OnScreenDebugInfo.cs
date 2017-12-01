@@ -11,6 +11,7 @@ namespace Modding.Patches
 
         private void Awake()
         {
+            Logger.Log("GameLoading");
             ModLoader.LoadMods();
             orig_Awake();
         }

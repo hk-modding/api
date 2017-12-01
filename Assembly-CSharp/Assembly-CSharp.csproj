@@ -40,6 +40,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="CallerMemberName.cs" />
+    <Compile Include="GithubVersionHelper.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Handlers.cs" />
     <Compile Include="HookInfoAttribute.cs" />
@@ -54,7 +55,6 @@
     <Compile Include="ModLoader.cs" />
     <Compile Include="ModSettingsDictionary.cs" />
     <Compile Include="ModVersionDraw.cs" />
-    <Compile Include="NotifyDictionary.cs" />
     <Compile Include="Patches\DRM\GameManager.cs" />
     <Compile Include="Patches\DRM\HeroController.cs" />
     <Compile Include="Patches\DRM\GetEventSender.cs" />
@@ -107,6 +107,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Vanilla\UnityEngine.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="github.crt" />
+    <EmbeddedResource Include="github2.crt" />
   </ItemGroup>
   <Target Name="ILMerge">
     <!-- the ILMergePath property points to the location of ILMerge.exe console application -->

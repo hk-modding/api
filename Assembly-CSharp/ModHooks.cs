@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using GlobalEnums;
 using MonoMod;
 using UnityEngine;
@@ -13,33 +17,24 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private static int _modVersion = 20;
-        
+        private const int _modVersion = 21;
 
-        private static readonly string LogPath = Application.persistentDataPath + "\\ModLog.txt";
+
         private static readonly string SettingsPath = Application.persistentDataPath + "\\ModdingApi.GlobalSettings.json";
         private static ModHooks _instance;
 
-        private static ModHooksGlobalSettings _globalSettings;
+        private ModHooksGlobalSettings _globalSettings;
 
-        private static ModHooksGlobalSettings GlobalSettings
+        private ModHooksGlobalSettings GlobalSettings
         {
             get
             {
                 if (_globalSettings != null) return _globalSettings;
 
                 LoadGlobalSettings();
-                SaveGlobalSettings();
                 return _globalSettings;
             }
         }
-
-        /// <summary>
-        /// Provides access to logging system.
-        /// </summary>
-        public static Logger Logger => _logger ?? (_logger = new Logger(GlobalSettings.LoggingLevel, LogPath));
-
-        private static Logger _logger;
 
         /// <summary>
         /// Currently Loaded Mods
@@ -62,22 +57,83 @@ namespace Modding
         /// </summary>
         public GameVersionData version;
 
+        /// <summary>
+        /// Denotes if the API is current
+        /// </summary>
+        public readonly bool IsCurrent = true;
+
         private ModHooks()
         {
+            Logger.Log("[API] - Adding GitHub SSL Cert to Allow for Checking of Mod Versions");
 
+            SetupServicePointAuthorizor();
+
+            Logger.SetLogLevel(GlobalSettings.LoggingLevel);
             GameVersion gameVersion;
             gameVersion.major = 1;
             gameVersion.minor = 2;
             gameVersion.revision = 2;
             gameVersion.package = 1;
             version = new GameVersionData { gameVersion = gameVersion };
-
+            
             ModVersion = version.GetGameVersionString() + "-" + _modVersion;
-            if (File.Exists(LogPath))
-                File.Delete(LogPath);
+
+            ApplicationQuitHook += SaveGlobalSettings;
+
+            try
+            {
+                GithubVersionHelper githubVersionHelper = new GithubVersionHelper("seanpr96/HollowKnight.Modding");
+
+                string currentGithubVersion = githubVersionHelper.GetVersion();
+                string[] temp = currentGithubVersion.Split('-');
+                int modVersionRevision = Convert.ToInt32(temp[1]);
+                Version tempNewVersion = new Version(temp[0]);
+                Version tempGameVersion = new Version(gameVersion.major, gameVersion.minor, gameVersion.revision, gameVersion.package);
+                Logger.LogDebug("Checking Game Version: " + tempGameVersion+ " < " + tempNewVersion);
+                if (tempNewVersion.CompareTo(tempGameVersion) < 0  || (tempNewVersion.CompareTo(tempGameVersion) == 0 && modVersionRevision > _modVersion))
+                    IsCurrent = false;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError("[API] - Couldn't check for new version." + ex);
+            }
 
         }
 
+        //Used to make the Github Certificate valid so that we can check for new versions.
+        private static void SetupServicePointAuthorizor()
+        {
+            X509Certificate2 gitHubCertificate = new X509Certificate2();
+            gitHubCertificate.Import(GetEmbeddedCertBytes("github.crt"));
+
+            X509Certificate2 gitHubCertificate2 = new X509Certificate2();
+            gitHubCertificate2.Import(GetEmbeddedCertBytes("github2.crt"));
+
+            ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, errors) =>
+            {
+                Logger.Log(certificate.Subject);
+                if (certificate.Equals(gitHubCertificate) || certificate.Equals(gitHubCertificate2))
+                    return true;
+
+                return false;
+            };
+        }
+
+        private static byte[] GetEmbeddedCertBytes(string name)
+        {
+            string resourceName = "Modding." + name;
+
+            using (Stream stream = Assembly.GetCallingAssembly().GetManifestResourceStream(resourceName))
+            {
+                if (stream == null)
+                    return null;
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    string result = reader.ReadToEnd();
+                    return Encoding.ASCII.GetBytes(result);
+                }
+            }
+        }
 
         /// <summary>
         /// Current instance of Modhooks.
@@ -89,7 +145,6 @@ namespace Modding
                 if (_instance != null) return _instance;
 
                 _instance = new ModHooks();
-                _instance.ApplicationQuitHook += SaveGlobalSettings;
                 return _instance;
             }
         }
@@ -110,6 +165,7 @@ namespace Modding
         /// Called when anything in the game tries to set a bool in player data
         /// </summary>
         /// <remarks>PlayerData.SetBool</remarks>
+        /// <see cref="SetBoolProxy"/>
         [HookInfo("Called when anything in the game tries to set a bool in player data", "PlayerData.SetBool")]
         public event SetBoolProxy SetPlayerBoolHook
         {
@@ -1394,7 +1450,7 @@ namespace Modding
         /// <summary>
         /// Save GlobalSettings to disk. (backs up the current global settings if it exists)
         /// </summary>
-        internal static void SaveGlobalSettings()
+        internal void SaveGlobalSettings()
         {
             Logger.Log("Saving Global Settings");
             if (File.Exists(SettingsPath + ".bak"))
@@ -1416,7 +1472,7 @@ namespace Modding
         /// <summary>
         /// Loads global settings from disk (if they exist)
         /// </summary>
-        internal static void LoadGlobalSettings()
+        internal void LoadGlobalSettings()
         {
             if (!File.Exists(SettingsPath))
             {

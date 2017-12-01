@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 namespace Modding
@@ -20,18 +22,19 @@ namespace Modding
 			{
 				return;
 			}
-			ModHooks.Logger.Log("[API] - Trying to load mods");
-		    string text = "Modding API: " + ModHooks.Instance.ModVersion + "\n";
+
+            Logger.Log("[API] - Trying to load mods");
+		    string text = "Modding API: " + ModHooks.Instance.ModVersion + (ModHooks.Instance.IsCurrent ? "" : " - New Version Available!") + "\n";
 			foreach (string text2 in Directory.GetFiles("hollow_knight_Data\\Managed\\Mods", "*.dll"))
 			{
-				ModHooks.Logger.LogDebug("[API] - Loading assembly: " + text2);
+				Logger.LogDebug("[API] - Loading assembly: " + text2);
 				try
 				{
 					foreach (Type type in Assembly.LoadFile(text2).GetExportedTypes())
 					{
 						if (IsSubclassOfRawGeneric(typeof(Mod<>), type))
 						{
-							ModHooks.Logger.LogDebug("[API] - Trying to instantiate mod<T>: " + type);
+							Logger.LogDebug("[API] - Trying to instantiate mod<T>: " + type);
 							IMod mod = Activator.CreateInstance(type) as IMod;
 							LoadedMods.Add((Mod)mod);
 						    if (mod == null) continue;
@@ -40,11 +43,11 @@ namespace Modding
                             ModHooks.Instance.LoadedModsWithVersions.Add(type.Name, mod.GetVersion());
 						    ModHooks.Instance.LoadedMods.Add(type.Name);
 
-						    text = string.Concat(text, type.Name, ": ", mod.GetVersion(), "\n");
+						    text = string.Concat(text, type.Name, ": ", mod.GetVersion(), mod.IsCurrent() ? "" : " - New Version Available!", "\n");
 						}
 						else if (!type.IsGenericType && type.IsClass && type.IsSubclassOf(typeof(Mod)))
 						{
-							ModHooks.Logger.LogDebug("[API] - Trying to instantiate mod: " + type);
+							Logger.LogDebug("[API] - Trying to instantiate mod: " + type);
 							Mod mod2 = type.GetConstructor(new Type[0])?.Invoke(new object[0]) as Mod;
 							LoadedMods.Add(mod2);
 						    if (mod2 == null) continue;
@@ -53,20 +56,20 @@ namespace Modding
                             ModHooks.Instance.LoadedModsWithVersions.Add(type.Name, mod2.GetVersion());
 						    ModHooks.Instance.LoadedMods.Add(type.Name);
 
-						    text = string.Concat(text, type.Name, ": ", mod2.GetVersion(), "\n");
+						    text = string.Concat(text, type.Name, ": ", mod2.GetVersion(), mod2.IsCurrent() ? "" : " - New Version Available!", "\n");
 						}
 					}
 				}
 				catch (Exception ex)
 				{
-					ModHooks.Logger.LogError("[API] - Error: " + ex);
+					Logger.LogError("[API] - Error: " + ex);
 				}
 			}
 			GameObject gameObject = new GameObject();
 			gameObject.AddComponent<ModVersionDraw>().drawString = text;
 			UnityEngine.Object.DontDestroyOnLoad(gameObject);
 			Loaded = true;
-		    ModHooks.SaveGlobalSettings();
+		    ModHooks.Instance.SaveGlobalSettings();
 		}
 
 		static ModLoader()
@@ -108,5 +111,8 @@ namespace Modding
         /// List of loaded mods.
         /// </summary>
 		public static List<Mod> LoadedMods = new List<Mod>();
-	}
+
+        
+	    
+    }
 }

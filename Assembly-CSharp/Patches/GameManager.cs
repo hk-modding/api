@@ -15,7 +15,7 @@ namespace Modding.Patches
 					SaveGameData saveGameData = new SaveGameData(this.playerData, this.sceneData);
             		Modding.ModHooks.Instance.OnBeforeSaveGameSave(saveGameData);
 					string text4 = JsonUtility.ToJson(saveGameData, !this.gameConfig.useSaveEncryption);
-    				Modding.ModHooks.Logger.LogFine("[API] - About to Serialize Save Data\n" + text4);
+    				Modding.Logger.LogFine("[API] - About to Serialize Save Data\n" + text4);
             
             Add this right before the return after the try:
       			Modding.ModHooks.Instance.OnSavegameSave(saveSlot);

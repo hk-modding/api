@@ -12,10 +12,6 @@ namespace Modding
     /// <remarks>Does not provide method to store mod settings in the save file.</remarks>
     public class Mod : IMod
     {
-        /// <summary>
-        /// The Current Mod's Instance.
-        /// </summary>
-        public static Mod Instance { get; private set; }
 
         /// <summary>
         /// The Mods Name
@@ -27,39 +23,43 @@ namespace Modding
         /// </summary>
         public Mod()
         {
-            Instance = this;
             Name = GetType().Name;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Log at the fine/detailed level.  Includes the Mod's name in the output.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public void LogFine(string message) => ModHooks.Logger.LogFine(FormatLogMessage(message));
+        public void LogFine(string message) => Logger.LogFine(FormatLogMessage(message));
 
+        /// <inheritdoc />
         /// <summary>
         /// Log at the debug level.  Includes the Mod's name in the output.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public void LogDebug(string message) => ModHooks.Logger.LogDebug(FormatLogMessage(message));
+        public void LogDebug(string message) => Logger.LogDebug(FormatLogMessage(message));
 
+        /// <inheritdoc />
         /// <summary>
         /// Log at the info level.  Includes the Mod's name in the output.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public void Log(string message) => ModHooks.Logger.Log(FormatLogMessage(message));
+        public void Log(string message) => Logger.Log(FormatLogMessage(message));
 
+        /// <inheritdoc />
         /// <summary>
         /// Log at the warn level.  Includes the Mod's name in the output.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public void LogWarn(string message) => ModHooks.Logger.LogWarn(FormatLogMessage(message));
+        public void LogWarn(string message) => Logger.LogWarn(FormatLogMessage(message));
 
+        /// <inheritdoc />
         /// <summary>
         /// Log at the error level.  Includes the Mod's name in the output.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public void LogError(string message) => ModHooks.Logger.LogError(FormatLogMessage(message));
+        public void LogError(string message) => Logger.LogError(FormatLogMessage(message));
 
         /// <summary>
         /// Formats a log message as "[TypeName] - Message"
@@ -86,6 +86,12 @@ namespace Modding
         /// </summary>
         /// <returns>Mod Version</returns>
         public virtual string GetVersion() => "UNKNOWN";
+
+        /// <summary>
+        /// Denotes if the running version is the current version.  Set this with <see cref="GithubVersionHelper"/>
+        /// </summary>
+        /// <returns>If the version is current or not.</returns>
+        public virtual bool IsCurrent() => false;
     }
 
     /// <inheritdoc />
@@ -93,7 +99,8 @@ namespace Modding
     /// <remarks>Provides automatic managment of saving mod settings in save file.</remarks>
     public class Mod<TSaveSettings> : Mod where TSaveSettings : IModSettings, new()
 	{
-        /// <summary>
+	    
+	    /// <summary>
         /// Instantiates Mod and adds hooks to store and retrieve mod settings during save/load.
         /// </summary>
 		public Mod()
@@ -170,16 +177,6 @@ namespace Modding
         {
             _globalSettingsFilename = Application.persistentDataPath + "\\" + GetType().Name + ".GlobalSettings.json";
             LoadGlobalSettings();
-
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Initializes the mod, including loading the globalsettings 
-        /// </summary>
-        public override void Initialize()
-        {
-            base.Initialize();
         }
 
         /// <summary>

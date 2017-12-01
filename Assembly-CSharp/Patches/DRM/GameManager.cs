@@ -2,16 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using GlobalEnums;
 using MonoMod;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// ReSharper disable All
 //We don't care about XML docs for these as they are being patched into the original code
-#pragma warning disable 1591, 0108, 0169, 0649, 114, 0414,0162, 1005, 1006
+#pragma warning disable 1591, 0108, 0169, 0649, 114, 0414,0162, IDE1005, IDE1006
 namespace Modding.Patches
 {
     //These are flat out copied from the game's decompiled source.  We tried doing IL edits, but it was so complicated as to make it not worth it.  If there ever is an easy way to decompile a method, get it as c#, edit, and recompile in monomod, we can remove this.
@@ -112,7 +111,7 @@ namespace Modding.Patches
                         SaveGameData saveGameData = new SaveGameData(this.playerData, this.sceneData);
                         ModHooks.Instance.OnBeforeSaveGameSave(saveGameData);
                         string text4 = JsonUtility.ToJson(saveGameData, !this.gameConfig.useSaveEncryption);
-                        ModHooks.Logger.LogFine("[API] - About to Serialize Save Data\n" + text4);
+                        Logger.LogFine("[API] - About to Serialize Save Data\n" + text4);
                         string graph = StringEncrypt.EncryptData(text4);
                         BinaryFormatter binaryFormatter = new BinaryFormatter();
                         FileStream fileStream = File.Create(Application.persistentDataPath + saveFilename);
@@ -173,7 +172,7 @@ namespace Modding.Patches
                         {
                             json = StringEncrypt.DecryptData(toDecrypt);
                         }
-                        ModHooks.Logger.LogFine("[API] - Loading Game:" + json);
+                        Logger.LogFine("[API] - Loading Game:" + json);
                         SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
                         global::PlayerData instance = saveGameData.playerData;
                         SceneData instance2 = saveGameData.sceneData;
