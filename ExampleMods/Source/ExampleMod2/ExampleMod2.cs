@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using GlobalEnums;
 using Modding;
 
@@ -15,6 +16,11 @@ namespace ExampleMod2
         private int _tempNailDamage;
 
         /// <summary>
+        /// Represents this Mod's instance.
+        /// </summary>
+        internal static ExampleMod2 Instance;
+
+        /// <summary>
         /// Fetches the Mod Version From AssemblyInfo.AssemblyVersion
         /// </summary>
         /// <returns>Mod's Version</returns>
@@ -25,6 +31,9 @@ namespace ExampleMod2
         /// </summary>
         public override void Initialize()
         {
+            //Assign the Instance to the instantiated mod.
+            Instance = this;
+
             Log("Initializing");
             
             //Here we are hooking into the AttackHook so we can modify the damage for the attack.
@@ -33,6 +42,33 @@ namespace ExampleMod2
             //Here want to hook into the AfterAttackHook to do something at the end of the attack animation.
             ModHooks.Instance.AfterAttackHook += OnAfterAttack;
             Log("Initialized");
+        }
+
+        /// <summary>
+        /// Checks to see if the mod is up to date from a github release, if a new release is in github, return false.  There will be a message in the UI noting that the mod is out of date.
+        /// </summary>
+        /// <remarks>This is an entirely optional function.  You can not override this method if you don't use github or want to use version checking.</remarks>
+        /// <returns></returns>
+        public override bool IsCurrent()
+        {
+            try
+            {
+                //This should be your repository's name.  
+                GithubVersionHelper helper = new GithubVersionHelper("username/ExampleMod2");
+
+                //This assumes you're using Semantic Versioning (ex: 1.2.3.4).  If you use another versioning system, you'll have to implement your own logic to determine if this is new.
+                Version currentVersion = new Version(GetVersion());
+
+                Version newVersion = new Version(helper.GetVersion());
+                LogDebug($"Comparing Versions: {newVersion} > {currentVersion}");
+                return newVersion.CompareTo(currentVersion) < 0;
+            }
+            catch (Exception ex)
+            {
+                LogError("Couldn't check version" + ex);
+            }
+
+            return true;
         }
 
 

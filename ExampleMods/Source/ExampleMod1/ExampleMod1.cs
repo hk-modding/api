@@ -15,6 +15,11 @@ namespace ExampleMod1
         private int _tempNailDamage;
 
         /// <summary>
+        /// Represents this Mod's instance.
+        /// </summary>
+        internal static ExampleMod1 Instance;
+
+        /// <summary>
         /// Fetches the Mod Version From AssemblyInfo.AssemblyVersion
         /// </summary>
         /// <returns>Mod's Version</returns>
@@ -25,6 +30,9 @@ namespace ExampleMod1
         /// </summary>
         public override void Initialize()
         {
+            //Assign the Instance to the instantiated mod.
+            Instance = this;
+
             Log("Initializing");
             
             //Here we are hooking into the AttackHook so we can modify the damage for the attack.
