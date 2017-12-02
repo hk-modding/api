@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace Modding
 {
-
-    /// <inheritdoc />
+    /// <inheritdoc cref="Loggable" />
+    /// <inheritdoc cref="IMod"/>
     /// <summary>
     /// Base mod class.
     /// </summary>
     /// <remarks>Does not provide method to store mod settings in the save file.</remarks>
-    public class Mod : IMod
+    public class Mod : Loggable, IMod
     {
 
         /// <summary>
@@ -18,6 +18,7 @@ namespace Modding
         /// </summary>
         public readonly string Name;
 
+        /// <inheritdoc />
         /// <summary>
         /// Constrcuts the mod, assignes the instance and sets the name.
         /// </summary>
@@ -25,49 +26,7 @@ namespace Modding
         {
             Name = GetType().Name;
         }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Log at the fine/detailed level.  Includes the Mod's name in the output.
-        /// </summary>
-        /// <param name="message">Message to log</param>
-        public void LogFine(string message) => Logger.LogFine(FormatLogMessage(message));
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Log at the debug level.  Includes the Mod's name in the output.
-        /// </summary>
-        /// <param name="message">Message to log</param>
-        public void LogDebug(string message) => Logger.LogDebug(FormatLogMessage(message));
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Log at the info level.  Includes the Mod's name in the output.
-        /// </summary>
-        /// <param name="message">Message to log</param>
-        public void Log(string message) => Logger.Log(FormatLogMessage(message));
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Log at the warn level.  Includes the Mod's name in the output.
-        /// </summary>
-        /// <param name="message">Message to log</param>
-        public void LogWarn(string message) => Logger.LogWarn(FormatLogMessage(message));
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Log at the error level.  Includes the Mod's name in the output.
-        /// </summary>
-        /// <param name="message">Message to log</param>
-        public void LogError(string message) => Logger.LogError(FormatLogMessage(message));
-
-        /// <summary>
-        /// Formats a log message as "[TypeName] - Message"
-        /// </summary>
-        /// <param name="message">Message to be formatted.</param>
-        /// <returns>Formatted Message</returns>
-        private string FormatLogMessage(string message) => $"[{Name}] - {message}";
-
+        
         /// <inheritdoc />
         /// <summary>
         /// Called when class is first constructed.
@@ -87,11 +46,12 @@ namespace Modding
         /// <returns>Mod Version</returns>
         public virtual string GetVersion() => "UNKNOWN";
 
+        /// <inheritdoc />
         /// <summary>
-        /// Denotes if the running version is the current version.  Set this with <see cref="GithubVersionHelper"/>
+        /// Denotes if the running version is the current version.  Set this with <see cref="T:Modding.GithubVersionHelper" />
         /// </summary>
         /// <returns>If the version is current or not.</returns>
-        public virtual bool IsCurrent() => false;
+        public virtual bool IsCurrent() => true;
     }
 
     /// <inheritdoc />
@@ -100,9 +60,10 @@ namespace Modding
     public class Mod<TSaveSettings> : Mod where TSaveSettings : IModSettings, new()
 	{
 	    
+	    /// <inheritdoc />
 	    /// <summary>
-        /// Instantiates Mod and adds hooks to store and retrieve mod settings during save/load.
-        /// </summary>
+	    /// Instantiates Mod and adds hooks to store and retrieve mod settings during save/load.
+	    /// </summary>
 		public Mod()
 		{
             Log("Instantiating Mod");

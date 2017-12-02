@@ -17,8 +17,9 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private const int _modVersion = 21;
+        private const int _modVersion = 23;
 
+        
 
         private static readonly string SettingsPath = Application.persistentDataPath + "\\ModdingApi.GlobalSettings.json";
         private static ModHooks _instance;
@@ -89,7 +90,7 @@ namespace Modding
                 int modVersionRevision = Convert.ToInt32(temp[1]);
                 Version tempNewVersion = new Version(temp[0]);
                 Version tempGameVersion = new Version(gameVersion.major, gameVersion.minor, gameVersion.revision, gameVersion.package);
-                Logger.LogDebug("Checking Game Version: " + tempGameVersion+ " < " + tempNewVersion);
+                Logger.LogDebug("[API] - Checking Game Version: " + tempGameVersion+ " < " + tempNewVersion);
                 if (tempNewVersion.CompareTo(tempGameVersion) < 0  || (tempNewVersion.CompareTo(tempGameVersion) == 0 && modVersionRevision > _modVersion))
                     IsCurrent = false;
             }
@@ -153,7 +154,7 @@ namespace Modding
         /// Logs the message to ModLog.txt in the save file path.
         /// </summary>
         /// <param name="info">Message To Log</param>
-        [Obsolete("This method is obsolete and will be removed in future Mod API Versions. Use ModHooks.Instance.Logger instead.")]
+        [Obsolete("This method is obsolete and will be removed in future Mod API Versions. Use Logger instead for global calls and just Log for mod calls..")]
         public static void ModLog(string info)
         {
             Logger.Log(info);
