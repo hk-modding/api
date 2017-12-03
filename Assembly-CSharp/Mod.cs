@@ -52,6 +52,12 @@ namespace Modding
         /// </summary>
         /// <returns>If the version is current or not.</returns>
         public virtual bool IsCurrent() => true;
+
+        /// <summary>
+        /// Controls when this mod should load compared to other mods.  Defaults to ordered by name.
+        /// </summary>
+        /// <returns></returns>
+        public virtual int LoadPriority() => 1;
     }
 
     /// <inheritdoc />
