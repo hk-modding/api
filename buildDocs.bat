@@ -3,3 +3,7 @@ SET VisualStudioVersion=15.0
 
 ..\docfx\docfx metadata
 ..\docfx\docfx build
+cd _site
+git add -A
+git commit -m "Updated Documentation"
+git push
