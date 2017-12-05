@@ -57,6 +57,7 @@
     <Compile Include="ModLoader.cs" />
     <Compile Include="ModSettingsDictionary.cs" />
     <Compile Include="ModVersionDraw.cs" />
+    <Compile Include="Patches\ChangeFontByLanguage.cs" />
     <Compile Include="Patches\DRM\GameManager.cs" />
     <Compile Include="Patches\DRM\HeroController.cs" />
     <Compile Include="Patches\DRM\GetEventSender.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="Patches\PlayMakerUnity2DProxy.cs" />
     <Compile Include="Patches\SaveGameData.cs" />
     <Compile Include="Patches\SaveStats.cs" />
+    <Compile Include="Patches\TMP_Text.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxies.cs" />
     <Compile Include="SerializableBoolDictionary.cs" />
@@ -108,6 +110,10 @@
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Vanilla\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Vanilla\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -17,7 +17,7 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private const int _modVersion = 24;
+        private const int _modVersion = 25;
 
         
 
@@ -71,10 +71,26 @@ namespace Modding
 
             Logger.SetLogLevel(GlobalSettings.LoggingLevel);
             GameVersion gameVersion;
-            gameVersion.major = 1;
-            gameVersion.minor = 2;
-            gameVersion.revision = 2;
-            gameVersion.package = 1;
+
+            try
+            {
+                string[] versionNums = Constants.GAME_VERSION.Split('.');
+
+                gameVersion.major = Convert.ToInt32(versionNums[0]);
+                gameVersion.minor = Convert.ToInt32(versionNums[1]);
+                gameVersion.revision = Convert.ToInt32(versionNums[2]);
+                gameVersion.package = Convert.ToInt32(versionNums[3]);
+            }
+            catch (Exception e)
+            {
+                gameVersion.major = 0;
+                gameVersion.minor = 0;
+                gameVersion.revision = 0;
+                gameVersion.package = 0;
+
+                Logger.LogError("[API] - Failed obtaining game version:\n" + e);
+            }
+            
             version = new GameVersionData { gameVersion = gameVersion };
             
             ModVersion = version.GetGameVersionString() + "-" + _modVersion;
@@ -1446,6 +1462,84 @@ namespace Modding
             Logger.LogFine("[API] - OnApplicationQuit Invoked");
 
             _ApplicationQuitHook?.Invoke();
+        }
+
+        /// <summary>
+        /// Called when the game changes to a new regional font
+        /// </summary>
+        /// <remarks>ChangeFontByLanguage.SetFont</remarks>
+        [HookInfo("Called when the game changes to a new regional font", "ChangeFontByLanguage.SetFont")]
+        public event SetFontHandler SetFontHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetFontHook");
+                _SetFontHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetFontHook");
+                _SetFontHook -= value;
+            }
+        }
+
+        private event SetFontHandler _SetFontHook;
+
+        /// <summary>
+        /// Called when the game changes to a new regional font
+        /// </summary>
+        /// <remarks>ChangeFontByLanguage.SetFont</remarks>
+        internal void OnSetFont()
+        {
+            Logger.LogFine("[API] - OnSetFont Invoked");
+
+            _SetFontHook?.Invoke();
+        }
+
+        /// <summary>
+        /// Called when TMP_Text.isRightToLeftText is requested
+        /// </summary>
+        /// <remarks>TMPro.TMP_Text.isRightToLeftText</remarks>
+        [HookInfo("Called when TMP_Text.isRightToLeftText is requested", "TMPro.TMP_Text.isRightToLeftText")]
+        public event TextDirectionProxy TextDirectionHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding TextDirectionHook");
+                _TextDirectionHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing TextDirectionHook");
+                _TextDirectionHook -= value;
+            }
+        }
+
+        private event TextDirectionProxy _TextDirectionHook;
+
+        /// <summary>
+        /// Called when TMP_Text.isRightToLeftText is requested
+        /// </summary>
+        /// <param name="direction">The currently set text direction</param>
+        /// <return>Modified text direction</return>
+        internal bool GetTextDirection(bool direction)
+        {
+            Logger.LogFine("[API] - GetTextDirection Invoked");
+
+            bool result = direction;
+            bool flag = false;
+            if (_TextDirectionHook == null) return result;
+
+            Delegate[] invocationList = _TextDirectionHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                bool flag2 = (bool)toInvoke.DynamicInvoke(direction);
+                if (flag2 == direction || flag) continue;
+
+                result = flag2;
+                flag = true;
+            }
+            return result;
         }
 
         /// <summary>

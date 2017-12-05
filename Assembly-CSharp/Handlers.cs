@@ -171,7 +171,6 @@ namespace Modding
     /// <param name="go"></param>
     public delegate void ColliderCreateHandler(GameObject go);
 
-
     /// <summary>
     /// Handle for events that accept a GameObject and return a GameObject
     /// </summary>
@@ -179,4 +178,9 @@ namespace Modding
     /// <returns></returns>
     public delegate GameObject GameObjectHandler(GameObject go);
 
+    /// <summary>
+    /// Called when the game changes to a new regional font
+    /// </summary>
+    /// <returns></returns>
+    public delegate void SetFontHandler();
 }
