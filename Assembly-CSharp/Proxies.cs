@@ -36,7 +36,6 @@
     /// <returns>Modified Damage</returns>
     public delegate int TakeDamageProxy(ref int hazardType, int damage);
 
-    
     /// <summary>
     /// Called when health is taken from the player
     /// </summary>
@@ -44,4 +43,10 @@
     /// <returns>Modified Damaged</returns>
     public delegate int TakeHealthProxy(int damage);
 
+    /// <summary>
+    /// Called when TMP_Text.isRightToLeftText is requested
+    /// </summary>
+    /// <param name="direction">The currently set text direction</param>
+    /// <return>Modified text direction</return>
+    public delegate bool TextDirectionProxy(bool direction);
 }

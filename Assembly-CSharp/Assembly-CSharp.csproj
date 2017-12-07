@@ -57,6 +57,8 @@
     <Compile Include="ModLoader.cs" />
     <Compile Include="ModSettingsDictionary.cs" />
     <Compile Include="ModVersionDraw.cs" />
+    <Compile Include="Patches\ChangeFontByLanguage.cs" />
+    <Compile Include="Patches\DialogueBox.cs" />
     <Compile Include="Patches\DRM\GameManager.cs" />
     <Compile Include="Patches\DRM\HeroController.cs" />
     <Compile Include="Patches\DRM\GetEventSender.cs" />
@@ -108,6 +110,10 @@
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Vanilla\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Vanilla\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
