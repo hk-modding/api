@@ -17,7 +17,7 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private const int _modVersion = 25;
+        private const int _modVersion = 26;
 
         
 
