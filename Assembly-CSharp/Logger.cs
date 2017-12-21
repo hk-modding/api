@@ -25,7 +25,7 @@ namespace Modding
             Debug.Log("Creating Mod Logger");
             _logLevel = LogLevel.Debug;
             
-            FileStream fileStream = new FileStream(Application.persistentDataPath + "\\ModLog.txt", FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+            FileStream fileStream = new FileStream(Application.persistentDataPath + ModHooks.PathSeperator + "ModLog.txt", FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             Writer = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
         }
 

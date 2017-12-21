@@ -19,9 +19,12 @@ namespace Modding
     {
         private const int _modVersion = 26;
 
+        /// <summary>
+        /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
+        /// </summary>
+        public static char PathSeperator = SystemInfo.operatingSystem.Contains("Windows") ? '\\' : '/';
         
-
-        private static readonly string SettingsPath = Application.persistentDataPath + "\\ModdingApi.GlobalSettings.json";
+        private static readonly string SettingsPath = Application.persistentDataPath + PathSeperator + "ModdingApi.GlobalSettings.json";
         private static ModHooks _instance;
 
         private ModHooksGlobalSettings _globalSettings;
@@ -62,6 +65,8 @@ namespace Modding
         /// Denotes if the API is current
         /// </summary>
         public readonly bool IsCurrent = true;
+
+
 
         private ModHooks()
         {
