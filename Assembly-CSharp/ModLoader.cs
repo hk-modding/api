@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 namespace Modding
@@ -26,8 +24,21 @@ namespace Modding
 
             Logger.Log("[API] - Trying to load mods");
 		    string text = "Modding API: " + ModHooks.Instance.ModVersion + (ModHooks.Instance.IsCurrent ? "" : " - New Version Available!") + "\n";
+		    string path = string.Empty;
+		    if (SystemInfo.operatingSystem.Contains("Windows"))
+		        path = Application.dataPath + "\\Managed\\Mods";
+            else if (SystemInfo.operatingSystem.Contains("Windows"))
+		        path = Application.dataPath + "/Managed/Mods/";
+            else
+                Logger.LogWarn($"Operating system of {SystemInfo.operatingSystem} is not known.  Unable to load mods.");
 
-			foreach (string text2 in Directory.GetFiles("hollow_knight_Data\\Managed\\Mods", "*.dll"))
+		    if (string.IsNullOrEmpty(path))
+		    {
+		        Loaded = true;
+		        return;
+		    }
+
+		    foreach (string text2 in Directory.GetFiles(path, "*.dll"))
 			{
 				Logger.LogDebug("[API] - Loading assembly: " + text2);
 				try
