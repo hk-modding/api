@@ -16,19 +16,19 @@ namespace Modding
         /// Loads the mod by searching for assemblies in hollow_knight_Data\Managed\Mods\
         /// </summary>
 		public static void LoadMods()
-		{
-			if (Loaded)
-			{
-				return;
-			}
+        {
+            if (Loaded)
+            {
+                return;
+            }
 
             Logger.Log("[API] - Trying to load mods");
-		    string text = "Modding API: " + ModHooks.Instance.ModVersion + (ModHooks.Instance.IsCurrent ? "" : " - New Version Available!") + "\n";
-		    string path = string.Empty;
-		    if (SystemInfo.operatingSystem.Contains("Windows"))
-		        path = Application.dataPath + "\\Managed\\Mods";
-            else if (SystemInfo.operatingSystem.Contains("Windows"))
-		        path = Application.dataPath + "/Managed/Mods/";
+            string text = "Modding API: " + ModHooks.Instance.ModVersion + (ModHooks.Instance.IsCurrent ? "" : " - New Version Available!") + "\n";
+            string path = string.Empty;
+            if (SystemInfo.operatingSystem.Contains("Windows"))
+                path = Application.dataPath + "\\Managed\\Mods";
+            else if (SystemInfo.operatingSystem.Contains("Mac"))
+                path = Application.dataPath + "/Resources/Data/Managed/Mods/";
             else
                 Logger.LogWarn($"Operating system of {SystemInfo.operatingSystem} is not known.  Unable to load mods.");
 
