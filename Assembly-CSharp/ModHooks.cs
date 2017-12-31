@@ -17,7 +17,7 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private const int _modVersion = 26;
+        private const int _modVersion = 27;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
