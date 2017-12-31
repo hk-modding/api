@@ -38,6 +38,16 @@
     <DocumentationFile>bin\Release\Assembly-CSharp.mm.xml</DocumentationFile>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugMac|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugMac\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="CallerMemberName.cs" />
     <Compile Include="GithubVersionHelper.cs" />
@@ -127,6 +137,11 @@
   <PropertyGroup>
     <PostBuildEvent>move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.dll" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.dll"
 move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.pdb" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.pdb"
+
+if "$(ConfigurationName)" == "Debug" goto :Debug
+if "$(ConfigurationName)" == "DebugMac" goto :DebugMac
+
+:Debug
 copy /Y "$(SolutionDir)Vanilla\*" "$(ProjectDir)$(OutputPath)\"
 copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
 cd "$(ProjectDir)$(OutputPath)"
@@ -140,12 +155,49 @@ powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -rep
 copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinal\hollow_knight_Data\Managed\"
 
 rem "Zip the Distribution Folder"
-powershell.exe -nologo -noprofile -command "&amp; { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::CreateFromDirectory('$(SolutionDir)\OutputFinal', '$(SolutionDir)\ModdingAPI.zip'); }"</PostBuildEvent>
+"$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPI.zip" "$(SolutionDir)OutputFinal\"
+
+goto :Exit
+
+:DebugMac
+copy /Y "$(SolutionDir)VanillaMac\*" "$(ProjectDir)$(OutputPath)\"
+copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
+cd "$(ProjectDir)$(OutputPath)"
+MonoMod.exe Assembly-CSharp.dll
+rem "Create the folder structure prefered by mods"
+md "$(SolutionDir)OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\Mods"
+rem "Copy the Mod's dll into the Mods folder"
+copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinal\readme.md"
+copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\Assembly-CSharp.dll"
+powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
+copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\"
+
+rem "Zip the Distribution Folder"
+"$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPIMac.zip" "$(SolutionDir)OutputFinalMac\"
+
+goto :Exit
+
+
+
+:Exit</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>rd "$(ProjectDir)$(OutputPath)" /s /q
 rem "If Distribution exists, delete it"
+
+if "$(ConfigurationName)" == "Debug" goto :Debug
+if "$(ConfigurationName)" == "DebugMac" goto :DebugMac
+
+:Debug
 rd /q /s "$(SolutionDir)OutputFinal\" 2&gt;nul
-del "$(SolutionDir)ModdingAPI.zip" 2&gt;nul</PreBuildEvent>
+del "$(SolutionDir)ModdingAPI.zip" 2&gt;nul
+goto :Exit
+
+:DebugMac
+rd /q /s "$(SolutionDir)OutputFinalMac\" 2&gt;nul
+del "$(SolutionDir)ModdingAPIMac.zip" 2&gt;nul
+goto :Exit
+
+:Exit</PreBuildEvent>
   </PropertyGroup>
 </Project>
