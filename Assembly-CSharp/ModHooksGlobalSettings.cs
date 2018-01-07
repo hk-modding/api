@@ -15,5 +15,15 @@
             get => (LogLevel) GetInt((int) LogLevel.Info);
             set => SetInt((int) value);
         }
+
+
+        /// <summary>
+        /// Determines if Debug Console (Which displays Messages from Logger) should be shown.
+        /// </summary>
+        public bool ShowDebugLogInGame
+        {
+            get => GetBool(false);
+            set => SetBool(value);
+        }
     }
 }

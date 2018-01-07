@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using GlobalEnums;
+using HutongGames.PlayMaker.Actions;
 using MonoMod;
 using UnityEngine;
 
@@ -17,7 +18,9 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        private const int _modVersion = 27;
+        internal static bool IsInitialized = false;
+
+        private const int _modVersion = 28;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
@@ -66,7 +69,29 @@ namespace Modding
         /// </summary>
         public readonly bool IsCurrent = true;
 
+        private Console _console;
 
+        internal void LogConsole(string message)
+        {
+            try
+            {
+                if (GlobalSettings.ShowDebugLogInGame)
+                {
+                    if (_console == null)
+                    {
+                        GameObject go = new GameObject();
+                        UnityEngine.Object.DontDestroyOnLoad(go);
+                        _console = go.AddComponent<Console>();
+                    }
+
+                    _console.AddText(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
+        }
 
         private ModHooks()
         {
@@ -120,6 +145,7 @@ namespace Modding
                 Logger.LogError("[API] - Couldn't check for new version." + ex);
             }
 
+            IsInitialized = true;
         }
 
         //Used to make the Github Certificate valid so that we can check for new versions.

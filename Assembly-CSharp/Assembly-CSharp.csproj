@@ -48,8 +48,20 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugDeploy|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugDeploy\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="CallerMemberName.cs" />
+    <Compile Include="CanvasUtil.cs" />
+    <Compile Include="Console.cs" />
     <Compile Include="GithubVersionHelper.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Handlers.cs" />
@@ -138,7 +150,7 @@
     <PostBuildEvent>move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.dll" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.dll"
 move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.pdb" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.pdb"
 
-if "$(ConfigurationName)" == "Debug" goto :Debug
+if "$(ConfigurationName)" == "Debug" or "$(ConfigurationName)" == "DebugDeploy"  goto :Debug
 if "$(ConfigurationName)" == "DebugMac" goto :DebugMac
 
 :Debug
@@ -155,8 +167,13 @@ powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -rep
 copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinal\hollow_knight_Data\Managed\"
 
 rem "Zip the Distribution Folder"
-"$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPI.zip" "$(SolutionDir)OutputFinal\"
+call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPI.zip" "$(SolutionDir)OutputFinal\"
 
+if "$(ConfigurationName)" == "DebugDeploy"  goto :Deploy
+goto :Exit
+
+:Deploy
+copy /Y "$(SolutionDir)OutputFinal\hollow_knight_Data\Managed\Assembly-CSharp.*" "C:\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\"
 goto :Exit
 
 :DebugMac
@@ -173,7 +190,7 @@ powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -rep
 copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\"
 
 rem "Zip the Distribution Folder"
-"$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPIMac.zip" "$(SolutionDir)OutputFinalMac\"
+call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPIMac.zip" "$(SolutionDir)OutputFinalMac\"
 
 goto :Exit
 
@@ -185,7 +202,7 @@ goto :Exit
     <PreBuildEvent>rd "$(ProjectDir)$(OutputPath)" /s /q
 rem "If Distribution exists, delete it"
 
-if "$(ConfigurationName)" == "Debug" goto :Debug
+if "$(ConfigurationName)" == "Debug" or "$(ConfigurationName)" == "DebugDeploy"  goto :Debug
 if "$(ConfigurationName)" == "DebugMac" goto :DebugMac
 
 :Debug

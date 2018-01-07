@@ -64,18 +64,28 @@ namespace Modding
 				}
 				catch (Exception ex)
 				{
-					Logger.LogError("[API] - Error: " + ex);
+				    Logger.LogError("[API] - Error: " + ex);
+                    text = string.Concat(text, text2, ": FAILED TO LOAD! Check ModLog.txt. \n");
 				}
 			}
 
 		    foreach (Mod mod in LoadedMods.OrderBy(x => x.LoadPriority()))
 		    {
-		        mod.Initialize();
+		        try
+		        {
+		            mod.Initialize();
 
-		        ModHooks.Instance.LoadedModsWithVersions.Add(mod.GetType().Name, mod.GetVersion());
-		        ModHooks.Instance.LoadedMods.Add(mod.GetType().Name);
+		            ModHooks.Instance.LoadedModsWithVersions.Add(mod.GetType().Name, mod.GetVersion());
+		            ModHooks.Instance.LoadedMods.Add(mod.GetType().Name);
 
-		        text = string.Concat(text, mod.GetType().Name, ": ", mod.GetVersion(), mod.IsCurrent() ? "" : " - New Version Available!", "\n");
+		            text = string.Concat(text, mod.GetType().Name, ": ", mod.GetVersion(),
+		                mod.IsCurrent() ? "" : " - New Version Available!", "\n");
+		        }
+		        catch (Exception ex)
+		        {
+		            text = string.Concat(text, mod.GetType().Name, ": FAILED TO LOAD! Check ModLog.txt. \n");
+		            Logger.LogError("[API] - Error: " + ex);
+                }
             }
 
 			GameObject gameObject = new GameObject();

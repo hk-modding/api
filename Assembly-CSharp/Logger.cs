@@ -118,6 +118,9 @@ namespace Modding
         {
             lock (Locker)
             {
+                if (ModHooks.IsInitialized)
+                    ModHooks.Instance.LogConsole(text);
+
                 Writer.Write(text);
             }
         }
