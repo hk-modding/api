@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Modding
 {
@@ -10,11 +8,21 @@ namespace Modding
     {
         public static GameObject OverlayCanvas;
         private static GameObject _textPanel;
-        private List<string> messages = new List<string>(20);
+        public static Font Arial;
+        private readonly List<string> _messages = new List<string>(25);
+        private bool _enabled = true;
+
+        public static Sprite CreateMonoColourSprite(byte[] col)
+        {
+            Texture2D tex = new Texture2D(1, 1);
+            tex.LoadRawTextureData(col);
+            tex.Apply();
+            return Sprite.Create(tex, new Rect(0, 0, 1, 1), Vector2.zero);
+        }
 
         public void Start()
         {
-            Debug.Log("Console.Start");
+            Arial = Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font;
             DontDestroyOnLoad(gameObject);
 
             if (OverlayCanvas == null) { 
@@ -22,22 +30,41 @@ namespace Modding
                 OverlayCanvas = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
                 OverlayCanvas.name = "ModdingApiConsoleLog";
                 DontDestroyOnLoad(OverlayCanvas);
-                _textPanel = CanvasUtil.CreateTextPanel(OverlayCanvas, string.Empty, 12, TextAnchor.UpperLeft,
-                    new CanvasUtil.RectData(new Vector2(1920, 400), new Vector2(0, 0)), false);
-                Debug.Log("Overlay Created");
+
+                GameObject background = CanvasUtil.CreateImagePanel(OverlayCanvas,
+                    CreateMonoColourSprite(new byte[] { 0x80, 0x00, 0x00, 0x00}),
+                    new CanvasUtil.RectData(new Vector2(500, 800), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0,0)));
+
+                _textPanel = CanvasUtil.CreateTextPanel(background, string.Join(string.Empty, _messages.ToArray()), 12, TextAnchor.LowerLeft,
+                    new CanvasUtil.RectData(new Vector2(-5, -5), new Vector2(0, 0), new Vector2(0, 0), new Vector2(1, 1)), Arial);
+
+                _textPanel.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap;
+
             }
         }
 
+        public void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.F10))
+            {
+                StartCoroutine(_enabled
+                    ? CanvasUtil.FadeOutCanvasGroup(OverlayCanvas.GetComponent<CanvasGroup>())
+                    : CanvasUtil.FadeInCanvasGroup(OverlayCanvas.GetComponent<CanvasGroup>()));
+                _enabled = !_enabled;
+            }
+        }
+
+
         public void AddText(string message)
         {
-            Debug.Log("Attempting to log to console:" + message);
+            if (_messages.Count > 24)
+                _messages.RemoveAt(0);
+
+            _messages.Add(message);
 
             if (_textPanel != null)
             {
-                if (messages.Count > 19)
-                    messages.RemoveAt(0);
-                messages.Add(message);
-                _textPanel.GetComponent<UnityEngine.UI.Text>().text = string.Join(string.Empty, messages.ToArray());
+                _textPanel.GetComponent<Text>().text = string.Join(string.Empty, _messages.ToArray());
             }
         }
     }

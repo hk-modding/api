@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +20,8 @@ namespace Modding
         /// 
         /// </summary>
         public static Font TrajanNormal;
+
+        private static readonly Dictionary<string, Font> Fonts = new Dictionary<string, Font>();
 
         /// <summary>
         /// 
@@ -115,6 +119,28 @@ namespace Modding
                     TrajanNormal = f;
                 }
             }
+        }
+
+
+        /// <summary>
+        /// Fetches the cached font if it exists.
+        /// </summary>
+        /// <param name="fontName"></param>
+        /// <returns>Font if found, null if not.</returns>
+        public static Font GetFont(string fontName)
+        {
+            if (Fonts.ContainsKey(fontName))
+                return Fonts[fontName];
+
+            foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())
+            {
+                if (f != null && f.name == fontName)
+                {
+                    Fonts.Add(fontName, f);
+                }
+            }
+
+            return Fonts.ContainsKey(fontName) ? Fonts[fontName] : null;
         }
 
         /// <summary>
@@ -286,14 +312,14 @@ namespace Modding
         /// <param name="fontSize"></param>
         /// <param name="textAnchor"></param>
         /// <param name="rectData"></param>
-        /// <param name="bold"></param>
+        /// <param name="font"></param>
         /// <returns></returns>
-        public static GameObject CreateTextPanel(GameObject parent, string text, int fontSize, TextAnchor textAnchor, RectData rectData, bool bold = true)
+        public static GameObject CreateTextPanel(GameObject parent, string text, int fontSize, TextAnchor textAnchor, RectData rectData, Font font)
         {
             GameObject panel = CreateBasePanel(parent, rectData);
 
             Text textObj = panel.AddComponent<Text>();
-            textObj.font = bold ? TrajanBold : TrajanNormal;
+            textObj.font = font;
 
             textObj.text = text;
             textObj.supportRichText = true;
@@ -301,6 +327,22 @@ namespace Modding
             textObj.alignment = textAnchor;
             return panel;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="text"></param>
+        /// <param name="fontSize"></param>
+        /// <param name="textAnchor"></param>
+        /// <param name="rectData"></param>
+        /// <param name="bold"></param>
+        /// <returns></returns>
+        public static GameObject CreateTextPanel(GameObject parent, string text, int fontSize, TextAnchor textAnchor, RectData rectData, bool bold = true)
+        {
+            return CreateTextPanel(parent, text, fontSize, textAnchor, rectData, bold ? TrajanBold : TrajanNormal);
+        }
+
 
         /*
          * ██╗███╗   ███╗ █████╗  ██████╗ ███████╗
@@ -476,5 +518,64 @@ namespace Modding
             return panel;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cg"></param>
+        /// <returns></returns>
+        public static IEnumerator FadeInCanvasGroup(CanvasGroup cg)
+        {
+            float loopFailsafe = 0f;
+            cg.alpha = 0f;
+            cg.gameObject.SetActive(true);
+            while (cg.alpha < 1f)
+            {
+                cg.alpha += Time.unscaledDeltaTime * 3.2f;
+                loopFailsafe += Time.unscaledDeltaTime;
+                if (cg.alpha >= 0.95f)
+                {
+                    cg.alpha = 1f;
+                    break;
+                }
+                if (loopFailsafe >= 2f)
+                {
+                    break;
+                }
+                yield return null;
+            }
+            cg.alpha = 1f;
+            cg.interactable = true;
+            cg.gameObject.SetActive(true);
+            yield return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cg"></param>
+        /// <returns></returns>
+        public static IEnumerator FadeOutCanvasGroup(CanvasGroup cg)
+        {
+            float loopFailsafe = 0f;
+            cg.interactable = false;
+            while (cg.alpha > 0.05f)
+            {
+                cg.alpha -= Time.unscaledDeltaTime * 3.2f;
+                loopFailsafe += Time.unscaledDeltaTime;
+                if (cg.alpha <= 0.05f)
+                {
+                    break;
+                }
+                if (loopFailsafe >= 2f)
+                {
+                    break;
+                }
+                yield return null;
+            }
+            cg.alpha = 0f;
+            cg.gameObject.SetActive(false);
+            yield return null;
+        }
     }
 }
