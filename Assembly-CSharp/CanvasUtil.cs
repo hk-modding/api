@@ -7,44 +7,44 @@ using UnityEngine.UI;
 namespace Modding
 {
     /// <summary>
-    /// 
+    /// Utility with helpful functions for drawing canvas elements on screen.
     /// </summary>
     public static class CanvasUtil
     {
         /// <summary>
-        /// 
+        /// Access to the TrajanBold Font
         /// </summary>
         public static Font TrajanBold;
 
         /// <summary>
-        /// 
+        /// Access to the TrajanNormal Font
         /// </summary>
         public static Font TrajanNormal;
 
         private static readonly Dictionary<string, Font> Fonts = new Dictionary<string, Font>();
 
         /// <summary>
-        /// 
+        /// Rectangle Helper Class
         /// </summary>
         public class RectData
         {
             /// <summary>
-            /// 
+            /// Difference in size of the rectangle as compared to it's parent.
             /// </summary>
-            public Vector2 RectSize;
+            public Vector2 RectSizeDelta;
 
             /// <summary>
-            /// 
+            /// Relative Offset Postion where Element is anchored as compared to Min / Max
             /// </summary>
-            public Vector2 Position;
+            public Vector2 AnchorPosition;
 
             /// <summary>
-            /// 
+            /// Describes on of the X,Y Positions of the Element
             /// </summary>
             public Vector2 AnchorMin;
 
             /// <summary>
-            /// 
+            /// Describes on of the X,Y Positions of the Element
             /// </summary>
             public Vector2 AnchorMax;
 
@@ -53,48 +53,80 @@ namespace Modding
             /// </summary>
             public Vector2 AnchorPivot;
 
+            /// <inheritdoc />
             /// <summary>
-            /// 
+            /// Describes a Rectangle's relative size, shape, and relative position to it's parent.
             /// </summary>
-            /// <param name="size"></param>
-            /// <param name="pos"></param>
-            public RectData(Vector2 size, Vector2 pos)
-            {
-                RectSize = size;
-                Position = pos;
-                AnchorMin = new Vector2(0.5f, 0.5f);
-                AnchorMax = new Vector2(0.5f, 0.5f);
-                AnchorPivot = new Vector2(0.5f, 0.5f);
-            }
+            /// <param name="sizeDelta">sizeDelta is size of the difference of the anchors multiplied by screen size so 
+            /// the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
+            /// so assuming a streched horizontally rectTransform on a 1920 screen, this would be
+            /// ((1-0)*1920)+sizeDelta.x
+            /// 1920 + sizeDelta.x
+            /// so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
+            /// and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
+            /// the same applies for height</param>
+            /// <param name="anchorPosition">Relative Offset Postion where Element is anchored as compared to Min / Max</param>
+            public RectData(Vector2 sizeDelta, Vector2 anchorPosition) 
+                : this(sizeDelta, anchorPosition, new Vector2(0.5f,0.5f),new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f)) { }
+
+
+            /// <inheritdoc />
+            /// <summary>
+            /// Describes a Rectangle's relative size, shape, and relative position to it's parent.
+            /// </summary>
+            /// <param name="sizeDelta">sizeDelta is size of the difference of the anchors multiplied by screen size so 
+            /// the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
+            /// so assuming a streched horizontally rectTransform on a 1920 screen, this would be
+            /// ((1-0)*1920)+sizeDelta.x
+            /// 1920 + sizeDelta.x
+            /// so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
+            /// and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
+            /// the same applies for height</param>
+            /// <param name="anchorPosition">Relative Offset Postion where Element is anchored as compared to Min / Max</param>
+            /// <param name="min">Describes 1 corner of the rectangle
+            /// 0,0 = bottom left
+            /// 0,1 = top left
+            /// 1,0 = bottom right
+            /// 1,1 = top right
+            /// </param>
+            /// <param name="max">Describes 1 corner of the rectangle
+            /// 0,0 = bottom left
+            /// 0,1 = top left
+            /// 1,0 = bottom right
+            /// 1,1 = top right
+            /// </param>
+            public RectData(Vector2 sizeDelta, Vector2 anchorPosition, Vector2 min, Vector2 max) 
+                : this(sizeDelta, anchorPosition, min, max, new Vector2(0.5f, 0.5f)) { }
 
             /// <summary>
-            /// 
+            /// Describes a Rectangle's relative size, shape, and relative position to it's parent.
             /// </summary>
-            /// <param name="size"></param>
-            /// <param name="pos"></param>
-            /// <param name="min"></param>
-            /// <param name="max"></param>
-            public RectData(Vector2 size, Vector2 pos, Vector2 min, Vector2 max)
+            /// <param name="sizeDelta">sizeDelta is size of the difference of the anchors multiplied by screen size so 
+            /// the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
+            /// so assuming a streched horizontally rectTransform on a 1920 screen, this would be
+            /// ((1-0)*1920)+sizeDelta.x
+            /// 1920 + sizeDelta.x
+            /// so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
+            /// and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
+            /// the same applies for height</param>
+            /// <param name="anchorPosition">Relative Offset Postion where Element is anchored as compared to Min / Max</param>
+            /// <param name="min">Describes 1 corner of the rectangle
+            /// 0,0 = bottom left
+            /// 0,1 = top left
+            /// 1,0 = bottom right
+            /// 1,1 = top right
+            /// </param>
+            /// <param name="max">Describes 1 corner of the rectangle
+            /// 0,0 = bottom left
+            /// 0,1 = top left
+            /// 1,0 = bottom right
+            /// 1,1 = top right
+            /// </param>
+            /// <param name="pivot">Controls the location to use to rotate the rectangle if necessary.</param>
+            public RectData(Vector2 sizeDelta, Vector2 anchorPosition, Vector2 min, Vector2 max, Vector2 pivot)
             {
-                RectSize = size;
-                Position = pos;
-                AnchorMin = min;
-                AnchorMax = max;
-                AnchorPivot = new Vector2(0.5f, 0.5f);
-            }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="size"></param>
-            /// <param name="pos"></param>
-            /// <param name="min"></param>
-            /// <param name="max"></param>
-            /// <param name="pivot"></param>
-            public RectData(Vector2 size, Vector2 pos, Vector2 min, Vector2 max, Vector2 pivot)
-            {
-                RectSize = size;
-                Position = pos;
+                RectSizeDelta = sizeDelta;
+                AnchorPosition = anchorPosition;
                 AnchorMin = min;
                 AnchorMax = max;
                 AnchorPivot = pivot;
@@ -102,11 +134,11 @@ namespace Modding
         }
 
         /// <summary>
-        /// 
+        /// Fetches the Trajan fonts to be cached and used.
         /// </summary>
         public static void CreateFonts()
         {
-
+            
             foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())
             {
                 if (f != null && f.name == "TrajanPro-Bold")
@@ -144,25 +176,31 @@ namespace Modding
         }
 
         /// <summary>
-        /// 
+        /// Creates a 1px * 1px sprite of a single color.
         /// </summary>
+        /// <param name="data">Optional value to control the single null sprite</param>
         /// <returns></returns>
-        public static Sprite NullSprite()
+        public static Sprite NullSprite(byte[] data = null)
         {
             Texture2D tex = new Texture2D(1, 1);
-            tex.LoadRawTextureData(new byte[] { 0x00, 0x00, 0x00, 0x00 });
+            if (data == null)
+            {
+                data = new byte[] {0x00, 0x00, 0x00, 0x00};
+            }
+
+            tex.LoadRawTextureData(data);
             tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, 1, 1), Vector2.zero);
         }
 
         /// <summary>
-        /// 
+        /// Creates a sprite with the given data.
         /// </summary>
-        /// <param name="data"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
+        /// <param name="data">Sprite texture data</param>
+        /// <param name="x">X location for sprite</param>
+        /// <param name="y">Y Locaiton for sprite</param>
+        /// <param name="width">Width of sprite</param>
+        /// <param name="height">Height of sprite</param>
         /// <returns></returns>
         public static Sprite CreateSprite(byte[] data, int x, int y, int width, int height)
         {
@@ -172,11 +210,12 @@ namespace Modding
             return Sprite.Create(tex, new Rect(x, y, width, height), Vector2.zero);
         }
 
+
         /// <summary>
-        /// 
+        /// Creates a base panel for other panels to use.
         /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="rd"></param>
+        /// <param name="parent">Parent Game Object under which this panel will be held</param>
+        /// <param name="rd">Rectangle data for this panel</param>
         /// <returns></returns>
         public static GameObject CreateBasePanel(GameObject parent, RectData rd)
         {
@@ -193,10 +232,10 @@ namespace Modding
 
 
         /// <summary>
-        /// 
+        /// Transforms the RectData into a RectTransform for the GameObject.
         /// </summary>
-        /// <param name="go"></param>
-        /// <param name="rd"></param>
+        /// <param name="go">GameObject to which this rectdata should be put into.</param>
+        /// <param name="rd">Rectangle Data</param>
         public static void AddRectTransform(GameObject go, RectData rd)
         {
             //Create a rectTransform
@@ -242,8 +281,8 @@ namespace Modding
             rt.anchorMax = rd.AnchorMax;
             rt.anchorMin = rd.AnchorMin;
             rt.pivot = rd.AnchorPivot;
-            rt.sizeDelta = rd.RectSize;
-            rt.anchoredPosition = rd.Position;
+            rt.sizeDelta = rd.RectSizeDelta;
+            rt.anchoredPosition = rd.AnchorPosition;
         }
 
         /*  
@@ -256,18 +295,18 @@ namespace Modding
          */
 
         /// <summary>
-        /// 
+        /// Creates a Canvas Element that is scaled to the parent's size.
         /// </summary>
-        /// <param name="renderMode"></param>
-        /// <param name="ppu"></param>
+        /// <param name="renderMode">Render Mode to Use</param>
+        /// <param name="referencePixelsPerUnit"></param>
         /// <returns></returns>
-        public static GameObject CreateCanvas(RenderMode renderMode, int ppu)
+        public static GameObject CreateCanvas(RenderMode renderMode, int referencePixelsPerUnit)
         {
             GameObject c = new GameObject();
             c.AddComponent<Canvas>().renderMode = renderMode;
             CanvasScaler cs = c.AddComponent<CanvasScaler>();
             cs.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            cs.referencePixelsPerUnit = ppu;
+            cs.referencePixelsPerUnit = referencePixelsPerUnit;
             c.AddComponent<GraphicRaycaster>();
             c.AddComponent<CanvasGroup>();
             c.GetComponent<CanvasGroup>().blocksRaycasts = false;
@@ -277,10 +316,10 @@ namespace Modding
 
 
         /// <summary>
-        /// 
+        /// Creates a Canvas Element.
         /// </summary>
-        /// <param name="renderMode"></param>
-        /// <param name="size"></param>
+        /// <param name="renderMode">RenderMode to Use</param>
+        /// <param name="size">Size of the Canvas</param>
         /// <returns></returns>
         public static GameObject CreateCanvas(RenderMode renderMode, Vector2 size)
         {
@@ -305,14 +344,14 @@ namespace Modding
          *    ╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝  
          */
         /// <summary>
-        /// 
+        /// Creates a Text Object
         /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="text"></param>
-        /// <param name="fontSize"></param>
-        /// <param name="textAnchor"></param>
-        /// <param name="rectData"></param>
-        /// <param name="font"></param>
+        /// <param name="parent">The GameObject that this text will be put into.</param>
+        /// <param name="text">The text that will be shown with this object</param>
+        /// <param name="fontSize">The text's font size.</param>
+        /// <param name="textAnchor">The location within the rectData where the text anchor should be.</param>
+        /// <param name="rectData">Rectangle Data to describe the Text Panel.</param>
+        /// <param name="font">The Font to use</param>
         /// <returns></returns>
         public static GameObject CreateTextPanel(GameObject parent, string text, int fontSize, TextAnchor textAnchor, RectData rectData, Font font)
         {
@@ -327,16 +366,15 @@ namespace Modding
             textObj.alignment = textAnchor;
             return panel;
         }
-
         /// <summary>
-        /// 
+        /// Creates a Text Object
         /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="text"></param>
-        /// <param name="fontSize"></param>
-        /// <param name="textAnchor"></param>
-        /// <param name="rectData"></param>
-        /// <param name="bold"></param>
+        /// <param name="parent">The GameObject that this text will be put into.</param>
+        /// <param name="text">The text that will be shown with this object</param>
+        /// <param name="fontSize">The text's font size.</param>
+        /// <param name="textAnchor">The location within the rectData where the text anchor should be.</param>
+        /// <param name="rectData">Rectangle Data to describe the Text Panel.</param>
+        /// <param name="bold">If True, TrajanBold will be the font used, else TrajanNormal</param>
         /// <returns></returns>
         public static GameObject CreateTextPanel(GameObject parent, string text, int fontSize, TextAnchor textAnchor, RectData rectData, bool bold = true)
         {
@@ -353,18 +391,18 @@ namespace Modding
          * ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
          */
         /// <summary>
-        /// 
+        /// Creates an Image Panel
         /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="spr"></param>
-        /// <param name="rectData"></param>
+        /// <param name="parent">The Parent GameObject for this image.</param>
+        /// <param name="sprite">The Image/Sprite to use</param>
+        /// <param name="rectData">The rectangle description for this sprite to inhabit</param>
         /// <returns></returns>
-        public static GameObject CreateImagePanel(GameObject parent, Sprite spr, RectData rectData)
+        public static GameObject CreateImagePanel(GameObject parent, Sprite sprite, RectData rectData)
         {
             GameObject panel = CreateBasePanel(parent, rectData);
 
             Image img = panel.AddComponent<Image>();
-            img.sprite = spr;
+            img.sprite = sprite;
             img.preserveAspect = true;
             return panel;
         }

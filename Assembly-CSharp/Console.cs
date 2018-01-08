@@ -12,14 +12,7 @@ namespace Modding
         private readonly List<string> _messages = new List<string>(25);
         private bool _enabled = true;
 
-        public static Sprite CreateMonoColourSprite(byte[] col)
-        {
-            Texture2D tex = new Texture2D(1, 1);
-            tex.LoadRawTextureData(col);
-            tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, 1, 1), Vector2.zero);
-        }
-
+        
         public void Start()
         {
             Arial = Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font;
@@ -32,15 +25,14 @@ namespace Modding
                 DontDestroyOnLoad(OverlayCanvas);
 
                 GameObject background = CanvasUtil.CreateImagePanel(OverlayCanvas,
-                    CreateMonoColourSprite(new byte[] { 0x80, 0x00, 0x00, 0x00}),
+                    CanvasUtil.NullSprite(new byte[] { 0x80, 0x00, 0x00, 0x00}),
                     new CanvasUtil.RectData(new Vector2(500, 800), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0,0)));
 
                 _textPanel = CanvasUtil.CreateTextPanel(background, string.Join(string.Empty, _messages.ToArray()), 12, TextAnchor.LowerLeft,
                     new CanvasUtil.RectData(new Vector2(-5, -5), new Vector2(0, 0), new Vector2(0, 0), new Vector2(1, 1)), Arial);
 
                 _textPanel.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap;
-
-            }
+                }
         }
 
         public void Update()
