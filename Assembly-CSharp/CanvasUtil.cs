@@ -194,11 +194,11 @@ namespace Modding
         }
 
         /// <summary>
-        /// Creates a sprite with the given data.
+        /// Creates a sprite from a sub-section of the given texture.
         /// </summary>
         /// <param name="data">Sprite texture data</param>
-        /// <param name="x">X location for sprite</param>
-        /// <param name="y">Y Locaiton for sprite</param>
+        /// <param name="x">X location of the sprite within the texture.</param>
+        /// <param name="y">Y Locaiton of the sprite within the texture.</param>
         /// <param name="width">Width of sprite</param>
         /// <param name="height">Height of sprite</param>
         /// <returns></returns>
@@ -528,7 +528,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// Creates a Toggle Group To allow for toggling multiple objects.
+        /// Allows for a radio button style group of toggles where only 1 can be toggled at once.
         /// </summary>
         /// <returns></returns>
         public static GameObject CreateToggleGroup()
@@ -543,7 +543,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// 
+        /// Hides everything in this object and children objects that goes outside this objects rect
         /// </summary>
         /// <param name="parent">Parent Object for this Panel</param>
         /// <param name="rectData">Describes the panel's rectangle</param>
