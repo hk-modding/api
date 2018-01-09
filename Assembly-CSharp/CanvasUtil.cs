@@ -416,18 +416,18 @@ namespace Modding
          * ╚═════╝  ╚═════╝    ╚═╝      ╚═╝    ╚═════╝ ╚═╝  ╚═══╝
          */
         /// <summary>
-        /// 
+        /// Creates a Button
         /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="action"></param>
-        /// <param name="id"></param>
-        /// <param name="spr"></param>
-        /// <param name="text"></param>
-        /// <param name="fontSize"></param>
-        /// <param name="textAnchor"></param>
-        /// <param name="rectData"></param>
-        /// <param name="bold"></param>
-        /// <param name="extraSprites"></param>
+        /// <param name="parent">The Parent GameObject for this Button</param>
+        /// <param name="action">Action to take when butotn is clicked</param>
+        /// <param name="id">Id passed to the action</param>
+        /// <param name="spr">Sprite to use for the button</param>
+        /// <param name="text">Text for the button</param>
+        /// <param name="fontSize">Size of the Text</param>
+        /// <param name="textAnchor">Where to Anchor the text within the button</param>
+        /// <param name="rectData">The rectangle description for this button</param>
+        /// <param name="bold">If Set, uses Trajan-Bold, else Trajan for the font</param>
+        /// <param name="extraSprites">Size 3 array of other sprite states for the button.  0 = Highlighted Sprite, 1 = Pressed Sprited, 2 = Disabled Sprite</param>
         /// <returns></returns>
         public static GameObject CreateButton(GameObject parent, Action<int> action, int id, Sprite spr, string text, int fontSize, TextAnchor textAnchor, RectData rectData, bool bold = true, params Sprite[] extraSprites)
         {
@@ -475,18 +475,18 @@ namespace Modding
              ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝                                                     
          */
         /// <summary>
-        /// 
+        /// Creates a checkbox
         /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="action"></param>
-        /// <param name="boxBgSprite"></param>
-        /// <param name="boxFgSprite"></param>
-        /// <param name="text"></param>
-        /// <param name="fontSize"></param>
-        /// <param name="textAnchor"></param>
-        /// <param name="rectData"></param>
-        /// <param name="bold"></param>
-        /// <param name="isOn"></param>
+        /// <param name="parent">The Parent GameObject for this Checkbox</param>
+        /// <param name="action">Action to take when butotn is clicked</param>
+        /// <param name="boxBgSprite">Sprite to use for the background of the box</param>
+        /// <param name="boxFgSprite">Sprite to use for the foreground of the box</param>
+        /// <param name="text">Text for the Checkbox</param>
+        /// <param name="fontSize">Size of the Text</param>
+        /// <param name="textAnchor">Where to Anchor the text within the checkbox</param>
+        /// <param name="rectData">The rectangle description for this checkbox</param>
+        /// <param name="bold">If Set, uses Trajan-Bold, else Trajan for the font</param>
+        /// <param name="isOn">Determines if the initial state of the checkbox is checked or not</param>
         /// <returns></returns>
         public static GameObject CreateToggle(GameObject parent, Action<bool> action, Sprite boxBgSprite, Sprite boxFgSprite, string text, int fontSize, TextAnchor textAnchor, RectData rectData, bool bold = true, bool isOn = false)
         {
@@ -528,7 +528,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// 
+        /// Creates a Toggle Group To allow for toggling multiple objects.
         /// </summary>
         /// <returns></returns>
         public static GameObject CreateToggleGroup()
@@ -545,8 +545,8 @@ namespace Modding
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="rectData"></param>
+        /// <param name="parent">Parent Object for this Panel</param>
+        /// <param name="rectData">Describes the panel's rectangle</param>
         /// <returns></returns>
         public static GameObject CreateRectMask2DPanel(GameObject parent, RectData rectData)
         {
@@ -558,7 +558,7 @@ namespace Modding
 
 
         /// <summary>
-        /// 
+        /// Fades the Canvas Group In When it is &lt; 1f
         /// </summary>
         /// <param name="cg"></param>
         /// <returns></returns>
@@ -589,7 +589,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// 
+        /// Fades the Canvas Group Out When it is &gt; .05f
         /// </summary>
         /// <param name="cg"></param>
         /// <returns></returns>
