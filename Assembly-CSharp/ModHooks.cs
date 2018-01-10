@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using GlobalEnums;
-using HutongGames.PlayMaker.Actions;
+using Modding.Menu;
 using MonoMod;
 using UnityEngine;
 
@@ -18,9 +18,9 @@ namespace Modding
     /// </summary>
 	public class ModHooks
     {
-        internal static bool IsInitialized = false;
+        internal static bool IsInitialized;
 
-        private const int _modVersion = 28;
+        private const int _modVersion = 29;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
@@ -32,13 +32,16 @@ namespace Modding
 
         private ModHooksGlobalSettings _globalSettings;
 
-        private ModHooksGlobalSettings GlobalSettings
+        internal ModHooksGlobalSettings GlobalSettings
         {
             get
             {
                 if (_globalSettings != null) return _globalSettings;
 
                 LoadGlobalSettings();
+
+                if (_globalSettings.ModEnabledSettings == null) _globalSettings.ModEnabledSettings = new SerializableBoolDictionary();
+                
                 return _globalSettings;
             }
         }
@@ -98,7 +101,7 @@ namespace Modding
             Logger.Log("[API] - Adding GitHub SSL Cert to Allow for Checking of Mod Versions");
 
             SetupServicePointAuthorizor();
-
+            ModManager manager = new ModManager();
             Logger.SetLogLevel(GlobalSettings.LoggingLevel);
             GameVersion gameVersion;
 
@@ -1602,7 +1605,7 @@ namespace Modding
         {
             if (!File.Exists(SettingsPath))
             {
-                _globalSettings = new ModHooksGlobalSettings { LoggingLevel = LogLevel.Info };
+                _globalSettings = new ModHooksGlobalSettings { LoggingLevel = LogLevel.Info,ModEnabledSettings = new SerializableBoolDictionary() };
                 return;
             }
 

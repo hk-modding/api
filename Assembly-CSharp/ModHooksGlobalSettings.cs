@@ -1,9 +1,13 @@
-﻿namespace Modding
+﻿using System;
+using UnityEngine;
+
+namespace Modding
 {
     /// <inheritdoc />
     /// <summary>
     /// Class to hold GlobalSettings for the Modding API
     /// </summary>
+    [Serializable]
     public class ModHooksGlobalSettings : IModSettings
     {
 
@@ -25,5 +29,11 @@
             get => GetBool(false);
             set => SetBool(value);
         }
+
+
+        /// <summary>
+        /// Lists the known mods that are currently installed and whether or not they've been enabled or disabled via the Mod Manager Menu.
+        /// </summary>
+        [SerializeField] public SerializableBoolDictionary ModEnabledSettings;
     }
 }

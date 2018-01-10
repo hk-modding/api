@@ -72,6 +72,9 @@
     <Compile Include="Loggable.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LogLevel.cs" />
+    <Compile Include="Menu\FauxMenuOptionHorizontal.cs" />
+    <Compile Include="Menu\FauxUIManager.cs" />
+    <Compile Include="Menu\ModManager.cs" />
     <Compile Include="Mod.cs" />
     <Compile Include="ModData.cs" />
     <Compile Include="ModHooks.cs" />
@@ -103,6 +106,8 @@
     <Compile Include="SerializableFloatDictionary.cs" />
     <Compile Include="SerializableIntDictionary.cs" />
     <Compile Include="SerializableStringDictionary.cs" />
+    <Compile Include="SimpleLogger.cs" />
+    <Compile Include="TogglableMod.cs" />
     <Compile Include="VoidModSettings.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

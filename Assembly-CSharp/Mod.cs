@@ -20,6 +20,13 @@ namespace Modding
 
         /// <inheritdoc />
         /// <summary>
+        /// Get's the Mod's Name
+        /// </summary>
+        /// <returns></returns>
+        public string GetName() => Name;
+
+        /// <inheritdoc />
+        /// <summary>
         /// Constrcuts the mod, assignes the instance and sets the name.
         /// </summary>
         public Mod()
@@ -32,12 +39,6 @@ namespace Modding
         /// Called when class is first constructed.
         /// </summary>
         public virtual void Initialize() { }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Called during game unload.
-        /// </summary>
-        public virtual void Unload() { }
 
         /// <inheritdoc />
         /// <summary>

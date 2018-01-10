@@ -6,15 +6,17 @@
     /// </summary>
     public interface IMod : ILogger
     {
+
+        /// <summary>
+        /// Get's the Mod's Name
+        /// </summary>
+        /// <returns></returns>
+        string GetName();
+
         /// <summary>
         /// Called when class is first constructed.
         /// </summary>
         void Initialize();
-
-        /// <summary>
-        /// Called during game unload.
-        /// </summary>
-        void Unload();
 
         /// <summary>
         /// Returns version of Mod

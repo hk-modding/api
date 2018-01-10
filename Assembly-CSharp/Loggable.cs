@@ -6,14 +6,14 @@
     /// </summary>
     public abstract class Loggable : ILogger
     {
-        private readonly string _name;
+        internal string ClassName;
 
         /// <summary>
         /// Basic setup for Loggable.
         /// </summary>
         protected Loggable()
         {
-             _name = GetType().Name;
+            ClassName = GetType().Name;
         }
 
         /// <inheritdoc />
@@ -91,13 +91,13 @@
         /// </summary>
         /// <param name="message">Message to be formatted.</param>
         /// <returns>Formatted Message</returns>
-        private string FormatLogMessage(string message) => $"[{_name}] - {message}";
+        private string FormatLogMessage(string message) => $"[{ClassName}] - {message}";
 
         /// <summary>
         /// Formats a log message as "[TypeName] - Message"
         /// </summary>
         /// <param name="message">Message to be formatted.</param>
         /// <returns>Formatted Message</returns>
-        private string FormatLogMessage(object message) => $"[{_name}] - {message.ToString()}";
+        private string FormatLogMessage(object message) => $"[{ClassName}] - {message.ToString()}";
     }
 }

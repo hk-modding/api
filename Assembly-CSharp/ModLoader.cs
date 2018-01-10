@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using UnityEngine;
 
 namespace Modding
@@ -23,7 +24,6 @@ namespace Modding
             }
 
             Logger.Log("[API] - Trying to load mods");
-            string text = "Modding API: " + ModHooks.Instance.ModVersion + (ModHooks.Instance.IsCurrent ? "" : " - New Version Available!") + "\n";
             string path = string.Empty;
             if (SystemInfo.operatingSystem.Contains("Windows"))
                 path = Application.dataPath + "\\Managed\\Mods";
@@ -65,7 +65,7 @@ namespace Modding
 				catch (Exception ex)
 				{
 				    Logger.LogError("[API] - Error: " + ex);
-                    text = string.Concat(text, text2, ": FAILED TO LOAD! Check ModLog.txt. \n");
+		            _errors.Add(string.Concat(text2, ": FAILED TO LOAD! Check ModLog.txt."));
 				}
 			}
 
@@ -73,33 +73,100 @@ namespace Modding
 		    {
 		        try
 		        {
-		            mod.Initialize();
-
-		            ModHooks.Instance.LoadedModsWithVersions.Add(mod.GetType().Name, mod.GetVersion());
-		            ModHooks.Instance.LoadedMods.Add(mod.GetType().Name);
-
-		            text = string.Concat(text, mod.GetType().Name, ": ", mod.GetVersion(),
-		                mod.IsCurrent() ? "" : " - New Version Available!", "\n");
+                    LoadMod(mod, false);
 		        }
 		        catch (Exception ex)
 		        {
-		            text = string.Concat(text, mod.GetType().Name, ": FAILED TO LOAD! Check ModLog.txt. \n");
+		            _errors.Add(string.Concat(mod.GetType().Name, ": FAILED TO LOAD! Check ModLog.txt."));
 		            Logger.LogError("[API] - Error: " + ex);
                 }
             }
 
+
 			GameObject gameObject = new GameObject();
-			gameObject.AddComponent<ModVersionDraw>().drawString = text;
-			UnityEngine.Object.DontDestroyOnLoad(gameObject);
+            _draw = gameObject.AddComponent<ModVersionDraw>();
+            UnityEngine.Object.DontDestroyOnLoad(gameObject);
+			UpdateModText();
 			Loaded = true;
+            
 		    ModHooks.Instance.SaveGlobalSettings();
 		}
+
+        private static List<string> _errors = new List<string>();
 
 		static ModLoader()
 		{
 			Loaded = false;
 			Debug = true;
 		}
+
+	    private static ModVersionDraw _draw;
+
+	    private static void UpdateModText()
+	    {
+            StringBuilder builder = new StringBuilder();
+	        builder.AppendLine("Modding API: " + ModHooks.Instance.ModVersion + (ModHooks.Instance.IsCurrent ? "" : " - New Version Available!") );
+	        foreach (string error in _errors)
+	        {
+	            builder.AppendLine(error);
+	        }
+
+            foreach (Mod mod in LoadedMods)
+	        {
+	            if (ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()])
+	            {
+	                if (!_modVersionsCache.ContainsKey(mod.Name))
+	                    _modVersionsCache.Add(mod.Name, $"{mod.GetVersion()} " + (mod.IsCurrent() ? string.Empty : " - New Version Available!"));
+
+	                builder.AppendLine($"{mod.Name} : {_modVersionsCache[mod.Name]}");
+                }
+	        }
+	        _draw.drawString = builder.ToString();
+
+	    }
+
+	    internal static void LoadMod(IMod mod)
+	    {
+	        ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = true;
+            LoadMod(mod, false);
+        }
+
+        internal static void LoadMod(IMod mod, bool updateModText)
+	    {
+            
+
+            mod.Initialize();
+
+
+            if (!ModHooks.Instance.LoadedModsWithVersions.ContainsKey(mod.GetType().Name))
+	            ModHooks.Instance.LoadedModsWithVersions.Add(mod.GetType().Name, mod.GetVersion());
+            else
+                ModHooks.Instance.LoadedModsWithVersions[mod.GetType().Name] = mod.GetVersion();
+
+            if (ModHooks.Instance.LoadedMods.All(x => x != mod.GetType().Name))
+                ModHooks.Instance.LoadedMods.Add(mod.GetType().Name);
+
+            if (updateModText)
+                UpdateModText();
+        }
+
+	    internal static void UnloadMod(ITogglableMod mod)
+	    {
+	        try
+	        {
+	            ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = false;
+	            ModHooks.Instance.LoadedModsWithVersions.Remove(mod.GetType().Name);
+	            ModHooks.Instance.LoadedMods.Remove(mod.GetType().Name);
+
+                mod.Unload();
+            }
+	        catch (Exception ex)
+	        {
+	            Logger.LogError($"[API] - Failed to unload Mod - {mod.GetName()} - {Environment.NewLine} - {ex} ");
+	        }
+
+            UpdateModText();
+        }
 
         /// <summary>
         /// Checks to see if a class is a subclass of a generic class.
@@ -135,7 +202,7 @@ namespace Modding
         /// </summary>
 		public static List<Mod> LoadedMods = new List<Mod>();
 
-        
+        private static Dictionary<string, string> _modVersionsCache = new Dictionary<string, string>();
 	    
     }
 }
