@@ -128,9 +128,7 @@ namespace Modding.Menu
             ModMenuScreen.transform.localPosition = _uim.optionsMenuScreen.gameObject.transform.localPosition;
             ModMenuScreen.transform.localScale = _uim.optionsMenuScreen.gameObject.transform.localScale;
 
-            // ReSharper disable SuspiciousTypeConversion.Global
             List<ITogglableMod> managableMods = ModLoader.LoadedMods.Where(x => x is ITogglableMod).Select(x => x).Cast<ITogglableMod>().ToList();
-            // ReSharper restore SuspiciousTypeConversion.Global
 
             //modMenuScreen.content = modMenuScreen.gameObject.transform.GetChild()
             ModMenuScreen.defaultHighlight = ModMenuScreen.content.gameObject.transform.GetChild(0).GetChild(0).GetComponent<MenuButton>();
@@ -146,98 +144,105 @@ namespace Modding.Menu
             Object.DestroyImmediate(item.GetComponent<MenuSetting>());
             Object.DestroyImmediate(ModMenuScreen.content.GetComponent<VerticalLayoutGroup>());
             Object.Destroy(ModMenuScreen.defaultHighlight.gameObject.transform.parent.gameObject);
-
-            if (managableMods.Count > 0)
+            try
             {
-
-                ModArray = new Selectable[managableMods.Count];
-
-                for (int i = 0; i < managableMods.Count; i++)
+                if (managableMods.Count > 0)
                 {
-                    GameObject menuItemParent = Object.Instantiate(item.gameObject);
-                    FauxMenuOptionHorizontal menuItem = menuItemParent.AddComponent<FauxMenuOptionHorizontal>();
-                    
-                    menuItem.navigation = Navigation.defaultNavigation;
-                    int modIndex = i;
 
-                    //Manages what should happen when the menu option changes (the user clicks and the mod is toggled On/Off)
-                    menuItem.OnUpdate += optionIndex =>
+                    ModArray = new Selectable[managableMods.Count];
+
+                    for (int i = 0; i < managableMods.Count; i++)
                     {
-                        ITogglableMod mod = managableMods[modIndex];
+                        GameObject menuItemParent = Object.Instantiate(item.gameObject);
+                        FauxMenuOptionHorizontal menuItem = menuItemParent.AddComponent<FauxMenuOptionHorizontal>();
 
-                        string name = mod.GetName();
+                        menuItem.navigation = Navigation.defaultNavigation;
+                        int modIndex = i;
 
-                        if (!ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(name))
-                            ModHooks.Instance.GlobalSettings.ModEnabledSettings.Add(name, true);
-
-                        if (optionIndex == 1)
+                        //Manages what should happen when the menu option changes (the user clicks and the mod is toggled On/Off)
+                        menuItem.OnUpdate += optionIndex =>
                         {
-                           ModLoader.UnloadMod(mod);
-                        }
-                        else
-                        {
-                           ModLoader.LoadMod(mod);
-                        }
-                    };
-                    //dataDump(modArray[i].gameObject, 1);                    
+                            ITogglableMod mod = managableMods[modIndex];
 
-                    menuItem.OptionList = new[] {"On", "Off"};
-                    menuItem.OptionText = menuItem.gameObject.transform.GetChild(1).GetComponent<Text>();
-                    menuItem.SelectedOptionIndex = ModHooks.Instance.GlobalSettings.ModEnabledSettings[managableMods[i].GetName()] ? 0 : 1;
-                    menuItem.LocalizeText = false;
-                    menuItem.SheetTitle = managableMods[i].GetName();
+                            string name = mod.GetName();
 
-                    Object.DestroyImmediate(menuItem.transform.FindChild("Label")
-                        .GetComponent<AutoLocalizeTextUI>());
-                    menuItem.transform.FindChild("Label").GetComponent<Text>().text = managableMods[i].GetName();
+                            if (!ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(name))
+                                ModHooks.Instance.GlobalSettings.ModEnabledSettings.Add(name, true);
 
-                    menuItem.leftCursor = menuItem.transform.FindChild("CursorLeft").GetComponent<Animator>();
-                    menuItem.rightCursor = menuItem.transform.FindChild("CursorRight").GetComponent<Animator>();
+                            if (optionIndex == 1)
+                            {
+                                ModLoader.UnloadMod(mod);
+                            }
+                            else
+                            {
+                                ModLoader.LoadMod(mod, true);
+                            }
+                        };
+                        //dataDump(modArray[i].gameObject, 1);                    
 
-                    menuItem.gameObject.name = managableMods[i].GetName();
+                        menuItem.OptionList = new[] {"On", "Off"};
+                        menuItem.OptionText = menuItem.gameObject.transform.GetChild(1).GetComponent<Text>();
+                        menuItem.SelectedOptionIndex =
+                            ModHooks.Instance.GlobalSettings.ModEnabledSettings[managableMods[i].GetName()] ? 0 : 1;
+                        menuItem.LocalizeText = false;
+                        menuItem.SheetTitle = managableMods[i].GetName();
 
-                    RectTransform rt = menuItemParent.GetComponent<RectTransform>();
+                        Object.DestroyImmediate(menuItem.transform.FindChild("Label")
+                            .GetComponent<AutoLocalizeTextUI>());
+                        menuItem.transform.FindChild("Label").GetComponent<Text>().text = managableMods[i].GetName();
 
-                    rt.SetParent(ModMenuScreen.content.transform);
-                    rt.localScale = new Vector3(2, 2, 2);
+                        menuItem.leftCursor = menuItem.transform.FindChild("CursorLeft").GetComponent<Animator>();
+                        menuItem.rightCursor = menuItem.transform.FindChild("CursorRight").GetComponent<Animator>();
 
-                    rt.sizeDelta = new Vector2(960, 120);
-                    rt.anchoredPosition = new Vector2(0, (766 / 2) - 90 - (150 * i));
-                    rt.anchorMin = new Vector2(0.5f, 1.0f);
-                    rt.anchorMax = new Vector2(0.5f, 1.0f);
+                        menuItem.gameObject.name = managableMods[i].GetName();
 
-                    //Image img = menuItem.AddComponent<Image>();
-                    //img.sprite = nullSprite();
-                    
-                    menuItem.cancelAction = CancelAction.DoNothing;
+                        RectTransform rt = menuItemParent.GetComponent<RectTransform>();
 
-                    ModArray[i] = menuItem;
+                        rt.SetParent(ModMenuScreen.content.transform);
+                        rt.localScale = new Vector3(2, 2, 2);
 
-                    //AutoLocalizeTextUI localizeUI = modArray[i].GetComponent<AutoLocalizeTextUI>();
-                    //modArray[i].transform.GetChild(0).GetComponent<Text>().text = mods[i];
-                    //GameObject.Destroy(localizeUI);
-                }
+                        rt.sizeDelta = new Vector2(960, 120);
+                        rt.anchoredPosition = new Vector2(0, (766 / 2) - 90 - (150 * i));
+                        rt.anchorMin = new Vector2(0.5f, 1.0f);
+                        rt.anchorMax = new Vector2(0.5f, 1.0f);
 
-                Navigation[] navs = new Navigation[ModArray.Length];
-                for (int i = 0; i < ModArray.Length; i++)
-                {
-                    navs[i] = new Navigation
+                        //Image img = menuItem.AddComponent<Image>();
+                        //img.sprite = nullSprite();
+
+                        menuItem.cancelAction = CancelAction.DoNothing;
+
+                        ModArray[i] = menuItem;
+
+                        //AutoLocalizeTextUI localizeUI = modArray[i].GetComponent<AutoLocalizeTextUI>();
+                        //modArray[i].transform.GetChild(0).GetComponent<Text>().text = mods[i];
+                        //GameObject.Destroy(localizeUI);
+                    }
+
+                    Navigation[] navs = new Navigation[ModArray.Length];
+                    for (int i = 0; i < ModArray.Length; i++)
                     {
-                        mode = Navigation.Mode.Explicit,
-                        selectOnUp = i == 0 ? Back : ModArray[i - 1],
-                        selectOnDown = i == ModArray.Length - 1 ? Back : ModArray[i + 1]
-                    };
+                        navs[i] = new Navigation
+                        {
+                            mode = Navigation.Mode.Explicit,
+                            selectOnUp = i == 0 ? Back : ModArray[i - 1],
+                            selectOnDown = i == ModArray.Length - 1 ? Back : ModArray[i + 1]
+                        };
 
-                    ModArray[i].navigation = navs[i];
+                        ModArray[i].navigation = navs[i];
+                    }
+
+                    ModMenuScreen.defaultHighlight = ModArray[0];
+                    Navigation nav2 = Back.navigation;
+                    nav2.selectOnUp = ModArray[ModArray.Length - 1];
+                    nav2.selectOnDown = ModArray[0];
+                    Back.navigation = nav2;
                 }
-
-                ModMenuScreen.defaultHighlight = ModArray[0];
-                Navigation nav2 = Back.navigation;
-                nav2.selectOnUp = ModArray[ModArray.Length - 1];
-                nav2.selectOnDown = ModArray[0];
-                Back.navigation = nav2;
             }
-            
+            catch (Exception ex)
+            {
+                LogError(ex);
+            }
+
 
             ((MenuButton)Back).cancelAction = CancelAction.DoNothing;
             EventTrigger backEvents = Back.gameObject.GetComponent<EventTrigger>();

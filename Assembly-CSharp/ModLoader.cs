@@ -65,11 +65,11 @@ namespace Modding
 				catch (Exception ex)
 				{
 				    Logger.LogError("[API] - Error: " + ex);
-		            _errors.Add(string.Concat(text2, ": FAILED TO LOAD! Check ModLog.txt."));
+		            Errors.Add(string.Concat(text2, ": FAILED TO LOAD! Check ModLog.txt."));
 				}
 			}
 
-		    foreach (Mod mod in LoadedMods.OrderBy(x => x.LoadPriority()))
+		    foreach (IMod mod in LoadedMods.OrderBy(x => x.LoadPriority()))
 		    {
 		        try
 		        {
@@ -77,9 +77,16 @@ namespace Modding
 		        }
 		        catch (Exception ex)
 		        {
-		            _errors.Add(string.Concat(mod.GetType().Name, ": FAILED TO LOAD! Check ModLog.txt."));
+		            Errors.Add(string.Concat(mod.GetName(), ": FAILED TO LOAD! Check ModLog.txt."));
 		            Logger.LogError("[API] - Error: " + ex);
                 }
+            }
+
+            //Clean out the ModEnabledSettings for any mods that don't exist.
+            foreach (string modName in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Keys)
+            {
+                if (LoadedMods.All(x => x.GetName() != modName))
+                    ModHooks.Instance.GlobalSettings.ModEnabledSettings.Remove(modName);
             }
 
 
@@ -92,7 +99,7 @@ namespace Modding
 		    ModHooks.Instance.SaveGlobalSettings();
 		}
 
-        private static List<string> _errors = new List<string>();
+        private static readonly List<string> Errors = new List<string>();
 
 		static ModLoader()
 		{
@@ -106,34 +113,33 @@ namespace Modding
 	    {
             StringBuilder builder = new StringBuilder();
 	        builder.AppendLine("Modding API: " + ModHooks.Instance.ModVersion + (ModHooks.Instance.IsCurrent ? "" : " - New Version Available!") );
-	        foreach (string error in _errors)
+	        foreach (string error in Errors)
 	        {
 	            builder.AppendLine(error);
 	        }
 
-            foreach (Mod mod in LoadedMods)
+            foreach (IMod mod in LoadedMods)
 	        {
 	            if (ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()])
 	            {
-	                if (!_modVersionsCache.ContainsKey(mod.Name))
-	                    _modVersionsCache.Add(mod.Name, $"{mod.GetVersion()} " + (mod.IsCurrent() ? string.Empty : " - New Version Available!"));
+	                if (!ModVersionsCache.ContainsKey(mod.GetName()))
+	                    ModVersionsCache.Add(mod.GetName(), $"{mod.GetVersion()} " + (mod.IsCurrent() ? string.Empty : " - New Version Available!"));
 
-	                builder.AppendLine($"{mod.Name} : {_modVersionsCache[mod.Name]}");
+	                builder.AppendLine($"{mod.GetName()} : {ModVersionsCache[mod.GetName()]}");
                 }
 	        }
-	        _draw.drawString = builder.ToString();
+            _draw.drawString = builder.ToString();
 
 	    }
 
 	    internal static void LoadMod(IMod mod)
 	    {
-	        ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = true;
-            LoadMod(mod, false);
+	        LoadMod(mod, false);
         }
 
         internal static void LoadMod(IMod mod, bool updateModText)
 	    {
-            
+	        ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = true;
 
             mod.Initialize();
 
@@ -150,7 +156,7 @@ namespace Modding
                 UpdateModText();
         }
 
-	    internal static void UnloadMod(ITogglableMod mod)
+	    internal static void UnloadMod(ITogglableMod mod) 
 	    {
 	        try
 	        {
@@ -200,9 +206,9 @@ namespace Modding
         /// <summary>
         /// List of loaded mods.
         /// </summary>
-		public static List<Mod> LoadedMods = new List<Mod>();
+		public static List<IMod> LoadedMods = new List<IMod>();
 
-        private static Dictionary<string, string> _modVersionsCache = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> ModVersionsCache = new Dictionary<string, string>();
 	    
     }
 }
