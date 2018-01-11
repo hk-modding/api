@@ -209,7 +209,7 @@ namespace Modding.Menu
                         //Image img = menuItem.AddComponent<Image>();
                         //img.sprite = nullSprite();
 
-                        menuItem.cancelAction = CancelAction.DoNothing;
+                        menuItem.cancelAction = Patches.CancelAction.QuitModMenu;
 
                         ModArray[i] = menuItem;
 
@@ -244,7 +244,7 @@ namespace Modding.Menu
             }
 
 
-            ((MenuButton)Back).cancelAction = CancelAction.DoNothing;
+            ((Patches.MenuSelectable)Back).cancelAction = Patches.CancelAction.QuitModMenu;
             EventTrigger backEvents = Back.gameObject.GetComponent<EventTrigger>();
 
             backEvents.triggers = new List<EventTrigger.Entry>();

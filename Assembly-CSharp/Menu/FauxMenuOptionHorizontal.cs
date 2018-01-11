@@ -9,7 +9,7 @@ namespace Modding.Menu
     /// <summary>
     /// Provides a simple toggle menu
     /// </summary>
-    public class FauxMenuOptionHorizontal : MenuSelectable, IPointerClickHandler, IMoveHandler
+    public class FauxMenuOptionHorizontal : Patches.MenuSelectable, IPointerClickHandler, IMoveHandler
     {
 
         private readonly SimpleLogger _log = new SimpleLogger("FauxMenuOptionHorizontal");

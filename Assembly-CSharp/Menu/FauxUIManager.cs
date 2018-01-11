@@ -16,8 +16,11 @@ namespace Modding.Menu
 
         internal static GameManager gameManager => _gm != null ? _gm : (_gm = GameManager.instance);
 
+        public static FauxUIManager Instance;
+
         public void Start()
         {
+            Instance = this;
             DontDestroyOnLoad(this);
         }
 
