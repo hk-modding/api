@@ -433,7 +433,7 @@ namespace Modding
         {
             GameObject panel = CreateBasePanel(parent, rectData);
 
-            CreateTextPanel(panel, text, fontSize, textAnchor, rectData, bold);
+            CreateTextPanel(panel, text, fontSize, textAnchor, new RectData(new Vector2(0,0), new Vector2(0,0)), bold);
 
             Image img = panel.AddComponent<Image>();
             img.sprite = spr;
