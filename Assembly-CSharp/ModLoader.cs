@@ -120,12 +120,20 @@ namespace Modding
 
             foreach (IMod mod in LoadedMods)
 	        {
-	            if (ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()])
+	            try
 	            {
-	                if (!ModVersionsCache.ContainsKey(mod.GetName()))
-	                    ModVersionsCache.Add(mod.GetName(), $"{mod.GetVersion()} " + (mod.IsCurrent() ? string.Empty : " - New Version Available!"));
+	                if (ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()])
+	                {
+	                    if (!ModVersionsCache.ContainsKey(mod.GetName()))
+	                        ModVersionsCache.Add(mod.GetName(),
+	                            $"{mod.GetVersion()} " + (mod.IsCurrent() ? string.Empty : " - New Version Available!"));
 
-	                builder.AppendLine($"{mod.GetName()} : {ModVersionsCache[mod.GetName()]}");
+	                    builder.AppendLine($"{mod.GetName()} : {ModVersionsCache[mod.GetName()]}");
+	                }
+	            }
+	            catch (Exception ex)
+	            {
+	                Logger.LogError($"[API] - Failed to append mod name text: {ex}");
                 }
 	        }
             _draw.drawString = builder.ToString();
