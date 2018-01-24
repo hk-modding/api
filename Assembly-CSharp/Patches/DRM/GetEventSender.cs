@@ -21,7 +21,7 @@ namespace Modding.Patches.DRM
                 this.sentByGameObject.Value = null;
             }
             if (this.sentByGameObject.Value != null)
-                ModHooks.Instance.OnGetEventSender(sentByGameObject.Value);
+                ModHooks.Instance.OnGetEventSender(sentByGameObject.Value, Fsm);
 
             base.Finish();
         }

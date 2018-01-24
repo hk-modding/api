@@ -12,9 +12,7 @@ namespace Modding.Patches
     {
         [MonoModIgnore] internal CancelAction cancelAction;
 
-        public void OnCancel_orig(BaseEventData eventData)
-        {
-        }
+        public extern void orig_OnCancel(BaseEventData eventData);
 
         public void OnCancel(BaseEventData eventData)
         {
@@ -26,7 +24,7 @@ namespace Modding.Patches
                 return;
             }
 
-            OnCancel_orig(eventData);
+            orig_OnCancel(eventData);
         }
     }
 

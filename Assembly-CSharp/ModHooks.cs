@@ -20,7 +20,7 @@ namespace Modding
     {
         internal static bool IsInitialized;
 
-        private const int _modVersion = 31;
+        private const int _modVersion = 34;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
@@ -1765,7 +1765,7 @@ namespace Modding
         /// </summary>
         /// <remarks>HutongGames.PlayMaker.Actions.GetEventSender</remarks>
         [HookInfo("Called whenever game sends GetEventSender. ", "HutongGames.PlayMaker.Actions.GetEventSender")]
-        public event GameObjectHandler OnGetEventSenderHook
+        public event GameObjectFsmHandler OnGetEventSenderHook
         {
             add
             {
@@ -1779,12 +1779,12 @@ namespace Modding
             }
         }
 
-        private event GameObjectHandler _OnGetEventSenderHook;
+        private event GameObjectFsmHandler _OnGetEventSenderHook;
 
         /// <summary>
         /// Called whenever the FSM OnGetEvent is ran (only done during attacks/spells right now).  
         /// </summary>
-        internal GameObject OnGetEventSender(GameObject go)
+        internal GameObject OnGetEventSender(GameObject go, HutongGames.PlayMaker.Fsm fsm)
         {
             Logger.LogFine("[API] - OnGetEventSendr Invoked");
             if (_OnGetEventSenderHook == null) return go;
@@ -1794,7 +1794,7 @@ namespace Modding
             {
                 try
                 {
-                    go = (GameObject)toInvoke.DynamicInvoke(go);
+                    go = (GameObject)toInvoke.DynamicInvoke(go, fsm);
                 }
                 catch (Exception ex)
                 {

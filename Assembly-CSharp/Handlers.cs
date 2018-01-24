@@ -1,4 +1,5 @@
 ﻿using GlobalEnums;
+using HutongGames.PlayMaker;
 using Modding.Patches;
 using UnityEngine;
 
@@ -177,6 +178,14 @@ namespace Modding
     /// <param name="go"></param>
     /// <returns></returns>
     public delegate GameObject GameObjectHandler(GameObject go);
+
+    /// <summary>
+    /// Handle for events that accept a GameObject and FSM and return a GameObject
+    /// </summary>
+    /// <param name="go"></param>
+    /// <param name="fsm"></param>
+    /// <returns></returns>
+    public delegate GameObject GameObjectFsmHandler(GameObject go, Fsm fsm);
 
     /// <summary>
     /// Called when the game changes to a new regional font

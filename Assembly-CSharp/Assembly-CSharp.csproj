@@ -173,7 +173,7 @@ powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -rep
 copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinal\hollow_knight_Data\Managed\"
 
 rem "Zip the Distribution Folder"
-call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPI.zip" "$(SolutionDir)OutputFinal\"
+call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPI.zip" "$(SolutionDir)OutputFinal\*"
 
 if "$(ConfigurationName)" == "DebugDeploy"  goto :Deploy
 goto :Exit
@@ -196,7 +196,7 @@ powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -rep
 copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\"
 
 rem "Zip the Distribution Folder"
-call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPIMac.zip" "$(SolutionDir)OutputFinalMac\"
+call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPIMac.zip" "$(SolutionDir)OutputFinalMac\hollow_knight.app\*"
 
 goto :Exit
 
