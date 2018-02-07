@@ -83,7 +83,8 @@ namespace Modding
             }
 
             //Clean out the ModEnabledSettings for any mods that don't exist.
-            foreach (string modName in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Keys)
+            //Calling ToList means we are not working with the dictionary keys directly, preventing an out of sync error
+            foreach (string modName in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Keys.ToList())
             {
                 if (LoadedMods.All(x => x.GetName() != modName))
                     ModHooks.Instance.GlobalSettings.ModEnabledSettings.Remove(modName);
