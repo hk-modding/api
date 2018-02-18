@@ -29,6 +29,8 @@ namespace Modding
                 path = Application.dataPath + "\\Managed\\Mods";
             else if (SystemInfo.operatingSystem.Contains("Mac"))
                 path = Application.dataPath + "/Resources/Data/Managed/Mods/";
+            else if (SystemInfo.operatingSystem.Contains("Linux"))
+                path = Application.dataPath + "/Managed/Mods";
             else
                 Logger.LogWarn($"Operating system of {SystemInfo.operatingSystem} is not known.  Unable to load mods.");
 
