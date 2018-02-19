@@ -29,6 +29,8 @@ namespace Modding
                 path = Application.dataPath + "\\Managed\\Mods";
             else if (SystemInfo.operatingSystem.Contains("Mac"))
                 path = Application.dataPath + "/Resources/Data/Managed/Mods/";
+            else if (SystemInfo.operatingSystem.Contains("Linux"))
+                path = Application.dataPath + "/Managed/Mods";
             else
                 Logger.LogWarn($"Operating system of {SystemInfo.operatingSystem} is not known.  Unable to load mods.");
 
@@ -83,7 +85,8 @@ namespace Modding
             }
 
             //Clean out the ModEnabledSettings for any mods that don't exist.
-            foreach (string modName in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Keys)
+            //Calling ToList means we are not working with the dictionary keys directly, preventing an out of sync error
+            foreach (string modName in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Keys.ToList())
             {
                 if (LoadedMods.All(x => x.GetName() != modName))
                     ModHooks.Instance.GlobalSettings.ModEnabledSettings.Remove(modName);
