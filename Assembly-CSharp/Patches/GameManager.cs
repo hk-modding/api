@@ -1,4 +1,5 @@
-﻿using MonoMod;
+﻿using System.Collections;
+using MonoMod;
 //We don't care about XML docs for these as they are being patched into the original code
 #pragma warning disable 1591
 #pragma warning disable CS0108
@@ -65,7 +66,14 @@ namespace Modding.Patches
             ModHooks.Instance.OnAfterSaveGameClear(saveSlot);
         }
 
+        public IEnumerator orig_PlayerDead(float waitTime) { yield break; }
 
+        public IEnumerator PlayerDead(float waitTime)
+        {
+            ModHooks.Instance.OnBeforePlayerDead();
+            yield return orig_PlayerDead(waitTime);
+            ModHooks.Instance.OnAfterPlayerDead();
+        }
 
     }
 }

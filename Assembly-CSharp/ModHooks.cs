@@ -20,7 +20,7 @@ namespace Modding
     {
         internal static bool IsInitialized;
 
-        private const int _modVersion = 34;
+        private const int _modVersion = 36;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
@@ -648,6 +648,97 @@ namespace Modding
             return damageAmount;
         }
 
+        /// <summary>
+        /// Called when the player dies
+        /// </summary>
+        /// <remarks>GameManager.PlayerDead</remarks>
+        [HookInfo("Called when the player dies", "GameManager.PlayerDead")]
+        public event VoidHandler BeforePlayerDeadHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding BeforePlayerDeadHook");
+                _BeforePlayerDeadHook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing BeforePlayerDeadHook");
+                _BeforePlayerDeadHook -= value;
+            }
+        }
+
+        private event VoidHandler _BeforePlayerDeadHook;
+
+        /// <summary>
+        /// Called when the player dies (at the beginning of the method)
+        /// </summary>
+        /// <remarks>GameManager.PlayerDead</remarks>
+        internal void OnBeforePlayerDead()
+        {
+            Logger.LogFine("[API] - OnBeforePlayerDead Invoked");
+
+            if (_BeforePlayerDeadHook == null) return;
+
+            Delegate[] invocationList = _BeforePlayerDeadHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                try
+                {
+                    toInvoke.DynamicInvoke();
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("[API] - " + ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called after the player dies
+        /// </summary>
+        /// <remarks>GameManager.PlayerDead</remarks>
+        [HookInfo("Called after the player dies", "GameManager.PlayerDead")]
+        public event VoidHandler AfterPlayerDeadHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AfterPlayerDeadHook");
+                _AfterPlayerDeadHook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AfterPlayerDeadHook");
+                _AfterPlayerDeadHook -= value;
+            }
+        }
+
+        private event VoidHandler _AfterPlayerDeadHook;
+
+        /// <summary>
+        /// Called after the player dies (at the end of the method)
+        /// </summary>
+        /// <remarks>GameManager.PlayerDead</remarks>
+        internal void OnAfterPlayerDead()
+        {
+            Logger.LogFine("[API] - OnAfterPlayerDead Invoked");
+
+            if (_AfterPlayerDeadHook == null) return;
+
+            Delegate[] invocationList = _AfterPlayerDeadHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                try
+                {
+                    toInvoke.DynamicInvoke();
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("[API] - " + ex);
+                }
+            }
+        }
 
         /// <summary>
         /// Called whenever the player attacks

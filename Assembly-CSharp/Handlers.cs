@@ -192,4 +192,14 @@ namespace Modding
     /// </summary>
     /// <returns></returns>
     public delegate void SetFontHandler();
+
+    /// <summary>
+    /// Generic Handler with a Void Return
+    /// </summary>
+    public delegate void VoidHandler();
+
+    /// <summary>
+    /// Generic Handler with a Boolean Return
+    /// </summary>
+    public delegate bool BoolHandler();
 }
