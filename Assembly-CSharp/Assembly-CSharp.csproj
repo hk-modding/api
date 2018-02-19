@@ -58,6 +58,16 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLinux|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugLinux\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="CallerMemberName.cs" />
     <Compile Include="CanvasUtil.cs" />
@@ -158,6 +168,7 @@ move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.pdb" "$(ProjectDir)$(OutputP
 
 if "$(ConfigurationName)" == "Debug" or "$(ConfigurationName)" == "DebugDeploy"  goto :Debug
 if "$(ConfigurationName)" == "DebugMac" goto :DebugMac
+if "$(ConfigurationName)" == "DebugLinux" goto :DebugLinux
 
 :Debug
 copy /Y "$(SolutionDir)Vanilla\*" "$(ProjectDir)$(OutputPath)\"
@@ -190,7 +201,7 @@ MonoMod.exe Assembly-CSharp.dll
 rem "Create the folder structure prefered by mods"
 md "$(SolutionDir)OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\Mods"
 rem "Copy the Mod's dll into the Mods folder"
-copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinal\readme.md"
+copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinalMac\readme.md"
 copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\Assembly-CSharp.dll"
 powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
 copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\"
@@ -200,6 +211,23 @@ call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPIMac.zip" "$(SolutionDir)Ou
 
 goto :Exit
 
+:DebugLinux
+copy /Y "$(SolutionDir)VanillaLinux\*" "$(ProjectDir)$(OutputPath)\"
+copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
+cd "$(ProjectDir)$(OutputPath)"
+MonoMod.exe Assembly-CSharp.dll
+rem "Create the folder structure prefered by mods"
+md "$(SolutionDir)OutputFinalLinux\hollow_knight_Data\Managed\Mods"
+rem "Copy the Mod's dll into the Mods folder"
+copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinalLinux\readme.md"
+copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinalLinux\hollow_knight_Data\Managed\Assembly-CSharp.dll"
+powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
+copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinalLinux\hollow_knight_Data\Managed\"
+
+rem "Zip the Distribution Folder"
+call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPILinux.zip" "$(SolutionDir)OutputFinalLinux\*"
+
+goto :Exit
 
 
 :Exit</PostBuildEvent>
@@ -210,6 +238,7 @@ rem "If Distribution exists, delete it"
 
 if "$(ConfigurationName)" == "Debug" or "$(ConfigurationName)" == "DebugDeploy"  goto :Debug
 if "$(ConfigurationName)" == "DebugMac" goto :DebugMac
+if "$(ConfigurationName)" == "DebugLinux" goto :DebugLinux
 
 :Debug
 rd /q /s "$(SolutionDir)OutputFinal\" 2&gt;nul
@@ -219,6 +248,11 @@ goto :Exit
 :DebugMac
 rd /q /s "$(SolutionDir)OutputFinalMac\" 2&gt;nul
 del "$(SolutionDir)ModdingAPIMac.zip" 2&gt;nul
+goto :Exit
+
+:DebugLinux
+rd /q /s "$(SolutionDir)OutputFinalLinux\" 2&gt;nul
+del "$(SolutionDir)ModdingAPILinux.zip" 2&gt;nul
 goto :Exit
 
 :Exit</PreBuildEvent>
