@@ -20,7 +20,7 @@ namespace Modding
     {
         internal static bool IsInitialized;
 
-        private const int _modVersion = 36;
+        private const int _modVersion = 37;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
@@ -2068,14 +2068,28 @@ namespace Modding
                 return;
             }
 
-            //Logger.Log("[API] - Loading Global Settings");
-            using (FileStream fileStream = File.OpenRead(SettingsPath))
+            try
             {
-                using (StreamReader reader = new StreamReader(fileStream))
+                //Logger.Log("[API] - Loading Global Settings");
+                using (FileStream fileStream = File.OpenRead(SettingsPath))
                 {
-                    string json = reader.ReadToEnd();
-                    _globalSettings = JsonUtility.FromJson<ModHooksGlobalSettings>(json);
+                    using (StreamReader reader = new StreamReader(fileStream))
+                    {
+                        string json = reader.ReadToEnd();
+                        _globalSettings = JsonUtility.FromJson<ModHooksGlobalSettings>(json);
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Logger.LogError("[API] - Failed to load global settings, creating new settings file:\n" + e);
+
+                if (File.Exists(SettingsPath))
+                {
+                    File.Move(SettingsPath, SettingsPath + ".error");
+                }
+
+                _globalSettings = new ModHooksGlobalSettings { LoggingLevel = LogLevel.Info, ModEnabledSettings = new SerializableBoolDictionary() };
             }
         }
 
