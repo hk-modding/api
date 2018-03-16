@@ -162,5 +162,18 @@ namespace Modding.Patches
                 healthBlue += 4;
             }
         }
+        
+        public void AddHealth(int amount)
+	    {
+            this.health = ModHooks.Instance.HealthGain();
+		    if (this.health + amount >= this.maxHealth)
+		    {
+		    	this.health = this.maxHealth;
+		    }
+		    else
+		    {
+		    	this.health += amount;
+		    }
+	    }
     }
 }
