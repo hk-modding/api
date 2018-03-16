@@ -985,9 +985,8 @@ namespace Modding
             }
         }
 
-        private event HeroUpdateHandler _HeroUpdateHook;
-
-
+        private event HeroUpdateHandler _HeroUpdateHook;	
+		
         /// <summary>
         /// Called whenever the hero updates
         /// </summary>
@@ -1009,6 +1008,62 @@ namespace Modding
                 }
             }
         }
+		
+	/// <summary>
+        /// Called whenever the player heals
+        /// </summary>
+        /// <remarks>PlayerData.health</remarks>
+	public event HealthGainHandler HealthGainHook
+	{
+		add
+		{
+			string format = "[{0}] - Adding HealthGainHook";
+			Type declaringType = value.Method.DeclaringType;
+			Modding.Logger.LogDebug(string.Format(format, (declaringType != null) ? declaringType.Name : null));
+			this._HealthGainHook += value;
+		}
+		remove
+		{
+			string format = "[{0}] - Removing AfterAttackHook";
+			Type declaringType = value.Method.DeclaringType;
+			Modding.Logger.LogDebug(string.Format(format, (declaringType != null) ? declaringType.Name : null));
+			this._HealthGainHook -= value;
+		}
+	}
+
+	public event HealthGainHandler _HealthGainHook;	
+		
+	/// <summary>
+        /// Called whenever the player heals
+        /// </summary>
+        /// <remarks>PlayerData.health</remarks>
+	internal int HealthGain()
+		{
+			Modding.Logger.LogFine("[API] - HealthGain Invoked");
+			int num = 0;
+			int result;
+			if (this._HealthGainHook == null)
+			{
+				result = num;
+			}
+			else
+			{
+				Delegate[] invocationList = this._HealthGainHook.GetInvocationList();
+				foreach (Delegate @delegate in invocationList)
+				{
+					try
+					{
+						num = (int)@delegate.DynamicInvoke(new object[0]);
+					}
+					catch (Exception ex)
+					{
+						Modding.Logger.LogError("[API] - " + ex);
+					}
+				}
+				result = num;
+			}
+			return result;
+		}
 
         /// <summary>
         /// Called whenever focus cost is calculated
