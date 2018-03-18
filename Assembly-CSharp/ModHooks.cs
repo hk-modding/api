@@ -20,7 +20,7 @@ namespace Modding
     {
         internal static bool IsInitialized;
 
-        private const int _modVersion = 37;
+        private const int _modVersion = 38;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
@@ -130,6 +130,7 @@ namespace Modding
 
             ApplicationQuitHook += SaveGlobalSettings;
 
+            //Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
             try
             {
                 GithubVersionHelper githubVersionHelper = new GithubVersionHelper("seanpr96/HollowKnight.Modding");
@@ -152,6 +153,7 @@ namespace Modding
         }
 
         //Used to make the Github Certificate valid so that we can check for new versions.
+        //Used this command in linux: openssl s_client -connect api.github.com:443
         private static void SetupServicePointAuthorizor()
         {
             X509Certificate2 gitHubCertificate = new X509Certificate2();
@@ -159,9 +161,10 @@ namespace Modding
 
             X509Certificate2 gitHubCertificate2 = new X509Certificate2();
             gitHubCertificate2.Import(GetEmbeddedCertBytes("github2.crt"));
-
-            ServicePointManager.ServerCertificateValidationCallback = (sender, certificate, chain, errors) =>
+            
+            ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, errors) =>
             {
+                Logger.LogDebug(errors.ToString());
                 Logger.Log(certificate.Subject);
                 if (certificate.Equals(gitHubCertificate) || certificate.Equals(gitHubCertificate2))
                     return true;
