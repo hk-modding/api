@@ -206,5 +206,5 @@ namespace Modding
     /// <summary>
     /// Called when the player heals
     /// </summary>
-    public delegate int HealthGainHandler();
+    public delegate int BeforeAddHealthHandler();
 }
