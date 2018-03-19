@@ -1013,57 +1013,46 @@ namespace Modding
         /// Called whenever the player heals
         /// </summary>
         /// <remarks>PlayerData.health</remarks>
-	public event HealthGainHandler HealthGainHook
+	public event BeforeAddHealthHandler BeforeAddHealthHook
 	{
 		add
 		{
-			string format = "[{0}] - Adding HealthGainHook";
-			Type declaringType = value.Method.DeclaringType;
-			Modding.Logger.LogDebug(string.Format(format, (declaringType != null) ? declaringType.Name : null));
-			this._HealthGainHook += value;
+			Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding BeforeAddHealthHook");
+			_BeforeAddHealthHook += value;
 		}
 		remove
 		{
-			string format = "[{0}] - Removing AfterAttackHook";
-			Type declaringType = value.Method.DeclaringType;
-			Modding.Logger.LogDebug(string.Format(format, (declaringType != null) ? declaringType.Name : null));
-			this._HealthGainHook -= value;
+			Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing BeforeAddHealthHook");
+			_BeforeAddHealthHook -= value;
 		}
 	}
 
-	public event HealthGainHandler _HealthGainHook;	
+	public event BeforeAddHealthHandler _BeforeAddHealthHook;	
 		
 	/// <summary>
         /// Called whenever the player heals
         /// </summary>
         /// <remarks>PlayerData.health</remarks>
-	internal int HealthGain()
-		{
-			Modding.Logger.LogFine("[API] - HealthGain Invoked");
-			int num = 0;
-			int result;
-			if (this._HealthGainHook == null)
-			{
-				result = num;
-			}
-			else
-			{
-				Delegate[] invocationList = this._HealthGainHook.GetInvocationList();
-				foreach (Delegate @delegate in invocationList)
-				{
-					try
-					{
-						num = (int)@delegate.DynamicInvoke(new object[0]);
-					}
-					catch (Exception ex)
-					{
-						Modding.Logger.LogError("[API] - " + ex);
-					}
-				}
-				result = num;
-			}
-			return result;
-		}
+	internal int BeforeAddHealth()
+	{
+            Logger.LogFine("[API] - BeforeAddHealth Invoked");
+
+            if (_BeforeAddHealthHook == null) return amount;
+
+            Delegate[] invocationList = _BeforeAddHealthHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                try
+                {
+                    amount = (int)toInvoke.DynamicInvoke(amount);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError("[API] - " + ex);
+                }
+            }
+            return amount;
+        }
 
         /// <summary>
         /// Called whenever focus cost is calculated
