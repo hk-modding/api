@@ -1033,7 +1033,7 @@ namespace Modding
         /// Called whenever the player heals
         /// </summary>
         /// <remarks>PlayerData.health</remarks>
-	internal int BeforeAddHealth()
+	internal int BeforeAddHealth(int amount)
 	{
             Logger.LogFine("[API] - BeforeAddHealth Invoked");
 
