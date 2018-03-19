@@ -162,18 +162,14 @@ namespace Modding.Patches
                 healthBlue += 4;
             }
         }
-        
+	
+        [MonoModOriginalName("AddHealth")]
+        public void orig_AddHealth(int amount) { }
+	
         public void AddHealth(int amount)
-	    {
-            this.health = ModHooks.Instance.HealthGain();
-		    if (this.health + amount >= this.maxHealth)
-		    {
-		    	this.health = this.maxHealth;
-		    }
-		    else
-		    {
-		    	this.health += amount;
-		    }
-	    }
+        {
+            amount = ModHooks.Instance.BeforeAddHealth(amount);
+            orig_AddHealth(amount);
+        }
     }
 }
