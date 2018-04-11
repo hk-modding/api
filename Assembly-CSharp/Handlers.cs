@@ -2,6 +2,7 @@
 using HutongGames.PlayMaker;
 using Modding.Patches;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Modding
 {
@@ -207,4 +208,14 @@ namespace Modding
     /// Called when the player heals
     /// </summary>
     public delegate int BeforeAddHealthHandler(int amount);
+
+    /// <summary>
+    /// Called when a HitInstance is created in TakeDamage. The hit instance returned defines the hit behavior that will happen. Overrides default behavior
+    /// </summary>
+    public delegate HitInstance HitInstanceHandler( Fsm owner, HitInstance hit );
+
+    /// <summary>
+    /// Called when a SceneManager calls DrawBlackBorders and creates boarders for a scene. You may use or modify the bounds of an area of the scene with these.
+    /// </summary>
+    public delegate void DrawBlackBordersHandler( List<GameObject> borders );
 }
