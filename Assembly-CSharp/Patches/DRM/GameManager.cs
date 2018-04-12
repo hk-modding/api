@@ -24,7 +24,7 @@ namespace Modding.Patches
 
         #region SaveGame
         [MonoModIgnore] private GameCameras gameCams;
-        [MonoModIgnore] private float sessionTotalPlayTimer;
+        [MonoModIgnore] private float sessionPlayTimer;
         [MonoModIgnore] private float sessionStartTime;
 
         [MonoModIgnore] private extern void UpdateSessionPlayTime();
@@ -34,6 +34,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public void SaveGame(int saveSlot)
         {
+            Debug.Log( "Saving game" );
             if( saveSlot >= 0 )
             {
                 if( this.gameCams.saveIcon != null )
@@ -61,23 +62,19 @@ namespace Modding.Patches
                     }
                     else
                     {
-                        Debug.LogError( "Error saving achievements (PlayerAchievements is null)" );
+                        Debug.Log( "Error saving achievements (PlayerAchievements is null)" );
                     }
                     if( this.playerData != null )
                     {
-                        if( this.gameState != GameState.PAUSED )
-                        {
-                            this.UpdateSessionPlayTime();
-                        }
-                        this.playerData.playTime += this.sessionTotalPlayTimer;
+                        this.playerData.playTime += this.sessionPlayTimer;
                         this.ResetGameTimer(); 
-                        this.playerData.version = "1.3.0.8";
+                        this.playerData.version = "1.3.0.9";
                         this.playerData.profileID = saveSlot;
                         this.playerData.CountGameCompletion();
                     }
                     else
                     {
-                        Debug.LogError( "Error updating PlayerData before save (PlayerData is null)" );
+                        Debug.Log( "Error updating PlayerData before save (PlayerData is null)" );
                     }
                     try
                     {
@@ -98,24 +95,10 @@ namespace Modding.Patches
                         {
                             Platform.Current.WriteSaveSlot( saveSlot, Encoding.UTF8.GetBytes( text ) );
                         }
-                        //bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
-                        //if( flag )
-                        //{
-                        //    string graph = Encryption.Encrypt(text);
-                        //    BinaryFormatter binaryFormatter = new BinaryFormatter();
-                        //    MemoryStream memoryStream = new MemoryStream();
-                        //    binaryFormatter.Serialize( memoryStream, graph );
-                        //    Platform.Current.WriteSaveSlot( saveSlot, memoryStream.ToArray() );
-                        //    memoryStream.Close();
-                        //}
-                        //else
-                        //{
-                        //    Platform.Current.WriteSaveSlot( saveSlot, Encoding.UTF8.GetBytes( text ) );
-                        //}
                     }
                     catch( Exception arg )
                     {
-                        Debug.LogError( "GM Save - There was an error saving the game: " + arg );
+                        Debug.Log( "GM Save - There was an error saving the game: " + arg );
                     }
                     Modding.ModHooks.Instance.OnSavegameSave( saveSlot );
                 }
@@ -126,8 +109,9 @@ namespace Modding.Patches
             }
             else
             {
-                Debug.LogError( "Save game slot not valid: " + saveSlot );
+                Debug.Log( "Save game slot not valid: " + saveSlot );
             }
+            Debug.Log( "Finished saving game!" );
         }
         #endregion
 
@@ -137,7 +121,7 @@ namespace Modding.Patches
         public bool LoadGame(int saveSlot)
         {
             if( !Platform.IsSaveSlotIndexValid( saveSlot ) )
-            {
+            { 
                 Debug.LogErrorFormat( "Cannot load from invalid save slot index {0}", new object[]
                 {
                 saveSlot
@@ -168,7 +152,7 @@ namespace Modding.Patches
                 {
                     json = Encoding.UTF8.GetString( Platform.Current.ReadSaveSlot( saveSlot ) );
                 }
-                Logger.LogFine( "[API] - Loading Game:" + json );
+                Debug.Log( "[API] - Loading Game:" + json );
                 SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
                 global::PlayerData instance = saveGameData.playerData;
                 SceneData instance2 = saveGameData.sceneData;
@@ -259,13 +243,11 @@ namespace Modding.Patches
         [MonoModIgnore] private bool waitForManualLevelStart;
         [MonoModIgnore] public event GameManager.DestroyPooledObjects DestroyPersonalPools;
         [MonoModIgnore] public event GameManager.UnloadLevel UnloadingLevel;
-        [MonoModIgnore] public Scene nextScene { get; private set; }
-        [MonoModIgnore] private extern void ManualLevelStart();
-        //[MonoModIgnore] public event GameManager.EnterSceneEvent OnFinishedEnteringScene;
 
         [MonoModReplace]
         public IEnumerator LoadSceneAdditive(string destScene)
         {
+            Debug.Log( "Loading "+destScene );
             destScene = ModHooks.Instance.BeforeSceneLoad(destScene);
             this.tilemapDirty = true;
             this.startedOnThisScene = false;
@@ -280,7 +262,6 @@ namespace Modding.Patches
                 this.UnloadingLevel();
             }
             string exitingScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-            this.nextScene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(destScene);
             AsyncOperation loadop = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(destScene, LoadSceneMode.Additive);
             loadop.allowSceneActivation = true;
             yield return loadop;
@@ -297,6 +278,7 @@ namespace Modding.Patches
             this.BeginScene();
             this.OnNextLevelReady();
             this.waitForManualLevelStart = false;
+            Debug.Log( "Done Loading " + destScene );
             yield break;
         }
         #endregion
@@ -324,5 +306,37 @@ namespace Modding.Patches
             ModHooks.Instance.OnNewGame();
         }
         #endregion
+
+        
+        [MonoModIgnore] private SceneLoad sceneLoad;
+
+        ///This will allow modders to access the scene loader. Note that if there's no transition in progress, it will be null!
+        ///Example use case: Start a co-routine that checks for an non null sceneLoad then hooks up a callback to the "Finish" delegate to do something when the game has completed loading a scene.
+        [MonoModIgnore] public SceneLoad SceneLoad {
+            get {
+                return sceneLoad;
+            }
+        }
+
+
+        ///This allows a mod (or anything else) to "queue" a scene transition
+        ///TODO: After some testing without this, see if we should put it back in
+        //[MonoModOriginalName( "BeginSceneTransitionRoutine" )]
+        //public void orig_BeginSceneTransitionRoutine( GameManager.SceneLoadInfo info ) { }
+        //[MonoModReplace]
+        //private IEnumerator BeginSceneTransitionRoutine( GameManager.SceneLoadInfo info )
+        //{
+        //    //this will allow 
+        //    while( sceneLoad != null )
+        //    {
+        //        Debug.LogErrorFormat( this, "Cannot scene transition to {0}, while a scene transition is in progress", new object[]
+        //        {
+        //             info.SceneName
+        //        } );
+        //        yield return new WaitForEndOfFrame();
+        //    }
+        //    orig_BeginSceneTransitionRoutine( info );            
+        //    yield break;
+        //}
     }
 }
