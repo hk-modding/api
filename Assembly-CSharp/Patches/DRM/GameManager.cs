@@ -68,7 +68,7 @@ namespace Modding.Patches
                     {
                         this.playerData.playTime += this.sessionPlayTimer;
                         this.ResetGameTimer(); 
-                        this.playerData.version = "1.3.0.9";
+                        this.playerData.version = "1.3.1.1";
                         this.playerData.profileID = saveSlot;
                         this.playerData.CountGameCompletion();
                     }
