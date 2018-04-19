@@ -97,6 +97,7 @@
     <Compile Include="Patches\ChaseObjectV2.cs" />
     <Compile Include="Patches\CheckTargetDirection.cs" />
     <Compile Include="Patches\DialogueBox.cs" />
+    <Compile Include="Patches\EnemyDeathEffects.cs" />
     <Compile Include="Patches\FaceObject.cs" />
     <Compile Include="Patches\DRM\GameManager.cs" />
     <Compile Include="Patches\DRM\HeroController.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="Patches\GetAngleToTarget2D.cs" />
     <Compile Include="Patches\GetColliderRange.cs" />
     <Compile Include="Patches\GradeMarker.cs" />
+    <Compile Include="Patches\DRM\HealthManager.cs" />
     <Compile Include="Patches\MenuSelectable.cs" />
     <Compile Include="Patches\ObjectPool.cs" />
     <Compile Include="Patches\GameManager.cs" />
