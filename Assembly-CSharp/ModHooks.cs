@@ -20,7 +20,7 @@ namespace Modding
     {
         internal static bool IsInitialized;
 
-        private const int _modVersion = 39;
+        private const int _modVersion = 40;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
@@ -2181,15 +2181,6 @@ namespace Modding
         }
 
 
-
-
-
-
-
-
-
-
-
         [HookInfo("Called when a SceneManager calls DrawBlackBorders and creates boarders for a scene. You may use or modify the bounds of an area of the scene with these.", "SceneManager.DrawBlackBorders")]
         public event DrawBlackBordersHandler DrawBlackBordersHook
         {
@@ -2224,6 +2215,86 @@ namespace Modding
                 try
                 {
                     toInvoke.DynamicInvoke( borders );
+                }
+                catch( Exception ex )
+                {
+                    Logger.LogError( "[API] - " + ex );
+                }
+            }
+        }
+
+        private event OnEnableEnemyHandler _OnEnableEnemyHook;
+
+        /// <summary>
+        /// Called when an enemy is enabled. Check this isDead flag to see if they're already dead. If you return true, this will mark the enemy as already dead on load. Default behavior is to return the value inside "isAlreadyDead".
+        /// </summary>
+        /// <remarks>HealthManager.CheckPersistence</remarks>
+        internal bool OnEnableEnemy( GameObject enemy, bool isAlreadyDead )
+        {
+            Logger.LogFine( "[API] - OnEnableEnemy Invoked" );
+
+            if( _OnEnableEnemyHook == null ) return isAlreadyDead;
+
+            Delegate[] invocationList = _OnEnableEnemyHook.GetInvocationList();
+            foreach( Delegate toInvoke in invocationList )
+            {
+                try
+                {
+                    isAlreadyDead = (bool)toInvoke.DynamicInvoke( enemy, isAlreadyDead );
+                }
+                catch( Exception ex )
+                {
+                    Logger.LogError( "[API] - " + ex );
+                }
+            }
+            return isAlreadyDead;
+        }
+
+
+        private event OnRecieveDeathEventHandler _OnRecieveDeathEventHook;
+
+        /// <summary>
+        /// Called when an enemy recieves a death event. It looks like this event may be called multiple times on an enemy, so check "eventAlreadyRecieved" to see if the event has been fired more than once.
+        /// </summary>
+        /// <remarks>EnemyDeathEffects.RecieveDeathEvent</remarks>
+        internal void OnRecieveDeathEvent( EnemyDeathEffects enemyDeathEffects, bool eventAlreadyRecieved, ref float? attackDirection, ref bool resetDeathEvent, ref bool spellBurn, ref bool isWatery )
+        {
+            Logger.LogFine( "[API] - OnRecieveDeathEvent Invoked" );
+
+            if( _OnRecieveDeathEventHook == null ) return;
+
+            Delegate[] invocationList = _OnRecieveDeathEventHook.GetInvocationList();
+            foreach( Delegate toInvoke in invocationList )
+            {
+                try
+                {
+                    toInvoke.DynamicInvoke( enemyDeathEffects, eventAlreadyRecieved, attackDirection, resetDeathEvent, spellBurn, isWatery );
+                }
+                catch( Exception ex )
+                {
+                    Logger.LogError( "[API] - " + ex );
+                }
+            }
+        }
+
+        private event OnRecordKillForJournalHandler _OnRecordKillForJournalHook;
+
+        /// <summary>
+        /// Called when an enemy dies and a journal kill is recorded. You may use the "playerDataName" string or one of the additional pre-formatted player data strings to look up values in playerData.
+        /// </summary>
+        /// <remarks>EnemyDeathEffects.OnRecordKillForJournal</remarks>
+        internal void OnRecordKillForJournal( EnemyDeathEffects enemyDeathEffects, string playerDataName, string killedBoolPlayerDataLookupKey, string killCountIntPlayerDataLookupKey, string newDataBoolPlayerDataLookupKey )
+        {
+            Logger.LogFine( "[API] - RecordKillForJournal Invoked" );
+
+            if( _OnRecordKillForJournalHook == null ) return;
+
+            Delegate[] invocationList = _OnRecordKillForJournalHook.GetInvocationList();
+            foreach( Delegate toInvoke in invocationList )
+            {
+                try
+                {
+                    toInvoke.DynamicInvoke( enemyDeathEffects, playerDataName, killedBoolPlayerDataLookupKey, killCountIntPlayerDataLookupKey, newDataBoolPlayerDataLookupKey );
                 }
                 catch( Exception ex )
                 {
