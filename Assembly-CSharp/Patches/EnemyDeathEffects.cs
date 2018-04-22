@@ -13,6 +13,7 @@ namespace Modding.Patches
         [MonoModIgnore]
         private bool didFire;
 
+        [MonoModOriginalName( "RecieveDeathEvent" )]
         public void orig_RecieveDeathEvent( float? attackDirection, bool resetDeathEvent = false, bool spellBurn = false, bool isWatery = false ) { }
 
         //Use this to hook into when an enemy dies. Check EnemyDeathEffects.didFire to prevent doing any actions on redundant invokes.
@@ -25,6 +26,7 @@ namespace Modding.Patches
         [MonoModIgnore]
         private string playerDataName;
 
+        [MonoModOriginalName( "RecordKillForJournal" )]
         private void orig_RecordKillForJournal() { }
 
         //Use this hook to get the journal name of the enemy that was just killed.
