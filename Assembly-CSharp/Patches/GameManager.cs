@@ -6,7 +6,6 @@ using MonoMod;
 
 namespace Modding.Patches
 {
-
     [MonoModPatch("global::GameManager")]
     public partial class GameManager : global::GameManager
     {
@@ -40,9 +39,11 @@ namespace Modding.Patches
 
         public void LoadScene(string destScene)
         {
+            Logger.Log( "Entered LoadScene!" );
             destScene = ModHooks.Instance.BeforeSceneLoad(destScene);
             orig_LoadScene(destScene);
             ModHooks.Instance.OnSceneChanged(destScene);
+            Logger.Log( "Finished LoadScene!" );
         }
 
         public string orig_GetSaveFilename(int saveSlot) { return string.Empty; }
@@ -70,10 +71,11 @@ namespace Modding.Patches
 
         public IEnumerator PlayerDead(float waitTime)
         {
+            Logger.Log( "Entered player dead!" );
             ModHooks.Instance.OnBeforePlayerDead();
             yield return orig_PlayerDead(waitTime);
             ModHooks.Instance.OnAfterPlayerDead();
+            Logger.Log( "Finished player dead!" );
         }
-
     }
 }
