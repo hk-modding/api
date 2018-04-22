@@ -6,7 +6,8 @@ using MonoMod;
 
 namespace Modding.Patches
 {
-    public partial class HealthManager : global::HealthManager
+    [MonoModPatch( "global::HealthManager" )]
+    public class HealthManager : global::HealthManager
     {
         [MonoModIgnore]
         public bool isDead;

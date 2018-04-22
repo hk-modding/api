@@ -2223,6 +2223,21 @@ namespace Modding
             }
         }
 
+        [HookInfo("Called when an enemy is enabled. Check this isDead flag to see if they're already dead. If you return true, this will mark the enemy as already dead on load. Default behavior is to return the value inside \"isAlreadyDead\".", "HealthManager.CheckPersistence")]
+        public event OnEnableEnemyHandler OnEnableEnemyHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnEnableEnemyHook");
+                _OnEnableEnemyHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnEnableEnemyHook");
+                _OnEnableEnemyHook -= value;
+            }
+        }
+
         private event OnEnableEnemyHandler _OnEnableEnemyHook;
 
         /// <summary>
@@ -2251,6 +2266,21 @@ namespace Modding
         }
 
 
+        [HookInfo("Called when an enemy recieves a death event. It looks like this event may be called multiple times on an enemy, so check \"eventAlreadyRecieved\" to see if the event has been fired more than once.", "EnemyDeathEffects.RecieveDeathEvent")]
+        public event OnRecieveDeathEventHandler OnRecieveDeathEventHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnRecieveDeathEventHook");
+                _OnRecieveDeathEventHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnRecieveDeathEventHook");
+                _OnRecieveDeathEventHook -= value;
+            }
+        }
+
         private event OnRecieveDeathEventHandler _OnRecieveDeathEventHook;
 
         /// <summary>
@@ -2274,6 +2304,22 @@ namespace Modding
                 {
                     Logger.LogError( "[API] - " + ex );
                 }
+            }
+        }
+
+
+        [HookInfo("Called when an enemy dies and a journal kill is recorded. You may use the \"playerDataName\" string or one of the additional pre-formatted player data strings to look up values in playerData.", "EnemyDeathEffects.OnRecordKillForJournal")]
+        public event OnRecordKillForJournalHandler OnRecordKillForJournalHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnRecordKillForJournalHook");
+                _OnRecordKillForJournalHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnRecordKillForJournalHook");
+                _OnRecordKillForJournalHook -= value;
             }
         }
 
