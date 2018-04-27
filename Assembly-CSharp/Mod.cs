@@ -90,6 +90,11 @@ namespace Modding
 			{
 			    Settings = new TSaveSettings();
                 Settings.SetSettings(data.modData[name]);
+
+                if (Settings is ISerializationCallbackReceiver callbackReceiver)
+                {
+                    callbackReceiver.OnAfterDeserialize();
+                }
 			}
 		}
 
