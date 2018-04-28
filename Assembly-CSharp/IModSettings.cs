@@ -8,7 +8,7 @@ namespace Modding
     /// Base class for storing settings for a Mod in the save file.
     /// </summary>
     [Serializable]
-    public class IModSettings : ISerializationCallbackReceiver
+    public class IModSettings
     {
         /// <summary>
         /// Initializes All Dictionaries
@@ -138,16 +138,6 @@ namespace Modding
             else
                 FloatValues.Add(name, value);
         }
-
-        /// <inheritdoc />
-        public void OnBeforeSerialize()
-		{
-		}
-
-	    /// <inheritdoc />
-		public void OnAfterDeserialize()
-		{
-		}
 
         /// <summary>
         /// String Values to be Stored
