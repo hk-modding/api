@@ -192,12 +192,15 @@ copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
 copy /Y "$(SolutionDir)ILRepack\*" $(ProjectDir)$(OutputPath)\"
 cd "$(ProjectDir)$(OutputPath)"
 MonoMod.exe Assembly-CSharp.dll
+
+rem "Generate Hooks"
 MonoMod.RuntimeDetour.HookGen.exe Assembly-CSharp.dll
+MonoMod.RuntimeDetour.HookGen.exe Playmaker.dll
 
 rem "Rename files so the assembly has the correct name and the output works"
 move "MONOMODDED_Assembly-CSharp.dll" "MONOModded.dll"
 move Assembly-CSharp.dll OriginalAssembly-CSharp.dll
-$(SolutionDir)packages\ILMerge.2.14.1208\tools\ILMerge.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll
+$(SolutionDir)packages\ILMerge.2.14.1208\tools\ILMerge.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MMHOOK_Playmaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll
 move Assembly-CSharp.dll MONOMODDED_Assembly-CSharp.dll
 
 rem "Create the folder structure prefered by mods"
