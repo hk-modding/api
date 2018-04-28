@@ -12,7 +12,7 @@ namespace MonoMod
 
         static MonoModRules()
         {
-            MMILRT.Modder.ShouldCleanupAttrib = IsUselessAttrib;
+            MonoModRule.Modder.ShouldCleanupAttrib = IsUselessAttrib;
         }
 
         /// <summary>
