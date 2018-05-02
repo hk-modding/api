@@ -171,9 +171,6 @@
     <EmbeddedResource Include="github.crt" />
     <EmbeddedResource Include="github2.crt" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Target Name="ILMerge">
     <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
     <Exec Command="$(ILMergeConsolePath) /out:$(SolutionDir)/Output/Assembly-CSharp.dll Assembly-CSharp.dll ModdingBase.dll" />
@@ -200,7 +197,7 @@ MonoMod.RuntimeDetour.HookGen.exe Playmaker.dll
 rem "Rename files so the assembly has the correct name and the output works"
 move "MONOMODDED_Assembly-CSharp.dll" "MONOModded.dll"
 move Assembly-CSharp.dll OriginalAssembly-CSharp.dll
-$(SolutionDir)packages\ILMerge.2.14.1208\tools\ILMerge.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MMHOOK_Playmaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll
+$(SolutionDir)ILRepack\ILRepack.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MMHOOK_Playmaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll
 move Assembly-CSharp.dll MONOMODDED_Assembly-CSharp.dll
 
 rem "Create the folder structure prefered by mods"
