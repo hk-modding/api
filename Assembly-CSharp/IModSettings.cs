@@ -142,26 +142,26 @@ namespace Modding
         /// <summary>
         /// String Values to be Stored
         /// </summary>
-		[SerializeField]
-		public SerializableStringDictionary StringValues;
+        [SerializeField]
+        public SerializableStringDictionary StringValues;
 
         /// <summary>
         /// Int Values to be Stored
         /// </summary>
-		[SerializeField]
-		public SerializableIntDictionary IntValues;
+        [SerializeField]
+        public SerializableIntDictionary IntValues;
 
         /// <summary>
         /// Bools to be Stored
         /// </summary>
-		[SerializeField]
-		public SerializableBoolDictionary BoolValues;
+        [SerializeField]
+        public SerializableBoolDictionary BoolValues;
 
         /// <summary>
         /// Float Values to be Stored
         /// </summary>
-		[SerializeField]
-		public SerializableFloatDictionary FloatValues;
+        [SerializeField]
+        public SerializableFloatDictionary FloatValues;
 
-	}
+    }
 }

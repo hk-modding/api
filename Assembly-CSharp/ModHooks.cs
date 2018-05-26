@@ -16,11 +16,11 @@ namespace Modding
     /// <summary>
     /// Class to hook into various events for the game.
     /// </summary>
-	public class ModHooks
+    public class ModHooks
     {
         internal static bool IsInitialized;
 
-        private const int _modVersion = 41;
+        private const int _modVersion = 42;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
@@ -190,7 +190,7 @@ namespace Modding
         /// <summary>
         /// Current instance of Modhooks.
         /// </summary>
-	    public static ModHooks Instance {
+        public static ModHooks Instance {
             get {
                 if( _instance != null ) return _instance;
 
@@ -1224,15 +1224,13 @@ namespace Modding
             Logger.LogFine( "[API] - OnDashPressed Invoked" );
 
             if( _DashPressedHook == null ) return false;
-
-            bool ret = true;
-
+            
             Delegate[] invocationList = _DashPressedHook.GetInvocationList();
             foreach( Delegate toInvoke in invocationList )
             {
                 try
                 {
-                    ret = (bool)toInvoke.DynamicInvoke();
+                    toInvoke.DynamicInvoke();
                 }
                 catch( Exception ex )
                 {
@@ -1240,7 +1238,7 @@ namespace Modding
                 }
             }
 
-            return ret;
+            return true;
         }
 
         #endregion

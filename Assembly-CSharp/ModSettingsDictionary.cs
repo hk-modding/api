@@ -7,9 +7,9 @@ namespace Modding
     /// <summary>
     /// Used to represent Mod Data in SaveGameData
     /// </summary>
-	[Serializable]
-	public class ModSettingsDictionary : SerializableDictionary<string, IModSettings>, ISerializationCallbackReceiver
-	{
+    [Serializable]
+    public class ModSettingsDictionary : SerializableDictionary<string, IModSettings>, ISerializationCallbackReceiver
+    {
         /// <summary>
         /// Occurs before serialization
         /// </summary>
@@ -25,5 +25,5 @@ namespace Modding
                 }
             }
         }
-	}
+    }
 }

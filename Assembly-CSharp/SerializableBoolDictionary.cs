@@ -6,8 +6,8 @@ namespace Modding
     /// <summary>
     /// Represents a Dictionary of Bools that can be serialized with Unity's JsonUtil
     /// </summary>
-	[Serializable]
-	public class SerializableBoolDictionary : SerializableDictionary<string, bool>
-	{
-	}
+    [Serializable]
+    public class SerializableBoolDictionary : SerializableDictionary<string, bool>
+    {
+    }
 }

@@ -30,7 +30,7 @@ namespace Modding.Patches
 
         public static string Get(string key, string sheetTitle)
         {
-			return ModHooks.Instance.LanguageGet(key, sheetTitle);
+            return ModHooks.Instance.LanguageGet(key, sheetTitle);
         }
     }
 }

@@ -6,12 +6,12 @@ namespace Modding
     /// <summary>
     /// Custom Mod Data
     /// </summary>
-	[Serializable]
-	public class ModData
-	{
+    [Serializable]
+    public class ModData
+    {
         /// <summary>
         /// Collection of all mods' settings
         /// </summary>
-		public List<IModSettings> Settings;
-	}
+        public List<IModSettings> Settings;
+    }
 }

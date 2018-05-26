@@ -162,10 +162,10 @@ namespace Modding.Patches
                 healthBlue += 4;
             }
         }
-	
+    
         [MonoModOriginalName("AddHealth")]
         public void orig_AddHealth(int amount) { }
-	
+    
         public void AddHealth(int amount)
         {
             amount = ModHooks.Instance.BeforeAddHealth(amount);

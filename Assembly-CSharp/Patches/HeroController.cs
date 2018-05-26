@@ -20,12 +20,12 @@ namespace Modding.Patches
          * change 
                 if (this.inputHandler.inputActions.dash.WasPressed)
             to
-      			if (this.inputHandler.inputActions.dash.WasPressed && !Modding.ModHooks.Instance.OnDashPressed())
+                  if (this.inputHandler.inputActions.dash.WasPressed && !Modding.ModHooks.Instance.OnDashPressed())
 
             change 
                 if (this.inputHandler.inputActions.dash.IsPressed && this.dashQueueSteps <= this.DASH_QUEUE_STEPS && this.CanDash() && this.dashQueuing && this.CanDash())
             to
-            	if (this.inputHandler.inputActions.dash.IsPressed && this.dashQueueSteps <= this.DASH_QUEUE_STEPS && this.CanDash() && this.dashQueuing && !Modding.ModHooks.Instance.OnDashPressed() && this.CanDash())
+                if (this.inputHandler.inputActions.dash.IsPressed && this.dashQueueSteps <= this.DASH_QUEUE_STEPS && this.CanDash() && this.dashQueuing && !Modding.ModHooks.Instance.OnDashPressed() && this.CanDash())
         */
 
         //DRMDONE: SoulGain: Add num = Modding.ModHooks.Instance.OnSoulGain(num); before this.playerData.AddMPCharge(num); 
@@ -40,7 +40,7 @@ namespace Modding.Patches
             orig_Attack(attackDir);
             //DRMDONE: Make sure to add before this.SlashComponent.StartSlash();
             //    Modding.ModHooks.Instance.AfterAttack(attackDir);
-		    //    if (!this.cState.attacking) return; 
+            //    if (!this.cState.attacking) return; 
             //
         }*/
 
@@ -134,7 +134,7 @@ namespace Modding.Patches
 
         public void DoAttack()
         {
-    		ModHooks.Instance.OnDoAttack();
+            ModHooks.Instance.OnDoAttack();
             orig_DoAttack();
         }
 
