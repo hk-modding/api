@@ -307,10 +307,10 @@
         </PreBuildEvent>
         <PreBuildEvent Condition="'$(OS)' != 'Windows_NT'">
             # If distribution exists, delete it
-            rm -r "$(ProjectDir)$(OutputPath)"
+            rm -rf "$(ProjectDir)$(OutputPath)"
 
-            rm -r "$(SolutionDir)OutputFinal\"
-            rm "$(SolutionDir)ModdingAPI.zip"
+            rm -rf "$(SolutionDir)OutputFinal\"
+            rm -f "$(SolutionDir)ModdingAPI.zip"
         </PreBuildEvent>
     </PropertyGroup>
 </Project>
