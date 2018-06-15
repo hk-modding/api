@@ -276,7 +276,8 @@
             cp "$(ProjectDir)$(OutputPath)/Assembly-CSharp.xml" "$(SolutionDir)/OutputFinal/hollow_knight_Data/Managed/"
 
             echo "Zip the Distribution Folder"
-            zip -r "$(SolutionDir)ModdingAPI.zip" $(SolutionDir)OutputFinal/*
+            cd "$(SolutionDir)/OutputFinal"
+            zip -r "../ModdingAPI.zip" *
         </PostBuildEvent>
     </PropertyGroup>
     <PropertyGroup>
