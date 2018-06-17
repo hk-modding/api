@@ -20,7 +20,7 @@ namespace Modding
     {
         internal static bool IsInitialized;
 
-        private const int _modVersion = 42;
+        private const int _modVersion = 43;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
@@ -1169,20 +1169,18 @@ namespace Modding
         /// Called during dash function to change velocity
         /// </summary>
         /// <remarks>HeroController.Dash</remarks>
-        internal Vector2? DashVelocityChange()
+        internal Vector2 DashVelocityChange(Vector2 change)
         {
             Logger.LogFine( "[API] - DashVelocityChange Invoked" );
 
-            if( _DashVectorHook == null ) return null;
-
-            Vector2? change = null;
+            if( _DashVectorHook == null ) return change;
 
             Delegate[] invocationList = _DashVectorHook.GetInvocationList();
             foreach( Delegate toInvoke in invocationList )
             {
                 try
                 {
-                    change = (Vector2)toInvoke.DynamicInvoke();
+                    change = (Vector2)toInvoke.DynamicInvoke( change );
                 }
                 catch( Exception ex )
                 {
