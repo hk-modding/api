@@ -88,9 +88,53 @@ namespace Modding.Patches
         private extern void FinishedDashing();
 
         [MonoModIgnore] private Rigidbody2D rb2d;
+        
+        // This is the original dash vector calculating code used by the game
+        // It is used to set the input dash velocity vector for the DashVectorHook
+        private Vector2 OrigDashVector()
+        {
+            const float BUMP_VELOCITY = 4f;
+            const float BUMP_VELOCITY_DASH = 5f;
+            Vector2 origVector;
 
-        private extern void orig_Dash();
+            float velocity;
+            if (this.playerData.equippedCharm_16 && this.cState.shadowDashing)
+            {
+                velocity = this.DASH_SPEED_SHARP;
+            }
+            else
+            {
+                velocity = this.DASH_SPEED;
+            }
 
+            if (this.dashingDown)
+            {
+                origVector = new Vector2(0f, -velocity);
+            }
+            else if (this.cState.facingRight)
+            {
+                if (this.CheckForBump(CollisionSide.right))
+                {
+                    origVector = new Vector2(velocity,
+                        (!this.cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY);
+                }
+                else
+                {
+                    origVector = new Vector2(velocity, 0f);
+                }
+            }
+            else if (this.CheckForBump(CollisionSide.left))
+            {
+                origVector = new Vector2(-velocity,
+                    (!this.cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY);
+            }
+            else
+            {
+                origVector = new Vector2(-velocity, 0f);
+            }
+            return origVector;
+        }
+        
         private void Dash()
         {
             AffectedByGravity(false);
@@ -100,18 +144,16 @@ namespace Modding.Patches
                 FinishedDashing();
                 return;
             }
-
-            // Check if we run our own dash code.
-            Vector2? vector = ModHooks.Instance.DashVelocityChange();
-            if (vector == null)
-            {
-                // Run the original dash code.
-                orig_Dash();
-                return;
-            }
-            rb2d.velocity = vector.Value;
+            
+            Vector2 vector = OrigDashVector();
+            vector = ModHooks.Instance.DashVelocityChange(vector);
+            
+            rb2d.velocity = vector;
             dash_timer += Time.deltaTime;
         }
+        
+        
+        
 
         #endregion
 

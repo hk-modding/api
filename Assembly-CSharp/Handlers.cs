@@ -160,7 +160,7 @@ namespace Modding
     /// Called during dash function to change velocity
     /// </summary>
     /// <returns>New vector for velocity</returns>
-    public delegate Vector2 DashVelocityHandler();
+    public delegate Vector2 DashVelocityHandler(Vector2 change);
 
     /// <summary>
     /// Called whenever the dash key is pressed. Overrides normal dash functionalit
