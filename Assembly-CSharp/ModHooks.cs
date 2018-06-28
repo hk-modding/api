@@ -1222,13 +1222,15 @@ namespace Modding
             Logger.LogFine( "[API] - OnDashPressed Invoked" );
 
             if( _DashPressedHook == null ) return false;
+
+            bool ret;
             
             Delegate[] invocationList = _DashPressedHook.GetInvocationList();
             foreach( Delegate toInvoke in invocationList )
             {
                 try
                 {
-                    toInvoke.DynamicInvoke();
+                    ret = (bool) toInvoke.DynamicInvoke();
                 }
                 catch( Exception ex )
                 {
@@ -1236,7 +1238,7 @@ namespace Modding
                 }
             }
 
-            return true;
+            return ret;
         }
 
         #endregion
