@@ -165,7 +165,7 @@ namespace Modding
     /// <summary>
     /// Called whenever the dash key is pressed. Overrides normal dash functionalit
     /// </summary>
-    public delegate void DashPressedHandler();
+    public delegate bool DashPressedHandler();
 
     /// <summary>
     /// Called whenever a new gameobject is created with a collider and playmaker2d
