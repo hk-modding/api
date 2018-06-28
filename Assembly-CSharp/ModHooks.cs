@@ -1192,10 +1192,10 @@ namespace Modding
         }
 
         /// <summary>
-        /// Called whenever the dash key is pressed. Overrides normal dash functionality
+        /// Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality
         /// </summary>
         /// <remarks>HeroController.LookForQueueInput</remarks>
-        [HookInfo("Called whenever the dash key is pressed. Overrides normal dash functionality", "HeroController.LookForQueueInput")]
+        [HookInfo("Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality", "HeroController.LookForQueueInput")]
         public event DashPressedHandler DashPressedHook
         {
             add
@@ -1214,7 +1214,7 @@ namespace Modding
         private event DashPressedHandler _DashPressedHook;
 
         /// <summary>
-        /// Called whenever the dash key is pressed. Overrides normal dash functionality
+        /// Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality
         /// </summary>
         /// <remarks>HeroController.LookForQueueInput</remarks>
         internal bool OnDashPressed()
@@ -1222,13 +1222,18 @@ namespace Modding
             Logger.LogFine( "[API] - OnDashPressed Invoked" );
 
             if( _DashPressedHook == null ) return false;
+
+            bool ret = false;
             
             Delegate[] invocationList = _DashPressedHook.GetInvocationList();
             foreach( Delegate toInvoke in invocationList )
             {
                 try
                 {
-                    toInvoke.DynamicInvoke();
+                    if ((bool) toInvoke.DynamicInvoke())
+                    {
+                        ret = true;
+                    }
                 }
                 catch( Exception ex )
                 {
@@ -1236,7 +1241,7 @@ namespace Modding
                 }
             }
 
-            return true;
+            return ret;
         }
 
         #endregion
