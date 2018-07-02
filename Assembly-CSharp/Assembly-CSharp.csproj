@@ -191,16 +191,6 @@
             cd "$(ProjectDir)$(OutputPath)"
             MonoMod.exe Assembly-CSharp.dll
 
-            rem "Generate Hooks"
-            MonoMod.RuntimeDetour.HookGen.exe Assembly-CSharp.dll
-            MonoMod.RuntimeDetour.HookGen.exe Playmaker.dll
-
-            rem "Rename files so the assembly has the correct name and the output works"
-            move "MONOMODDED_Assembly-CSharp.dll" "MONOModded.dll"
-            move Assembly-CSharp.dll OriginalAssembly-CSharp.dll
-            $(SolutionDir)ILRepack\ILRepack.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MMHOOK_Playmaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll
-            move Assembly-CSharp.dll MONOMODDED_Assembly-CSharp.dll
-
             rem "Create the folder structure prefered by mods"
             md "$(SolutionDir)OutputFinal\hollow_knight_Data\Managed\Mods"
             rem "Copy the Mod's dll into the Mods folder"
