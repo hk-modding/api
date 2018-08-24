@@ -16,7 +16,7 @@ namespace Modding.Patches
 
 
         [MonoModIgnore]
-        public SaveStats(int maxHealth, int geo, MapZone mapZone, float playTime, int maxMPReserve, int permadeathMode, float completionPercentage, bool unlockedCompletionRate) : base(maxHealth, geo, mapZone, playTime, maxMPReserve, permadeathMode, completionPercentage, unlockedCompletionRate)
+        public SaveStats(int maxHealth, int geo, MapZone mapZone, float playTime, int maxMPReserve, int permadeathMode, bool bossRushMode, float completionPercentage, bool unlockedCompletionRate) : base(maxHealth, geo, mapZone, playTime, maxMPReserve, permadeathMode, bossRushMode, completionPercentage, unlockedCompletionRate)
         {
         }
     }

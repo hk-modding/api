@@ -205,7 +205,7 @@ namespace Modding
         public static Sprite CreateSprite(byte[] data, int x, int y, int width, int height)
         {
             Texture2D tex = new Texture2D(1, 1);
-            tex.LoadImage(data);
+            tex.LoadRawTextureData(data);
             tex.anisoLevel = 0;
             return Sprite.Create(tex, new Rect(x, y, width, height), Vector2.zero);
         }

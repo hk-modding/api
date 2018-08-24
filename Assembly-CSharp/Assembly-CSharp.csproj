@@ -158,11 +158,35 @@
     <Reference Include="System.Xml">
       <HintPath>..\Vanilla\System.Xml.dll</HintPath>
     </Reference>
-    <Reference Include="Unity, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\Unity.dll</HintPath>
+    <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.JSONSerializeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.Physics2DModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\Vanilla\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -301,23 +325,6 @@
 
             rm -rf "$(SolutionDir)OutputFinal"
             rm -f "$(SolutionDir)ModdingAPI.zip"
-            
-            rm -f "$(SolutionDir)Vanilla/Unity.dll"
-            
-            export Van="$(SolutionDir)Vanilla/"
-            mono ${SolutionDir}packages/ILRepack.2.0.15/tools/ILRepack.exe /out:${SolutionDir}Vanilla/Unity.dll \
-        ${Van}UnityEngine.dll ${Van}UnityEngine.SharedInternalsModule.dll ${Van}UnityEngine.AccessibilityModule.dll \
-        ${Van}UnityEngine.AIModule.dll ${Van}UnityEngine.AnimationModule.dll ${Van}UnityEngine.ARModule.dll ${Van}UnityEngine.AssetBundleModule.dll \
-        ${Van}UnityEngine.AudioModule.dll ${Van}UnityEngine.ClothModule.dll ${Van}UnityEngine.ClusterInputModule.dll ${Van}UnityEngine.ClusterRendererModule.dll \
-        ${Van}UnityEngine.CrashReportingModule.dll ${Van}UnityEngine.DirectorModule.dll ${Van}UnityEngine.GameCenterModule.dll \
-        ${Van}UnityEngine.GridModule.dll ${Van}UnityEngine.ImageConversionModule.dll ${Van}UnityEngine.IMGUIModule.dll ${Van}UnityEngine.InputModule.dll \
-        ${Van}UnityEngine.JSONSerializeModule.dll ${Van}UnityEngine.ParticlesLegacyModule.dll  ${Van}UnityEngine.PerformanceReportingModule.dll ${Van}UnityEngine.Physics2DModule.dll \
-        ${Van}UnityEngine.PhysicsModule.dll ${Van}UnityEngine.ScreenCaptureModule.dll ${Van}UnityEngine.SharedInternalsModule.dll \
-        ${Van}UnityEngine.SpatialTracking.dll ${Van}UnityEngine.SpriteMaskModule.dll ${Van}UnityEngine.SpriteShapeModule.dll \
-        ${Van}UnityEngine.StandardEvents.dll ${Van}UnityEngine.StyleSheetsModule.dll ${Van}UnityEngine.TerrainModule.dll ${Van}UnityEngine.TerrainPhysicsModule.dll \
-        ${Van}UnityEngine.TextRenderingModule.dll ${Van}UnityEngine.TilemapModule.dll ${Van}UnityEngine.Timeline.dll \
-        ${Van}UnityEngine.Un* ${Van}UnityEngine.UNETModule.dll ${Van}UnityEngine.V* \
-        ${Van}UnityEngine.W* \
         </PreBuildEvent>
   </PropertyGroup>
 </Project>

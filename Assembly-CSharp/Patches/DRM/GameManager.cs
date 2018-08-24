@@ -37,22 +37,16 @@ namespace Modding.Patches
             Debug.Log( "Saving game" );
             if( saveSlot >= 0 )
             {
-                if( this.gameCams.saveIcon != null )
+                GameObject gameObject = GameObject.FindGameObjectWithTag("Save Icon");
+                if (gameObject != null)
                 {
-                    this.gameCams.saveIcon.SendEvent( "GAME SAVED" );
-                }
-                else
-                {
-                    GameObject gameObject = GameObject.FindGameObjectWithTag("Save Icon");
-                    if( gameObject != null )
+                    PlayMakerFSM playMakerFSM = FSMUtility.LocateFSM(gameObject, "Checkpoint Control");
+                    if (playMakerFSM != null)
                     {
-                        PlayMakerFSM playMakerFSM = FSMUtility.LocateFSM(gameObject, "Checkpoint Control");
-                        if( playMakerFSM != null )
-                        {
-                            playMakerFSM.SendEvent( "GAME SAVED" );
-                        }
+                        playMakerFSM.SendEvent("GAME SAVED");
                     }
                 }
+                
                 this.SaveLevelState();
                 if( !this.gameConfig.disableSaveGame )
                 {
@@ -88,12 +82,12 @@ namespace Modding.Patches
                             BinaryFormatter binaryFormatter = new BinaryFormatter();
                             MemoryStream memoryStream = new MemoryStream();
                             binaryFormatter.Serialize( memoryStream, graph );
-                            Platform.Current.WriteSaveSlot( saveSlot, memoryStream.ToArray() );
+                            Platform.Current.WriteSaveSlot( saveSlot, memoryStream.ToArray(), (noop) => { } );
                             memoryStream.Close();
                         }
                         else
                         {
-                            Platform.Current.WriteSaveSlot( saveSlot, Encoding.UTF8.GetBytes( text ) );
+                            Platform.Current.WriteSaveSlot( saveSlot, Encoding.UTF8.GetBytes( text ), (noop) => { } );
                         }
                     }
                     catch( Exception arg )
@@ -128,7 +122,10 @@ namespace Modding.Patches
                 } );
                 return false;
             }
-            if( !Platform.Current.IsSaveSlotInUse( saveSlot ) )
+
+            bool saveSlotUsed = true;
+            Platform.Current.IsSaveSlotInUse(saveSlot, b => { saveSlotUsed = b; });
+            if( !saveSlotUsed )
             {
                 Debug.LogErrorFormat( "Cannot load from empty save slot index {0}", new object[]
                 {
@@ -144,13 +141,17 @@ namespace Modding.Patches
                 if( flag )
                 {
                     BinaryFormatter binaryFormatter = new BinaryFormatter();
-                    MemoryStream serializationStream = new MemoryStream(Platform.Current.ReadSaveSlot(saveSlot));
+                    byte[] data = new byte[0];
+                    Platform.Current.ReadSaveSlot(saveSlot, bytes => { data = bytes; });
+                    MemoryStream serializationStream = new MemoryStream(data);
                     string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
                     json = Encryption.Decrypt( encryptedString );
                 }
                 else
                 {
-                    json = Encoding.UTF8.GetString( Platform.Current.ReadSaveSlot( saveSlot ) );
+                    byte[] data = new byte[0];
+                    Platform.Current.ReadSaveSlot(saveSlot, bytes => { data = bytes; });
+                    json = Encoding.UTF8.GetString( data );
                 }
                 Debug.Log( "[API] - Loading Game:" + json );
                 SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
@@ -192,7 +193,10 @@ namespace Modding.Patches
                 } );
                 return null;
             }
-            if( !Platform.Current.IsSaveSlotInUse( saveSlot ) )
+            
+            bool saveSlotUsed = false;
+            Platform.Current.IsSaveSlotInUse(saveSlot, b => { saveSlotUsed = b; });
+            if( !saveSlotUsed )
             {
                 return null;
             }
@@ -205,17 +209,21 @@ namespace Modding.Patches
                 if( flag )
                 {
                     BinaryFormatter binaryFormatter = new BinaryFormatter();
-                    MemoryStream serializationStream = new MemoryStream(Platform.Current.ReadSaveSlot(saveSlot));
+                    byte[] data = new byte[0];
+                    Platform.Current.ReadSaveSlot(saveSlot, bytes => { data = bytes; });
+                    MemoryStream serializationStream = new MemoryStream(data);
                     string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
                     json = Encryption.Decrypt( encryptedString );
                 }
                 else
                 {
-                    json = Encoding.UTF8.GetString( Platform.Current.ReadSaveSlot( saveSlot ) );
+                    byte[] data = new byte[0];
+                    Platform.Current.ReadSaveSlot(saveSlot, bytes => { data = bytes; });
+                    json = Encoding.UTF8.GetString( data );
                 }
                 SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
                 global::PlayerData playerData = saveGameData.playerData;
-                SaveStats saveStats = new SaveStats(playerData.maxHealthBase, playerData.geo, playerData.mapZone, playerData.playTime, playerData.MPReserveMax, playerData.permadeathMode, playerData.completionPercentage, playerData.unlockedCompletionRate)
+                SaveStats saveStats = new SaveStats(playerData.maxHealthBase, playerData.geo, playerData.mapZone, playerData.playTime, playerData.MPReserveMax, playerData.permadeathMode, playerData.bossRushMode, playerData.completionPercentage, playerData.unlockedCompletionRate)
                 {
                     Name = saveGameData.Name,
                     LoadedMods = saveGameData.LoadedMods
