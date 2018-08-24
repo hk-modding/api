@@ -138,55 +138,60 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Vanilla\Assembly-CSharp.dll</HintPath>
+      <HintPath>../Vanilla/Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\MonoMod\Mono.Cecil.dll</HintPath>
+      <HintPath>../MonoMod/Mono.Cecil.dll</HintPath>
     </Reference>
-    <Reference Include="MonoMod, Version=17.4.6530.30093, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\MonoMod\MonoMod.exe</HintPath>
+    <Reference Include="MonoMod, Version=17.4.6657.30937, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../MonoMod/MonoMod.exe</HintPath>
+    </Reference>
+    <Reference Include="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <HintPath>..\Vanilla\mscorlib.dll</HintPath>
     </Reference>
     <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Vanilla\PlayMaker.dll</HintPath>
+      <HintPath>../Vanilla/PlayMaker.dll</HintPath>
     </Reference>
-    <Reference Include="System">
-      <HintPath>..\Vanilla\System.dll</HintPath>
+    <Reference Include="System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <HintPath>../../../../../usr/lib64/mono/2.0-api/System.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml">
-      <HintPath>..\Vanilla\System.Xml.dll</HintPath>
+    <Reference Include="System.Xml, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <HintPath>../../../../../usr/lib64/mono/2.0-api/System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>../Vanilla/UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>../Vanilla/UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>../Vanilla/UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>../Vanilla/UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <HintPath>../Vanilla/UnityEngine.JSONSerializeModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <HintPath>../Vanilla/UnityEngine.ParticleSystemModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\UnityEngine.Physics2DModule.dll</HintPath>
+      <HintPath>../Vanilla/UnityEngine.Physics2DModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>../Vanilla/UnityEngine.TextRenderingModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\UnityEngine.UI.dll</HintPath>
+      <HintPath>../Vanilla/UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Vanilla\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>../Vanilla/UnityEngine.UIModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
