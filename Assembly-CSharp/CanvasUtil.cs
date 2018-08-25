@@ -188,7 +188,7 @@ namespace Modding
                 data = new byte[] {0x00, 0x00, 0x00, 0x00};
             }
 
-            tex.LoadRawTextureData(data);
+            tex.LoadImage(data);
             tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, 1, 1), Vector2.zero);
         }
@@ -205,7 +205,7 @@ namespace Modding
         public static Sprite CreateSprite(byte[] data, int x, int y, int width, int height)
         {
             Texture2D tex = new Texture2D(1, 1);
-            tex.LoadRawTextureData(data);
+            tex.LoadImage(data);
             tex.anisoLevel = 0;
             return Sprite.Create(tex, new Rect(x, y, width, height), Vector2.zero);
         }

@@ -59,7 +59,7 @@ namespace Modding.Menu
         public static Sprite NullSprite()
         {
             Texture2D tex = new Texture2D(1, 1);
-            tex.LoadRawTextureData(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+            tex.LoadImage(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
             tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, 1, 1), Vector2.zero);
         }
@@ -67,7 +67,7 @@ namespace Modding.Menu
         public static Sprite CreateSprite(byte[] data, int x, int y, int w, int h)
         {
             Texture2D tex = new Texture2D(1, 1);
-            tex.LoadRawTextureData(data);
+            tex.LoadImage(data);
             tex.anisoLevel = 0;
             return Sprite.Create(tex, new Rect(x, y, w, h), Vector2.zero);
         }
