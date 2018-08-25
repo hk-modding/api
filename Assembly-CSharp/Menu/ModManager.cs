@@ -59,7 +59,7 @@ namespace Modding.Menu
         public static Sprite NullSprite()
         {
             Texture2D tex = new Texture2D(1, 1);
-            tex.LoadImage(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
+            tex.LoadRawTextureData(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
             tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, 1, 1), Vector2.zero);
         }

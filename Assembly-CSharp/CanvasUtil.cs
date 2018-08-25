@@ -188,7 +188,7 @@ namespace Modding
                 data = new byte[] {0x00, 0x00, 0x00, 0x00};
             }
 
-            tex.LoadImage(data);
+            tex.LoadRawTextureData(data);
             tex.Apply();
             return Sprite.Create(tex, new Rect(0, 0, 1, 1), Vector2.zero);
         }
