@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using MonoMod;
 //We don't care about XML docs for these as they are being patched into the original code
 #pragma warning disable 1591
@@ -46,24 +47,12 @@ namespace Modding.Patches
             Logger.Log( "Finished LoadScene!" );
         }
 
-        public string orig_GetSaveFilename(int saveSlot) { return string.Empty; }
+        public void orig_ClearSaveFile(int saveSlot, Action<bool> callback) { }
 
-        public string GetSaveFilename(int saveSlot)
-        {
-            string saveFileName = ModHooks.Instance.GetSaveFileName(saveSlot);
-            if (!string.IsNullOrEmpty(saveFileName))
-            {
-                return saveFileName;
-            }
-            return orig_GetSaveFilename(saveSlot);
-        }
-
-        public void orig_ClearSaveFile(int saveSlot) { }
-
-        public void ClearSaveFile(int saveSlot)
+        public void ClearSaveFile(int saveSlot, Action<bool> callback)
         {
             ModHooks.Instance.OnSavegameClear(saveSlot);
-            orig_ClearSaveFile(saveSlot);
+            orig_ClearSaveFile(saveSlot, callback);
             ModHooks.Instance.OnAfterSaveGameClear(saveSlot);
         }
 

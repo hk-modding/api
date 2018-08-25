@@ -1,209 +1,210 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{1CACEA6A-D114-46B1-8C47-F2F92062B844}</ProjectGuid>
-        <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>Modding</RootNamespace>
-        <AssemblyName>Assembly-CSharp.mm</AssemblyName>
-        <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-        <FileAlignment>512</FileAlignment>
-        <TargetFrameworkProfile>
-        </TargetFrameworkProfile>
-        <NuGetPackageImportStamp>
-        </NuGetPackageImportStamp>
-        <!-- <NoStdLib>True</NoStdLib>-->
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\Debug\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
-        <Prefer32Bit>false</Prefer32Bit>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <DocumentationFile>bin\Release\Assembly-CSharp.mm.xml</DocumentationFile>
-        <Prefer32Bit>false</Prefer32Bit>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugMac|AnyCPU'">
-        <DebugSymbols>true</DebugSymbols>
-        <OutputPath>bin\DebugMac\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
-        <DebugType>full</DebugType>
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <ErrorReport>prompt</ErrorReport>
-        <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugDeploy|AnyCPU'">
-        <DebugSymbols>true</DebugSymbols>
-        <OutputPath>bin\DebugDeploy\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
-        <DebugType>full</DebugType>
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <ErrorReport>prompt</ErrorReport>
-        <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLinux|AnyCPU'">
-        <DebugSymbols>true</DebugSymbols>
-        <OutputPath>bin\DebugLinux\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
-        <DebugType>full</DebugType>
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <ErrorReport>prompt</ErrorReport>
-        <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    </PropertyGroup>
-    <ItemGroup>
-        <Compile Include="CallerMemberName.cs"/>
-        <Compile Include="CanvasUtil.cs"/>
-        <Compile Include="Console.cs"/>
-        <Compile Include="GithubVersionHelper.cs"/>
-        <Compile Include="GlobalSuppressions.cs"/>
-        <Compile Include="Handlers.cs"/>
-        <Compile Include="HookInfoAttribute.cs"/>
-        <Compile Include="ILogger.cs"/>
-        <Compile Include="IMod.cs"/>
-        <Compile Include="IModSettings.cs"/>
-        <Compile Include="Loggable.cs"/>
-        <Compile Include="Logger.cs"/>
-        <Compile Include="LogLevel.cs"/>
-        <Compile Include="Menu\FauxMenuOptionHorizontal.cs"/>
-        <Compile Include="Menu\FauxUIManager.cs"/>
-        <Compile Include="Menu\ModManager.cs"/>
-        <Compile Include="Mod.cs"/>
-        <Compile Include="ModData.cs"/>
-        <Compile Include="ModHooks.cs"/>
-        <Compile Include="ModHooksGlobalSettings.cs"/>
-        <Compile Include="ModLoader.cs"/>
-        <Compile Include="ModSettingsDictionary.cs"/>
-        <Compile Include="ModVersionDraw.cs"/>
-        <Compile Include="Patches\ChangeFontByLanguage.cs"/>
-        <Compile Include="Patches\ChaseObject.cs"/>
-        <Compile Include="Patches\ChaseObjectV2.cs"/>
-        <Compile Include="Patches\CheckTargetDirection.cs"/>
-        <Compile Include="Patches\DialogueBox.cs"/>
-        <Compile Include="Patches\EnemyDeathEffects.cs"/>
-        <Compile Include="Patches\FaceObject.cs"/>
-        <Compile Include="Patches\DRM\GameManager.cs"/>
-        <Compile Include="Patches\DRM\HeroController.cs"/>
-        <Compile Include="Patches\DRM\GetEventSender.cs"/>
-        <Compile Include="Patches\GetAngleToTarget2D.cs"/>
-        <Compile Include="Patches\GetColliderRange.cs"/>
-        <Compile Include="Patches\GradeMarker.cs"/>
-        <Compile Include="Patches\DRM\HealthManager.cs"/>
-        <Compile Include="Patches\MenuSelectable.cs"/>
-        <Compile Include="Patches\ObjectPool.cs"/>
-        <Compile Include="Patches\GameManager.cs"/>
-        <Compile Include="Patches\HeroController.cs"/>
-        <Compile Include="Patches\InputHandler.cs"/>
-        <Compile Include="Patches\Language.cs"/>
-        <Compile Include="Patches\MonoModRules.cs"/>
-        <Compile Include="Patches\OnScreenDebugInfo.cs"/>
-        <Compile Include="Patches\OnTriggerEnter2D.cs"/>
-        <Compile Include="Patches\PlayerData.cs"/>
-        <Compile Include="Patches\PlayMakerUnity2DProxy.cs"/>
-        <Compile Include="Patches\SaveGameData.cs"/>
-        <Compile Include="Patches\SaveStats.cs"/>
-        <Compile Include="Patches\SceneColorManager.cs"/>
-        <Compile Include="Patches\SceneManager.cs"/>
-        <Compile Include="Patches\SetParticleEmissionRate.cs"/>
-        <Compile Include="Patches\TakeDamage.cs"/>
-        <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="Proxies.cs"/>
-        <Compile Include="SerializableBoolDictionary.cs"/>
-        <Compile Include="SerializableDictionary.cs"/>
-        <Compile Include="SerializableFloatDictionary.cs"/>
-        <Compile Include="SerializableIntDictionary.cs"/>
-        <Compile Include="SerializableStringDictionary.cs"/>
-        <Compile Include="SimpleLogger.cs"/>
-        <Compile Include="TogglableMod.cs"/>
-        <Compile Include="VoidModSettings.cs"/>
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
-    <ItemGroup>
-        <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-            <SpecificVersion>False</SpecificVersion>
-            <HintPath>../Vanilla/Assembly-CSharp.dll</HintPath>
-        </Reference>
-        <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-            <SpecificVersion>False</SpecificVersion>
-            <HintPath>../MonoMod/Mono.Cecil.dll</HintPath>
-        </Reference>
-        <Reference Include="MonoMod">
-            <HintPath>../MonoMod/MonoMod.exe</HintPath>
-        </Reference>
-        <Reference Include="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-            <HintPath>..\Vanilla\mscorlib.dll</HintPath>
-        </Reference>
-        <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-            <SpecificVersion>False</SpecificVersion>
-            <HintPath>../Vanilla/PlayMaker.dll</HintPath>
-        </Reference>
-        <Reference Include="System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-            <HintPath>../../../../../usr/lib64/mono/2.0-api/System.dll</HintPath>
-        </Reference>
-        <Reference Include="System.Xml, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-            <HintPath>../../../../../usr/lib64/mono/2.0-api/System.Xml.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>..\Vanilla\UnityEngine.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>../Vanilla/UnityEngine.AnimationModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>../Vanilla/UnityEngine.AudioModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>../Vanilla/UnityEngine.CoreModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>../Vanilla/UnityEngine.IMGUIModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>../Vanilla/UnityEngine.JSONSerializeModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>../Vanilla/UnityEngine.ParticleSystemModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>../Vanilla/UnityEngine.Physics2DModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>../Vanilla/UnityEngine.TextRenderingModule.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>../Vanilla/UnityEngine.UI.dll</HintPath>
-        </Reference>
-        <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-            <HintPath>../Vanilla/UnityEngine.UIModule.dll</HintPath>
-        </Reference>
-    </ItemGroup>
-    <ItemGroup>
-        <EmbeddedResource Include="github.crt"/>
-        <EmbeddedResource Include="github2.crt"/>
-    </ItemGroup>
-    <Target Name="ILMerge">
-        <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
-        <Exec Command="$(ILMergeConsolePath) /out:$(SolutionDir)/Output/Assembly-CSharp.dll Assembly-CSharp.dll ModdingBase.dll"/>
-    </Target>
-    <PropertyGroup>
-        <PostBuildEvent Condition="'$(OS)' == 'Windows_NT'">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1CACEA6A-D114-46B1-8C47-F2F92062B844}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Modding</RootNamespace>
+    <AssemblyName>Assembly-CSharp.mm</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <!-- <NoStdLib>True</NoStdLib>-->
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Assembly-CSharp.mm.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugMac|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugMac\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugDeploy|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugDeploy\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLinux|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\DebugLinux\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="CallerMemberName.cs" />
+    <Compile Include="CanvasUtil.cs" />
+    <Compile Include="Console.cs" />
+    <Compile Include="GithubVersionHelper.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Handlers.cs" />
+    <Compile Include="HookInfoAttribute.cs" />
+    <Compile Include="ILogger.cs" />
+    <Compile Include="IMod.cs" />
+    <Compile Include="IModSettings.cs" />
+    <Compile Include="Loggable.cs" />
+    <Compile Include="Logger.cs" />
+    <Compile Include="LogLevel.cs" />
+    <Compile Include="Menu\FauxMenuOptionHorizontal.cs" />
+    <Compile Include="Menu\FauxUIManager.cs" />
+    <Compile Include="Menu\ModManager.cs" />
+    <Compile Include="Mod.cs" />
+    <Compile Include="ModData.cs" />
+    <Compile Include="ModHooks.cs" />
+    <Compile Include="ModHooksGlobalSettings.cs" />
+    <Compile Include="ModLoader.cs" />
+    <Compile Include="ModSettingsDictionary.cs" />
+    <Compile Include="ModVersionDraw.cs" />
+    <Compile Include="Patches\ChangeFontByLanguage.cs" />
+    <Compile Include="Patches\ChaseObject.cs" />
+    <Compile Include="Patches\ChaseObjectV2.cs" />
+    <Compile Include="Patches\CheckTargetDirection.cs" />
+    <Compile Include="Patches\DialogueBox.cs" />
+    <Compile Include="Patches\EnemyDeathEffects.cs" />
+    <Compile Include="Patches\FaceObject.cs" />
+    <Compile Include="Patches\DRM\GameManager.cs" />
+    <Compile Include="Patches\DRM\HeroController.cs" />
+    <Compile Include="Patches\DRM\GetEventSender.cs" />
+    <Compile Include="Patches\GetAngleToTarget2D.cs" />
+    <Compile Include="Patches\GetColliderRange.cs" />
+    <Compile Include="Patches\GradeMarker.cs" />
+    <Compile Include="Patches\DRM\HealthManager.cs" />
+    <Compile Include="Patches\MenuSelectable.cs" />
+    <Compile Include="Patches\ObjectPool.cs" />
+    <Compile Include="Patches\GameManager.cs" />
+    <Compile Include="Patches\HeroController.cs" />
+    <Compile Include="Patches\InputHandler.cs" />
+    <Compile Include="Patches\Language.cs" />
+    <Compile Include="Patches\MonoModRules.cs" />
+    <Compile Include="Patches\OnScreenDebugInfo.cs" />
+    <Compile Include="Patches\OnTriggerEnter2D.cs" />
+    <Compile Include="Patches\Platform.cs" />
+    <Compile Include="Patches\PlayerData.cs" />
+    <Compile Include="Patches\PlayMakerUnity2DProxy.cs" />
+    <Compile Include="Patches\SaveGameData.cs" />
+    <Compile Include="Patches\SaveStats.cs" />
+    <Compile Include="Patches\SceneColorManager.cs" />
+    <Compile Include="Patches\SceneManager.cs" />
+    <Compile Include="Patches\SetParticleEmissionRate.cs" />
+    <Compile Include="Patches\TakeDamage.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Proxies.cs" />
+    <Compile Include="SerializableBoolDictionary.cs" />
+    <Compile Include="SerializableDictionary.cs" />
+    <Compile Include="SerializableFloatDictionary.cs" />
+    <Compile Include="SerializableIntDictionary.cs" />
+    <Compile Include="SerializableStringDictionary.cs" />
+    <Compile Include="SimpleLogger.cs" />
+    <Compile Include="TogglableMod.cs" />
+    <Compile Include="VoidModSettings.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>../Vanilla/Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>../MonoMod/Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod">
+      <HintPath>../MonoMod/MonoMod.exe</HintPath>
+    </Reference>
+    <Reference Include="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <HintPath>..\Vanilla\mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>../Vanilla/PlayMaker.dll</HintPath>
+    </Reference>
+    <Reference Include="System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <HintPath>../../../../../usr/lib64/mono/2.0-api/System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <HintPath>../../../../../usr/lib64/mono/2.0-api/System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\Vanilla\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../Vanilla/UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../Vanilla/UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../Vanilla/UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../Vanilla/UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../Vanilla/UnityEngine.JSONSerializeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../Vanilla/UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Physics2DModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../Vanilla/UnityEngine.Physics2DModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../Vanilla/UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../Vanilla/UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>../Vanilla/UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="github.crt" />
+    <EmbeddedResource Include="github2.crt" />
+  </ItemGroup>
+  <Target Name="ILMerge">
+    <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
+    <Exec Command="$(ILMergeConsolePath) /out:$(SolutionDir)/Output/Assembly-CSharp.dll Assembly-CSharp.dll ModdingBase.dll" />
+  </Target>
+  <PropertyGroup>
+    <PostBuildEvent Condition="'$(OS)' == 'Windows_NT'">
             move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.dll" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.dll"
             move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.pdb" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.pdb"
 
@@ -285,7 +286,7 @@
 
             :Exit
         </PostBuildEvent>
-        <PostBuildEvent Condition="'$(OS)' != 'Windows_NT'">
+    <PostBuildEvent Condition="'$(OS)' != 'Windows_NT'">
             mv "$(ProjectDir)$(OutputPath)/Assembly-CSharp.mm.dll" "$(ProjectDir)$(OutputPath)/Assembly-CSharp.dll.mm.dll"
             mv "$(ProjectDir)$(OutputPath)/Assembly-CSharp.mm.pdb" "$(ProjectDir)$(OutputPath)/Assembly-CSharp.dll.mm.pdb"
 
@@ -315,9 +316,9 @@
             cd "$(SolutionDir)/OutputFinal"
             zip -r "../ModdingAPI.zip" *
         </PostBuildEvent>
-    </PropertyGroup>
-    <PropertyGroup>
-        <PreBuildEvent Condition="'$(OS)' == 'Windows_NT'">
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent Condition="'$(OS)' == 'Windows_NT'">
             rd "$(ProjectDir)$(OutputPath)" /s /q
             rem "If Distribution exists, delete it"
 
@@ -342,12 +343,12 @@
 
             :Exit
         </PreBuildEvent>
-        <PreBuildEvent Condition="'$(OS)' != 'Windows_NT'">
+    <PreBuildEvent Condition="'$(OS)' != 'Windows_NT'">
             # If distribution exists, delete it
             rm -rf "$(ProjectDir)$(OutputPath)"
 
             rm -rf "$(SolutionDir)OutputFinal"
             rm -f "$(SolutionDir)ModdingAPI.zip"
         </PreBuildEvent>
-    </PropertyGroup>
+  </PropertyGroup>
 </Project>
