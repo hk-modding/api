@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using GlobalEnums;
 using MonoMod;
 using UnityEngine;
@@ -392,226 +393,255 @@ namespace Modding.Patches
         [MonoModIgnore] private extern IEnumerator Die();
         [MonoModIgnore] private extern IEnumerator DieFromHazard(HazardType hazardType, float angle);
         [MonoModIgnore] private extern IEnumerator StartRecoil(CollisionSide impactSide, bool spawnDamageEffect, int damageAmount);
+	    [MonoModIgnore]	public event HeroController.TakeDamageEvent OnTakenDamage;
 
         [MonoModReplace]
         public void TakeDamage(GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
         {
-            damageAmount = ModHooks.Instance.OnTakeDamage(ref hazardType, damageAmount);
-
-            bool spawnDamageEffect = true;
-            if (damageAmount > 0)
-            {
-                if (this.CanTakeDamage())
-                {
-                    if (this.damageMode == DamageMode.HAZARD_ONLY && hazardType == 1)
-                    {
-                        return;
-                    }
-                    if (this.cState.shadowDashing && hazardType == 1)
-                    {
-                        return;
-                    }
-                    if (this.parryInvulnTimer > 0f && hazardType == 1)
-                    {
-                        return;
-                    }
-                    bool flag = false;
-                    if (this.carefreeShieldEquipped && hazardType == 1)
-                    {
-                        if (this.hitsSinceShielded > 7)
-                        {
-                            this.hitsSinceShielded = 7;
-                        }
-                        switch (this.hitsSinceShielded)
-                        {
-                            case 1:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 10f)
-                                {
-                                    flag = true;
-                                }
-                                break;
-                            case 2:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 20f)
-                                {
-                                    flag = true;
-                                }
-                                break;
-                            case 3:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 30f)
-                                {
-                                    flag = true;
-                                }
-                                break;
-                            case 4:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 50f)
-                                {
-                                    flag = true;
-                                }
-                                break;
-                            case 5:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 70f)
-                                {
-                                    flag = true;
-                                }
-                                break;
-                            case 6:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 80f)
-                                {
-                                    flag = true;
-                                }
-                                break;
-                            case 7:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 90f)
-                                {
-                                    flag = true;
-                                }
-                                break;
-                            default:
-                                flag = false;
-                                break;
-                        }
-                        if (flag)
-                        {
-                            this.hitsSinceShielded = 0;
-                            this.carefreeShield.SetActive(true);
-                            damageAmount = 0;
-                            spawnDamageEffect = false;
-                        }
-                        else
-                        {
-                            this.hitsSinceShielded++;
-                        }
-                    }
-                    damageAmount = Modding.ModHooks.Instance.AfterTakeDamage(hazardType, damageAmount);
-                    if (this.playerData.equippedCharm_5 && this.playerData.blockerHits > 0 && hazardType == 1 && this.cState.focusing && !flag)
-                    {
-                        this.proxyFSM.SendEvent("HeroCtrl-TookBlockerHit");
-                        this.audioSource.PlayOneShot(this.blockerImpact, 1f);
-                        spawnDamageEffect = false;
-                        damageAmount = 0;
-                    }
-                    else
-                    {
-                        this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-                    }
-                    this.CancelAttack();
-                    if (this.cState.wallSliding)
-                    {
-                        this.cState.wallSliding = false;
-                    }
-                    if (this.cState.touchingWall)
-                    {
-                        this.cState.touchingWall = false;
-                    }
-                    if (this.cState.recoilingLeft || this.cState.recoilingRight)
-                    {
-                        this.CancelRecoilHorizontal();
-                    }
-                    if (this.cState.bouncing)
-                    {
-                        this.CancelBounce();
-                        this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
-                    }
-                    if (this.cState.shroomBouncing)
-                    {
-                        this.CancelBounce();
-                        this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
-                    }
-                    if (!flag)
-                    {
-                        this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
-                    }
-                    if (!this.takeNoDamage && !this.playerData.invinciTest)
-                    {
-                        if (this.playerData.overcharmed)
-                        {
-                            this.playerData.TakeHealth(damageAmount * 2);
-                        }
-                        else
-                        {
-                            this.playerData.TakeHealth(damageAmount);
-                        }
-                    }
-                    if (this.playerData.equippedCharm_3 && damageAmount > 0)
-                    {
-                        if (this.playerData.equippedCharm_35)
-                        {
-                            this.AddMPCharge(this.GRUB_SOUL_MP_COMBO);
-                        }
-                        else
-                        {
-                            this.AddMPCharge(this.GRUB_SOUL_MP);
-                        }
-                    }
-                    if (this.joniBeam && damageAmount > 0)
-                    {
-                        this.joniBeam = false;
-                    }
-                    if (this.cState.nailCharging || this.nailChargeTimer != 0f)
-                    {
-                        this.cState.nailCharging = false;
-                        this.nailChargeTimer = 0f;
-                    }
-                    if (this.playerData.health == 0)
-                    {
-                        base.StartCoroutine(this.Die());
-                    }
-                    else if (hazardType == 2)
-                    {
-                        base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, go.transform.rotation.z));
-                    }
-                    else if (hazardType == 3)
-                    {
-                        base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
-                    }
-                    else if (hazardType == 4)
-                    {
-                        Debug.Log("Lava death");
-                    }
-                    else if (hazardType == 5)
-                    {
-                        base.StartCoroutine(this.DieFromHazard(HazardType.PIT, 0f));
-                    }
-                    else
-                    {
-                        base.StartCoroutine(this.StartRecoil(damageSide, spawnDamageEffect, damageAmount));
-                    }
-                }
-                else if (this.cState.invulnerable && !this.cState.hazardDeath && !this.playerData.isInvincible)
-                {
-                    if (hazardType == 2)
-                    {
-                        this.playerData.TakeHealth(damageAmount);
-                        this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-                        if (this.playerData.health == 0)
-                        {
-                            base.StartCoroutine(this.Die());
-                        }
-                        else
-                        {
-                            base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, go.transform.rotation.z));
-                        }
-                    }
-                    else if (hazardType == 3)
-                    {
-                        this.playerData.TakeHealth(damageAmount);
-                        this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-                        if (this.playerData.health == 0)
-                        {
-                            base.StartCoroutine(this.Die());
-                        }
-                        else
-                        {
-                            base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
-                        }
-                    }
-                    else if (hazardType == 4)
-                    {
-                        Debug.Log("Lava damage");
-                    }
-                }
-            }
-        }
+	        damageAmount = ModHooks.Instance.OnTakeDamage(ref hazardType, damageAmount);
+		    bool spawnDamageEffect = true;
+		    if (damageAmount > 0)
+		    {
+		    	if (BossSceneController.IsBossScene)
+		    	{
+		    		int bossLevel = BossSceneController.Instance.BossLevel;
+		    		if (bossLevel != 1)
+		    		{
+		    			if (bossLevel == 2)
+		    			{
+		    				damageAmount = 9999;
+		    			}
+		    		}
+		    		else
+		    		{
+		    			damageAmount *= 2;
+		    		}
+		    	}
+		    	if (this.CanTakeDamage())
+		    	{
+		    		if (this.damageMode == DamageMode.HAZARD_ONLY && hazardType == 1)
+		    		{
+		    			return;
+		    		}
+		    		if (this.cState.shadowDashing && hazardType == 1)
+		    		{
+		    			return;
+		    		}
+		    		if (this.parryInvulnTimer > 0f && hazardType == 1)
+		    		{
+		    			return;
+		    		}
+		    		VibrationMixer mixer = VibrationManager.GetMixer();
+		    		if (mixer != null)
+		    		{
+		    			mixer.StopAllEmissionsWithTag("heroAction");
+		    		}
+		    		bool flag = false;
+		    		if (this.carefreeShieldEquipped && hazardType == 1)
+		    		{
+		    			if (this.hitsSinceShielded > 7)
+		    			{
+		    				this.hitsSinceShielded = 7;
+		    			}
+		    			switch (this.hitsSinceShielded)
+		    			{
+		    			case 1:
+		    				if ((float)UnityEngine.Random.Range(1, 100) <= 10f)
+		    				{
+		    					flag = true;
+		    				}
+		    				break;
+		    			case 2:
+		    				if ((float)UnityEngine.Random.Range(1, 100) <= 20f)
+		    				{
+		    					flag = true;
+		    				}
+		    				break;
+		    			case 3:
+		    				if ((float)UnityEngine.Random.Range(1, 100) <= 30f)
+		    				{
+		    					flag = true;
+		    				}
+		    				break;
+		    			case 4:
+		    				if ((float)UnityEngine.Random.Range(1, 100) <= 50f)
+		    				{
+		    					flag = true;
+		    				}
+		    				break;
+		    			case 5:
+		    				if ((float)UnityEngine.Random.Range(1, 100) <= 70f)
+		    				{
+		    					flag = true;
+		    				}
+		    				break;
+		    			case 6:
+		    				if ((float)UnityEngine.Random.Range(1, 100) <= 80f)
+		    				{
+		    					flag = true;
+		    				}
+		    				break;
+		    			case 7:
+		    				if ((float)UnityEngine.Random.Range(1, 100) <= 90f)
+		    				{
+		    					flag = true;
+		    				}
+		    				break;
+		    			default:
+		    				flag = false;
+		    				break;
+		    			}
+		    			if (flag)
+		    			{
+		    				this.hitsSinceShielded = 0;
+		    				this.carefreeShield.SetActive(true);
+		    				damageAmount = 0;
+		    				spawnDamageEffect = false;
+		    			}
+		    			else
+		    			{
+		    				this.hitsSinceShielded++;
+		    			}
+		    		}
+				    damageAmount = ModHooks.Instance.AfterTakeDamage(hazardType, damageAmount);
+		    		if (this.playerData.equippedCharm_5 && this.playerData.blockerHits > 0 && hazardType == 1 && this.cState.focusing && !flag)
+		    		{
+		    			this.proxyFSM.SendEvent("HeroCtrl-TookBlockerHit");
+		    			this.audioSource.PlayOneShot(this.blockerImpact, 1f);
+		    			spawnDamageEffect = false;
+		    			damageAmount = 0;
+		    		}
+		    		else
+		    		{
+		    			this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
+		    		}
+		    		this.CancelAttack();
+		    		if (this.cState.wallSliding)
+		    		{
+		    			this.cState.wallSliding = false;
+		    			this.wallSlideVibrationPlayer.Stop();
+		    		}
+		    		if (this.cState.touchingWall)
+		    		{
+		    			this.cState.touchingWall = false;
+		    		}
+		    		if (this.cState.recoilingLeft || this.cState.recoilingRight)
+		    		{
+		    			this.CancelRecoilHorizontal();
+		    		}
+		    		if (this.cState.bouncing)
+		    		{
+		    			this.CancelBounce();
+		    			this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
+		    		}
+		    		if (this.cState.shroomBouncing)
+		    		{
+		    			this.CancelBounce();
+		    			this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
+		    		}
+		    		if (!flag)
+		    		{
+		    			this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
+		    		}
+		    		if (!this.takeNoDamage && !this.playerData.invinciTest)
+		    		{
+		    			if (this.playerData.overcharmed)
+		    			{
+		    				this.playerData.TakeHealth(damageAmount * 2);
+		    			}
+		    			else
+		    			{
+		    				this.playerData.TakeHealth(damageAmount);
+		    			}
+		    		}
+		    		if (this.playerData.equippedCharm_3 && damageAmount > 0)
+		    		{
+		    			if (this.playerData.equippedCharm_35)
+		    			{
+		    				this.AddMPCharge(this.GRUB_SOUL_MP_COMBO);
+		    			}
+		    			else
+		    			{
+		    				this.AddMPCharge(this.GRUB_SOUL_MP);
+		    			}
+		    		}
+		    		if (this.joniBeam && damageAmount > 0)
+		    		{
+		    			this.joniBeam = false;
+		    		}
+		    		if (this.cState.nailCharging || this.nailChargeTimer != 0f)
+		    		{
+		    			this.cState.nailCharging = false;
+		    			this.nailChargeTimer = 0f;
+		    		}
+		    		if (damageAmount > 0 && this.OnTakenDamage != null)
+				    {
+		    			this.OnTakenDamage();
+		    		}
+		    		if (this.playerData.health == 0)
+		    		{
+		    			base.StartCoroutine(this.Die());
+		    		}
+		    		else if (hazardType == 2)
+		    		{
+		    			base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, (!(go != null)) ? 0f : go.transform.rotation.z));
+		    		}
+		    		else if (hazardType == 3)
+		    		{
+		    			base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
+		    		}
+		    		else if (hazardType == 4)
+		    		{
+		    			Debug.Log("Lava death");
+		    		}
+		    		else if (hazardType == 5)
+		    		{
+		    			base.StartCoroutine(this.DieFromHazard(HazardType.PIT, 0f));
+		    		}
+		    		else
+		    		{
+		    			base.StartCoroutine(this.StartRecoil(damageSide, spawnDamageEffect, damageAmount));
+		    		}
+		    	}
+		    	else if (this.cState.invulnerable && !this.cState.hazardDeath && !this.playerData.isInvincible)
+		    	{
+		    		if (hazardType == 2)
+		    		{
+		    			if (!this.takeNoDamage)
+		    			{
+		    				this.playerData.TakeHealth(damageAmount);
+		    			}
+		    			this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
+		    			if (this.playerData.health == 0)
+		    			{
+		    				base.StartCoroutine(this.Die());
+		    			}
+		    			else
+		    			{
+		    				this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
+		    				base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, (!(go != null)) ? 0f : go.transform.rotation.z));
+		    			}
+		    		}
+		    		else if (hazardType == 3)
+		    		{
+		    			this.playerData.TakeHealth(damageAmount);
+		    			this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
+		    			if (this.playerData.health == 0)
+		    			{
+		    				base.StartCoroutine(this.Die());
+		    			}
+		    			else
+		    			{
+		    				base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
+		    			}
+		    		}
+		    		else if (hazardType == 4)
+		    		{
+		    			Debug.Log("Lava damage");
+		    		}
+		    	}
+		    }
+	    }
         #endregion
     }
 }
