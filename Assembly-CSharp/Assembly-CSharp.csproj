@@ -220,12 +220,12 @@
 
             rem "Generate Hooks"
             MonoMod.RuntimeDetour.HookGen.exe Assembly-CSharp.dll
-            MonoMod.RuntimeDetour.HookGen.exe Playmaker.dll
+            MonoMod.RuntimeDetour.HookGen.exe PlayMaker.dll
 
             rem "Rename files so the assembly has the correct name and the output works"
             move "MONOMODDED_Assembly-CSharp.dll" "MONOModded.dll"
             move Assembly-CSharp.dll OriginalAssembly-CSharp.dll
-            $(SolutionDir)ILRepack\ILRepack.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MMHOOK_Playmaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll
+            $(SolutionDir)ILRepack\ILRepack.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MMHOOK_PlayMaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll
             move Assembly-CSharp.dll MONOMODDED_Assembly-CSharp.dll
 
             rem "Create the folder structure prefered by mods"
@@ -293,6 +293,15 @@
             cp $(SolutionDir)MonoMod/* $(ProjectDir)$(OutputPath)/
             cd "$(ProjectDir)$(OutputPath)"
             mono MonoMod.exe Assembly-CSharp.dll
+
+            mono MonoMod.RuntimeDetour.HookGen.exe Assembly-CSharp.dll
+            mono MonoMod.RuntimeDetour.HookGen.exe PlayMaker.dll
+
+            mv "MONOMODDED_Assembly-CSharp.dll" "MONOModded.dll"
+            mv Assembly-CSharp.dll OriginalAssembly-CSharp.dll
+            mono $(SolutionDir)ILRepack/ILRepack.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MMHOOK_PlayMaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll
+            mv Assembly-CSharp.dll MONOMODDED_Assembly-CSharp.dll
+
             echo "Create the folder structure prefered by mods"
             mkdir -p "$(SolutionDir)OutputFinal/hollow_knight_Data/Managed/Mods"
             echo "Copy the Mod's dll into the Mods folder"
@@ -304,7 +313,6 @@
 
             echo "Zip the Distribution Folder"
             cd "$(SolutionDir)/OutputFinal"
-            cp "$(SolutionDir)Vanilla/Unity.dll" "$(SolutionDir)/OutputFinal/hollow_knight_Data/Managed/"
             zip -r "../ModdingAPI.zip" *
         </PostBuildEvent>
     </PropertyGroup>
