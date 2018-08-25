@@ -14,7 +14,6 @@ namespace Modding.Patches
         protected string GetSaveSlotFileName(int slotIndex, SaveSlotFileNameUsage usage)
         {
             string saveFileName = ModHooks.Instance.GetSaveFileName(slotIndex);
-            ModHooks.ModLog("[API] - " + saveFileName);
             return string.IsNullOrEmpty(saveFileName)
                 ? orig_GetSaveSlotFileName(slotIndex, usage) 
                 : saveFileName;
