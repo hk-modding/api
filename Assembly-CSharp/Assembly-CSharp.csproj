@@ -223,8 +223,8 @@
             MonoMod.exe Assembly-CSharp.dll
 
             rem "Generate Hooks"
-            MonoMod.RuntimeDetour.HookGen.exe Assembly-CSharp.dll
-            MonoMod.RuntimeDetour.HookGen.exe PlayMaker.dll
+            MonoMod.RuntimeDetour.HookGen.exe --private Assembly-CSharp.dll
+            MonoMod.RuntimeDetour.HookGen.exe --private PlayMaker.dll
 
             rem "Rename files so the assembly has the correct name and the output works"
             move "MONOMODDED_Assembly-CSharp.dll" "MONOModded.dll"
@@ -298,8 +298,8 @@
             cd "$(ProjectDir)$(OutputPath)"
             mono MonoMod.exe Assembly-CSharp.dll
 
-            mono MonoMod.RuntimeDetour.HookGen.exe Assembly-CSharp.dll
-            mono MonoMod.RuntimeDetour.HookGen.exe PlayMaker.dll
+            mono MonoMod.RuntimeDetour.HookGen.exe --private Assembly-CSharp.dll
+            mono MonoMod.RuntimeDetour.HookGen.exe --private PlayMaker.dll
 
             mv "MONOMODDED_Assembly-CSharp.dll" "MONOModded.dll"
             mv Assembly-CSharp.dll OriginalAssembly-CSharp.dll
