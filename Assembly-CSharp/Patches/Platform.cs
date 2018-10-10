@@ -6,17 +6,28 @@ namespace Modding.Patches
     [MonoModPatch("global::Platform")]
     public abstract class Platform : global::Platform
     {
-        protected extern string orig_GetSaveSlotFileName(int slotIndex, SaveSlotFileNameUsage usage);
-
         public static bool IsSaveSlotIndexValid(int slotIndex) => true;
         
         // ReSharper disable once UnusedMember.Global
         protected string GetSaveSlotFileName(int slotIndex, SaveSlotFileNameUsage usage)
         {
-            string saveFileName = ModHooks.Instance.GetSaveFileName(slotIndex);
-            return string.IsNullOrEmpty(saveFileName)
-                ? orig_GetSaveSlotFileName(slotIndex, usage) 
-                : saveFileName;
+            string text = slotIndex == 0 ? "user.dat" : $"user{slotIndex}.dat";
+
+            string modhook = ModHooks.Instance.GetSaveFileName(slotIndex);
+
+            text = string.IsNullOrEmpty(modhook) ? text : modhook;
+
+            switch (usage)
+            {
+                case SaveSlotFileNameUsage.Backup:
+                    text += ".bak";
+                    break;
+                case SaveSlotFileNameUsage.BackupMarkedForDeletion:
+                    text += ".del";
+                    break;
+            }
+
+            return text;
         }
     }
 }
