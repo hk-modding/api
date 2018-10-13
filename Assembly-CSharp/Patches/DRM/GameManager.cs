@@ -251,7 +251,6 @@ namespace Modding.Patches
                   {
                       json = Encoding.UTF8.GetString(fileBytes);
                   }
-                  Debug.Log("[API] - Loading Game:" + json);
                   SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
                   global::PlayerData playerData = saveGameData.playerData;
                   SaveStats saveStats = new SaveStats(playerData.maxHealthBase, playerData.geo, playerData.mapZone,
