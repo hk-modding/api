@@ -29,15 +29,15 @@ Building the API is fairly straightforward. (Note that we're still building this
 
 Contributors
 =======
-Original Authors:
-MyEyes / Firzen
-Seanpr
+Original Authors:  
+MyEyes / Firzen  
+Seanpr  
 
-Contributors:
-iamwyza
-esipode
-Kerr1291
-5FiftySix6
-natis1
-Ayugradow
-KayDeeTee
+Contributors:  
+iamwyza  
+esipode  
+Kerr1291  
+5FiftySix6  
+natis1  
+Ayugradow  
+KayDeeTee  
