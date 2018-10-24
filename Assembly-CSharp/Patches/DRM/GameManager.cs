@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using GlobalEnums;
 using System.Text;
+using MonoMod;
 //using MonoMod;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -13,7 +13,7 @@ using MonoModIgnore = MonoMod.MonoModIgnore;
 using MonoModReplace = MonoMod.MonoModReplace;
 using MonoModOriginalName = MonoMod.MonoModOriginalName;
 
-// ReSharper disable All
+// ReSharper disable all
 //We don't care about XML docs for these as they are being patched into the original code
 #pragma warning disable 1591, 0108, 0169, 0649, 114, 0414,0162, IDE1005, IDE1006
 namespace Modding.Patches
@@ -30,210 +30,259 @@ namespace Modding.Patches
         [MonoModIgnore] private extern void UpdateSessionPlayTime();
         [MonoModIgnore] private extern int CheckOldBackups(ref List<string> backupFiles, string backUpSaveSlotPath, bool removeOldest = false);
         [MonoModIgnore] private extern void ResetGameTimer();
+	    [MonoModIgnore] private extern void ShowSaveIcon();
+	    [MonoModIgnore] private extern void HideSaveIcon();
 
         [MonoModReplace]
-        public void SaveGame(int saveSlot)
+        public void SaveGame(int saveSlot, Action<bool> callback)
         {
-            Debug.Log( "Saving game" );
-            if( saveSlot >= 0 )
-            {
-                if( this.gameCams.saveIcon != null )
-                {
-                    this.gameCams.saveIcon.SendEvent( "GAME SAVED" );
-                }
-                else
-                {
-                    GameObject gameObject = GameObject.FindGameObjectWithTag("Save Icon");
-                    if( gameObject != null )
-                    {
-                        PlayMakerFSM playMakerFSM = FSMUtility.LocateFSM(gameObject, "Checkpoint Control");
-                        if( playMakerFSM != null )
-                        {
-                            playMakerFSM.SendEvent( "GAME SAVED" );
-                        }
-                    }
-                }
-                this.SaveLevelState();
-                if( !this.gameConfig.disableSaveGame )
-                {
-                    if( this.achievementHandler != null )
-                    {
-                        this.achievementHandler.FlushRecordsToDisk();
-                    }
-                    else
-                    {
-                        Debug.Log( "Error saving achievements (PlayerAchievements is null)" );
-                    }
-                    if( this.playerData != null )
-                    {
-                        this.playerData.playTime += this.sessionPlayTimer;
-                        this.ResetGameTimer(); 
-                        this.playerData.version = Constants.GAME_VERSION;
-                        this.playerData.profileID = saveSlot;
-                        this.playerData.CountGameCompletion();
-                    }
-                    else
-                    {
-                        Debug.Log( "Error updating PlayerData before save (PlayerData is null)" );
-                    }
-                    try
-                    {
-                        SaveGameData obj = new SaveGameData(this.playerData, this.sceneData);
-                        ModHooks.Instance.OnBeforeSaveGameSave( obj );
-                        string text = JsonUtility.ToJson(obj);
-                        bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
-                        if( flag )
-                        {
-                            string graph = Encryption.Encrypt(text);
-                            BinaryFormatter binaryFormatter = new BinaryFormatter();
-                            MemoryStream memoryStream = new MemoryStream();
-                            binaryFormatter.Serialize( memoryStream, graph );
-                            Platform.Current.WriteSaveSlot( saveSlot, memoryStream.ToArray() );
-                            memoryStream.Close();
-                        }
-                        else
-                        {
-                            Platform.Current.WriteSaveSlot( saveSlot, Encoding.UTF8.GetBytes( text ) );
-                        }
-                    }
-                    catch( Exception arg )
-                    {
-                        Debug.Log( "GM Save - There was an error saving the game: " + arg );
-                    }
-                    Modding.ModHooks.Instance.OnSavegameSave( saveSlot );
-                }
-                else
-                {
-                    Debug.Log( "Saving game disabled. No save file written." );
-                }
-            }
-            else
-            {
-                Debug.Log( "Save game slot not valid: " + saveSlot );
-            }
-            Debug.Log( "Finished saving game!" );
+		    if (saveSlot >= 0)
+		    {
+		    	this.SaveLevelState();
+		    	if (!this.gameConfig.disableSaveGame)
+		    	{
+		    		this.ShowSaveIcon();
+		    		if (this.achievementHandler != null)
+		    		{
+		    			this.achievementHandler.FlushRecordsToDisk();
+		    		}
+		    		else
+		    		{
+		    			Debug.LogError("Error saving achievements (PlayerAchievements is null)");
+		    		}
+		    		if (this.playerData != null)
+		    		{
+		    			this.playerData.playTime += this.sessionPlayTimer;
+		    			this.ResetGameTimer();
+		    			this.playerData.version = "1.4.2.4";
+		    			this.playerData.profileID = saveSlot;
+		    			this.playerData.CountGameCompletion();
+		    		}
+		    		else
+		    		{
+		    			Debug.LogError("Error updating PlayerData before save (PlayerData is null)");
+		    		}
+		    		try
+		    		{
+		    			SaveGameData obj = new SaveGameData(this.playerData, this.sceneData);
+					    ModHooks.Instance.OnBeforeSaveGameSave(obj);
+		    			string text = JsonUtility.ToJson(obj);
+		    			bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
+		    			if (flag)
+		    			{
+		    				string graph = Encryption.Encrypt(text);
+		    				BinaryFormatter binaryFormatter = new BinaryFormatter();
+		    				MemoryStream memoryStream = new MemoryStream();
+		    				binaryFormatter.Serialize(memoryStream, graph);
+		    				byte[] binary = memoryStream.ToArray();
+		    				memoryStream.Close();
+		    				Platform.Current.WriteSaveSlot(saveSlot, binary, delegate(bool didSave)
+		    				{
+		    					this.HideSaveIcon();
+		    					callback(didSave);
+		    				});
+		    			}
+		    			else
+		    			{
+		    				Platform.Current.WriteSaveSlot(saveSlot, Encoding.UTF8.GetBytes(text), delegate(bool didSave)
+		    				{
+		    					this.HideSaveIcon();
+		    					if (callback != null)
+		    					{
+		    						callback(didSave);
+		    					}
+		    				});
+		    			}
+		    		}
+		    		catch (Exception arg)
+		    		{
+		    			Debug.LogError("GM Save - There was an error saving the game: " + arg);
+		    			this.HideSaveIcon();
+		    			if (callback != null)
+		    			{
+		    				CoreLoop.InvokeNext(delegate
+		    				{
+		    					callback(false);
+		    				});
+		    			}
+		    		}
+				    ModHooks.Instance.OnSavegameSave(saveSlot);
+		    	}
+		    	else
+		    	{
+		    		Debug.Log("Saving game disabled. No save file written.");
+		    		if (callback != null)
+		    		{
+		    			CoreLoop.InvokeNext(delegate
+		    			{
+		    				callback(false);
+		    			});
+		    		}
+		    	}
+		    }
+		    else
+		    {
+		    	Debug.LogError("Save game slot not valid: " + saveSlot);
+		    	if (callback != null)
+		    	{
+		    		CoreLoop.InvokeNext(delegate
+		    		{
+		    			callback(false);
+		    		});
+		    	}
+		    }
         }
         #endregion
 
         #region LoadGame
 
         [MonoModReplace]
-        public bool LoadGame(int saveSlot)
+        public void LoadGame(int saveSlot, Action<bool> callback)
         {
-            if( !Platform.IsSaveSlotIndexValid( saveSlot ) )
-            { 
-                Debug.LogErrorFormat( "Cannot load from invalid save slot index {0}", new object[]
-                {
-                saveSlot
-                } );
-                return false;
-            }
-            if( !Platform.Current.IsSaveSlotInUse( saveSlot ) )
+            if (!Platform.IsSaveSlotIndexValid(saveSlot))
             {
-                Debug.LogErrorFormat( "Cannot load from empty save slot index {0}", new object[]
+                Debug.LogErrorFormat("Cannot load from invalid save slot index {0}", new object[]
                 {
-                saveSlot
-                } );
-                return false;
-            }
-            bool result;
-            try
-            {
-                bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
-                string json;
-                if( flag )
+                    saveSlot
+                });
+                if (callback != null)
                 {
-                    BinaryFormatter binaryFormatter = new BinaryFormatter();
-                    MemoryStream serializationStream = new MemoryStream(Platform.Current.ReadSaveSlot(saveSlot));
-                    string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
-                    json = Encryption.Decrypt( encryptedString );
+                    CoreLoop.InvokeNext(delegate { callback(false); });
                 }
-                else
-                {
-                    json = Encoding.UTF8.GetString( Platform.Current.ReadSaveSlot( saveSlot ) );
-                }
-                Debug.Log( "[API] - Loading Game:" + json );
-                SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
-                global::PlayerData instance = saveGameData.playerData;
-                SceneData instance2 = saveGameData.sceneData;
-                ModHooks.Instance.OnAfterSaveGameLoad( saveGameData );
-                global::PlayerData.instance = instance;
-                this.playerData = instance;
-                SceneData.instance = instance2;
-                this.sceneData = instance2;
-                this.profileID = saveSlot;
-                this.inputHandler.RefreshPlayerData();
-                ModHooks.Instance.OnSavegameLoad( saveSlot );
-                result = true;
+
+                return;
             }
-            catch( Exception ex )
+
+            Platform.Current.ReadSaveSlot(saveSlot, delegate(byte[] fileBytes)
             {
-                Debug.LogFormat( "Error loading save file for slot {0}: {1}", new object[]
+                bool obj;
+                try
                 {
-                saveSlot,
-                ex
-                } );
-                result = false;
-            }
-            return result;
+                    bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
+                    string json;
+                    if (flag)
+                    {
+                        BinaryFormatter binaryFormatter = new BinaryFormatter();
+                        MemoryStream serializationStream = new MemoryStream(fileBytes);
+                        string encryptedString = (string) binaryFormatter.Deserialize(serializationStream);
+                        json = Encryption.Decrypt(encryptedString);
+                    }
+                    else
+                    {
+                        json = Encoding.UTF8.GetString(fileBytes);
+                    }
+
+                    SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
+                    global::PlayerData instance = saveGameData.playerData;
+                    SceneData instance2 = saveGameData.sceneData;
+                    global::PlayerData.instance = instance;
+                    this.playerData = instance;
+                    SceneData.instance = instance2;
+                    ModHooks.Instance.OnAfterSaveGameLoad(saveGameData);
+                    this.sceneData = instance2;
+                    this.profileID = saveSlot;
+                    this.inputHandler.RefreshPlayerData();
+                    ModHooks.Instance.OnSavegameLoad(saveSlot);
+                    obj = true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogFormat("Error loading save file for slot {0}: {1}", new object[]
+                    {
+                        saveSlot,
+                        ex
+                    });
+                    obj = false;
+                }
+
+                if (callback != null)
+                {
+                    callback(obj);
+                }
+            });
         }
 
         #endregion
 
         #region GetSaveStatsForSlot
-        [MonoModReplace]
-        public SaveStats GetSaveStatsForSlot(int saveSlot)
+	    [MonoModReplace]
+        public void GetSaveStatsForSlot(int saveSlot, Action<global::SaveStats> callback)
         {
-            if( !Platform.IsSaveSlotIndexValid( saveSlot ) )
-            {
-                Debug.LogErrorFormat( "Cannot get save stats for invalid slot {0}", new object[]
-                {
-                saveSlot
-                } );
-                return null;
-            }
-            if( !Platform.Current.IsSaveSlotInUse( saveSlot ) )
-            {
-                return null;
-            }
-            SaveStats result;
-            try
-            {
+          if (!Platform.IsSaveSlotIndexValid(saveSlot))
+          {
+              Debug.LogErrorFormat("Cannot get save stats for invalid slot {0}", new object[]
+              {
+                  saveSlot
+              });
+              if (callback != null)
+              {
+                  CoreLoop.InvokeNext(delegate
+                  {
+                      callback(null);
+                  });
+              }
+              return;
+          }
+          Platform.Current.ReadSaveSlot(saveSlot, delegate(byte[] fileBytes)
+          {
+              if (fileBytes == null)
+              {
+                  if (callback != null)
+                  {
+                      CoreLoop.InvokeNext(delegate
+                      {
+                          callback(null);
+                      });
+                  }
+                  return;
+              }
+              try
+              {
+                  bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
+                  string json;
+                  if (flag)
+                  {
+                      BinaryFormatter binaryFormatter = new BinaryFormatter();
+                      MemoryStream serializationStream = new MemoryStream(fileBytes);
+                      string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
+                      json = Encryption.Decrypt(encryptedString);
+                  }
+                  else
+                  {
+                      json = Encoding.UTF8.GetString(fileBytes);
+                  }
+                  SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
+                  global::PlayerData playerData = saveGameData.playerData;
+                  SaveStats saveStats = new SaveStats(playerData.maxHealthBase, playerData.geo, playerData.mapZone,
+                      playerData.playTime, playerData.MPReserveMax, playerData.permadeathMode, playerData.bossRushMode,
+                      playerData.completionPercentage, playerData.unlockedCompletionRate);
+                  if (callback != null)
+                  {
+                      CoreLoop.InvokeNext(delegate
+                      {
+                          callback(saveStats);
+                      });
+                  }
+              }
+              catch (Exception ex)
+              {
+                  Debug.LogError(string.Concat(new object[]
+                  {
+                      "Error while loading save file for slot ",
+                      saveSlot,
+                      " Exception: ",
+                      ex
+                  }));
+                  if (callback != null)
+                  {
+                      CoreLoop.InvokeNext(delegate
+                      {
+                          callback(null);
+                      });
+                  }
+              }
+          });
 
-                bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
-                string json;
-                if( flag )
-                {
-                    BinaryFormatter binaryFormatter = new BinaryFormatter();
-                    MemoryStream serializationStream = new MemoryStream(Platform.Current.ReadSaveSlot(saveSlot));
-                    string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
-                    json = Encryption.Decrypt( encryptedString );
-                }
-                else
-                {
-                    json = Encoding.UTF8.GetString( Platform.Current.ReadSaveSlot( saveSlot ) );
-                }
-                SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
-                global::PlayerData playerData = saveGameData.playerData;
-                SaveStats saveStats = new SaveStats(playerData.maxHealthBase, playerData.geo, playerData.mapZone, playerData.playTime, playerData.MPReserveMax, playerData.permadeathMode, playerData.completionPercentage, playerData.unlockedCompletionRate)
-                {
-                    Name = saveGameData.Name,
-                    LoadedMods = saveGameData.LoadedMods
-                };
-                result = saveStats;
-            }
-            catch( Exception ex )
-            {
-                Debug.LogError( string.Concat( new object[]
-                {
-                "Error while loading save file for slot ",
-                saveSlot,
-                " Exception: ",
-                ex
-                } ) );
-                result = null;
-            }
-            return result;
         }
         #endregion
 
@@ -319,8 +368,10 @@ namespace Modding.Patches
         }
 
 
-        ///This allows a mod (or anything else) to "queue" a scene transition
+#pragma warning disable 1587
+	    ///This allows a mod (or anything else) to "queue" a scene transition
         ///TODO: After some testing without this, see if we should put it back in
+#pragma warning restore 1587
         //[MonoModOriginalName( "BeginSceneTransitionRoutine" )]
         //public void orig_BeginSceneTransitionRoutine( GameManager.SceneLoadInfo info ) { }
         //[MonoModReplace]
