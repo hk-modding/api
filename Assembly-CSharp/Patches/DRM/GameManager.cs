@@ -314,7 +314,7 @@ namespace Modding.Patches
             AsyncOperation loadop = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(destScene, LoadSceneMode.Additive);
             loadop.allowSceneActivation = true;
             yield return loadop;
-            UnityEngine.SceneManagement.SceneManager.UnloadScene(exitingScene);
+            yield return UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(exitingScene);
             ModHooks.Instance.OnSceneChanged(destScene);
             this.RefreshTilemapInfo(destScene);
             if( this.IsUnloadAssetsRequired( exitingScene, destScene ) )

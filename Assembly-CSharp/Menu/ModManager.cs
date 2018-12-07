@@ -111,15 +111,15 @@ namespace Modding.Menu
             modButton.transform.localScale = modButton.FindSelectableOnUp().transform.localScale;
 
             Object.Destroy(modButton.gameObject.GetComponent<AutoLocalizeTextUI>());
-            modButton.gameObject.transform.FindChild("Text").GetComponent<Text>().text = "Mods";
+            modButton.gameObject.transform.Find("Text").GetComponent<Text>().text = "Mods";
             //ADD MODS TO OPTIONS MENU
 
             //SETUP MOD MENU
             GameObject go = Object.Instantiate(_uim.optionsMenuScreen.gameObject);
             ModMenuScreen = go.GetComponent<MenuScreen>();
-            ModMenuScreen.title = ModMenuScreen.gameObject.transform.FindChild("Title").GetComponent<CanvasGroup>();
-            ModMenuScreen.topFleur = ModMenuScreen.gameObject.transform.FindChild("TopFleur").GetComponent<Animator>();
-            ModMenuScreen.content = ModMenuScreen.gameObject.transform.FindChild("Content").GetComponent<CanvasGroup>();
+            ModMenuScreen.title = ModMenuScreen.gameObject.transform.Find("Title").GetComponent<CanvasGroup>();
+            ModMenuScreen.topFleur = ModMenuScreen.gameObject.transform.Find("TopFleur").GetComponent<Animator>();
+            ModMenuScreen.content = ModMenuScreen.gameObject.transform.Find("Content").GetComponent<CanvasGroup>();
 
             ModMenuScreen.title.gameObject.GetComponent<Text>().text = "Mods";
             Object.Destroy(ModMenuScreen.title.gameObject.GetComponent<AutoLocalizeTextUI>());
@@ -187,12 +187,12 @@ namespace Modding.Menu
                         menuItem.LocalizeText = false;
                         menuItem.SheetTitle = managableMods[i].GetName();
 
-                        Object.DestroyImmediate(menuItem.transform.FindChild("Label")
+                        Object.DestroyImmediate(menuItem.transform.Find("Label")
                             .GetComponent<AutoLocalizeTextUI>());
-                        menuItem.transform.FindChild("Label").GetComponent<Text>().text = managableMods[i].GetName();
+                        menuItem.transform.Find("Label").GetComponent<Text>().text = managableMods[i].GetName();
 
-                        menuItem.leftCursor = menuItem.transform.FindChild("CursorLeft").GetComponent<Animator>();
-                        menuItem.rightCursor = menuItem.transform.FindChild("CursorRight").GetComponent<Animator>();
+                        menuItem.leftCursor = menuItem.transform.Find("CursorLeft").GetComponent<Animator>();
+                        menuItem.rightCursor = menuItem.transform.Find("CursorRight").GetComponent<Animator>();
 
                         menuItem.gameObject.name = managableMods[i].GetName();
 
