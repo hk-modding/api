@@ -26,3 +26,18 @@ Building the API is fairly straightforward. (Note that we're still building this
 4. Set the build configuration to DebugMac.
 4. Build.  The patched assembly should be in `RepoPath/OutputFinalMac/hollow_knight.app/Contents/Resources/Data/Managed/` (There is also a zip file in `RepoPath/ModdingAPIMac.zip` ready to upload to Google Drive)
 5. Copy Assembly-CSharp.* to `%HollowKnightGameInstallPath%/Contents/Resources/Data/Managed/`
+
+Contributors
+=======
+Original Authors:  
+MyEyes / Firzen  
+Seanpr  
+
+Contributors:  
+iamwyza  
+esipode  
+Kerr1291  
+5FiftySix6  
+natis1  
+Ayugradow  
+KayDeeTee  
