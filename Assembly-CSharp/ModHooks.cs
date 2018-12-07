@@ -21,7 +21,7 @@ namespace Modding
     {
         internal static bool IsInitialized;
 
-        private const int _modVersion = 45;
+        private const int _modVersion = 46;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux

@@ -77,7 +77,7 @@ namespace Modding
             {
                 try
                 {
-                    LoadMod(mod, false);
+                    LoadMod(mod, false, false);
                 }
                 catch (Exception ex)
                 {
@@ -159,9 +159,9 @@ namespace Modding
             LoadMod(mod, false);
         }
 
-        internal static void LoadMod(IMod mod, bool updateModText)
+        internal static void LoadMod(IMod mod, bool updateModText, bool changeSettings = true)
         {
-            if(!ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()))
+            if(changeSettings)
                 ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = true;
 
             mod.Initialize();
