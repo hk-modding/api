@@ -161,7 +161,7 @@ namespace Modding
 
         internal static void LoadMod(IMod mod, bool updateModText, bool changeSettings = true)
         {
-            if(changeSettings)
+            if(changeSettings || !ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()))
                 ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = true;
 
             mod.Initialize();

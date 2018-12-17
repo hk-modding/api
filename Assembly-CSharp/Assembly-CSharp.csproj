@@ -134,6 +134,7 @@
     <Compile Include="SimpleLogger.cs" />
     <Compile Include="TogglableMod.cs" />
     <Compile Include="VoidModSettings.cs" />
+    <Compile Include="ReflectionHelper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

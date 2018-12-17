@@ -1,5 +1,4 @@
-﻿using HutongGames.PlayMaker;
-using MonoMod;
+﻿using MonoMod;
 
 // ReSharper disable All
 //Sticking this here because right now, we're not sold on the source thing.  But i want to do this to make my life easier.

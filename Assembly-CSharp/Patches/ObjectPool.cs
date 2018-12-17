@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using MonoMod;
+﻿using MonoMod;
 using UnityEngine;
 // ReSharper disable All
 #pragma warning disable 1591, 0108, 0169, 0649, 0414,0626
