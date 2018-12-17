@@ -18,25 +18,20 @@ namespace Modding.Patches
             ReflectionHelper.SetAttr(this, boolName, value);
         }
 
-
         public bool GetBoolInternal(string boolName)
         {
             return ReflectionHelper.GetAttr<bool?>(this, boolName) ?? false;
         }
-
 
         public void SetIntInternal(string intName, int value)
         {
             ReflectionHelper.SetAttr(this, intName, value);
         }
 
-
         public int GetIntInternal(string intName)
         {
             return ReflectionHelper.GetAttr<int?>(this, intName) ?? -9999;
         }
-
-
 
         [MonoModReplace]
         public void SetBool(string boolName, bool value)
