@@ -4,10 +4,47 @@ using System.Reflection;
 
 namespace Modding
 {
+    /// <summary>
+    /// A class to aid in reflection while caching it.
+    /// </summary>
     public static class ReflectionHelper
     {
         private static readonly Dictionary<Type, Dictionary<string, FieldInfo>> Fields =
             new Dictionary<Type, Dictionary<string, FieldInfo>>();
+
+        /// <summary>
+        /// Gets a field on a type
+        /// </summary>
+        /// <param name="t">Type</param>
+        /// <param name="field">Field name</param>
+        /// <param name="instance"></param>
+        /// <returns>FieldInfo for field or null if field does not exist.</returns>
+        public static FieldInfo GetField(Type t, string field, bool instance = true)
+        {
+            
+            if(!Fields.TryGetValue(t, out Dictionary<string, FieldInfo> typeFields))
+            {
+                Fields.Add(t, typeFields = new Dictionary<string, FieldInfo>());
+            }
+
+            if (typeFields.TryGetValue(field, out FieldInfo fi))
+            {
+                return fi;
+            }
+
+            FieldInfo info = t.GetField(field);
+            
+            if (info != null)
+            {
+                typeFields.Add(field,
+                               t.GetField(field,
+                                          BindingFlags.NonPublic | BindingFlags.Public |
+                                          (instance ? BindingFlags.Instance : BindingFlags.Static)));
+            }
+            
+            return info;
+        }
+
 
         /// <summary>
         /// Get a field on an object/type using a string.
@@ -21,24 +58,7 @@ namespace Modding
         {
             if (obj == null || string.IsNullOrEmpty(name)) return default(T);
 
-            Type t = obj.GetType();
-
-            if (!Fields.ContainsKey(t))
-            {
-                Fields.Add(t, new Dictionary<string, FieldInfo>());
-            }
-
-            Dictionary<string, FieldInfo> typeFields = Fields[t];
-
-            if (!typeFields.ContainsKey(name))
-            {
-                typeFields.Add(name,
-                               t.GetField(name,
-                                          BindingFlags.NonPublic | BindingFlags.Public |
-                                          (instance ? BindingFlags.Instance : BindingFlags.Static)));
-            }
-
-            return (T) typeFields[name]?.GetValue(obj);
+            return (T) GetField(obj.GetType(), name, instance)?.GetValue(obj);
         }
 
         /// <summary>
@@ -53,24 +73,7 @@ namespace Modding
         {
             if (obj == null || string.IsNullOrEmpty(name)) return;
 
-            Type t = obj.GetType();
-
-            if (!Fields.ContainsKey(t))
-            {
-                Fields.Add(t, new Dictionary<string, FieldInfo>());
-            }
-
-            Dictionary<string, FieldInfo> typeFields = Fields[t];
-
-            if (!typeFields.ContainsKey(name))
-            {
-                typeFields.Add(name,
-                               t.GetField(name,
-                                          BindingFlags.NonPublic | BindingFlags.Public |
-                                          (instance ? BindingFlags.Instance : BindingFlags.Static)));
-            }
-
-            typeFields[name]?.SetValue(obj, val);
+            GetField(obj.GetType(), name, instance)?.SetValue(obj, val);
         }
     }
 }

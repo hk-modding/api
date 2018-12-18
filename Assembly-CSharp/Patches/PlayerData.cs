@@ -60,7 +60,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public void IncrementInt(string intName)
         {
-            if (base.GetType().GetField(intName) != null)
+            if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
             {
                 ModHooks.Instance.SetPlayerInt(intName, this.GetIntInternal(intName) + 1);
                 return;
@@ -71,7 +71,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public void DecrementInt(string intName)
         {
-            if (GetType().GetField(intName) != null)
+            if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
             {
                 ModHooks.Instance.SetPlayerInt(intName, this.GetIntInternal(intName) - 1);
             }
@@ -80,7 +80,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public void IntAdd(string intName, int amount)
         {
-            if (base.GetType().GetField(intName) != null)
+            if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
             {
                 ModHooks.Instance.SetPlayerInt(intName, this.GetIntInternal(intName) + amount);
                 return;
