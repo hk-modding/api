@@ -21,8 +21,7 @@ namespace Modding
         /// <returns>FieldInfo for field or null if field does not exist.</returns>
         public static FieldInfo GetField(Type t, string field, bool instance = true)
         {
-            
-            if(!Fields.TryGetValue(t, out Dictionary<string, FieldInfo> typeFields))
+            if (!Fields.TryGetValue(t, out Dictionary<string, FieldInfo> typeFields))
             {
                 Fields.Add(t, typeFields = new Dictionary<string, FieldInfo>());
             }
@@ -32,17 +31,16 @@ namespace Modding
                 return fi;
             }
 
-            FieldInfo info = t.GetField(field);
-            
-            if (info != null)
+            fi = t.GetField(field,
+                            BindingFlags.NonPublic | BindingFlags.Public |
+                            (instance ? BindingFlags.Instance : BindingFlags.Static));
+
+            if (fi != null)
             {
-                typeFields.Add(field,
-                               t.GetField(field,
-                                          BindingFlags.NonPublic | BindingFlags.Public |
-                                          (instance ? BindingFlags.Instance : BindingFlags.Static)));
+                typeFields.Add(field, fi);
             }
-            
-            return info;
+
+            return fi;
         }
 
 
