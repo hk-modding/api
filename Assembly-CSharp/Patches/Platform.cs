@@ -1,6 +1,7 @@
 ﻿using MonoMod;
 
 #pragma warning disable 1591
+#pragma warning disable 108,114
 namespace Modding.Patches
 {
     [MonoModPatch("global::Platform")]

@@ -11,6 +11,7 @@ using MonoMod;
 using UnityEngine;
 
 
+#pragma warning disable 1591
 namespace Modding
 {
     /// <summary>
@@ -20,7 +21,7 @@ namespace Modding
     {
         internal static bool IsInitialized;
 
-        private const int _modVersion = 45;
+        private const int _modVersion = 46;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
@@ -129,23 +130,23 @@ namespace Modding
             ApplicationQuitHook += SaveGlobalSettings;
 
             //Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
-            try
-            {
-                GithubVersionHelper githubVersionHelper = new GithubVersionHelper("seanpr96/HollowKnight.Modding");
+            // try
+            // {
+            //     GithubVersionHelper githubVersionHelper = new GithubVersionHelper("seanpr96/HollowKnight.Modding");
 
-                string currentGithubVersion = githubVersionHelper.GetVersion();
-                string[] temp = currentGithubVersion.Split('-');
-                int modVersionRevision = Convert.ToInt32(temp[1]);
-                Version tempNewVersion = new Version(temp[0]);
-                Version tempGameVersion = new Version(gameVersion.major, gameVersion.minor, gameVersion.revision, gameVersion.package);
-                Logger.LogDebug( "[API] - Checking Game Version: " + tempGameVersion + " < " + tempNewVersion );
-                if( tempNewVersion.CompareTo( tempGameVersion ) < 0 || ( tempNewVersion.CompareTo( tempGameVersion ) == 0 && modVersionRevision > _modVersion ) )
-                    IsCurrent = false;
-            }
-            catch( Exception ex )
-            {
-                Logger.LogError( "[API] - Couldn't check for new version." + ex );
-            }
+            //     string currentGithubVersion = githubVersionHelper.GetVersion();
+            //     string[] temp = currentGithubVersion.Split('-');
+            //     int modVersionRevision = Convert.ToInt32(temp[1]);
+            //     Version tempNewVersion = new Version(temp[0]);
+            //     Version tempGameVersion = new Version(gameVersion.major, gameVersion.minor, gameVersion.revision, gameVersion.package);
+            //     Logger.LogDebug( "[API] - Checking Game Version: " + tempGameVersion + " < " + tempNewVersion );
+            //     if( tempNewVersion.CompareTo( tempGameVersion ) < 0 || ( tempNewVersion.CompareTo( tempGameVersion ) == 0 && modVersionRevision > _modVersion ) )
+            //         IsCurrent = false;
+            // }
+            // catch( Exception ex )
+            // {
+            //     Logger.LogError( "[API] - Couldn't check for new version." + ex );
+            // }
 
             IsInitialized = true;
         }
@@ -2106,6 +2107,8 @@ namespace Modding
         /// </summary>
         internal void LoadGlobalSettings()
         {
+            Logger.Log("Loading ModdingApi Global Settings.");
+            
             if( !File.Exists( SettingsPath ) )
             {
                 _globalSettings = new ModHooksGlobalSettings { LoggingLevel = LogLevel.Info, ModEnabledSettings = new SerializableBoolDictionary() };

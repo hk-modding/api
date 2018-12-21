@@ -70,12 +70,14 @@ namespace Modding
                     Errors.Add(string.Concat(text2, ": FAILED TO LOAD! Check ModLog.txt."));
                 }
             }
-
+            
+            ModHooks.Instance.LoadGlobalSettings();
+            
             foreach (IMod mod in LoadedMods.OrderBy(x => x.LoadPriority()))
             {
                 try
                 {
-                    LoadMod(mod, false);
+                    LoadMod(mod, false, false);
                 }
                 catch (Exception ex)
                 {
@@ -91,7 +93,16 @@ namespace Modding
                 if (LoadedMods.All(x => x.GetName() != modName))
                     ModHooks.Instance.GlobalSettings.ModEnabledSettings.Remove(modName);
             }
-
+            
+            // Get previously disabled mods and disable them.
+            foreach (KeyValuePair<string, bool> modPair in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Where(x => !x.Value))
+            {
+                IMod mod = LoadedMods.FirstOrDefault(x => x.GetName() == modPair.Key);
+                if (!(mod is ITogglableMod togglable)) continue;
+                togglable.Unload();
+                Logger.LogDebug($"Mod {modPair.Key} was unloaded.");
+            }
+            
 
             GameObject gameObject = new GameObject();
             _draw = gameObject.AddComponent<ModVersionDraw>();
@@ -148,9 +159,10 @@ namespace Modding
             LoadMod(mod, false);
         }
 
-        internal static void LoadMod(IMod mod, bool updateModText)
+        internal static void LoadMod(IMod mod, bool updateModText, bool changeSettings = true)
         {
-            ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = true;
+            if(changeSettings || !ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()))
+                ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = true;
 
             mod.Initialize();
 

@@ -105,6 +105,7 @@ namespace Modding.Menu
 
         public void UIquitModMenu()
         {
+            ModHooks.Instance.SaveGlobalSettings();
             StartCoroutine(QuitModMenu());
         }
 

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using GlobalEnums;
 using UnityEngine;
 using MonoMod;
 // ReSharper disable All

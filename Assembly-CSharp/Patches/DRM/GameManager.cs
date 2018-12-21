@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using MonoMod;
 //using MonoMod;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -314,7 +313,7 @@ namespace Modding.Patches
             AsyncOperation loadop = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(destScene, LoadSceneMode.Additive);
             loadop.allowSceneActivation = true;
             yield return loadop;
-            UnityEngine.SceneManagement.SceneManager.UnloadScene(exitingScene);
+            yield return UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(exitingScene);
             ModHooks.Instance.OnSceneChanged(destScene);
             this.RefreshTilemapInfo(destScene);
             if( this.IsUnloadAssetsRequired( exitingScene, destScene ) )

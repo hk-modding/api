@@ -34,23 +34,23 @@ namespace Modding
             //Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
 
             return "0.0";
-            try
-            {
-                //This needs to be added on every call
-                WebClient.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.121 Safari/535.2");
-                string url = $"https://api.github.com/repos/{_repositoryName}/releases/latest";
-                Logger.LogDebug("[API] - Fetching " + url);
-                string json = WebClient.DownloadString(url);
-                Logger.LogFine("[API] - " + json);
-                string version = FromJson(json)?.tag_name;
-                Logger.LogDebug("[API] Version Found: " + version);
-                return version;
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError("Failed to fetch url with error: \n" +ex);
-            }
-            return string.Empty;
+            // try
+            // {
+            //     //This needs to be added on every call
+            //     WebClient.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.121 Safari/535.2");
+            //     string url = $"https://api.github.com/repos/{_repositoryName}/releases/latest";
+            //     Logger.LogDebug("[API] - Fetching " + url);
+            //     string json = WebClient.DownloadString(url);
+            //     Logger.LogFine("[API] - " + json);
+            //     string version = FromJson(json)?.tag_name;
+            //     Logger.LogDebug("[API] Version Found: " + version);
+            //     return version;
+            // }
+            // catch (Exception ex)
+            // {
+            //     Logger.LogError("Failed to fetch url with error: \n" +ex);
+            // }
+            // return string.Empty;
         }
         // ReSharper disable All
 #pragma warning disable 0649
