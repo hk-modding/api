@@ -27,11 +27,24 @@ namespace Modding
 
         /// <inheritdoc />
         /// <summary>
-        /// Constrcuts the mod, assignes the instance and sets the name.
+        /// Legacy constructor instead of optional argument to not break old mods
         /// </summary>
-        public Mod()
+        public Mod() : this(null)
         {
-            Name = GetType().Name;
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Constructs the mod, assigns the instance and sets the name.
+        /// </summary>
+        public Mod(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                name = GetType().Name;
+            }
+
+            Name = name;
         }
         
         /// <inheritdoc />
@@ -66,12 +79,19 @@ namespace Modding
     /// <remarks>Provides automatic managment of saving mod settings in save file.</remarks>
     public class Mod<TSaveSettings> : Mod where TSaveSettings : IModSettings, new()
     {
-        
+        /// <inheritdoc />
+        /// <summary>
+        /// Legacy constructor instead of optional argument to not break old mods
+        /// </summary>
+        public Mod() : this(null)
+        {
+        }
+
         /// <inheritdoc />
         /// <summary>
         /// Instantiates Mod and adds hooks to store and retrieve mod settings during save/load.
         /// </summary>
-        public Mod()
+        public Mod(string name) : base(name)
         {
             Log("Instantiating Mod");
             ModHooks.Instance.BeforeSavegameSaveHook += SaveSettings;
@@ -144,9 +164,17 @@ namespace Modding
 
         /// <inheritdoc />
         /// <summary>
+        /// Legacy constructor instead of optional argument to not break old mods
+        /// </summary>
+        public Mod() : this(null)
+        {
+        }
+
+        /// <inheritdoc />
+        /// <summary>
         /// Basic Constructor for the Mod.  
         /// </summary>
-        public Mod()
+        public Mod(string name) : base(name)
         {
             _globalSettingsFilename = Application.persistentDataPath + ModHooks.PathSeperator + GetType().Name + ".GlobalSettings.json";
             LoadGlobalSettings();

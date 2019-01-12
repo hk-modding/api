@@ -132,26 +132,74 @@ namespace Modding
                 builder.AppendLine(error);
             }
 
+            // 56 you made me do this, I hope you're happy
+            Dictionary<string, List<IMod>> modsByNamespace = new Dictionary<string, List<IMod>>();
+
             foreach (IMod mod in LoadedMods)
             {
                 try
                 {
-                    if (ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()])
+                    if (!ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()])
                     {
-                        if (!ModVersionsCache.ContainsKey(mod.GetName()))
-                            ModVersionsCache.Add(mod.GetName(),
-                                $"{mod.GetVersion()} " + (mod.IsCurrent() ? string.Empty : " - New Version Available!"));
-
-                        builder.AppendLine($"{mod.GetName()} : {ModVersionsCache[mod.GetName()]}");
+                        continue;
                     }
+
+                    if (!ModVersionsCache.ContainsKey(mod.GetName()))
+                    {
+                        ModVersionsCache.Add(mod.GetName(), mod.GetVersion() + (mod.IsCurrent() ? string.Empty : " - New Version Available!"));
+                    }
+
+                    string ns = mod.GetType().Namespace;
+
+                    if (!modsByNamespace.TryGetValue(ns, out List<IMod> nsMods))
+                    {
+                        nsMods = new List<IMod>();
+                        modsByNamespace.Add(ns, nsMods);
+                    }
+
+                    nsMods.Add(mod);
                 }
-                catch (Exception ex)
+                catch (Exception e)
                 {
-                    Logger.LogError($"[API] - Failed to append mod name text: {ex}");
+                    Logger.LogError($"[API] - Failed to obtain mod namespace:\n{e}");
                 }
             }
-            _draw.drawString = builder.ToString();
 
+            foreach (string ns in modsByNamespace.Keys)
+            {
+                try
+                {
+                    List<IMod> nsMods = modsByNamespace[ns];
+
+                    if (nsMods == null || nsMods.Count == 0)
+                    {
+                        Logger.LogWarn("[API] - Namespace mod list empty, ignoring");
+                        continue;
+                    }
+                    else if (nsMods.Count == 1)
+                    {
+                        builder.AppendLine($"{nsMods[0].GetName()} : {ModVersionsCache[nsMods[0].GetName()]}");
+                    }
+                    else
+                    {
+                        builder.Append($"{ns} : ");
+                        for (int i = 0; i < nsMods.Count; i++)
+                        {
+                            builder.Append(nsMods[i].GetName() + (i == nsMods.Count - 1 ? Environment.NewLine : ", "));
+                            if ((i + 1) % 4 == 0 && i < nsMods.Count - 1)
+                            {
+                                builder.Append(Environment.NewLine + "\t");
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.LogError($"[API] - Failed to append mod name text:\n{e}");
+                }
+            }
+
+            _draw.drawString = builder.ToString();
         }
 
         internal static void LoadMod(IMod mod)
