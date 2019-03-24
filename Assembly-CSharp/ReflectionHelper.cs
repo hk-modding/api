@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Security;
 using JetBrains.Annotations;
 
 namespace Modding
@@ -51,10 +52,10 @@ namespace Modding
 
 
         /// <summary>
-        /// Gets delegate from type
+        /// Gets delegate getting field on type
         /// </summary>
         /// <param name="fi">FieldInfo for field.</param>
-        /// <returns>FieldInfo for field or null if field does not exist.</returns>
+        /// <returns>Function which gets value of field</returns>
         private static Delegate GetGetter<TType, TField>(FieldInfo fi)
         {
             if (Getters.TryGetValue(fi, out Delegate d))
@@ -62,11 +63,9 @@ namespace Modding
                 return d;
             }
 
-            // ReSharper disable RedundantCast
             d = fi.IsStatic
-                ? (Delegate) CreateGetStaticFieldDelegate<TField>(fi)
-                : (Delegate) CreateGetFieldDelegate<TType, TField>(fi);
-            // ReSharper enable RedundantCast
+                ? CreateGetStaticFieldDelegate<TType, TField>(fi)
+                : CreateGetFieldDelegate<TType, TField>(fi);
             
             Getters.Add(fi, d);
 
@@ -74,10 +73,10 @@ namespace Modding
         }
         
         /// <summary>
-        /// Gets delegate from type
+        /// Gets delegate setting field on type
         /// </summary>
         /// <param name="fi">FieldInfo for field.</param>
-        /// <returns>FieldInfo for field or null if field does not exist.</returns>
+        /// <returns>Function which sets field passed as FieldInfo</returns>
         private static Delegate GetSetter<TType, TField>(FieldInfo fi)
         {
             if (Setters.TryGetValue(fi, out Delegate d))
@@ -85,11 +84,9 @@ namespace Modding
                 return d;
             }
 
-            // ReSharper disable RedundantCast
             d = fi.IsStatic
-                ? (Delegate) CreateSetStaticFieldDelegate<TField>(fi)
-                : (Delegate) CreateSetFieldDelegate<TType, TField>(fi);
-            // ReSharper enable RedundantCast
+                ? CreateSetStaticFieldDelegate<TType, TField>(fi)
+                : CreateSetFieldDelegate<TType, TField>(fi);
             
             Setters.Add(fi, d);
 
@@ -100,17 +97,18 @@ namespace Modding
         /// Create delegate returning value of static field.
         /// </summary>
         /// <param name="fi">FieldInfo of field</param>
-        /// <typeparam name="T">Field type</typeparam>
+        /// <typeparam name="TField">Field type</typeparam>
+        /// <typeparam name="TType">Type which field resides upon</typeparam>
         /// <returns>Function returning static field</returns>
         [PublicAPI]
-        private static Delegate CreateGetStaticFieldDelegate<T>(FieldInfo fi)
+        private static Delegate CreateGetStaticFieldDelegate<TType, TField>(FieldInfo fi)
         {
             var dm = new DynamicMethod
             (
                 "FieldAccess" + fi.DeclaringType?.Name + fi.Name,
-                typeof(T),
+                typeof(TField),
                 new Type[0],
-                typeof(ReflectionHelper)
+                typeof(TType)
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -118,7 +116,7 @@ namespace Modding
             gen.Emit(OpCodes.Ldsfld, fi);
             gen.Emit(OpCodes.Ret);
 
-            return dm.CreateDelegate(typeof(Func<T>));
+            return dm.CreateDelegate(typeof(Func<TField>));
         }
 
         /// <summary>
@@ -136,7 +134,7 @@ namespace Modding
                 "FieldAccess" + fi.DeclaringType?.Name + fi.Name,
                 typeof(TField),
                 new Type[] {typeof(TType)},
-                typeof(ReflectionHelper)
+                typeof(TType)
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -155,7 +153,7 @@ namespace Modding
                 "FieldSet" + fi.DeclaringType?.Name + fi.Name,
                 typeof(void),
                 new Type[] {typeof(TType), typeof(TField)},
-                typeof(ReflectionHelper)
+                typeof(TType)
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -168,14 +166,14 @@ namespace Modding
             return dm.CreateDelegate(typeof(Action<TType, TField>));
         }
 
-        private static Delegate CreateSetStaticFieldDelegate<T>(FieldInfo fi)
+        private static Delegate CreateSetStaticFieldDelegate<TType, TField>(FieldInfo fi)
         {
             var dm = new DynamicMethod
             (
                 "FieldSet" + fi.DeclaringType?.Name + fi.Name,
                 typeof(void),
-                new Type[] {typeof(T)},
-                typeof(ReflectionHelper)
+                new Type[] {typeof(TField)},
+                typeof(TType)
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -183,7 +181,7 @@ namespace Modding
             gen.Emit(OpCodes.Stsfld, fi);
             gen.Emit(OpCodes.Ret);
 
-            return dm.CreateDelegate(typeof(Action<T>));
+            return dm.CreateDelegate(typeof(Action<TField>));
         }
 
         /// <summary>
