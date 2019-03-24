@@ -26,7 +26,7 @@ namespace Modding
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
         /// </summary>
-        public static char PathSeperator = SystemInfo.operatingSystem.Contains("Windows") ? '\\' : '/';
+        public static readonly char PathSeperator = SystemInfo.operatingSystem.Contains("Windows") ? '\\' : '/';
 
         private static readonly string SettingsPath = Application.persistentDataPath + PathSeperator + "ModdingApi.GlobalSettings.json";
         private static ModHooks _instance;
