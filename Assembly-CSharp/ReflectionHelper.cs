@@ -195,7 +195,9 @@ namespace Modding
         [PublicAPI]
         public static TField GetAttr<TObject, TField>(TObject obj, string name)
         {
-            return ((Func<TObject, TField>) GetGetter<TObject, TField>(GetField(typeof(TObject), name)))(obj);
+            FieldInfo fi = GetField(typeof(TObject), name);
+
+            return fi == null ? default(TField) : ((Func<TObject, TField>) GetGetter<TObject, TField>(fi))(obj);
         }
 
         /// <summary>
@@ -208,7 +210,9 @@ namespace Modding
         [PublicAPI]
         public static TField GetAttr<TType, TField>(string name)
         {
-            return ((Func<TField>) GetGetter<TType, TField>(GetField(typeof(TType), name)))();
+            FieldInfo fi = GetField(typeof(TType), name);
+            
+            return fi == null ? default(TField) : ((Func<TField>) GetGetter<TType, TField>(fi))();
         }
 
         /// <summary>
