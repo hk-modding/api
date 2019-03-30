@@ -185,6 +185,24 @@ namespace Modding
         }
 
         /// <summary>
+        /// Get a field on an object using a string. Cast to TCast before returning and if field doesn't exist return default.
+        /// </summary>
+        /// <param name="obj">Object/Object of type which the field is on</param>
+        /// <param name="name">Name of the field</param>
+        /// <param name="default">Default return</param>
+        /// <typeparam name="TField">Type of field</typeparam>
+        /// <typeparam name="TObject">Type of object being passed in</typeparam>
+        /// <typeparam name="TCast">Type of return.</typeparam>
+        /// <returns>The value of a field on an object/type</returns>
+        [PublicAPI]
+        public static TCast GetAttr<TObject, TField, TCast>(TObject obj, string name, TCast @default = default(TCast)) 
+        {
+            FieldInfo fi = GetField(typeof(TObject), name);
+
+            return fi == null ? @default : (TCast) (object) ((Func<TObject, TField>) GetGetter<TObject, TField>(fi))(obj);
+        }
+
+        /// <summary>
         /// Get a field on an object using a string.
         /// </summary>
         /// <param name="obj">Object/Object of type which the field is on</param>
@@ -195,9 +213,9 @@ namespace Modding
         [PublicAPI]
         public static TField GetAttr<TObject, TField>(TObject obj, string name)
         {
-            FieldInfo fi = GetField(typeof(TObject), name);
+            FieldInfo fi = GetField(typeof(TObject), name) ?? throw new MissingFieldException();
 
-            return fi == null ? default(TField) : ((Func<TObject, TField>) GetGetter<TObject, TField>(fi))(obj);
+            return ((Func<TObject, TField>) GetGetter<TObject, TField>(fi))(obj);
         }
 
         /// <summary>

@@ -20,7 +20,7 @@ namespace Modding.Patches
 
         public bool GetBoolInternal(string boolName)
         {
-            return ReflectionHelper.GetAttr<PlayerData, bool>(this, boolName);
+            return ReflectionHelper.GetAttr<PlayerData, bool, bool?>(this, boolName) ?? false;
         }
 
         public void SetIntInternal(string intName, int value)
@@ -30,7 +30,7 @@ namespace Modding.Patches
 
         public int GetIntInternal(string intName)
         {
-            return ReflectionHelper.GetAttr<PlayerData, int>(this, intName);
+            return ReflectionHelper.GetAttr<PlayerData, int, int?>(this, intName) ?? -9999;
         }
 
         [MonoModReplace]
