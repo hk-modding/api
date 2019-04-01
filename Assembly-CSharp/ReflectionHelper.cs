@@ -242,9 +242,29 @@ namespace Modding
         /// <typeparam name="TField">Type of field</typeparam>
         /// <typeparam name="TObject">Type of object being passed in</typeparam>
         [PublicAPI]
+        public static void SetAttrSafe<TObject, TField>(TObject obj, string name, TField value)
+        {
+            FieldInfo fi = GetField(typeof(TObject), name);
+
+            if (fi == null) return;
+            
+            ((Action<TObject, TField>) GetSetter<TObject, TField>(fi))(obj, value);
+        }
+        
+        /// <summary>
+        /// Set a field on an object using a string.
+        /// </summary>
+        /// <param name="obj">Object/Object of type which the field is on</param>
+        /// <param name="name">Name of the field</param>
+        /// <param name="value">Value to set the field to</param>
+        /// <typeparam name="TField">Type of field</typeparam>
+        /// <typeparam name="TObject">Type of object being passed in</typeparam>
+        [PublicAPI]
         public static void SetAttr<TObject, TField>(TObject obj, string name, TField value)
         {
-            ((Action<TObject, TField>) GetSetter<TObject, TField>(GetField(typeof(TObject), name)))(obj, value);
+            FieldInfo fi = GetField(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
+            
+            ((Action<TObject, TField>) GetSetter<TObject, TField>(fi))(obj, value);
         }
 
         /// <summary>

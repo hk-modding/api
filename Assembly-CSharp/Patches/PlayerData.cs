@@ -15,7 +15,7 @@ namespace Modding.Patches
 
         public void SetBoolInternal(string boolName, bool value)
         {
-            ReflectionHelper.SetAttr(this, boolName, value);
+            ReflectionHelper.SetAttrSafe(this, boolName, value);
         }
 
         public bool GetBoolInternal(string boolName)
@@ -25,7 +25,7 @@ namespace Modding.Patches
 
         public void SetIntInternal(string intName, int value)
         {
-            ReflectionHelper.SetAttr(this, intName, value);
+            ReflectionHelper.SetAttrSafe(this, intName, value);
         }
 
         public int GetIntInternal(string intName)
