@@ -111,22 +111,20 @@ namespace Modding.Patches
         }
         */
 
+        [MonoModOriginalName("UpdateBlueHealth")]
+        public void orig_UpdateBlueHealth() { }
+
+        [MonoModReplace]
         public void UpdateBlueHealth()
         {
             healthBlue = ModHooks.Instance.OnBlueHealth();
-            if (equippedCharm_8)
-            {
-                healthBlue += 2;
-            }
-            if (equippedCharm_9)
-            {
-                healthBlue += 4;
-            }
+            orig_UpdateBlueHealth();
         }
     
         [MonoModOriginalName("AddHealth")]
         public void orig_AddHealth(int amount) { }
-    
+
+        [MonoModReplace]
         public void AddHealth(int amount)
         {
             amount = ModHooks.Instance.BeforeAddHealth(amount);

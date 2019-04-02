@@ -356,4 +356,94 @@
             rm -f "$(SolutionDir)ModdingAPI.zip"
         </PreBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+            move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.dll" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.dll"
+            move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.pdb" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.pdb"
+
+            if "$(ConfigurationName)" == "Debug" or "$(ConfigurationName)" == "DebugDeploy" goto :Debug
+            if "$(ConfigurationName)" == "DebugMac" goto :DebugMac
+            if "$(ConfigurationName)" == "DebugLinux" goto :DebugLinux
+
+            :Debug
+            copy /Y "$(SolutionDir)Vanilla\*" "$(ProjectDir)$(OutputPath)\"
+            copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
+            copy /Y "$(SolutionDir)ILRepack\*" $(ProjectDir)$(OutputPath)\"
+            copy /Y "$(SolutionDir)Prepatcher\PrePatcher.exe" $(ProjectDir)$(OutputPath)\"
+            cd "$(ProjectDir)$(OutputPath)"
+
+            PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll
+            del Assembly-CSharp.dll
+            rename Assembly-CSharp-patched.dll Assembly-CSharp.dll
+
+            MonoMod.exe Assembly-CSharp.dll
+     
+            rem "Generate Hooks"
+            MonoMod.RuntimeDetour.HookGen.exe --private Assembly-CSharp.dll
+            MonoMod.RuntimeDetour.HookGen.exe --private PlayMaker.dll
+
+            rem "Rename files so the assembly has the correct name and the output works"
+            move "MONOMODDED_Assembly-CSharp.dll" "MONOModded.dll"
+            move Assembly-CSharp.dll OriginalAssembly-CSharp.dll
+            $(SolutionDir)ILRepack\ILRepack.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MMHOOK_PlayMaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll
+            move Assembly-CSharp.dll MONOMODDED_Assembly-CSharp.dll
+
+            rem "Create the folder structure prefered by mods"
+            md "$(SolutionDir)OutputFinal\hollow_knight_Data\Managed\Mods"
+            rem "Copy the Mod's dll into the Mods folder"
+            copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinal\readme.md"
+            copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinal\hollow_knight_Data\Managed\Assembly-CSharp.dll"
+            powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
+            copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinal\hollow_knight_Data\Managed\"
+
+            rem "Zip the Distribution Folder"
+            call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPI.zip" "$(SolutionDir)OutputFinal\*"
+
+            if "$(ConfigurationName)" == "DebugDeploy" goto :Deploy
+            goto :Exit
+
+            :Deploy
+            copy /Y "$(SolutionDir)OutputFinal\hollow_knight_Data\Managed\Assembly-CSharp.*" "C:\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\"
+            goto :Exit
+
+            :DebugMac
+            copy /Y "$(SolutionDir)VanillaMac\*" "$(ProjectDir)$(OutputPath)\"
+            copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
+            cd "$(ProjectDir)$(OutputPath)"
+            MonoMod.exe Assembly-CSharp.dll
+            rem "Create the folder structure prefered by mods"
+            md "$(SolutionDir)OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\Mods"
+            rem "Copy the Mod's dll into the Mods folder"
+            copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinalMac\readme.md"
+            copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\Assembly-CSharp.dll"
+            powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
+            copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\"
+
+            rem "Zip the Distribution Folder"
+            call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPIMac.zip" "$(SolutionDir)OutputFinalMac\hollow_knight.app\*"
+
+            goto :Exit
+
+            :DebugLinux
+            copy /Y "$(SolutionDir)VanillaLinux\*" "$(ProjectDir)$(OutputPath)\"
+            copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
+            cd "$(ProjectDir)$(OutputPath)"
+            MonoMod.exe Assembly-CSharp.dll
+            rem "Create the folder structure prefered by mods"
+            md "$(SolutionDir)OutputFinalLinux\hollow_knight_Data\Managed\Mods"
+            rem "Copy the Mod's dll into the Mods folder"
+            copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinalLinux\readme.md"
+            copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinalLinux\hollow_knight_Data\Managed\Assembly-CSharp.dll"
+            powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
+            copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinalLinux\hollow_knight_Data\Managed\"
+
+            rem "Zip the Distribution Folder"
+            call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPILinux.zip" "$(SolutionDir)OutputFinalLinux\*"
+
+            goto :Exit
+
+
+            :Exit
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>
