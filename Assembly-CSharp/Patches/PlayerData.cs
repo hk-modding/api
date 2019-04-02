@@ -1,4 +1,5 @@
-﻿using MonoMod;
+﻿using System;
+using MonoMod;
 using UnityEngine;
 //We disable a bunch of warnings here because they don't mean anything.  They all relate to not finding proper stuff for methods/properties/fields that are stubs to make the new methods work.
 //We don't care about XML docs for these as they are being patched into the original code
@@ -31,6 +32,53 @@ namespace Modding.Patches
         public int GetIntInternal(string intName)
         {
             return ReflectionHelper.GetAttr<PlayerData, int, int?>(this, intName) ?? -9999;
+        }
+
+        public void SetFloatInternal(string floatName, float value)
+        {
+            ReflectionHelper.SetAttrSafe(this, floatName, value);
+        }
+
+        public float GetFloatInternal(string floatName)
+        {
+            return ReflectionHelper.GetAttr<PlayerData, float, float?>(this, floatName) ?? -9999f;
+        }
+
+        public void SetStringInternal(string stringName, string value)
+        {
+            ReflectionHelper.SetAttrSafe(this, stringName, value);
+        }
+
+        public string GetStringInternal(string stringName)
+        {
+            return ReflectionHelper.GetAttr<PlayerData, string, string>(this, stringName) ?? " ";
+        }
+
+        public void SetVector3Internal(string vector3Name, Vector3 value)
+        {
+            ReflectionHelper.SetAttrSafe(this, vector3Name, value);
+        }
+
+        public Vector3 GetVector3Internal(string vector3Name)
+        {
+            return ReflectionHelper.GetAttr<PlayerData, Vector3, Vector3?>(this, vector3Name) ?? Vector3.zero;
+        }
+
+        public void SetVariableInternal<T>(string variableName, T value)
+        {
+            ReflectionHelper.SetAttrSafe(this, variableName, value);
+        }
+
+        public T GetVariableInternal<T>(string variableName)
+        {
+            try
+            {
+                return ReflectionHelper.GetAttr<PlayerData, T, T>(this, variableName);
+            }
+            catch
+            {
+                return default(T);
+            }
         }
 
         [MonoModReplace]
@@ -88,6 +136,54 @@ namespace Modding.Patches
             Debug.Log("PlayerData: Could not find field named " + intName + ", check variable name exists and FSM variable string is correct.");
         }
 
+        [MonoModReplace]
+        public float GetFloat(string floatName)
+        {
+            return ModHooks.Instance.GetPlayerFloat(floatName);
+        }
+
+        [MonoModReplace]
+        public void SetFloat(string floatName, float value)
+        {
+            ModHooks.Instance.SetPlayerFloat(floatName, value);
+        }
+
+        [MonoModReplace]
+        public string GetString(string stringName)
+        {
+            return ModHooks.Instance.GetPlayerString(stringName);
+        }
+
+        [MonoModReplace]
+        public void SetString(string stringName, string value)
+        {
+            ModHooks.Instance.SetPlayerString(stringName, value);
+        }
+
+        [MonoModReplace]
+        public Vector3 GetVector3(string vector3Name)
+        {
+            return ModHooks.Instance.GetPlayerVector3(vector3Name);
+        }
+
+        [MonoModReplace]
+        public void SetVector3(string vector3Name, Vector3 value)
+        {
+            ModHooks.Instance.SetPlayerVector3(vector3Name, value);
+        }
+
+        [MonoModReplace]
+        public T GetVariable<T>(string varName)
+        {
+            return ModHooks.Instance.GetPlayerVariable<T>(varName);
+        }
+
+        [MonoModReplace]
+        public void SetVariable<T>(string varName, T value)
+        {
+            ModHooks.Instance.SetPlayerVariable<T>(varName, value);
+        }
+
         [MonoModOriginalName("TakeHealth")]
         public void orig_TakeHealth(int amount) { }
 
@@ -114,7 +210,6 @@ namespace Modding.Patches
         [MonoModOriginalName("UpdateBlueHealth")]
         public void orig_UpdateBlueHealth() { }
 
-        [MonoModReplace]
         public void UpdateBlueHealth()
         {
             healthBlue = ModHooks.Instance.OnBlueHealth();
@@ -124,7 +219,6 @@ namespace Modding.Patches
         [MonoModOriginalName("AddHealth")]
         public void orig_AddHealth(int amount) { }
 
-        [MonoModReplace]
         public void AddHealth(int amount)
         {
             amount = ModHooks.Instance.BeforeAddHealth(amount);

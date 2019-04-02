@@ -211,16 +211,16 @@ namespace Modding.Patches
         [MonoModReplace]
         public void SoulGain()
         {
-            int mpcharge = this.playerData.MPCharge;
+            int mpcharge = this.playerData.GetInt("MPCharge");
             int num;
-            if (mpcharge < this.playerData.maxMP)
+            if (mpcharge < this.playerData.GetInt("maxMP"))
             {
                 num = 11;
-                if (this.playerData.equippedCharm_20)
+                if (this.playerData.GetBool("equippedCharm_20"))
                 {
                     num += 3;
                 }
-                if (this.playerData.equippedCharm_21)
+                if (this.playerData.GetBool("equippedCharm_21"))
                 {
                     num += 8;
                 }
@@ -228,20 +228,20 @@ namespace Modding.Patches
             else
             {
                 num = 6;
-                if (this.playerData.equippedCharm_20)
+                if (this.playerData.GetBool("equippedCharm_20"))
                 {
                     num += 2;
                 }
-                if (this.playerData.equippedCharm_21)
+                if (this.playerData.GetBool("equippedCharm_21"))
                 {
                     num += 6;
                 }
             }
-            int mpreserve = this.playerData.MPReserve;
+            int mpreserve = this.playerData.GetInt("MPReserve");
             num = Modding.ModHooks.Instance.OnSoulGain(num);
             this.playerData.AddMPCharge(num);
             GameCameras.instance.soulOrbFSM.SendEvent("MP GAIN");
-            if (this.playerData.MPReserve != mpreserve)
+            if (this.playerData.GetInt("MPReserve") != mpreserve)
             {
                 this.gm.soulVessel_fsm.SendEvent("MP RESERVE UP");
             }
@@ -503,7 +503,7 @@ namespace Modding.Patches
 		    			}
 		    		}
 				    damageAmount = ModHooks.Instance.AfterTakeDamage(hazardType, damageAmount);
-		    		if (this.playerData.equippedCharm_5 && this.playerData.blockerHits > 0 && hazardType == 1 && this.cState.focusing && !flag)
+		    		if (this.playerData.GetBool("equippedCharm_5") && this.playerData.GetInt("blockerHits") > 0 && hazardType == 1 && this.cState.focusing && !flag)
 		    		{
 		    			this.proxyFSM.SendEvent("HeroCtrl-TookBlockerHit");
 		    			this.audioSource.PlayOneShot(this.blockerImpact, 1f);
@@ -542,9 +542,9 @@ namespace Modding.Patches
 		    		{
 		    			this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
 		    		}
-		    		if (!this.takeNoDamage && !this.playerData.invinciTest)
+		    		if (!this.takeNoDamage && !this.playerData.GetBool("invinciTest"))
 		    		{
-		    			if (this.playerData.overcharmed)
+		    			if (this.playerData.GetBool("overcharmed"))
 		    			{
 		    				this.playerData.TakeHealth(damageAmount * 2);
 		    			}
@@ -553,9 +553,9 @@ namespace Modding.Patches
 		    				this.playerData.TakeHealth(damageAmount);
 		    			}
 		    		}
-		    		if (this.playerData.equippedCharm_3 && damageAmount > 0)
+		    		if (this.playerData.GetBool("equippedCharm_3") && damageAmount > 0)
 		    		{
-		    			if (this.playerData.equippedCharm_35)
+		    			if (this.playerData.GetBool("equippedCharm_35"))
 		    			{
 		    				this.AddMPCharge(this.GRUB_SOUL_MP_COMBO);
 		    			}
@@ -577,7 +577,7 @@ namespace Modding.Patches
 				    {
 		    			this.OnTakenDamage();
 		    		}
-		    		if (this.playerData.health == 0)
+		    		if (this.playerData.GetInt("health") == 0)
 		    		{
 		    			base.StartCoroutine(this.Die());
 		    		}
@@ -602,7 +602,7 @@ namespace Modding.Patches
 		    			base.StartCoroutine(this.StartRecoil(damageSide, spawnDamageEffect, damageAmount));
 		    		}
 		    	}
-		    	else if (this.cState.invulnerable && !this.cState.hazardDeath && !this.playerData.isInvincible)
+		    	else if (this.cState.invulnerable && !this.cState.hazardDeath && !this.playerData.GetBool("isInvincible"))
 		    	{
 		    		if (hazardType == 2)
 		    		{
@@ -611,7 +611,7 @@ namespace Modding.Patches
 		    				this.playerData.TakeHealth(damageAmount);
 		    			}
 		    			this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-		    			if (this.playerData.health == 0)
+		    			if (this.playerData.GetInt("health") == 0)
 		    			{
 		    				base.StartCoroutine(this.Die());
 		    			}
@@ -625,7 +625,7 @@ namespace Modding.Patches
 		    		{
 		    			this.playerData.TakeHealth(damageAmount);
 		    			this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-		    			if (this.playerData.health == 0)
+		    			if (this.playerData.GetInt("health") == 0)
 		    			{
 		    				base.StartCoroutine(this.Die());
 		    			}

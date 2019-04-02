@@ -418,6 +418,467 @@ namespace Modding
             return result;
         }
 
+        /// <summary>
+        /// Called when anything in the game tries to set a float in player data
+        /// </summary>
+        /// <remarks>PlayerData.SetFloat</remarks>
+        [HookInfo("Called when anything in the game tries to set a float in player data", "PlayerData.SetFloat")]
+        public event SetFloatProxy SetPlayerFloatHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerFloatHook");
+                _SetPlayerFloatHook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerFloatHook");
+                _SetPlayerFloatHook -= value;
+            }
+        }
+
+        private event SetFloatProxy _SetPlayerFloatHook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.SetFloat 
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
+        /// <param name="val">Value to set</param>
+        internal void SetPlayerFloat(string target, float val)
+        {
+            if (_SetPlayerFloatHook != null)
+            {
+                Delegate[] invocationList = _SetPlayerFloatHook.GetInvocationList();
+                foreach (Delegate toInvoke in invocationList)
+                {
+                    try
+                    {
+                        toInvoke.DynamicInvoke(target, val);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("[API] - " + ex);
+                    }
+                }
+
+                return;
+            }
+
+            Patches.PlayerData.instance.SetFloatInternal(target, val);
+        }
+
+        /// <summary>
+        /// Called when anything in the game tries to get a float from player data
+        /// </summary>
+        /// <remarks>PlayerData.GetFloat</remarks>
+        [HookInfo("Called when anything in the game tries to get a float from player data", "PlayerData.GetFloat")]
+        public event GetFloatProxy GetPlayerFloatHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerFloatHook");
+                _GetPlayerFloatHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerFloatHook");
+                _GetPlayerFloatHook -= value;
+            }
+        }
+
+        private event GetFloatProxy _GetPlayerFloatHook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.GetFloat 
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
+        internal float GetPlayerFloat(string target)
+        {
+            float floatInternal = Patches.PlayerData.instance.GetFloatInternal(target);
+            float result = floatInternal;
+            bool flag = false;
+            if (_GetPlayerFloatHook == null) return result;
+
+            Delegate[] invocationList = _GetPlayerFloatHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                try
+                {
+                    float f = (float)toInvoke.DynamicInvoke(target);
+                    if (f == floatInternal || flag) continue;
+
+                    result = f;
+                    flag = true;
+                }
+                catch (Exception ex)
+                {
+
+                    Logger.LogError("[API] - " + ex);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Called when anything in the game tries to set a string in player data
+        /// </summary>
+        /// <remarks>PlayerData.SetString</remarks>
+        [HookInfo("Called when anything in the game tries to set a string in player data", "PlayerData.SetString")]
+        public event SetStringProxy SetPlayerStringHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerStringHook");
+                _SetPlayerStringHook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerStringHook");
+                _SetPlayerStringHook -= value;
+            }
+        }
+
+        private event SetStringProxy _SetPlayerStringHook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.SetString 
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
+        /// <param name="val">Value to set</param>
+        internal void SetPlayerString(string target, string val)
+        {
+            if (_SetPlayerStringHook != null)
+            {
+                Delegate[] invocationList = _SetPlayerStringHook.GetInvocationList();
+                foreach (Delegate toInvoke in invocationList)
+                {
+                    try
+                    {
+                        toInvoke.DynamicInvoke(target, val);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("[API] - " + ex);
+                    }
+                }
+
+                return;
+            }
+
+            Patches.PlayerData.instance.SetStringInternal(target, val);
+        }
+
+        /// <summary>
+        /// Called when anything in the game tries to get a string from player data
+        /// </summary>
+        /// <remarks>PlayerData.GetString</remarks>
+        [HookInfo("Called when anything in the game tries to get a string from player data", "PlayerData.GetString")]
+        public event GetStringProxy GetPlayerStringHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerStringHook");
+                _GetPlayerStringHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerStringHook");
+                _GetPlayerStringHook -= value;
+            }
+        }
+
+        private event GetStringProxy _GetPlayerStringHook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.GetString 
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
+        internal string GetPlayerString(string target)
+        {
+            string stringInternal = Patches.PlayerData.instance.GetStringInternal(target);
+            string result = stringInternal;
+            bool flag = false;
+            if (_GetPlayerStringHook == null) return result;
+
+            Delegate[] invocationList = _GetPlayerStringHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                try
+                {
+                    string s = (string)toInvoke.DynamicInvoke(target);
+                    if (s == stringInternal || flag) continue;
+
+                    result = s;
+                    flag = true;
+                }
+                catch (Exception ex)
+                {
+
+                    Logger.LogError("[API] - " + ex);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Called when anything in the game tries to set a Vector3 in player data
+        /// </summary>
+        /// <remarks>PlayerData.SetVector3</remarks>
+        [HookInfo("Called when anything in the game tries to set a Vector3 in player data", "PlayerData.SetVector3")]
+        public event SetVector3Proxy SetPlayerVector3Hook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerVector3Hook");
+                _SetPlayerVector3Hook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerVector3Hook");
+                _SetPlayerVector3Hook -= value;
+            }
+        }
+
+        private event SetVector3Proxy _SetPlayerVector3Hook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.SetVector3 
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
+        /// <param name="val">Value to set</param>
+        internal void SetPlayerVector3(string target, Vector3 val)
+        {
+            if (_SetPlayerVector3Hook != null)
+            {
+                Delegate[] invocationList = _SetPlayerVector3Hook.GetInvocationList();
+                foreach (Delegate toInvoke in invocationList)
+                {
+                    try
+                    {
+                        toInvoke.DynamicInvoke(target, val);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("[API] - " + ex);
+                    }
+                }
+
+                return;
+            }
+
+            Patches.PlayerData.instance.SetVector3Internal(target, val);
+        }
+
+        /// <summary>
+        /// Called when anything in the game tries to get a Vector3 from player data
+        /// </summary>
+        /// <remarks>PlayerData.GetVector3</remarks>
+        [HookInfo("Called when anything in the game tries to get a Vector3 from player data", "PlayerData.GetVector3")]
+        public event GetVector3Proxy GetPlayerVector3Hook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerVector3Hook");
+                _GetPlayerVector3Hook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerVector3Hook");
+                _GetPlayerVector3Hook -= value;
+            }
+        }
+
+        private event GetVector3Proxy _GetPlayerVector3Hook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.GetVector3
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
+        internal Vector3 GetPlayerVector3(string target)
+        {
+            Vector3 vecInternal = Patches.PlayerData.instance.GetVector3Internal(target);
+            Vector3 result = vecInternal;
+            bool flag = false;
+            if (_GetPlayerVector3Hook == null) return result;
+
+            Delegate[] invocationList = _GetPlayerVector3Hook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                try
+                {
+                    Vector3 vec = (Vector3)toInvoke.DynamicInvoke(target);
+                    if (vec == vecInternal || flag) continue;
+
+                    result = vec;
+                    flag = true;
+                }
+                catch (Exception ex)
+                {
+
+                    Logger.LogError("[API] - " + ex);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Called when anything in the game tries to set a generic variable in player data
+        /// </summary>
+        /// <remarks>PlayerData.SetVariable</remarks>
+        [HookInfo("Called when anything in the game tries to set a generic variable in player data", "PlayerData.SetVariable")]
+        public event SetVariableProxy SetPlayerVariableHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerVariableHook");
+                _SetPlayerVariableHook += value;
+
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerVariableHook");
+                _SetPlayerVariableHook -= value;
+            }
+        }
+
+        private event SetVariableProxy _SetPlayerVariableHook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.SetVariable 
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
+        /// <param name="val">Value to set</param>
+        internal void SetPlayerVariable<T>(string target, T val)
+        {
+            Type t = typeof(T);
+            if (t == typeof(bool))
+            {
+                SetPlayerBool(target, (bool)(object)val);
+                return;
+            }
+            else if (t == typeof(int))
+            {
+                SetPlayerInt(target, (int)(object)val);
+                return;
+            }
+            else if (t == typeof(float))
+            {
+                SetPlayerFloat(target, (float)(object)val);
+                return;
+            }
+            else if (t == typeof(string))
+            {
+                SetPlayerString(target, (string)(object)val);
+                return;
+            }
+            else if (t == typeof(Vector3))
+            {
+                SetPlayerVector3(target, (Vector3)(object)val);
+                return;
+            }
+
+            if (_SetPlayerVariableHook != null)
+            {
+                Delegate[] invocationList = _SetPlayerVariableHook.GetInvocationList();
+                foreach (Delegate toInvoke in invocationList)
+                {
+                    try
+                    {
+                        toInvoke.DynamicInvoke(typeof(T), target, val);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("[API] - " + ex);
+                    }
+                }
+
+                return;
+            }
+
+            Patches.PlayerData.instance.SetVariableInternal<T>(target, val);
+        }
+
+        /// <summary>
+        /// Called when anything in the game tries to get a generic variable from player data
+        /// </summary>
+        /// <remarks>PlayerData.GetVariable</remarks>
+        [HookInfo("Called when anything in the game tries to get a generic variable from player data", "PlayerData.GetVariable")]
+        public event GetVariableProxy GetPlayerVariableHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerVariableHook");
+                _GetPlayerVariableHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerVariableHook");
+                _GetPlayerVariableHook -= value;
+            }
+        }
+
+        private event GetVariableProxy _GetPlayerVariableHook;
+
+        /// <summary>
+        /// Called by the game in PlayerData.GetVariable
+        /// </summary>
+        /// <param name="target">Target Field Name</param>
+        internal T GetPlayerVariable<T>(string target)
+        {
+            Type t = typeof(T);
+            if (t == typeof(bool))
+            {
+                return (T)(object)GetPlayerBool(target);
+            }
+            else if (t == typeof(int))
+            {
+                return (T)(object)GetPlayerInt(target);
+            }
+            else if (t == typeof(float))
+            {
+                return (T)(object)GetPlayerFloat(target);
+            }
+            else if (t == typeof(string))
+            {
+                return (T)(object)GetPlayerString(target);
+            }
+            else if (t == typeof(Vector3))
+            {
+                return (T)(object)GetPlayerVector3(target);
+            }
+
+            T varInternal = Patches.PlayerData.instance.GetVariableInternal<T>(target);
+            T result = varInternal;
+            bool flag = false;
+            if (_GetPlayerVariableHook == null) return result;
+
+            Delegate[] invocationList = _GetPlayerVariableHook.GetInvocationList();
+            foreach (Delegate toInvoke in invocationList)
+            {
+                try
+                {
+                    T v = (T)toInvoke.DynamicInvoke(typeof(T), target);
+                    if (v.Equals(varInternal) || flag) continue;
+
+                    result = v;
+                    flag = true;
+                }
+                catch (Exception ex)
+                {
+
+                    Logger.LogError("[API] - " + ex);
+                }
+            }
+
+            return result;
+        }
+
         private event NewPlayerDataHandler _NewPlayerDataHook;
 
         /// <summary>
