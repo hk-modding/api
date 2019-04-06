@@ -51,18 +51,17 @@ namespace Modding
         /// <summary>
         /// Currently Loaded Mods
         /// </summary>
-        public List<string> LoadedMods = new List<string>();
+        public readonly List<string> LoadedMods = new List<string>();
 
         /// <summary>
         /// Dictionary of mods and their version #s
         /// </summary>
-        public SerializableStringDictionary LoadedModsWithVersions = new SerializableStringDictionary();
+        public readonly SerializableStringDictionary LoadedModsWithVersions = new SerializableStringDictionary();
 
         /// <summary>
         /// The Version of the Modding API
         /// </summary>
         public string ModVersion;
-
 
         /// <summary>
         /// Version of the Game
@@ -72,6 +71,7 @@ namespace Modding
         /// <summary>
         /// Denotes if the API is current
         /// </summary>
+        // ReSharper disable once ConvertToConstant.Global
         public readonly bool IsCurrent = true;
 
         private Console _console;
@@ -133,7 +133,7 @@ namespace Modding
 
             ApplicationQuitHook += SaveGlobalSettings;
 
-            //Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
+            // Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
             // try
             // {
             //     GithubVersionHelper githubVersionHelper = new GithubVersionHelper("seanpr96/HollowKnight.Modding");
@@ -143,8 +143,8 @@ namespace Modding
             //     int modVersionRevision = Convert.ToInt32(temp[1]);
             //     Version tempNewVersion = new Version(temp[0]);
             //     Version tempGameVersion = new Version(gameVersion.major, gameVersion.minor, gameVersion.revision, gameVersion.package);
-            //     Logger.LogDebug( "[API] - Checking Game Version: " + tempGameVersion + " < " + tempNewVersion );
-            //     if( tempNewVersion.CompareTo( tempGameVersion ) < 0 || ( tempNewVersion.CompareTo( tempGameVersion ) == 0 && modVersionRevision > _modVersion ) )
+            //     Logger.LogDebug("[API] - Checking Game Version: " + tempGameVersion + " < " + tempNewVersion);
+            //     if(tempNewVersion.CompareTo( tempGameVersion ) < 0 || ( tempNewVersion.CompareTo( tempGameVersion ) == 0 && modVersionRevision > _modVersion))
             //         IsCurrent = false;
             // }
             // catch( Exception ex )
@@ -155,8 +155,8 @@ namespace Modding
             IsInitialized = true;
         }
 
-        //Used to make the Github Certificate valid so that we can check for new versions.
-        //Used this command in linux: openssl s_client -connect api.github.com:443
+        // Used to make the Github Certificate valid so that we can check for new versions.
+        // Used this command in linux: openssl s_client -connect api.github.com:443
         private static void SetupServicePointAuthorizor()
         {
             X509Certificate2 gitHubCertificate = new X509Certificate2();
@@ -169,10 +169,7 @@ namespace Modding
             {
                 Logger.LogDebug(errors.ToString());
                 Logger.Log(certificate.Subject);
-                if (certificate.Equals(gitHubCertificate) || certificate.Equals(gitHubCertificate2))
-                    return true;
-
-                return false;
+                return certificate.Equals(gitHubCertificate) || certificate.Equals(gitHubCertificate2);
             };
         }
 

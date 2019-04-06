@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Modding
@@ -11,6 +13,8 @@ namespace Modding
     /// <summary>
     /// Handles loading of mods.
     /// </summary>
+    [SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
+    [PublicAPI]
     internal static class ModLoader
     {
         /// <summary>
@@ -174,7 +178,6 @@ namespace Modding
                     if (nsMods == null || nsMods.Count == 0)
                     {
                         Logger.LogWarn("[API] - Namespace mod list empty, ignoring");
-                        continue;
                     }
                     else if (nsMods.Count == 1)
                     {
@@ -200,11 +203,6 @@ namespace Modding
             }
 
             _draw.drawString = builder.ToString();
-        }
-
-        internal static void LoadMod(IMod mod)
-        {
-            LoadMod(mod, false);
         }
 
         internal static void LoadMod(IMod mod, bool updateModText, bool changeSettings = true)

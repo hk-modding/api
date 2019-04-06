@@ -12,7 +12,6 @@ namespace Modding
     /// <remarks>Does not provide method to store mod settings in the save file.</remarks>
     public class Mod : Loggable, IMod
     {
-
         /// <summary>
         /// The Mods Name
         /// </summary>
@@ -106,15 +105,15 @@ namespace Modding
         {
             string name = GetType().Name;
             Log("Loading Mod Settings from Save.");
-            if (data?.modData != null && data.modData.ContainsKey(name))
-            {
-                Settings = new TSaveSettings();
-                Settings.SetSettings(data.modData[name]);
+            
+            if (data?.modData == null || !data.modData.ContainsKey(name)) return;
+            
+            Settings = new TSaveSettings();
+            Settings.SetSettings(data.modData[name]);
 
-                if (Settings is ISerializationCallbackReceiver callbackReceiver)
-                {
-                    callbackReceiver.OnAfterDeserialize();
-                }
+            if (Settings is ISerializationCallbackReceiver callbackReceiver)
+            {
+                callbackReceiver.OnAfterDeserialize();
             }
         }
 
@@ -166,9 +165,7 @@ namespace Modding
         /// <summary>
         /// Legacy constructor instead of optional argument to not break old mods
         /// </summary>
-        public Mod() : this(null)
-        {
-        }
+        public Mod() : this(null) {}
 
         /// <inheritdoc />
         /// <summary>

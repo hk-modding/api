@@ -10,7 +10,6 @@ namespace Modding
     [Serializable]
     public class ModHooksGlobalSettings : IModSettings
     {
-
         /// <summary>
         /// Logging Level to use.
         /// </summary>
@@ -20,7 +19,6 @@ namespace Modding
             set => SetInt((int) value);
         }
 
-
         /// <summary>
         /// Determines if Debug Console (Which displays Messages from Logger) should be shown.
         /// </summary>
@@ -29,7 +27,6 @@ namespace Modding
             get => GetBool(false);
             set => SetBool(value);
         }
-
 
         /// <summary>
         /// Lists the known mods that are currently installed and whether or not they've been enabled or disabled via the Mod Manager Menu.

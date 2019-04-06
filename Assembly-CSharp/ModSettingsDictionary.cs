@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Modding
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="SerializableDictionary{TKey,TValue}" />
     /// <summary>
     /// Used to represent Mod Data in SaveGameData
     /// </summary>
