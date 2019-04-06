@@ -10,6 +10,7 @@ using JetBrains.Annotations;
 using Modding.Menu;
 using MonoMod;
 using UnityEngine;
+// ReSharper disable PossibleInvalidCastExceptionInForeachLoop
 
 // ReSharper disable SuggestVarOrType_SimpleTypes
 #pragma warning disable 1591
@@ -246,7 +247,7 @@ namespace Modding
         {
             if (_SetPlayerBoolHook != null)
             {
-                SetBoolProxy[] invocationList = (SetBoolProxy[]) _SetPlayerBoolHook.GetInvocationList();
+                Delegate[] invocationList = _SetPlayerBoolHook.GetInvocationList();
                 
                 foreach (SetBoolProxy toInvoke in invocationList)
                 {
@@ -299,9 +300,9 @@ namespace Modding
             bool gotValue = false;
             if (_GetPlayerBoolHook == null) return result;
 
-            GetBoolProxy[] invocationList = (GetBoolProxy[]) _GetPlayerBoolHook.GetInvocationList();
+         Delegate[] invocationList = _GetPlayerBoolHook.GetInvocationList();
             
-            foreach (var toInvoke in invocationList)
+            foreach (GetBoolProxy toInvoke in invocationList)
             {
                 try
                 {
@@ -351,7 +352,7 @@ namespace Modding
         {
             if (_SetPlayerIntHook != null)
             {
-                SetIntProxy[] invocationList = (SetIntProxy[]) _SetPlayerIntHook.GetInvocationList();
+                Delegate[] invocationList = _SetPlayerIntHook.GetInvocationList();
                 
                 foreach (SetIntProxy toInvoke in invocationList)
                 {
@@ -404,7 +405,7 @@ namespace Modding
             
             if (_GetPlayerIntHook == null) return result;
 
-            GetIntProxy[] invocationList = (GetIntProxy[]) _GetPlayerIntHook.GetInvocationList();
+            Delegate[] invocationList = _GetPlayerIntHook.GetInvocationList();
             
             foreach (GetIntProxy toInvoke in invocationList)
             {
@@ -455,7 +456,7 @@ namespace Modding
         {
             if (_SetPlayerFloatHook != null)
             {
-                SetFloatProxy[] invocationList = (SetFloatProxy[]) _SetPlayerFloatHook.GetInvocationList();
+                Delegate[] invocationList = _SetPlayerFloatHook.GetInvocationList();
                 
                 foreach (SetFloatProxy toInvoke in invocationList)
                 {
@@ -508,7 +509,7 @@ namespace Modding
             
             if (_GetPlayerFloatHook == null) return result;
 
-            GetFloatProxy[] invocationList = (GetFloatProxy[]) _GetPlayerFloatHook.GetInvocationList();
+            Delegate[] invocationList = _GetPlayerFloatHook.GetInvocationList();
             
             foreach (GetFloatProxy toInvoke in invocationList)
             {
@@ -561,7 +562,7 @@ namespace Modding
         {
             if (_SetPlayerStringHook != null)
             {
-                SetStringProxy[] invocationList = (SetStringProxy[]) _SetPlayerStringHook.GetInvocationList();
+                Delegate[] invocationList = _SetPlayerStringHook.GetInvocationList();
                 
                 foreach (SetStringProxy toInvoke in invocationList)
                 {
@@ -613,7 +614,7 @@ namespace Modding
             bool gotValue = false;
             if (_GetPlayerStringHook == null) return result;
 
-            GetStringProxy[] invocationList = (GetStringProxy[]) _GetPlayerStringHook.GetInvocationList();
+            Delegate[] invocationList = _GetPlayerStringHook.GetInvocationList();
             
             foreach (GetStringProxy toInvoke in invocationList)
             {
@@ -664,7 +665,7 @@ namespace Modding
         {
             if (_SetPlayerVector3Hook != null)
             {
-                SetVector3Proxy[] invocationList = (SetVector3Proxy[]) _SetPlayerVector3Hook.GetInvocationList();
+                Delegate[] invocationList = _SetPlayerVector3Hook.GetInvocationList();
                 
                 foreach (SetVector3Proxy toInvoke in invocationList)
                 {
@@ -717,7 +718,7 @@ namespace Modding
             
             if (_GetPlayerVector3Hook == null) return result;
 
-            GetVector3Proxy[] invocationList = (GetVector3Proxy[]) _GetPlayerVector3Hook.GetInvocationList();
+            Delegate[] invocationList = _GetPlayerVector3Hook.GetInvocationList();
             
             foreach (GetVector3Proxy toInvoke in invocationList)
             {
@@ -797,7 +798,7 @@ namespace Modding
 
             if (_SetPlayerVariableHook != null)
             {
-                SetVariableProxy[] invocationList = (SetVariableProxy[]) _SetPlayerVariableHook.GetInvocationList();
+                Delegate[] invocationList = _SetPlayerVariableHook.GetInvocationList();
                 
                 foreach (SetVariableProxy toInvoke in invocationList)
                 {
@@ -874,7 +875,7 @@ namespace Modding
             
             if (_GetPlayerVariableHook == null) return result;
 
-            GetVariableProxy[] invocationList = (GetVariableProxy[]) _GetPlayerVariableHook.GetInvocationList();
+            Delegate[] invocationList = _GetPlayerVariableHook.GetInvocationList();
             
             foreach (GetVariableProxy toInvoke in invocationList)
             {
@@ -926,7 +927,7 @@ namespace Modding
 
             if (_NewPlayerDataHook == null) return;
             
-            NewPlayerDataHandler[] invocationList = (NewPlayerDataHandler[]) _NewPlayerDataHook.GetInvocationList();
+            Delegate[] invocationList = _NewPlayerDataHook.GetInvocationList();
             
             foreach (NewPlayerDataHandler toInvoke in invocationList)
             {
@@ -971,7 +972,7 @@ namespace Modding
             int result = 0;
             if (_BlueHealthHook == null) return result;
 
-            BlueHealthHandler[] invocationList = (BlueHealthHandler[]) _BlueHealthHook.GetInvocationList();
+            Delegate[] invocationList = _BlueHealthHook.GetInvocationList();
             
             foreach (BlueHealthHandler toInvoke in invocationList)
             {
@@ -1020,7 +1021,7 @@ namespace Modding
 
             if (_TakeHealthHook == null) return damage;
 
-            TakeHealthProxy[] invocationList = (TakeHealthProxy[]) _TakeHealthHook.GetInvocationList();
+            Delegate[] invocationList = _TakeHealthHook.GetInvocationList();
             
             foreach (TakeHealthProxy toInvoke in invocationList)
             {
@@ -1068,7 +1069,7 @@ namespace Modding
 
             if (_TakeDamageHook == null) return damage;
 
-            TakeDamageProxy[] invocationList = (TakeDamageProxy[]) _TakeDamageHook.GetInvocationList();
+            Delegate[] invocationList = _TakeDamageHook.GetInvocationList();
             
             foreach (TakeDamageProxy toInvoke in invocationList)
             {
@@ -1114,7 +1115,7 @@ namespace Modding
 
             if (_AfterTakeDamageHook == null) return damageAmount;
 
-            AfterTakeDamageHandler[] invocationList = (AfterTakeDamageHandler[]) _AfterTakeDamageHook.GetInvocationList();
+            Delegate[] invocationList = _AfterTakeDamageHook.GetInvocationList();
             
             foreach (AfterTakeDamageHandler toInvoke in invocationList)
             {
@@ -1162,7 +1163,7 @@ namespace Modding
 
             if (_BeforePlayerDeadHook == null) return;
 
-            VoidHandler[] invocationList = (VoidHandler[]) _BeforePlayerDeadHook.GetInvocationList();
+            Delegate[] invocationList = _BeforePlayerDeadHook.GetInvocationList();
             
             foreach (VoidHandler toInvoke in invocationList)
             {
@@ -1208,7 +1209,7 @@ namespace Modding
 
             if (_AfterPlayerDeadHook == null) return;
 
-            VoidHandler[] invocationList = (VoidHandler[]) _AfterPlayerDeadHook.GetInvocationList();
+            Delegate[] invocationList = _AfterPlayerDeadHook.GetInvocationList();
             
             foreach (VoidHandler toInvoke in invocationList)
             {
@@ -1254,7 +1255,7 @@ namespace Modding
 
             if (_AttackHook == null) return;
             
-            AttackHandler[] invocationList = (AttackHandler[]) _AttackHook.GetInvocationList();
+            Delegate[] invocationList = _AttackHook.GetInvocationList();
             
             foreach (AttackHandler toInvoke in invocationList)
             {
@@ -1299,7 +1300,7 @@ namespace Modding
 
             if (_DoAttackHook == null) return;
             
-            DoAttackHandler[] invocationList = (DoAttackHandler[]) _DoAttackHook.GetInvocationList();
+            Delegate[] invocationList = _DoAttackHook.GetInvocationList();
             
             foreach (DoAttackHandler toInvoke in invocationList)
             {
@@ -1347,7 +1348,7 @@ namespace Modding
 
             if (_AfterAttackHook == null) return;
             
-            AfterAttackHandler[] invocationList = (AfterAttackHandler[]) _AfterAttackHook.GetInvocationList();
+            Delegate[] invocationList = _AfterAttackHook.GetInvocationList();
             
             foreach (AfterAttackHandler toInvoke in invocationList)
             {
@@ -1393,7 +1394,7 @@ namespace Modding
 
             if (_SlashHitHook == null) return;
             
-            SlashHitHandler[] invocationList = (SlashHitHandler[]) _SlashHitHook.GetInvocationList();
+            Delegate[] invocationList = _SlashHitHook.GetInvocationList();
             
             foreach (SlashHitHandler toInvoke in invocationList)
             {
@@ -1440,7 +1441,7 @@ namespace Modding
 
             if (_CharmUpdateHook == null) return;
             
-            CharmUpdateHandler[] invocationList = (CharmUpdateHandler[]) _CharmUpdateHook.GetInvocationList();
+            Delegate[] invocationList = _CharmUpdateHook.GetInvocationList();
             
             foreach (CharmUpdateHandler toInvoke in invocationList)
             {
@@ -1486,7 +1487,7 @@ namespace Modding
 
             if (_HeroUpdateHook == null) return;
             
-            HeroUpdateHandler[] invocationList = (HeroUpdateHandler[]) _HeroUpdateHook.GetInvocationList();
+            Delegate[] invocationList = _HeroUpdateHook.GetInvocationList();
             
             foreach (HeroUpdateHandler toInvoke in invocationList)
             {
@@ -1531,7 +1532,7 @@ namespace Modding
 
             if (_BeforeAddHealthHook == null) return amount;
 
-            BeforeAddHealthHandler[] invocationList = (BeforeAddHealthHandler[]) _BeforeAddHealthHook.GetInvocationList();
+            Delegate[] invocationList = _BeforeAddHealthHook.GetInvocationList();
             
             foreach (BeforeAddHealthHandler toInvoke in invocationList)
             {
@@ -1579,7 +1580,7 @@ namespace Modding
             
             if (_FocusCostHook == null) return result;
 
-            FocusCostHandler[] invocationList = (FocusCostHandler[]) _FocusCostHook.GetInvocationList();
+            Delegate[] invocationList = _FocusCostHook.GetInvocationList();
             
             foreach (FocusCostHandler toInvoke in invocationList)
             {
@@ -1626,7 +1627,7 @@ namespace Modding
 
             if (_SoulGainHook == null) return num;
 
-            SoulGainHandler[] invocationList = (SoulGainHandler[]) _SoulGainHook.GetInvocationList();
+            Delegate[] invocationList = _SoulGainHook.GetInvocationList();
             
             foreach (SoulGainHandler toInvoke in invocationList)
             {
@@ -1675,7 +1676,7 @@ namespace Modding
 
             if (_DashVectorHook == null) return change;
 
-            DashVelocityHandler[] invocationList = (DashVelocityHandler[]) _DashVectorHook.GetInvocationList();
+            Delegate[] invocationList = _DashVectorHook.GetInvocationList();
             
             foreach (DashVelocityHandler toInvoke in invocationList)
             {
@@ -1725,7 +1726,7 @@ namespace Modding
 
             bool ret = false;
 
-            DashPressedHandler[] invocationList = (DashPressedHandler[]) _DashPressedHook.GetInvocationList();
+            Delegate[] invocationList = _DashPressedHook.GetInvocationList();
             
             foreach (DashPressedHandler toInvoke in invocationList)
             {
@@ -1779,7 +1780,7 @@ namespace Modding
 
             if (_SavegameLoadHook == null) return;
             
-            SavegameLoadHandler[] invocationList = (SavegameLoadHandler[]) _SavegameLoadHook.GetInvocationList();
+            Delegate[] invocationList = _SavegameLoadHook.GetInvocationList();
             
             foreach (SavegameLoadHandler toInvoke in invocationList)
             {
@@ -1825,7 +1826,7 @@ namespace Modding
 
             if (_SavegameSaveHook == null) return;
             
-            SavegameSaveHandler[] invocationList = (SavegameSaveHandler[]) _SavegameSaveHook.GetInvocationList();
+            Delegate[] invocationList = _SavegameSaveHook.GetInvocationList();
             
             foreach (SavegameSaveHandler toInvoke in invocationList)
             {
@@ -1871,7 +1872,7 @@ namespace Modding
 
             if (_NewGameHook == null) return;
 
-            NewGameHandler[] invocationList = (NewGameHandler[]) _NewGameHook.GetInvocationList();
+            Delegate[] invocationList = _NewGameHook.GetInvocationList();
             
             foreach (NewGameHandler toInvoke in invocationList)
             {
@@ -1917,7 +1918,7 @@ namespace Modding
 
             if (_SavegameClearHook == null) return;
             
-            ClearSaveGameHandler[] invocationList = (ClearSaveGameHandler[]) _SavegameClearHook.GetInvocationList();
+            Delegate[] invocationList = _SavegameClearHook.GetInvocationList();
             
             foreach (ClearSaveGameHandler toInvoke in invocationList)
             {
@@ -1964,7 +1965,7 @@ namespace Modding
 
             if (_AfterSavegameLoadHook == null) return;
             
-            AfterSavegameLoadHandler[] invocationList = (AfterSavegameLoadHandler[]) _AfterSavegameLoadHook.GetInvocationList();
+            Delegate[] invocationList = _AfterSavegameLoadHook.GetInvocationList();
             
             foreach (AfterSavegameLoadHandler toInvoke in invocationList)
             {
@@ -2012,7 +2013,7 @@ namespace Modding
             
             if (_BeforeSavegameSaveHook == null) return;
             
-            BeforeSavegameSaveHandler[] invocationList = (BeforeSavegameSaveHandler[]) _BeforeSavegameSaveHook.GetInvocationList();
+            Delegate[] invocationList = _BeforeSavegameSaveHook.GetInvocationList();
             
             foreach (BeforeSavegameSaveHandler toInvoke in invocationList)
             {
@@ -2059,7 +2060,7 @@ namespace Modding
 
             string ret = null;
 
-            GetSaveFileNameHandler[] invocationList = (GetSaveFileNameHandler[]) _GetSaveFileNameHook.GetInvocationList();
+            Delegate[] invocationList = _GetSaveFileNameHook.GetInvocationList();
             
             foreach (GetSaveFileNameHandler toInvoke in invocationList)
             {
@@ -2106,7 +2107,7 @@ namespace Modding
 
             if (_AfterSaveGameClearHook == null) return;
             
-            AfterClearSaveGameHandler[] invocationList = (AfterClearSaveGameHandler[]) _AfterSaveGameClearHook.GetInvocationList();
+            Delegate[] invocationList = _AfterSaveGameClearHook.GetInvocationList();
             
             foreach (AfterClearSaveGameHandler toInvoke in invocationList)
             {
@@ -2156,7 +2157,7 @@ namespace Modding
             
             if (_LanguageGetHook == null) return result;
 
-            LanguageGetHandler[] invocationList = (LanguageGetHandler[]) _LanguageGetHook.GetInvocationList();
+            Delegate[] invocationList = _LanguageGetHook.GetInvocationList();
             
             foreach (LanguageGetHandler toInvoke in invocationList)
             {
@@ -2210,7 +2211,7 @@ namespace Modding
 
             if (_SceneChanged == null) return;
             
-            SceneChangedHandler[] invocationList = (SceneChangedHandler[]) _SceneChanged.GetInvocationList();
+            Delegate[] invocationList = _SceneChanged.GetInvocationList();
             
             foreach (SceneChangedHandler toInvoke in invocationList)
             {
@@ -2256,7 +2257,7 @@ namespace Modding
 
             if (_BeforeSceneLoadHook == null) return sceneName;
 
-            BeforeSceneLoadHandler[] invocationList = (BeforeSceneLoadHandler[]) _BeforeSceneLoadHook.GetInvocationList();
+            Delegate[] invocationList = _BeforeSceneLoadHook.GetInvocationList();
             
             foreach (BeforeSceneLoadHandler toInvoke in invocationList)
             {
@@ -2349,7 +2350,7 @@ namespace Modding
 
             if (_ColliderCreateHook == null) return;
             
-            ColliderCreateHandler[] invocationList = (ColliderCreateHandler[]) _ColliderCreateHook.GetInvocationList();
+            Delegate[] invocationList = _ColliderCreateHook.GetInvocationList();
             
             foreach (ColliderCreateHandler toInvoke in invocationList)
             {
@@ -2394,7 +2395,7 @@ namespace Modding
             
             if (_ObjectPoolSpawnHook == null) return go;
 
-            GameObjectHandler[] invocationList = (GameObjectHandler[]) _ObjectPoolSpawnHook.GetInvocationList();
+            Delegate[] invocationList = _ObjectPoolSpawnHook.GetInvocationList();
             
             foreach (GameObjectHandler toInvoke in invocationList)
             {
@@ -2442,7 +2443,7 @@ namespace Modding
             
             if (_OnGetEventSenderHook == null) return go;
 
-            GameObjectFsmHandler[] invocationList = (GameObjectFsmHandler[]) _OnGetEventSenderHook.GetInvocationList();
+            Delegate[] invocationList = _OnGetEventSenderHook.GetInvocationList();
             
             foreach (GameObjectFsmHandler toInvoke in invocationList)
             {
@@ -2490,7 +2491,7 @@ namespace Modding
 
             if (_ApplicationQuitHook == null) return;
             
-            ApplicationQuitHandler[] invocationList = (ApplicationQuitHandler[]) _ApplicationQuitHook.GetInvocationList();
+            Delegate[] invocationList = _ApplicationQuitHook.GetInvocationList();
             
             foreach (ApplicationQuitHandler toInvoke in invocationList)
             {
@@ -2536,7 +2537,7 @@ namespace Modding
 
             if (_SetFontHook == null) return;
             
-            SetFontHandler[] invocationList = (SetFontHandler[]) _SetFontHook.GetInvocationList();
+            Delegate[] invocationList = _SetFontHook.GetInvocationList();
             
             foreach (SetFontHandler toInvoke in invocationList)
             {
@@ -2585,7 +2586,7 @@ namespace Modding
             bool changedValue = false;
             if (_TextDirectionHook == null) return result;
 
-            TextDirectionProxy[] invocationList = (TextDirectionProxy[]) _TextDirectionHook.GetInvocationList();
+            Delegate[] invocationList = _TextDirectionHook.GetInvocationList();
             
             foreach (TextDirectionProxy toInvoke in invocationList)
             {
@@ -2694,7 +2695,7 @@ namespace Modding
 
             if (_HitInstanceHook == null) return hit;
 
-            HitInstanceHandler[] invocationList = (HitInstanceHandler[]) _HitInstanceHook.GetInvocationList();
+            Delegate[] invocationList = _HitInstanceHook.GetInvocationList();
             
             foreach (HitInstanceHandler toInvoke in invocationList)
             {
@@ -2743,7 +2744,7 @@ namespace Modding
 
             if (_DrawBlackBordersHook == null) return;
 
-            DrawBlackBordersHandler[] invocationList = (DrawBlackBordersHandler[]) _DrawBlackBordersHook.GetInvocationList();
+            Delegate[] invocationList = _DrawBlackBordersHook.GetInvocationList();
             
             foreach (DrawBlackBordersHandler toInvoke in invocationList)
             {
@@ -2790,7 +2791,7 @@ namespace Modding
 
             if (_OnEnableEnemyHook == null) return isAlreadyDead;
 
-            OnEnableEnemyHandler[] invocationList = (OnEnableEnemyHandler[]) _OnEnableEnemyHook.GetInvocationList();
+            Delegate[] invocationList = _OnEnableEnemyHook.GetInvocationList();
             
             foreach (OnEnableEnemyHandler toInvoke in invocationList)
             {
@@ -2848,7 +2849,7 @@ namespace Modding
 
             if (_OnRecieveDeathEventHook == null) return;
 
-            OnRecieveDeathEventHandler[] invocationList = (OnRecieveDeathEventHandler[]) _OnRecieveDeathEventHook.GetInvocationList();
+            Delegate[] invocationList = _OnRecieveDeathEventHook.GetInvocationList();
             
             foreach (OnRecieveDeathEventHandler toInvoke in invocationList)
             {
@@ -2902,7 +2903,7 @@ namespace Modding
 
             if (_OnRecordKillForJournalHook == null) return;
 
-            OnRecordKillForJournalHandler[] invocationList = (OnRecordKillForJournalHandler[]) _OnRecordKillForJournalHook.GetInvocationList();
+            Delegate[] invocationList = _OnRecordKillForJournalHook.GetInvocationList();
             
             foreach (OnRecordKillForJournalHandler toInvoke in invocationList)
             {
