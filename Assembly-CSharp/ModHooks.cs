@@ -880,7 +880,7 @@ namespace Modding
             {
                 try
                 {
-                    T v = (T) toInvoke.Invoke(typeof(T), target);
+                    T v = (T) toInvoke.Invoke(typeof(T), target, varInternal);
                     if (v.Equals(varInternal) || gotValue) continue;
 
                     result = v;
