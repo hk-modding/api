@@ -798,21 +798,24 @@ namespace Modding
 
             if (_SetPlayerVariableHook != null)
             {
+                bool gotValue = false;
                 Delegate[] invocationList = _SetPlayerVariableHook.GetInvocationList();
                 
                 foreach (SetVariableProxy toInvoke in invocationList)
                 {
                     try
                     {
-                        toInvoke.Invoke(typeof(T), target, val);
+                        T v = (T) toInvoke.Invoke(typeof(T), target, val);
+                        if (v.Equals(val) || gotValue) continue;
+
+                        val = v;
+                        gotValue = true;
                     }
                     catch (Exception ex)
                     {
                         Logger.LogError("[API] - " + ex);
                     }
                 }
-
-                return;
             }
 
             Patches.PlayerData.instance.SetVariableInternal(target, val);
