@@ -1,5 +1,6 @@
 ﻿namespace Modding
 {
+    /// <inheritdoc />
     /// <summary>
     /// Empty Unused Settings.
     /// </summary>

@@ -199,11 +199,6 @@ namespace Modding
     public delegate void VoidHandler();
 
     /// <summary>
-    /// Generic Handler with a Boolean Return
-    /// </summary>
-    public delegate bool BoolHandler();
-
-    /// <summary>
     /// Called when the player heals
     /// </summary>
     public delegate int BeforeAddHealthHandler(int amount);

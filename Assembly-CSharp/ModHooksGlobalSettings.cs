@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Modding
@@ -7,6 +8,7 @@ namespace Modding
     /// <summary>
     /// Class to hold GlobalSettings for the Modding API
     /// </summary>
+    [PublicAPI]
     [Serializable]
     public class ModHooksGlobalSettings : IModSettings
     {

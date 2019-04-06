@@ -155,6 +155,7 @@ namespace Modding
 
                     string ns = mod.GetType().Namespace;
 
+                    // ReSharper disable once AssignNullToNotNullAttribute
                     if (!modsByNamespace.TryGetValue(ns, out List<IMod> nsMods))
                     {
                         nsMods = new List<IMod>();

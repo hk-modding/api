@@ -2,12 +2,13 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+// ReSharper disable SuggestVarOrType_SimpleTypes
 
 namespace Prepatcher
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Length < 2)
             {
@@ -172,7 +173,7 @@ namespace Prepatcher
             }
         }
 
-        public static MethodDefinition GenerateSwappedMethod(TypeDefinition methodParent, MethodDefinition oldMethod)
+        private static MethodDefinition GenerateSwappedMethod(TypeDefinition methodParent, MethodDefinition oldMethod)
         {
             MethodDefinition swapped = new MethodDefinition(oldMethod.Name + "SwappedArgs", MethodAttributes.Assembly | MethodAttributes.HideBySig, methodParent.Module.TypeSystem.Void);
             swapped.Parameters.Add(new ParameterDefinition(oldMethod.Parameters.ToArray()[1].ParameterType) { Name = "value" });
@@ -181,7 +182,7 @@ namespace Prepatcher
             if (oldMethod.HasGenericParameters)
             {
                 int paramCount = 0;
-                foreach (GenericParameter oldParam in oldMethod.GenericParameters)
+                foreach (GenericParameter _ in oldMethod.GenericParameters)
                 {
                     swapped.GenericParameters.Add(new GenericParameter(swapped) { Name = "T" + paramCount });
                     paramCount++;

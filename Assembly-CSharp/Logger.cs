@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Modding
@@ -9,6 +10,7 @@ namespace Modding
     /// <summary>
     /// Shared logger for mods to use.
     /// </summary>
+    [PublicAPI]
     // This is threadsafe, but it's blocking.  Hopefully mods don't try to log so much that it becomes an issue.  If it does we'll have to look at a better system.
     public static class Logger
     {

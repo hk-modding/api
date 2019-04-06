@@ -1,8 +1,11 @@
-﻿namespace Modding
+﻿using JetBrains.Annotations;
+
+namespace Modding
 {
     /// <summary>
     /// Logging Utility
     /// </summary>
+    [PublicAPI]
     public interface ILogger
     {
         /// <summary>

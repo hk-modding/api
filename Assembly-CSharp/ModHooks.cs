@@ -18,6 +18,7 @@ namespace Modding
     /// <summary>
     /// Class to hook into various events for the game.
     /// </summary>
+    [PublicAPI]
     public class ModHooks
     {
         internal static bool IsInitialized;
@@ -80,17 +81,16 @@ namespace Modding
         {
             try
             {
-                if (GlobalSettings.ShowDebugLogInGame)
+                if (!GlobalSettings.ShowDebugLogInGame) return;
+                
+                if (_console == null)
                 {
-                    if (_console == null)
-                    {
-                        GameObject go = new GameObject();
-                        UnityEngine.Object.DontDestroyOnLoad(go);
-                        _console = go.AddComponent<Console>();
-                    }
-
-                    _console.AddText(message);
+                    GameObject go = new GameObject();
+                    UnityEngine.Object.DontDestroyOnLoad(go);
+                    _console = go.AddComponent<Console>();
                 }
+
+                _console.AddText(message);
             }
             catch (Exception ex)
             {
@@ -144,12 +144,12 @@ namespace Modding
             //     Version tempNewVersion = new Version(temp[0]);
             //     Version tempGameVersion = new Version(gameVersion.major, gameVersion.minor, gameVersion.revision, gameVersion.package);
             //     Logger.LogDebug("[API] - Checking Game Version: " + tempGameVersion + " < " + tempNewVersion);
-            //     if(tempNewVersion.CompareTo( tempGameVersion ) < 0 || ( tempNewVersion.CompareTo( tempGameVersion ) == 0 && modVersionRevision > _modVersion))
+            //     if(tempNewVersion.CompareTo(tempGameVersion ) < 0 || (tempNewVersion.CompareTo(tempGameVersion) == 0 && modVersionRevision > _modVersion))
             //         IsCurrent = false;
             // }
-            // catch( Exception ex )
+            // catch(Exception ex)
             // {
-            //     Logger.LogError( "[API] - Couldn't check for new version." + ex );
+            //     Logger.LogError("[API] - Couldn't check for new version." + ex);
             // }
 
             IsInitialized = true;

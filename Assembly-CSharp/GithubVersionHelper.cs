@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+// ReSharper disable All (Disabled class anyways)
 
 namespace Modding
 {

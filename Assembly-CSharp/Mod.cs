@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Modding
@@ -10,6 +11,7 @@ namespace Modding
     /// Base mod class.
     /// </summary>
     /// <remarks>Does not provide method to store mod settings in the save file.</remarks>
+    [PublicAPI]
     public class Mod : Loggable, IMod
     {
         /// <summary>
@@ -28,9 +30,7 @@ namespace Modding
         /// <summary>
         /// Legacy constructor instead of optional argument to not break old mods
         /// </summary>
-        public Mod() : this(null)
-        {
-        }
+        public Mod() : this(null) {}
 
         /// <inheritdoc />
         /// <summary>
@@ -76,15 +76,14 @@ namespace Modding
     /// <inheritdoc />
     /// <typeparam name="TSaveSettings">A Mod specific implementation of <see cref="IModSettings"/></typeparam>
     /// <remarks>Provides automatic managment of saving mod settings in save file.</remarks>
+    [PublicAPI]
     public class Mod<TSaveSettings> : Mod where TSaveSettings : IModSettings, new()
     {
         /// <inheritdoc />
         /// <summary>
         /// Legacy constructor instead of optional argument to not break old mods
         /// </summary>
-        public Mod() : this(null)
-        {
-        }
+        public Mod() : this(null) {}
 
         /// <inheritdoc />
         /// <summary>
@@ -111,6 +110,7 @@ namespace Modding
             Settings = new TSaveSettings();
             Settings.SetSettings(data.modData[name]);
 
+            // ReSharper disable once SuspiciousTypeConversion.Global
             if (Settings is ISerializationCallbackReceiver callbackReceiver)
             {
                 callbackReceiver.OnAfterDeserialize();
@@ -155,6 +155,7 @@ namespace Modding
     /// </summary>
     /// <typeparam name="TSaveSettings">A Mod specific implementation of <see cref="IModSettings"/></typeparam>
     /// <typeparam name="TGlobalSettings">A Mod specific implementation of <see cref="IModSettings"/> used for global/non-save-specific settings.</typeparam>
+    [PublicAPI]
     public class Mod<TSaveSettings, TGlobalSettings> : Mod<TSaveSettings> 
         where TSaveSettings : IModSettings, new()
         where TGlobalSettings : IModSettings, new()

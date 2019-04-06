@@ -6,9 +6,9 @@ namespace Modding
 {
     internal class Console : MonoBehaviour
     {
-        public static GameObject OverlayCanvas;
+        private static GameObject OverlayCanvas;
         private static GameObject _textPanel;
-        public static Font Arial;
+        private static Font Arial;
         private readonly List<string> _messages = new List<string>(25);
         private bool _enabled = true;
 

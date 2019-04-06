@@ -16,8 +16,8 @@ namespace Modding.Menu
         private static FauxUIManager _fauxUim;
         public static MenuScreen ModMenuScreen;
 
-        public static Selectable[] ModArray;
-        public static Selectable Back;
+        private static Selectable[] ModArray;
+        private static Selectable Back;
 
         public ModManager()
         {
@@ -28,47 +28,6 @@ namespace Modding.Menu
             _fauxUim = go.AddComponent<FauxUIManager>();
 
             Log("Initialized");
-        }
-
-        public void DataDump(GameObject go, int depth)
-        {
-            LogDebug(new string('-', depth) + go.name);
-            foreach (Component comp in go.GetComponents<Component>())
-            {
-                switch (comp.GetType().ToString())
-                {
-                    case "UnityEngine.RectTransform":
-                        LogDebug(new string('+', depth) + comp.GetType() + " : " + ((RectTransform)comp).sizeDelta + ", " + ((RectTransform)comp).anchoredPosition + ", " + ((RectTransform)comp).anchorMin + ", " + ((RectTransform)comp).anchorMax);
-                        break;
-                    case "UnityEngine.UI.Text":
-                        LogDebug(new string('+', depth) + comp.GetType() + " : " + ((Text)comp).text);
-                        break;
-                    default:
-                        LogDebug(new string('+', depth) + comp.GetType());
-                        break;
-                }
-            }
-            foreach (Transform child in go.transform)
-            {
-                DataDump(child.gameObject, depth + 1);
-            }
-        }
-
-
-        public static Sprite NullSprite()
-        {
-            Texture2D tex = new Texture2D(1, 1);
-            tex.LoadRawTextureData(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF });
-            tex.Apply();
-            return Sprite.Create(tex, new Rect(0, 0, 1, 1), Vector2.zero);
-        }
-
-        public static Sprite CreateSprite(byte[] data, int x, int y, int w, int h)
-        {
-            Texture2D tex = new Texture2D(1, 1);
-            tex.LoadImage(data);
-            tex.anisoLevel = 0;
-            return Sprite.Create(tex, new Rect(x, y, w, h), Vector2.zero);
         }
 
         private void SceneLoaded(Scene scene, LoadSceneMode lsm)

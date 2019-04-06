@@ -10,6 +10,7 @@ namespace Modding
     [Serializable]
     public class ModSettingsDictionary : SerializableDictionary<string, IModSettings>, ISerializationCallbackReceiver
     {
+        /// <inheritdoc />
         /// <summary>
         /// Occurs before serialization
         /// </summary>
@@ -19,6 +20,7 @@ namespace Modding
 
             foreach (IModSettings settings in Values)
             {
+                // ReSharper disable once SuspiciousTypeConversion.Global
                 if (settings is ISerializationCallbackReceiver callbackReceiver)
                 {
                     callbackReceiver.OnBeforeSerialize();
