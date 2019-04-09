@@ -125,6 +125,7 @@
     <Compile Include="Patches\SetParticleEmissionRate.cs" />
     <Compile Include="Patches\StartManager.cs" />
     <Compile Include="Patches\TakeDamage.cs" />
+    <Compile Include="Patches\UIManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxies.cs" />
     <Compile Include="SerializableBoolDictionary.cs" />

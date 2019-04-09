@@ -1,0 +1,32 @@
+﻿using UnityEngine;
+using MonoMod;
+
+// ReSharper disable All
+#pragma warning disable 1591, 0108, 0169, 0649, 0414
+
+namespace Modding.Patches
+{
+    [MonoModPatch("global::UIManager")]
+    public class UIManager : global::UIManager
+    {
+        [MonoModIgnore]
+        private static UIManager _instance;
+        
+        public static UIManager get_instance()
+        {
+            if (UIManager._instance == null)
+            {
+                UIManager._instance = UnityEngine.Object.FindObjectOfType<UIManager>();
+
+                if (UIManager._instance == null) return null;
+                
+                if (Application.isPlaying)
+                {
+                    UnityEngine.Object.DontDestroyOnLoad(UIManager._instance.gameObject);
+                }
+            }
+
+            return UIManager._instance;
+        }
+    }
+}
