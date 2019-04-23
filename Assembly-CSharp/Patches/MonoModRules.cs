@@ -1,8 +1,8 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Mono.Cecil;
 using MonoMod.InlineRT;
 // ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedMember.Global
 // ReSharper disable once CheckNamespace
 
 namespace MonoMod
@@ -10,6 +10,7 @@ namespace MonoMod
     /// <summary>
     /// Class for controlling some of the adjustments needed for monomod transformations
     /// </summary>
+    [UsedImplicitly]
     public static partial class MonoModRules
     {
         static MonoModRules()
@@ -26,7 +27,7 @@ namespace MonoMod
         public static bool IsUselessAttrib(ICustomAttributeProvider holder, TypeReference attribType)
         {
             // If the attribute isn't a MonoMod attribute, it's "useful."
-            return attribType.Namespace.StartsWith("MonoMod") && attribType.Name.StartsWith("MonoMod");
+            return attribType.Namespace.StartsWith("MonoMod") && attribType.Name.StartsWith("MonoMod") || attribType.Namespace.StartsWith("Modding.Patches");
 
             /*
             TypeDefinition type = holder as TypeDefinition ??

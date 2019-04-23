@@ -106,6 +106,7 @@
     <Compile Include="Patches\GetColliderRange.cs" />
     <Compile Include="Patches\GradeMarker.cs" />
     <Compile Include="Patches\DRM\HealthManager.cs" />
+    <Compile Include="Patches\HasComponent.cs" />
     <Compile Include="Patches\MenuSelectable.cs" />
     <Compile Include="Patches\ObjectPool.cs" />
     <Compile Include="Patches\GameManager.cs" />
@@ -118,6 +119,8 @@
     <Compile Include="Patches\Platform.cs" />
     <Compile Include="Patches\PlayerData.cs" />
     <Compile Include="Patches\PlayMakerUnity2DProxy.cs" />
+    <Compile Include="Patches\ReplaceMethod.cs" />
+    <Compile Include="Patches\ReplaceWithNop.cs" />
     <Compile Include="Patches\SaveGameData.cs" />
     <Compile Include="Patches\SaveStats.cs" />
     <Compile Include="Patches\SceneColorManager.cs" />
