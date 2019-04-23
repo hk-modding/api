@@ -6,6 +6,7 @@ using Mono.Cecil.Cil;
 
 namespace Prepatcher
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     internal class Program
     {
         private static void Main(string[] args)
@@ -22,23 +23,23 @@ namespace Prepatcher
             {
                 TypeDefinition pd = module.GetType("", "PlayerData");
 
-                MethodDefinition pdGetBool = pd.Methods.Where(method => method.Name == "GetBool").First();
-                MethodDefinition pdSetBool = pd.Methods.Where(method => method.Name == "SetBool").First();
+                MethodDefinition pdGetBool = pd.Methods.First(method => method.Name == "GetBool");
+                MethodDefinition pdSetBool = pd.Methods.First(method => method.Name == "SetBool");
 
-                MethodDefinition pdGetFloat = pd.Methods.Where(method => method.Name == "GetFloat").First();
-                MethodDefinition pdSetFloat = pd.Methods.Where(method => method.Name == "SetFloat").First();
+                MethodDefinition pdGetFloat = pd.Methods.First(method => method.Name == "GetFloat");
+                MethodDefinition pdSetFloat = pd.Methods.First(method => method.Name == "SetFloat");
 
-                MethodDefinition pdGetInt = pd.Methods.Where(method => method.Name == "GetInt").First();
-                MethodDefinition pdSetInt = pd.Methods.Where(method => method.Name == "SetInt").First();
+                MethodDefinition pdGetInt = pd.Methods.First(method => method.Name == "GetInt");
+                MethodDefinition pdSetInt = pd.Methods.First(method => method.Name == "SetInt");
 
-                MethodDefinition pdGetString = pd.Methods.Where(method => method.Name == "GetString").First();
-                MethodDefinition pdSetString = pd.Methods.Where(method => method.Name == "SetString").First();
+                MethodDefinition pdGetString = pd.Methods.First(method => method.Name == "GetString");
+                MethodDefinition pdSetString = pd.Methods.First(method => method.Name == "SetString");
 
-                MethodDefinition pdGetVector3 = pd.Methods.Where(method => method.Name == "GetVector3").First();
-                MethodDefinition pdSetVector3 = pd.Methods.Where(method => method.Name == "SetVector3").First();
+                MethodDefinition pdGetVector3 = pd.Methods.First(method => method.Name == "GetVector3");
+                MethodDefinition pdSetVector3 = pd.Methods.First(method => method.Name == "SetVector3");
 
-                MethodDefinition pdGetVariable = pd.Methods.Where(method => method.Name == "GetVariable").First();
-                MethodDefinition pdSetVariable = pd.Methods.Where(method => method.Name == "SetVariable").First();
+                MethodDefinition pdGetVariable = pd.Methods.First(method => method.Name == "GetVariable");
+                MethodDefinition pdSetVariable = pd.Methods.First(method => method.Name == "SetVariable");
                 
                 MethodDefinition setBoolSwappedArgs = GenerateSwappedMethod(pd, pdSetBool);
                 MethodDefinition setFloatSwappedArgs = GenerateSwappedMethod(pd, pdSetFloat);
