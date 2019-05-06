@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -9,9 +10,10 @@ namespace Modding.Menu
     /// <summary>
     /// Provides a simple toggle menu
     /// </summary>
+    [PublicAPI]
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class FauxMenuOptionHorizontal : Patches.MenuSelectable, IPointerClickHandler, IMoveHandler
     {
-
         private readonly SimpleLogger _log = new SimpleLogger("FauxMenuOptionHorizontal");
 
         /// <summary>

@@ -16,6 +16,8 @@ namespace Modding
         /// </summary>
         public void OnGUI()
         {
+            if (UIManager.instance == null) return;
+            
             if (drawString != null && (UIManager.instance.uiState == UIState.MAIN_MENU_HOME || UIManager.instance.uiState == UIState.PAUSED))
             {
                 if (style == null)

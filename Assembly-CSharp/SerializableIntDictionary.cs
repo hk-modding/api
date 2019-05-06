@@ -7,7 +7,5 @@ namespace Modding
     /// Represents a Dictionary of Ints that can be serialized with Unity's JsonUtil
     /// </summary>
     [Serializable]
-    public class SerializableIntDictionary : SerializableDictionary<string, int>
-    {
-    }
+    public class SerializableIntDictionary : SerializableDictionary<string, int> {}
 }

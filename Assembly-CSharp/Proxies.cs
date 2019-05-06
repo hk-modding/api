@@ -78,8 +78,9 @@ namespace Modding
     /// </summary>
     /// <param name="type">The type of the variable</param>
     /// <param name="varName">Name of the variable</param>
+    /// <param name="orig">Original value</param>
     /// <returns>The variable value</returns>
-    public delegate object GetVariableProxy(Type type, string varName);
+    public delegate object GetVariableProxy(Type type, string varName, object orig);
 
     /// <summary>
     /// Called when anything in the game tries to set a generic variable
@@ -87,7 +88,7 @@ namespace Modding
     /// <param name="type">The type of the variable</param>
     /// <param name="varName">Name of the variable</param>
     /// <param name="value">Value to be used</param>
-    public delegate void SetVariableProxy(Type type, string varName, object value);
+    public delegate object SetVariableProxy(Type type, string varName, object value);
 
     /// <summary>
     /// Called when damage is dealt to the player

@@ -4,6 +4,7 @@ using UnityEngine;
 namespace Modding.Menu
 {
     
+    /// <inheritdoc />
     /// <summary>
     /// Provides a menu UI manager
     /// </summary>
@@ -14,7 +15,7 @@ namespace Modding.Menu
 
         private static GameManager _gm;
 
-        internal static GameManager gameManager => _gm != null ? _gm : (_gm = GameManager.instance);
+        private static GameManager gameManager => _gm != null ? _gm : _gm = GameManager.instance;
 
         public static FauxUIManager Instance;
 
@@ -24,7 +25,7 @@ namespace Modding.Menu
             DontDestroyOnLoad(this);
         }
 
-        public IEnumerator ShowMenu(MenuScreen menu)
+        private IEnumerator ShowMenu(MenuScreen menu)
         {
             gameManager.inputHandler.StopUIInput();
             if (menu.screenCanvasGroup != null)
@@ -61,9 +62,7 @@ namespace Modding.Menu
             menu.HighlightDefault();
         }
 
-        
-
-        public IEnumerator HideMenu(MenuScreen menu)
+        private IEnumerator HideMenu(MenuScreen menu)
         {
             gameManager.inputHandler.StopUIInput();
             if (menu.title != null)
@@ -109,7 +108,7 @@ namespace Modding.Menu
             StartCoroutine(QuitModMenu());
         }
 
-        public IEnumerator LoadModMenu()
+        private IEnumerator LoadModMenu()
         {
             _logger.Log("Loading Mod Menu");
             yield return StartCoroutine(HideMenu(UIManager.instance.optionsMenuScreen));
@@ -117,14 +116,12 @@ namespace Modding.Menu
             gameManager.inputHandler.StartUIInput();
         }
 
-        public IEnumerator QuitModMenu()
+        private IEnumerator QuitModMenu()
         {
             _logger.Log("Quitting Mod Menu");
             yield return StartCoroutine(HideMenu(ModManager.ModMenuScreen));
             yield return StartCoroutine(ShowMenu(UIManager.instance.optionsMenuScreen));
             gameManager.inputHandler.StartUIInput();
         }
-
-
     }
 }

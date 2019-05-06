@@ -64,7 +64,7 @@ namespace Modding
     /// <param name="data">New PlayerData</param>
     public delegate void NewPlayerDataHandler(PlayerData data);
 
-    
+
     /// <summary>
     /// Called after scene has been loaded.
     /// </summary>
@@ -98,7 +98,7 @@ namespace Modding
     /// <param name="data">Current PlayerData</param>
     /// <param name="controller">Current HeroController</param>
     public delegate void CharmUpdateHandler(PlayerData data, HeroController controller);
-    
+
     /// <summary>
     /// Called when the player attacks
     /// </summary>
@@ -199,11 +199,6 @@ namespace Modding
     public delegate void VoidHandler();
 
     /// <summary>
-    /// Generic Handler with a Boolean Return
-    /// </summary>
-    public delegate bool BoolHandler();
-    
-    /// <summary>
     /// Called when the player heals
     /// </summary>
     public delegate int BeforeAddHealthHandler(int amount);
@@ -211,25 +206,40 @@ namespace Modding
     /// <summary>
     /// Called when a HitInstance is created in TakeDamage. The hit instance returned defines the hit behavior that will happen. Overrides default behavior
     /// </summary>
-    public delegate HitInstance HitInstanceHandler( Fsm owner, HitInstance hit );
+    public delegate HitInstance HitInstanceHandler(Fsm owner, HitInstance hit);
 
     /// <summary>
     /// Called when a SceneManager calls DrawBlackBorders and creates boarders for a scene. You may use or modify the bounds of an area of the scene with these.
     /// </summary>
-    public delegate void DrawBlackBordersHandler( List<GameObject> borders );
+    public delegate void DrawBlackBordersHandler(List<GameObject> borders);
 
     /// <summary>
     /// Called when an enemy is enabled. Check this isDead flag to see if they're already dead. If you return true, this will mark the enemy as already dead on load. Default behavior is to return the value inside "isAlreadyDead".
     /// </summary>
-    public delegate bool OnEnableEnemyHandler( GameObject enemy, bool isAlreadyDead );
+    public delegate bool OnEnableEnemyHandler(GameObject enemy, bool isAlreadyDead);
 
     /// <summary>
     /// Called when an enemy recieves a death event. It looks like this event may be called multiple times on an enemy, so check "eventAlreadyRecieved" to see if the event has been fired more than once.
     /// </summary>
-    public delegate bool OnRecieveDeathEventHandler( EnemyDeathEffects enemyDeathEffects, bool eventAlreadyRecieved, ref float? attackDirection, ref bool resetDeathEvent, ref bool spellBurn, ref bool isWatery );
+    public delegate bool OnRecieveDeathEventHandler
+    (
+        EnemyDeathEffects enemyDeathEffects,
+        bool eventAlreadyRecieved,
+        ref float? attackDirection,
+        ref bool resetDeathEvent,
+        ref bool spellBurn,
+        ref bool isWatery
+    );
 
     /// <summary>
     /// Called when an enemy dies and a journal kill is recorded. You may use the "playerDataName" string or one of the additional pre-formatted player data strings to look up values in playerData.
     /// </summary>
-    public delegate bool OnRecordKillForJournalHandler( EnemyDeathEffects enemyDeathEffects, string playerDataName, string killedBoolPlayerDataLookupKey, string killCountIntPlayerDataLookupKey, string newDataBoolPlayerDataLookupKey );
+    public delegate bool OnRecordKillForJournalHandler
+    (
+        EnemyDeathEffects enemyDeathEffects,
+        string playerDataName,
+        string killedBoolPlayerDataLookupKey,
+        string killCountIntPlayerDataLookupKey,
+        string newDataBoolPlayerDataLookupKey
+    );
 }

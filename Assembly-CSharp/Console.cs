@@ -6,33 +6,32 @@ namespace Modding
 {
     internal class Console : MonoBehaviour
     {
-        public static GameObject OverlayCanvas;
+        private static GameObject OverlayCanvas;
         private static GameObject _textPanel;
-        public static Font Arial;
+        private static Font Arial;
         private readonly List<string> _messages = new List<string>(25);
         private bool _enabled = true;
 
-        
         public void Start()
         {
             Arial = Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font;
             DontDestroyOnLoad(gameObject);
 
-            if (OverlayCanvas == null) { 
-                CanvasUtil.CreateFonts();
-                OverlayCanvas = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
-                OverlayCanvas.name = "ModdingApiConsoleLog";
-                DontDestroyOnLoad(OverlayCanvas);
+            if (OverlayCanvas != null) return;
+             
+            CanvasUtil.CreateFonts();
+            OverlayCanvas = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
+            OverlayCanvas.name = "ModdingApiConsoleLog";
+            DontDestroyOnLoad(OverlayCanvas);
 
-                GameObject background = CanvasUtil.CreateImagePanel(OverlayCanvas,
-                    CanvasUtil.NullSprite(new byte[] { 0x80, 0x00, 0x00, 0x00}),
-                    new CanvasUtil.RectData(new Vector2(500, 800), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0,0)));
+            GameObject background = CanvasUtil.CreateImagePanel(OverlayCanvas,
+                CanvasUtil.NullSprite(new byte[] { 0x80, 0x00, 0x00, 0x00}),
+                new CanvasUtil.RectData(new Vector2(500, 800), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0,0)));
 
-                _textPanel = CanvasUtil.CreateTextPanel(background, string.Join(string.Empty, _messages.ToArray()), 12, TextAnchor.LowerLeft,
-                    new CanvasUtil.RectData(new Vector2(-5, -5), new Vector2(0, 0), new Vector2(0, 0), new Vector2(1, 1)), Arial);
+            _textPanel = CanvasUtil.CreateTextPanel(background, string.Join(string.Empty, _messages.ToArray()), 12, TextAnchor.LowerLeft,
+                new CanvasUtil.RectData(new Vector2(-5, -5), new Vector2(0, 0), new Vector2(0, 0), new Vector2(1, 1)), Arial);
 
-                _textPanel.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap;
-                }
+            _textPanel.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap;
         }
 
         public void Update()
@@ -45,7 +44,6 @@ namespace Modding
                 _enabled = !_enabled;
             }
         }
-
 
         public void AddText(string message)
         {

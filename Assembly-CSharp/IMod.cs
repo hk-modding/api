@@ -1,4 +1,6 @@
-﻿namespace Modding
+﻿using JetBrains.Annotations;
+
+namespace Modding
 {
     /// <inheritdoc />
     /// <summary>
@@ -42,6 +44,7 @@
     /// Generic implementation of Mod which allows for settings
     /// </summary>
     /// <typeparam name="T">Implementation of <see cref="IModSettings"/></typeparam>
+    [PublicAPI]
     public interface IMod<T> : IMod where T : IModSettings
     {
         /// <summary>
@@ -56,6 +59,7 @@
     /// </summary>
     /// <typeparam name="T">Implementation of <see cref="IModSettings"/></typeparam>
     /// <typeparam name="TG">Implementation of <see cref="IModSettings"/></typeparam>
+    [PublicAPI]
     public interface IMod<T,TG> : IMod where T : IModSettings where TG : IModSettings
     {
         /// <summary>

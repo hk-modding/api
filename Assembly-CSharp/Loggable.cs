@@ -98,6 +98,6 @@
         /// </summary>
         /// <param name="message">Message to be formatted.</param>
         /// <returns>Formatted Message</returns>
-        private string FormatLogMessage(object message) => $"[{ClassName}] - {message.ToString()}";
+        private string FormatLogMessage(object message) => $"[{ClassName}] - {message}";
     }
 }

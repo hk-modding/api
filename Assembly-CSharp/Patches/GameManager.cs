@@ -2,6 +2,7 @@
 using System.Collections;
 using MonoMod;
 //We don't care about XML docs for these as they are being patched into the original code
+// ReSharper disable all
 #pragma warning disable 1591
 #pragma warning disable CS0108
 

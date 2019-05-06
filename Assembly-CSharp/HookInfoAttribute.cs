@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace Modding
 {
@@ -6,6 +7,7 @@ namespace Modding
     /// <summary>
     /// Attribute to describe hooks programatically.
     /// </summary>
+    [PublicAPI]
     public class HookInfoAttribute : Attribute
     {
         /// <inheritdoc />

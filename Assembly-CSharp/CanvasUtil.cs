@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
+// ReSharper disable SuggestVarOrType_SimpleTypes
 
 namespace Modding
 {
     /// <summary>
     /// Utility with helpful functions for drawing canvas elements on screen.
     /// </summary>
+    [PublicAPI]
     public static class CanvasUtil
     {
         /// <summary>

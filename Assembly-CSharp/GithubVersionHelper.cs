@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+// ReSharper disable All (Disabled class anyways)
 
 namespace Modding
 {
@@ -31,7 +32,7 @@ namespace Modding
         /// <returns></returns>
         public string GetVersion()
         {
-            //Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
+            // Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
 
             return "0.0";
             // try

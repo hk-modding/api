@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Modding
@@ -8,6 +9,7 @@ namespace Modding
     /// Base class for storing settings for a Mod in the save file.
     /// </summary>
     [Serializable]
+    [PublicAPI]
     public class IModSettings
     {
         /// <summary>
@@ -20,7 +22,6 @@ namespace Modding
             BoolValues = new SerializableBoolDictionary();
             FloatValues = new SerializableFloatDictionary();
         }
-
 
         /// <summary>
         /// Hydrates the classes dictionaries with incoming data.

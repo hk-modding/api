@@ -1,8 +1,11 @@
-﻿namespace Modding
+﻿using JetBrains.Annotations;
+
+namespace Modding
 {
     /// <summary>
     /// What level should logs be done at?
     /// </summary>
+    [PublicAPI]
     public enum LogLevel
     {
         /// <summary>
