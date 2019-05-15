@@ -2,7 +2,7 @@
 {
     /// <inheritdoc />
     /// <summary>
-    /// Interface which signifies that this mod can be loaded _and_ unloaded while in game.  Implementing this inerface requires that properly handle tracking every hook you add, game state that you change, so that you can disable it all.
+    /// Interface which signifies that this mod can be loaded _and_ unloaded while in game. When re-initialized the mod will be passed null rather than preloading again.
     /// </summary>
     public interface ITogglableMod : IMod
     {

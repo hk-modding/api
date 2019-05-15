@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using UnityEngine;
 
 namespace Modding
 {
@@ -16,9 +18,16 @@ namespace Modding
         string GetName();
 
         /// <summary>
-        /// Called when class is first constructed.
+        /// Returns the objects to preload in order for the mod to work.
         /// </summary>
-        void Initialize();
+        /// <returns>A List of tuples containing scene name, object name</returns>
+        List<(string, string)> GetPreloadNames();
+
+        /// <summary>
+        /// Called after preloading of all mods.
+        /// </summary>
+        /// <param name="preloadedObjects">The preloaded objects relevant to this <see cref="Mod"/></param>
+        void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects);
 
         /// <summary>
         /// Returns version of Mod

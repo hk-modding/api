@@ -203,10 +203,16 @@
     <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>../Vanilla/UnityEngine.UIModule.dll</HintPath>
     </Reference>
+    <Reference Include="ValueTupleBridge, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ValueTupleBridge.0.1.5\lib\net35\ValueTupleBridge.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="github.crt" />
     <EmbeddedResource Include="github2.crt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Target Name="ILMerge">
     <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
@@ -372,8 +378,9 @@
             :Debug
             copy /Y "$(SolutionDir)Vanilla\*" "$(ProjectDir)$(OutputPath)\"
             copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
-            copy /Y "$(SolutionDir)ILRepack\*" $(ProjectDir)$(OutputPath)\"
-            copy /Y "$(SolutionDir)Prepatcher\PrePatcher.exe" $(ProjectDir)$(OutputPath)\"
+            copy /Y "$(SolutionDir)ILRepack\*" "$(ProjectDir)$(OutputPath)\"
+            copy /Y "$(SolutionDir)Prepatcher\PrePatcher.exe" "$(ProjectDir)$(OutputPath)\"
+            copy /Y "$(SolutionDir)packages\ValueTupleBridge.0.1.5\lib\net35\ValueTupleBridge.dll" "$(ProjectDir)$(OutputPath)\"
             cd "$(ProjectDir)$(OutputPath)"
 
             PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll
@@ -389,7 +396,7 @@
             rem "Rename files so the assembly has the correct name and the output works"
             move "MONOMODDED_Assembly-CSharp.dll" "MONOModded.dll"
             move Assembly-CSharp.dll OriginalAssembly-CSharp.dll
-            $(SolutionDir)ILRepack\ILRepack.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MMHOOK_PlayMaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll
+            $(SolutionDir)ILRepack\ILRepack.exe /out:Assembly-CSharp.dll MONOModded.dll MMHOOK_Assembly-CSharp.dll MMHOOK_PlayMaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll ValueTupleBridge.dll
             move Assembly-CSharp.dll MONOMODDED_Assembly-CSharp.dll
 
             rem "Create the folder structure prefered by mods"
