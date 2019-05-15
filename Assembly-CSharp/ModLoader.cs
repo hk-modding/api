@@ -82,8 +82,6 @@ namespace Modding
                     Errors.Add(string.Concat(text2, ": FAILED TO LOAD! Check ModLog.txt."));
                 }
             }
-            
-            ModHooks.Instance.LoadGlobalSettings();
 
             List<string> scenes = new List<string>();
             for (int i = 0; i < USceneManager.sceneCountInBuildSettings; i++)
@@ -154,112 +152,144 @@ namespace Modding
                 }
             }
 
-            // Create a blanker so the preloading is invisible (but still audible TODO)
-            GameObject blanker = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, Vector2.one);
-            Object.DontDestroyOnLoad(blanker);
-
-            CanvasUtil.CreateImagePanel(
-                blanker,
-                CanvasUtil.NullSprite(new byte[] { 0x00, 0x00, 0x00, 0xFF }),
-                new CanvasUtil.RectData(Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one))
-                .GetComponent<Image>().preserveAspect = false;
-
-            // Preload all needed objects
-            foreach (string sceneName in toPreload.Keys)
+            if (toPreload.Count > 0)
             {
-                Logger.Log($"[API] - Loading scene \"{sceneName}\"");
+                // Mute all audio
+                AudioListener.pause = true;
 
-                USceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                // Create a blanker so the preloading is invisible
+                GameObject blanker = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
+                Object.DontDestroyOnLoad(blanker);
 
-                // LoadScene takes 2 frames to work
-                yield return new WaitForEndOfFrame();
-                yield return new WaitForEndOfFrame();
+                CanvasUtil.CreateImagePanel(
+                    blanker,
+                    CanvasUtil.NullSprite(new byte[] { 0x00, 0x00, 0x00, 0xFF }),
+                    new CanvasUtil.RectData(Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one))
+                    .GetComponent<Image>().preserveAspect = false;
 
-                Scene scene = USceneManager.GetSceneByName(sceneName);
-                GameObject[] rootObjects = scene.GetRootGameObjects();
+                // Create loading bar background
+                CanvasUtil.CreateImagePanel(
+                    blanker,
+                    CanvasUtil.NullSprite(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF }),
+                    new CanvasUtil.RectData(new Vector2(1000, 100), Vector2.zero, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f)))
+                    .GetComponent<Image>().preserveAspect = false;
 
-                // Fetch object names to preload
-                List<(IMod, List<string>)> sceneObjects = toPreload[sceneName];
+                // Create actual loading bar
+                GameObject loadingBar = CanvasUtil.CreateImagePanel(
+                    blanker,
+                    CanvasUtil.NullSprite(new byte[] { 0x99, 0x99, 0x99, 0xFF }),
+                    new CanvasUtil.RectData(new Vector2(0, 75), Vector2.zero, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f)));
 
-                foreach ((IMod mod, List<string> objNames) in sceneObjects)
+                loadingBar.GetComponent<Image>().preserveAspect = false;
+                RectTransform loadingBarRect = loadingBar.GetComponent<RectTransform>();
+
+                // Preload all needed objects
+                int progress = 0;
+                foreach (string sceneName in toPreload.Keys)
                 {
-                    Logger.Log($"[API] - Fetching objects for mod \"{mod.GetName()}\"");
+                    Logger.Log($"[API] - Loading scene \"{sceneName}\"");
 
-                    foreach (string objName in objNames)
+                    USceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+
+                    // LoadScene takes 2 frames to work
+                    yield return new WaitForEndOfFrame();
+                    yield return new WaitForEndOfFrame();
+
+                    Scene scene = USceneManager.GetSceneByName(sceneName);
+                    GameObject[] rootObjects = scene.GetRootGameObjects();
+
+                    // Fetch object names to preload
+                    List<(IMod, List<string>)> sceneObjects = toPreload[sceneName];
+
+                    foreach ((IMod mod, List<string> objNames) in sceneObjects)
                     {
-                        Logger.Log($"[API] - Fetching object \"{objName}\"");
+                        Logger.Log($"[API] - Fetching objects for mod \"{mod.GetName()}\"");
 
-                        // Split object name into root and child names based on '/'
-                        string rootName = null;
-                        string childName = null;
+                        foreach (string objName in objNames)
+                        {
+                            Logger.Log($"[API] - Fetching object \"{objName}\"");
 
-                        int slashIndex = objName.IndexOf('/');
-                        if (slashIndex == -1)
-                        {
-                            rootName = objName;
-                        }
-                        else if (slashIndex == 0 || slashIndex == objName.Length - 1)
-                        {
-                            Logger.LogWarn($"Invalid preload object name given by mod \"{mod.GetName()}\": \"{objName}\"");
-                            continue;
-                        }
-                        else
-                        {
-                            rootName = objName.Substring(0, slashIndex);
-                            childName = objName.Substring(slashIndex + 1);
-                        }
+                            // Split object name into root and child names based on '/'
+                            string rootName = null;
+                            string childName = null;
 
-                        // Get root object
-                        GameObject obj = rootObjects.FirstOrDefault(o => o.name == rootName);
-                        if (obj == null)
-                        {
-                            Logger.LogWarn($"Could not find object \"{objName}\" in scene \"{sceneName}\", requested by mod \"{mod.GetName()}\"");
-                            continue;
-                        }
-
-                        // Get child object
-                        if (childName != null)
-                        {
-                            Transform t = obj.transform.Find(childName);
-                            if (t == null)
+                            int slashIndex = objName.IndexOf('/');
+                            if (slashIndex == -1)
                             {
-                                Logger.LogWarn($"Could not find object \"{objName}\" in scene \"{sceneName}\", requested by mod \"{mod.GetName()}\"");
+                                rootName = objName;
+                            }
+                            else if (slashIndex == 0 || slashIndex == objName.Length - 1)
+                            {
+                                Logger.LogWarn($"[API] - Invalid preload object name given by mod \"{mod.GetName()}\": \"{objName}\"");
+                                continue;
+                            }
+                            else
+                            {
+                                rootName = objName.Substring(0, slashIndex);
+                                childName = objName.Substring(slashIndex + 1);
+                            }
+
+                            // Get root object
+                            GameObject obj = rootObjects.FirstOrDefault(o => o.name == rootName);
+                            if (obj == null)
+                            {
+                                Logger.LogWarn($"[API] - Could not find object \"{objName}\" in scene \"{sceneName}\", requested by mod \"{mod.GetName()}\"");
                                 continue;
                             }
 
-                            obj = t.gameObject;
+                            // Get child object
+                            if (childName != null)
+                            {
+                                Transform t = obj.transform.Find(childName);
+                                if (t == null)
+                                {
+                                    Logger.LogWarn($"[API] - Could not find object \"{objName}\" in scene \"{sceneName}\", requested by mod \"{mod.GetName()}\"");
+                                    continue;
+                                }
+
+                                obj = t.gameObject;
+                            }
+
+                            // Create all sub-dictionaries if necessary (Yes, it's terrible)
+                            if (!preloadedObjects.TryGetValue(mod, out Dictionary<string, Dictionary<string, GameObject>> modPreloadedObjects))
+                            {
+                                modPreloadedObjects = new Dictionary<string, Dictionary<string, GameObject>>();
+                                preloadedObjects[mod] = modPreloadedObjects;
+                            }
+
+                            if (!modPreloadedObjects.TryGetValue(sceneName, out Dictionary<string, GameObject> modScenePreloadedObjects))
+                            {
+                                modScenePreloadedObjects = new Dictionary<string, GameObject>();
+                                modPreloadedObjects[sceneName] = modScenePreloadedObjects;
+                            }
+
+                            // Create inactive duplicate of requested object
+                            obj = Object.Instantiate(obj);
+                            Object.DontDestroyOnLoad(obj);
+                            obj.SetActive(false);
+
+                            // Set object to be passed to mod
+                            modScenePreloadedObjects[objName] = obj;
                         }
-
-                        // Create all sub-dictionaries if necessary (Yes, it's terrible)
-                        if (!preloadedObjects.TryGetValue(mod, out Dictionary<string, Dictionary<string, GameObject>> modPreloadedObjects))
-                        {
-                            modPreloadedObjects = new Dictionary<string, Dictionary<string, GameObject>>();
-                            preloadedObjects[mod] = modPreloadedObjects;
-                        }
-
-                        if (!modPreloadedObjects.TryGetValue(sceneName, out Dictionary<string, GameObject> modScenePreloadedObjects))
-                        {
-                            modScenePreloadedObjects = new Dictionary<string, GameObject>();
-                            modPreloadedObjects[sceneName] = modScenePreloadedObjects;
-                        }
-
-                        // Create inactive duplicate of requested object
-                        obj = Object.Instantiate(obj);
-                        Object.DontDestroyOnLoad(obj);
-                        obj.SetActive(false);
-
-                        // Set object to be passed to mod
-                        modScenePreloadedObjects[objName] = obj;
                     }
+
+                    // Update loading progress
+                    progress++;
+                    loadingBarRect.sizeDelta = new Vector2(progress / (float)toPreload.Count * 975, loadingBarRect.sizeDelta.y);
                 }
+
+                // Restore the audio
+                AudioListener.pause = false;
+
+                // Reload the main menu to fix the music/shaders
+                Logger.Log("[API] - Preload done, returning to main menu");
+                yield return GameManager.instance.ReturnToMainMenu(GameManager.ReturnToMainMenuSaveModes.DontSave);
+
+                // Remove the black screen
+                Object.Destroy(blanker);
             }
 
-            // Reload the main menu to fix the music/shaders
-            Logger.Log("[API] - Preload done, returning to main menu");
-            yield return GameManager.instance.ReturnToMainMenu(GameManager.ReturnToMainMenuSaveModes.DontSave);
-
-            // Remove the black screen
-            Object.Destroy(blanker);
+            ModHooks.Instance.LoadGlobalSettings();
 
             foreach (IMod mod in orderedMods)
             {
