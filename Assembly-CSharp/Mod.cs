@@ -222,6 +222,10 @@ namespace Modding
                         {
                             receiver.OnBeforeSerialize();
                         }
+                        else if (settings == null)
+                        {
+                            return;
+                        }
 
                         string text4 = JsonUtility.ToJson(settings, true);
                         writer.Write(text4);
