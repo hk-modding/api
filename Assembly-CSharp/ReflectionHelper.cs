@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 namespace Modding
 {
     /// <summary>
-    /// A class to aid in reflection while caching it.
+    ///     A class to aid in reflection while caching it.
     /// </summary>
     public static class ReflectionHelper
     {
@@ -15,11 +15,11 @@ namespace Modding
             new Dictionary<Type, Dictionary<string, FieldInfo>>();
 
         private static readonly Dictionary<FieldInfo, Delegate> Getters = new Dictionary<FieldInfo, Delegate>();
-        
+
         private static readonly Dictionary<FieldInfo, Delegate> Setters = new Dictionary<FieldInfo, Delegate>();
 
         /// <summary>
-        /// Gets a field on a type
+        ///     Gets a field on a type
         /// </summary>
         /// <param name="t">Type</param>
         /// <param name="field">Field name</param>
@@ -38,8 +38,8 @@ namespace Modding
             }
 
             fi = t.GetField(field,
-                            BindingFlags.NonPublic | BindingFlags.Public |
-                            (instance ? BindingFlags.Instance : BindingFlags.Static));
+                BindingFlags.NonPublic | BindingFlags.Public |
+                (instance ? BindingFlags.Instance : BindingFlags.Static));
 
             if (fi != null)
             {
@@ -51,7 +51,7 @@ namespace Modding
 
 
         /// <summary>
-        /// Gets delegate getting field on type
+        ///     Gets delegate getting field on type
         /// </summary>
         /// <param name="fi">FieldInfo for field.</param>
         /// <returns>Function which gets value of field</returns>
@@ -65,14 +65,14 @@ namespace Modding
             d = fi.IsStatic
                 ? CreateGetStaticFieldDelegate<TType, TField>(fi)
                 : CreateGetFieldDelegate<TType, TField>(fi);
-            
+
             Getters.Add(fi, d);
 
             return d;
         }
-        
+
         /// <summary>
-        /// Gets delegate setting field on type
+        ///     Gets delegate setting field on type
         /// </summary>
         /// <param name="fi">FieldInfo for field.</param>
         /// <returns>Function which sets field passed as FieldInfo</returns>
@@ -86,14 +86,14 @@ namespace Modding
             d = fi.IsStatic
                 ? CreateSetStaticFieldDelegate<TType, TField>(fi)
                 : CreateSetFieldDelegate<TType, TField>(fi);
-            
+
             Setters.Add(fi, d);
 
             return d;
         }
 
         /// <summary>
-        /// Create delegate returning value of static field.
+        ///     Create delegate returning value of static field.
         /// </summary>
         /// <param name="fi">FieldInfo of field</param>
         /// <typeparam name="TField">Field type</typeparam>
@@ -102,7 +102,7 @@ namespace Modding
         [PublicAPI]
         private static Delegate CreateGetStaticFieldDelegate<TType, TField>(FieldInfo fi)
         {
-            var dm = new DynamicMethod
+            DynamicMethod dm = new DynamicMethod
             (
                 "FieldAccess" + fi.DeclaringType?.Name + fi.Name,
                 typeof(TField),
@@ -119,7 +119,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// Create delegate returning value of field of object
+        ///     Create delegate returning value of field of object
         /// </summary>
         /// <param name="fi"></param>
         /// <typeparam name="TType"></typeparam>
@@ -128,11 +128,11 @@ namespace Modding
         [PublicAPI]
         private static Delegate CreateGetFieldDelegate<TType, TField>(FieldInfo fi)
         {
-            var dm = new DynamicMethod
+            DynamicMethod dm = new DynamicMethod
             (
                 "FieldAccess" + fi.DeclaringType?.Name + fi.Name,
                 typeof(TField),
-                new Type[] {typeof(TType)},
+                new[] {typeof(TType)},
                 typeof(TType)
             );
 
@@ -144,14 +144,14 @@ namespace Modding
 
             return dm.CreateDelegate(typeof(Func<TType, TField>));
         }
-        
+
         private static Delegate CreateSetFieldDelegate<TType, TField>(FieldInfo fi)
         {
-            var dm = new DynamicMethod
+            DynamicMethod dm = new DynamicMethod
             (
                 "FieldSet" + fi.DeclaringType?.Name + fi.Name,
                 typeof(void),
-                new Type[] {typeof(TType), typeof(TField)},
+                new[] {typeof(TType), typeof(TField)},
                 typeof(TType)
             );
 
@@ -167,11 +167,11 @@ namespace Modding
 
         private static Delegate CreateSetStaticFieldDelegate<TType, TField>(FieldInfo fi)
         {
-            var dm = new DynamicMethod
+            DynamicMethod dm = new DynamicMethod
             (
                 "FieldSet" + fi.DeclaringType?.Name + fi.Name,
                 typeof(void),
-                new Type[] {typeof(TField)},
+                new[] {typeof(TField)},
                 typeof(TType)
             );
 
@@ -184,7 +184,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// Get a field on an object using a string. Cast to TCast before returning and if field doesn't exist return default.
+        ///     Get a field on an object using a string. Cast to TCast before returning and if field doesn't exist return default.
         /// </summary>
         /// <param name="obj">Object/Object of type which the field is on</param>
         /// <param name="name">Name of the field</param>
@@ -194,15 +194,17 @@ namespace Modding
         /// <typeparam name="TCast">Type of return.</typeparam>
         /// <returns>The value of a field on an object/type</returns>
         [PublicAPI]
-        public static TCast GetAttr<TObject, TField, TCast>(TObject obj, string name, TCast @default = default(TCast)) 
+        public static TCast GetAttr<TObject, TField, TCast>(TObject obj, string name, TCast @default = default(TCast))
         {
             FieldInfo fi = GetField(typeof(TObject), name);
 
-            return fi == null ? @default : (TCast) (object) ((Func<TObject, TField>) GetGetter<TObject, TField>(fi))(obj);
+            return fi == null
+                ? @default
+                : (TCast) (object) ((Func<TObject, TField>) GetGetter<TObject, TField>(fi))(obj);
         }
 
         /// <summary>
-        /// Get a field on an object using a string.
+        ///     Get a field on an object using a string.
         /// </summary>
         /// <param name="obj">Object/Object of type which the field is on</param>
         /// <param name="name">Name of the field</param>
@@ -218,7 +220,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// Get a static field on an type using a string.
+        ///     Get a static field on an type using a string.
         /// </summary>
         /// <param name="name">Name of the field</param>
         /// <typeparam name="TType">Type which static field resides upon</typeparam>
@@ -228,12 +230,12 @@ namespace Modding
         public static TField GetAttr<TType, TField>(string name)
         {
             FieldInfo fi = GetField(typeof(TType), name);
-            
+
             return fi == null ? default(TField) : ((Func<TField>) GetGetter<TType, TField>(fi))();
         }
 
         /// <summary>
-        /// Set a field on an object using a string.
+        ///     Set a field on an object using a string.
         /// </summary>
         /// <param name="obj">Object/Object of type which the field is on</param>
         /// <param name="name">Name of the field</param>
@@ -245,13 +247,16 @@ namespace Modding
         {
             FieldInfo fi = GetField(typeof(TObject), name);
 
-            if (fi == null) return;
-            
+            if (fi == null)
+            {
+                return;
+            }
+
             ((Action<TObject, TField>) GetSetter<TObject, TField>(fi))(obj, value);
         }
-        
+
         /// <summary>
-        /// Set a field on an object using a string.
+        ///     Set a field on an object using a string.
         /// </summary>
         /// <param name="obj">Object/Object of type which the field is on</param>
         /// <param name="name">Name of the field</param>
@@ -261,13 +266,14 @@ namespace Modding
         [PublicAPI]
         public static void SetAttr<TObject, TField>(TObject obj, string name, TField value)
         {
-            FieldInfo fi = GetField(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
-            
+            FieldInfo fi = GetField(typeof(TObject), name) ??
+                           throw new MissingFieldException($"Field {name} does not exist!");
+
             ((Action<TObject, TField>) GetSetter<TObject, TField>(fi))(obj, value);
         }
 
         /// <summary>
-        /// Set a static field on an type using a string.
+        ///     Set a static field on an type using a string.
         /// </summary>
         /// <param name="name">Name of the field</param>
         /// <param name="value">Value to set the field to</param>
@@ -280,8 +286,9 @@ namespace Modding
         }
 
         #region Obsolete
+
         /// <summary>
-        /// Set a field on an object using a string.
+        ///     Set a field on an object using a string.
         /// </summary>
         /// <param name="obj">Object/Object of type which the field is on</param>
         /// <param name="name">Name of the field</param>
@@ -292,13 +299,16 @@ namespace Modding
         [Obsolete("Use SetAttr<TType, TField> and SetAttr<TObject, TField>.")]
         public static void SetAttr<T>(object obj, string name, T val, bool instance = true)
         {
-            if (obj == null || string.IsNullOrEmpty(name)) return;
+            if (obj == null || string.IsNullOrEmpty(name))
+            {
+                return;
+            }
 
             GetField(obj.GetType(), name, instance)?.SetValue(obj, val);
         }
 
         /// <summary>
-        /// Get a field on an object/type using a string.
+        ///     Get a field on an object/type using a string.
         /// </summary>
         /// <param name="obj">Object/Object of type which the field is on</param>
         /// <param name="name">Name of the field</param>
@@ -309,11 +319,14 @@ namespace Modding
         [Obsolete("Use GetAttr<TObject, TField>.")]
         public static T GetAttr<T>(object obj, string name, bool instance = true)
         {
-            if (obj == null || string.IsNullOrEmpty(name)) return default(T);
+            if (obj == null || string.IsNullOrEmpty(name))
+            {
+                return default(T);
+            }
 
             return (T) GetField(obj.GetType(), name, instance)?.GetValue(obj);
         }
-        #endregion
 
+        #endregion
     }
 }

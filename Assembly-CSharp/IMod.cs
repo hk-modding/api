@@ -6,43 +6,42 @@ namespace Modding
 {
     /// <inheritdoc />
     /// <summary>
-    /// Base interface for Mods
+    ///     Base interface for Mods
     /// </summary>
     public interface IMod : ILogger
     {
-
         /// <summary>
-        /// Get's the Mod's Name
+        ///     Get's the Mod's Name
         /// </summary>
         /// <returns></returns>
         string GetName();
 
         /// <summary>
-        /// Returns the objects to preload in order for the mod to work.
+        ///     Returns the objects to preload in order for the mod to work.
         /// </summary>
         /// <returns>A List of tuples containing scene name, object name</returns>
         List<(string, string)> GetPreloadNames();
 
         /// <summary>
-        /// Called after preloading of all mods.
+        ///     Called after preloading of all mods.
         /// </summary>
-        /// <param name="preloadedObjects">The preloaded objects relevant to this <see cref="Mod"/></param>
+        /// <param name="preloadedObjects">The preloaded objects relevant to this <see cref="Mod" /></param>
         void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects);
 
         /// <summary>
-        /// Returns version of Mod
+        ///     Returns version of Mod
         /// </summary>
         /// <returns>Mod Version</returns>
         string GetVersion();
 
         /// <summary>
-        /// Denotes if the running version is the current version.  Set this with <see cref="GithubVersionHelper"/>
+        ///     Denotes if the running version is the current version.  Set this with <see cref="GithubVersionHelper" />
         /// </summary>
         /// <returns>If the version is current or not.</returns>
         bool IsCurrent();
 
         /// <summary>
-        /// Controls when this mod should load compared to other mods.  Defaults to ordered by name.
+        ///     Controls when this mod should load compared to other mods.  Defaults to ordered by name.
         /// </summary>
         /// <returns></returns>
         int LoadPriority();
@@ -50,34 +49,34 @@ namespace Modding
 
     /// <inheritdoc />
     /// <summary>
-    /// Generic implementation of Mod which allows for settings
+    ///     Generic implementation of Mod which allows for settings
     /// </summary>
-    /// <typeparam name="T">Implementation of <see cref="IModSettings"/></typeparam>
+    /// <typeparam name="T">Implementation of <see cref="ModSettings" /></typeparam>
     [PublicAPI]
-    public interface IMod<T> : IMod where T : IModSettings
+    public interface IMod<T> : IMod where T : ModSettings
     {
         /// <summary>
-        /// Settings For the Mod that would be saved with the save file.
+        ///     Settings For the Mod that would be saved with the save file.
         /// </summary>
         T Settings { get; set; }
     }
 
     /// <inheritdoc />
     /// <summary>
-    /// Generic implementation of Mod which allows for settings
+    ///     Generic implementation of Mod which allows for settings
     /// </summary>
-    /// <typeparam name="T">Implementation of <see cref="IModSettings"/></typeparam>
-    /// <typeparam name="TG">Implementation of <see cref="IModSettings"/></typeparam>
+    /// <typeparam name="T">Implementation of <see cref="ModSettings" /></typeparam>
+    /// <typeparam name="TG">Implementation of <see cref="ModSettings" /></typeparam>
     [PublicAPI]
-    public interface IMod<T,TG> : IMod where T : IModSettings where TG : IModSettings
+    public interface IMod<T, TG> : IMod where T : ModSettings where TG : ModSettings
     {
         /// <summary>
-        /// Settings For the Mod that would be saved with the save file.
+        ///     Settings For the Mod that would be saved with the save file.
         /// </summary>
         T Settings { get; set; }
 
         /// <summary>
-        /// Global Settings which are stored independently of saves.
+        ///     Global Settings which are stored independently of saves.
         /// </summary>
         TG GlobalSettings { get; set; }
     }

@@ -6,17 +6,17 @@ using MonoMod;
 #pragma warning disable 1591, 0108, 0169, 0649, 0414
 namespace Modding.Patches
 {
-    [MonoModPatch( "HutongGames.PlayMaker.Actions.FaceObject" )]
+    [MonoModPatch("HutongGames.PlayMaker.Actions.FaceObject")]
     public class FaceObject : HutongGames.PlayMaker.Actions.FaceObject
     {
-        [MonoModIgnore]
-        public FsmGameObject objectA;
+        [MonoModIgnore] public FsmGameObject objectA;
 
-        [MonoModIgnore]
-        public FsmGameObject objectB;
+        [MonoModIgnore] public FsmGameObject objectB;
 
-        [MonoModOriginalName( "DoFace" )]
-        private void orig_DoFace() { }
+        [MonoModOriginalName("DoFace")]
+        private void orig_DoFace()
+        {
+        }
 
         //Added checks for null and an attempt to fix any missing references
         //as well as a try/catch in case something goes wrong to keep the whole FSM from breaking down...
@@ -24,27 +24,27 @@ namespace Modding.Patches
         {
             try
             {
-                if( objectA == null || objectA.Value == null )
+                if (objectA == null || objectA.Value == null)
                 {
-                    objectA = new HutongGames.PlayMaker.FsmGameObject( Fsm.GameObject );
+                    objectA = new FsmGameObject(Fsm.GameObject);
                 }
 
-                if( (objectB == null || objectB.Value == null) && HeroController.instance != null )
+                if ((objectB == null || objectB.Value == null) && HeroController.instance != null)
                 {
-                    objectB = new HutongGames.PlayMaker.FsmGameObject( HeroController.instance?.proxyFSM.Fsm.GameObject );
+                    objectB = new FsmGameObject(HeroController.instance?.proxyFSM.Fsm.GameObject);
                 }
 
-                if( ( objectA == null || objectA.Value == null ) || ( objectB == null || objectA.Value == null ) )
+                if ((objectA == null || objectA.Value == null) || (objectB == null || objectA.Value == null))
                 {
-                    base.Finish();
+                    Finish();
                     return;
                 }
 
                 orig_DoFace();
             }
-            catch( System.Exception ex )
+            catch
             {
-                base.Finish();
+                Finish();
             }
         }
     }

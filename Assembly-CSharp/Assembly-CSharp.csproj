@@ -78,7 +78,7 @@
     <Compile Include="HookInfoAttribute.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="IMod.cs" />
-    <Compile Include="IModSettings.cs" />
+    <Compile Include="ModSettings.cs" />
     <Compile Include="Loggable.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="LogLevel.cs" />

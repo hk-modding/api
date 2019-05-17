@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+
 // ReSharper disable All (Disabled class anyways)
 
 namespace Modding
 {
     /// <summary>
-    /// Class to help determine if your version is out of date.
+    ///     Class to help determine if your version is out of date.
     /// </summary>
     public class GithubVersionHelper
     {
         private static readonly WebClient WebClient = new WebClient();
-        
-        private static GithubRelease FromJson(string json) => JsonUtility.FromJson<GithubRelease>(json);
 
         private readonly string _repositoryName;
 
         /// <summary>
-        /// Provides a convenient method to access the Github Release Information, Allowing for simple checking of released versions.
+        ///     Provides a convenient method to access the Github Release Information, Allowing for simple checking of released
+        ///     versions.
         /// </summary>
         /// <param name="repositoryName">Repository Name such as "seanpr96/HollowKnight.Modding"</param>
         public GithubVersionHelper(string repositoryName)
@@ -26,8 +26,10 @@ namespace Modding
             _repositoryName = repositoryName;
         }
 
+        private static GithubRelease FromJson(string json) => JsonUtility.FromJson<GithubRelease>(json);
+
         /// <summary>
-        /// Fetches the Current Release Version From Github
+        ///     Fetches the Current Release Version From Github
         /// </summary>
         /// <returns></returns>
         public string GetVersion()
@@ -57,47 +59,46 @@ namespace Modding
 #pragma warning disable 0649
         private class Author
         {
-            public string login;
-            public int id;
             public string avatar_url;
-            public string gravatar_id;
-            public string url;
-            public string html_url;
+            public string events_url;
             public string followers_url;
             public string following_url;
             public string gists_url;
+            public string gravatar_id;
+            public string html_url;
+            public int id;
+            public string login;
+            public string organizations_url;
+            public string received_events_url;
+            public string repos_url;
+            public bool site_admin;
             public string starred_url;
             public string subscriptions_url;
-            public string organizations_url;
-            public string repos_url;
-            public string events_url;
-            public string received_events_url;
             public string type;
-            public bool site_admin;
+            public string url;
         }
 
         private class GithubRelease
         {
-            public string url;
+            public List<object> assets;
             public string assets_url;
-            public string upload_url;
+            public Author author;
+            public string body;
+            public DateTime created_at;
+            public bool draft;
             public string html_url;
             public int id;
-            public string tag_name;
-            public string target_commitish;
             public string name;
-            public bool draft;
-            public Author author;
             public bool prerelease;
-            public DateTime created_at;
             public DateTime published_at;
-            public List<object> assets;
+            public string tag_name;
             public string tarball_url;
+            public string target_commitish;
+            public string upload_url;
+            public string url;
             public string zipball_url;
-            public string body;
         }
         // ReSharper enable All
 #pragma warning restore 0649
-
     }
 }

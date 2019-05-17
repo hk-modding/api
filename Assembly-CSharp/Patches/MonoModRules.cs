@@ -91,7 +91,9 @@ namespace MonoMod
             foreach (MethodDefinition method in instance.DeclaringType.Methods)
             {
                 if (method.Name == hookName)
+                {
                     return method;
+                }
             }
 
             return null;
@@ -109,7 +111,9 @@ namespace MonoMod
             foreach (FieldDefinition field in baseMethod.DeclaringType.Fields)
             {
                 if (field.Name == fieldName)
+                {
                     return field;
+                }
             }
             return null;
         }
@@ -126,11 +130,17 @@ namespace MonoMod
             //   Console.WriteLine("GetClassField");
             foreach (TypeDefinition type in baseMethod.DeclaringType.Module.Types)
             {
-                if (type.Name != typeName) continue;
+                if (type.Name != typeName)
+                {
+                    continue;
+                }
+
                 foreach (FieldDefinition field in baseMethod.DeclaringType.Fields)
                 {
                     if (field.Name == fieldName)
+                    {
                         return field;
+                    }
                 }
             }
             return null;
@@ -148,7 +158,9 @@ namespace MonoMod
             foreach (MethodDefinition method in baseMethod.DeclaringType.Methods)
             {
                 if (method.Name == methodName)
+                {
                     return method;
+                }
             }
             return null;
         }
@@ -165,11 +177,18 @@ namespace MonoMod
         //    Console.WriteLine("GetMethodDefinition");
             foreach (TypeDefinition type in baseMethod.DeclaringType.Module.Types)
             {
-                if (type.Name != typeName) continue;
+                if (type.Name != typeName)
+                {
+                    continue;
+                }
 
                 foreach(MethodDefinition method in type.Methods)
+                {
                     if (method.Name == methodName)
+                    {
                         return method;
+                    }
+                }
             }
             return null;
         }

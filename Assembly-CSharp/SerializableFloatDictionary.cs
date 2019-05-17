@@ -4,8 +4,10 @@ namespace Modding
 {
     /// <inheritdoc />
     /// <summary>
-    /// Represents a Dictionary of Floats that can be serialized with Unity's JsonUtil
+    ///     Represents a Dictionary of Floats that can be serialized with Unity's JsonUtil
     /// </summary>
     [Serializable]
-    public class SerializableFloatDictionary : SerializableDictionary<string, float> {}
+    public class SerializableFloatDictionary : SerializableDictionary<string, float>
+    {
+    }
 }

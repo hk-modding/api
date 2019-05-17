@@ -18,8 +18,11 @@ namespace Modding.Patches
             {
                 UIManager._instance = UnityEngine.Object.FindObjectOfType<UIManager>();
 
-                if (UIManager._instance == null) return null;
-                
+                if (UIManager._instance == null)
+                {
+                    return null;
+                }
+
                 if (Application.isPlaying)
                 {
                     UnityEngine.Object.DontDestroyOnLoad(UIManager._instance.gameObject);

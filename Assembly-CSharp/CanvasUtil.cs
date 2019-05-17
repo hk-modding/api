@@ -4,144 +4,35 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
+
 // ReSharper disable SuggestVarOrType_SimpleTypes
+// ReSharper disable file UnusedMember.Global
 
 namespace Modding
 {
     /// <summary>
-    /// Utility with helpful functions for drawing canvas elements on screen.
+    ///     Utility with helpful functions for drawing canvas elements on screen.
     /// </summary>
     [PublicAPI]
     public static class CanvasUtil
     {
         /// <summary>
-        /// Access to the TrajanBold Font
+        ///     Access to the TrajanBold Font
         /// </summary>
         public static Font TrajanBold;
 
         /// <summary>
-        /// Access to the TrajanNormal Font
+        ///     Access to the TrajanNormal Font
         /// </summary>
         public static Font TrajanNormal;
 
         private static readonly Dictionary<string, Font> Fonts = new Dictionary<string, Font>();
 
         /// <summary>
-        /// Rectangle Helper Class
-        /// </summary>
-        public class RectData
-        {
-            /// <summary>
-            /// Difference in size of the rectangle as compared to it's parent.
-            /// </summary>
-            public Vector2 RectSizeDelta;
-
-            /// <summary>
-            /// Relative Offset Postion where Element is anchored as compared to Min / Max
-            /// </summary>
-            public Vector2 AnchorPosition;
-
-            /// <summary>
-            /// Describes on of the X,Y Positions of the Element
-            /// </summary>
-            public Vector2 AnchorMin;
-
-            /// <summary>
-            /// Describes on of the X,Y Positions of the Element
-            /// </summary>
-            public Vector2 AnchorMax;
-
-            /// <summary>
-            /// 
-            /// </summary>
-            public Vector2 AnchorPivot;
-
-            /// <inheritdoc />
-            /// <summary>
-            /// Describes a Rectangle's relative size, shape, and relative position to it's parent.
-            /// </summary>
-            /// <param name="sizeDelta">sizeDelta is size of the difference of the anchors multiplied by screen size so 
-            /// the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
-            /// so assuming a streched horizontally rectTransform on a 1920 screen, this would be
-            /// ((1-0)*1920)+sizeDelta.x
-            /// 1920 + sizeDelta.x
-            /// so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
-            /// and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
-            /// the same applies for height</param>
-            /// <param name="anchorPosition">Relative Offset Postion where Element is anchored as compared to Min / Max</param>
-            public RectData(Vector2 sizeDelta, Vector2 anchorPosition) 
-                : this(sizeDelta, anchorPosition, new Vector2(0.5f,0.5f),new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f)) { }
-
-
-            /// <inheritdoc />
-            /// <summary>
-            /// Describes a Rectangle's relative size, shape, and relative position to it's parent.
-            /// </summary>
-            /// <param name="sizeDelta">sizeDelta is size of the difference of the anchors multiplied by screen size so 
-            /// the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
-            /// so assuming a streched horizontally rectTransform on a 1920 screen, this would be
-            /// ((1-0)*1920)+sizeDelta.x
-            /// 1920 + sizeDelta.x
-            /// so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
-            /// and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
-            /// the same applies for height</param>
-            /// <param name="anchorPosition">Relative Offset Postion where Element is anchored as compared to Min / Max</param>
-            /// <param name="min">Describes 1 corner of the rectangle
-            /// 0,0 = bottom left
-            /// 0,1 = top left
-            /// 1,0 = bottom right
-            /// 1,1 = top right
-            /// </param>
-            /// <param name="max">Describes 1 corner of the rectangle
-            /// 0,0 = bottom left
-            /// 0,1 = top left
-            /// 1,0 = bottom right
-            /// 1,1 = top right
-            /// </param>
-            public RectData(Vector2 sizeDelta, Vector2 anchorPosition, Vector2 min, Vector2 max) 
-                : this(sizeDelta, anchorPosition, min, max, new Vector2(0.5f, 0.5f)) { }
-
-            /// <summary>
-            /// Describes a Rectangle's relative size, shape, and relative position to it's parent.
-            /// </summary>
-            /// <param name="sizeDelta">sizeDelta is size of the difference of the anchors multiplied by screen size so 
-            /// the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
-            /// so assuming a streched horizontally rectTransform on a 1920 screen, this would be
-            /// ((1-0)*1920)+sizeDelta.x
-            /// 1920 + sizeDelta.x
-            /// so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
-            /// and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
-            /// the same applies for height</param>
-            /// <param name="anchorPosition">Relative Offset Postion where Element is anchored as compared to Min / Max</param>
-            /// <param name="min">Describes 1 corner of the rectangle
-            /// 0,0 = bottom left
-            /// 0,1 = top left
-            /// 1,0 = bottom right
-            /// 1,1 = top right
-            /// </param>
-            /// <param name="max">Describes 1 corner of the rectangle
-            /// 0,0 = bottom left
-            /// 0,1 = top left
-            /// 1,0 = bottom right
-            /// 1,1 = top right
-            /// </param>
-            /// <param name="pivot">Controls the location to use to rotate the rectangle if necessary.</param>
-            public RectData(Vector2 sizeDelta, Vector2 anchorPosition, Vector2 min, Vector2 max, Vector2 pivot)
-            {
-                RectSizeDelta = sizeDelta;
-                AnchorPosition = anchorPosition;
-                AnchorMin = min;
-                AnchorMax = max;
-                AnchorPivot = pivot;
-            }
-        }
-
-        /// <summary>
-        /// Fetches the Trajan fonts to be cached and used.
+        ///     Fetches the Trajan fonts to be cached and used.
         /// </summary>
         public static void CreateFonts()
         {
-            
             foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())
             {
                 if (f != null && f.name == "TrajanPro-Bold")
@@ -158,14 +49,16 @@ namespace Modding
 
 
         /// <summary>
-        /// Fetches the cached font if it exists.
+        ///     Fetches the cached font if it exists.
         /// </summary>
         /// <param name="fontName"></param>
         /// <returns>Font if found, null if not.</returns>
         public static Font GetFont(string fontName)
         {
             if (Fonts.ContainsKey(fontName))
+            {
                 return Fonts[fontName];
+            }
 
             foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())
             {
@@ -179,7 +72,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// Creates a 1px * 1px sprite of a single color.
+        ///     Creates a 1px * 1px sprite of a single color.
         /// </summary>
         /// <param name="data">Optional value to control the single null sprite</param>
         /// <returns></returns>
@@ -197,7 +90,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// Creates a sprite from a sub-section of the given texture.
+        ///     Creates a sprite from a sub-section of the given texture.
         /// </summary>
         /// <param name="data">Sprite texture data</param>
         /// <param name="x">X location of the sprite within the texture.</param>
@@ -215,7 +108,7 @@ namespace Modding
 
 
         /// <summary>
-        /// Creates a base panel for other panels to use.
+        ///     Creates a base panel for other panels to use.
         /// </summary>
         /// <param name="parent">Parent Game Object under which this panel will be held</param>
         /// <param name="rd">Rectangle data for this panel</param>
@@ -228,6 +121,7 @@ namespace Modding
                 basePanel.transform.SetParent(parent.transform);
                 basePanel.transform.localScale = new Vector3(1, 1, 1);
             }
+
             basePanel.AddComponent<CanvasRenderer>();
             AddRectTransform(basePanel, rd);
             return basePanel;
@@ -235,50 +129,50 @@ namespace Modding
 
 
         /// <summary>
-        /// Transforms the RectData into a RectTransform for the GameObject.
+        ///     Transforms the RectData into a RectTransform for the GameObject.
         /// </summary>
         /// <param name="go">GameObject to which this rectdata should be put into.</param>
         /// <param name="rd">Rectangle Data</param>
         public static void AddRectTransform(GameObject go, RectData rd)
         {
-            //Create a rectTransform
-            //Set the total size of the content
-            //all you need to know is, 
-            //--
+            // Create a rectTransform
+            // Set the total size of the content
+            // all you need to know is, 
+            // --
 
-            //sizeDelta is size of the difference of the anchors multiplied by screen size so
-            //the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
-            //so assuming a streched horizontally rectTransform on a 1920 screen, this would be
-            //((1-0)*1920)+sizeDelta.x
-            //1920 + sizeDelta.x
-            //so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
-            //and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
-            //the same applies for height
+            // sizeDelta is size of the difference of the anchors multiplied by screen size so
+            // the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
+            // so assuming a streched horizontally rectTransform on a 1920 screen, this would be
+            // ((1-0)*1920)+sizeDelta.x
+            // 1920 + sizeDelta.x
+            // so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
+            // and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
+            // the same applies for height
 
-            //anchorPosition is basically an offset to the center of the anchors multiplies by screen size so
-            //a 0.5,0.5 min and 0.5,0.5 max, would put the anchor in the middle of the screen but anchorPosition just offsets that 
-            //i.e on a 1920x1080 screen
-            //anchorPosition 100,100 would do (1920*0.5)+100,(1080*0.5)+100, so 1060,640
+            // anchorPosition is basically an offset to the center of the anchors multiplies by screen size so
+            // a 0.5,0.5 min and 0.5,0.5 max, would put the anchor in the middle of the screen but anchorPosition just offsets that 
+            // i.e on a 1920x1080 screen
+            // anchorPosition 100,100 would do (1920*0.5)+100,(1080*0.5)+100, so 1060,640
 
-            //ANCHOR MIN / MAX
-            //--
-            //0,0 = bottom left
-            //0,1 = top left
-            //1,0 = bottom right
-            //1,1 = top right
-            //--
+            // ANCHOR MIN / MAX
+            // --
+            // 0,0 = bottom left
+            // 0,1 = top left
+            // 1,0 = bottom right
+            // 1,1 = top right
+            // --
 
 
-            //The only other rects I'd use are
-            //anchorMin = 0.0, yyy anchorMax = 1.0, yyy (strech horizontally) y = 0.0 is bottom, y = 0.5 is center, y = 1.0 is top
-            //anchorMin = xxx, 0.0 anchorMax = xxx, 1.0 (strech vertically) x = 0.0 is left, x = 0.5 is center, x = 1.0 is right
-            //anchorMin = 0.0, 0.0 anchorMax = 1.0, 1.0 (strech to fill)
-            //--
-            //technically you can anchor these anywhere on the screen
-            //you can even use negative values to float something offscreen
+            // The only other rects I'd use are
+            // anchorMin = 0.0, yyy anchorMax = 1.0, yyy (strech horizontally) y = 0.0 is bottom, y = 0.5 is center, y = 1.0 is top
+            // anchorMin = xxx, 0.0 anchorMax = xxx, 1.0 (strech vertically) x = 0.0 is left, x = 0.5 is center, x = 1.0 is right
+            // anchorMin = 0.0, 0.0 anchorMax = 1.0, 1.0 (strech to fill)
+            // --
+            // technically you can anchor these anywhere on the screen
+            // you can even use negative values to float something offscreen
 
-            //as for the pivot, the pivot determines where the "center" of the rect is which is useful if you want to rotate something by its corner, note that this DOES offset the anchor positions
-            //i.e. with a 100x100 square, setting the pivot to be 1,1 will put the top right of the square at the anchor position (-50,-50 from its starting position)
+            // as for the pivot, the pivot determines where the "center" of the rect is which is useful if you want to rotate something by its corner, note that this DOES offset the anchor positions
+            // i.e. with a 100x100 square, setting the pivot to be 1,1 will put the top right of the square at the anchor position (-50,-50 from its starting position)
 
             RectTransform rt = go.AddComponent<RectTransform>();
             rt.anchorMax = rd.AnchorMax;
@@ -298,7 +192,7 @@ namespace Modding
          */
 
         /// <summary>
-        /// Creates a Canvas Element that is scaled to the parent's size.
+        ///     Creates a Canvas Element that is scaled to the parent's size.
         /// </summary>
         /// <param name="renderMode">Render Mode to Use</param>
         /// <param name="referencePixelsPerUnit"></param>
@@ -319,7 +213,7 @@ namespace Modding
 
 
         /// <summary>
-        /// Creates a Canvas Element.
+        ///     Creates a Canvas Element.
         /// </summary>
         /// <param name="renderMode">RenderMode to Use</param>
         /// <param name="size">Size of the Canvas</param>
@@ -347,7 +241,7 @@ namespace Modding
          *    ╚═╝   ╚══════╝╚═╝  ╚═╝   ╚═╝  
          */
         /// <summary>
-        /// Creates a Text Object
+        ///     Creates a Text Object
         /// </summary>
         /// <param name="parent">The GameObject that this text will be put into.</param>
         /// <param name="text">The text that will be shown with this object</param>
@@ -356,7 +250,8 @@ namespace Modding
         /// <param name="rectData">Rectangle Data to describe the Text Panel.</param>
         /// <param name="font">The Font to use</param>
         /// <returns></returns>
-        public static GameObject CreateTextPanel(GameObject parent, string text, int fontSize, TextAnchor textAnchor, RectData rectData, Font font)
+        public static GameObject CreateTextPanel(GameObject parent, string text, int fontSize, TextAnchor textAnchor,
+            RectData rectData, Font font)
         {
             GameObject panel = CreateBasePanel(parent, rectData);
 
@@ -369,8 +264,9 @@ namespace Modding
             textObj.alignment = textAnchor;
             return panel;
         }
+
         /// <summary>
-        /// Creates a Text Object
+        ///     Creates a Text Object
         /// </summary>
         /// <param name="parent">The GameObject that this text will be put into.</param>
         /// <param name="text">The text that will be shown with this object</param>
@@ -379,7 +275,8 @@ namespace Modding
         /// <param name="rectData">Rectangle Data to describe the Text Panel.</param>
         /// <param name="bold">If True, TrajanBold will be the font used, else TrajanNormal</param>
         /// <returns></returns>
-        public static GameObject CreateTextPanel(GameObject parent, string text, int fontSize, TextAnchor textAnchor, RectData rectData, bool bold = true)
+        public static GameObject CreateTextPanel(GameObject parent, string text, int fontSize, TextAnchor textAnchor,
+            RectData rectData, bool bold = true)
         {
             return CreateTextPanel(parent, text, fontSize, textAnchor, rectData, bold ? TrajanBold : TrajanNormal);
         }
@@ -394,7 +291,7 @@ namespace Modding
          * ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
          */
         /// <summary>
-        /// Creates an Image Panel
+        ///     Creates an Image Panel
         /// </summary>
         /// <param name="parent">The Parent GameObject for this image.</param>
         /// <param name="sprite">The Image/Sprite to use</param>
@@ -419,7 +316,7 @@ namespace Modding
          * ╚═════╝  ╚═════╝    ╚═╝      ╚═╝    ╚═════╝ ╚═╝  ╚═══╝
          */
         /// <summary>
-        /// Creates a Button
+        ///     Creates a Button
         /// </summary>
         /// <param name="parent">The Parent GameObject for this Button</param>
         /// <param name="action">Action to take when butotn is clicked</param>
@@ -430,23 +327,25 @@ namespace Modding
         /// <param name="textAnchor">Where to Anchor the text within the button</param>
         /// <param name="rectData">The rectangle description for this button</param>
         /// <param name="bold">If Set, uses Trajan-Bold, else Trajan for the font</param>
-        /// <param name="extraSprites">Size 3 array of other sprite states for the button.  0 = Highlighted Sprite, 1 = Pressed Sprited, 2 = Disabled Sprite</param>
+        /// <param name="extraSprites">
+        ///     Size 3 array of other sprite states for the button.  0 = Highlighted Sprite, 1 = Pressed
+        ///     Sprited, 2 = Disabled Sprite
+        /// </param>
         /// <returns></returns>
-        public static GameObject CreateButton(GameObject parent, Action<int> action, int id, Sprite spr, string text, int fontSize, TextAnchor textAnchor, RectData rectData, bool bold = true, params Sprite[] extraSprites)
+        public static GameObject CreateButton(GameObject parent, Action<int> action, int id, Sprite spr, string text,
+            int fontSize, TextAnchor textAnchor, RectData rectData, bool bold = true, params Sprite[] extraSprites)
         {
             GameObject panel = CreateBasePanel(parent, rectData);
 
-            CreateTextPanel(panel, text, fontSize, textAnchor, new RectData(new Vector2(0,0), new Vector2(0,0)), bold);
+            CreateTextPanel(panel, text, fontSize, textAnchor, new RectData(new Vector2(0, 0), new Vector2(0, 0)),
+                bold);
 
             Image img = panel.AddComponent<Image>();
             img.sprite = spr;
 
             Button button = panel.AddComponent<Button>();
             button.targetGraphic = img;
-            button.onClick.AddListener(delegate
-            {
-                action(id);
-            });
+            button.onClick.AddListener(delegate { action(id); });
 
             if (extraSprites.Length == 3)
             {
@@ -478,7 +377,7 @@ namespace Modding
              ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝                                                     
          */
         /// <summary>
-        /// Creates a checkbox
+        ///     Creates a checkbox
         /// </summary>
         /// <param name="parent">The Parent GameObject for this Checkbox</param>
         /// <param name="action">Action to take when butotn is clicked</param>
@@ -491,7 +390,9 @@ namespace Modding
         /// <param name="bold">If Set, uses Trajan-Bold, else Trajan for the font</param>
         /// <param name="isOn">Determines if the initial state of the checkbox is checked or not</param>
         /// <returns></returns>
-        public static GameObject CreateToggle(GameObject parent, Action<bool> action, Sprite boxBgSprite, Sprite boxFgSprite, string text, int fontSize, TextAnchor textAnchor, RectData rectData, bool bold = true, bool isOn = false)
+        public static GameObject CreateToggle(GameObject parent, Action<bool> action, Sprite boxBgSprite,
+            Sprite boxFgSprite, string text, int fontSize, TextAnchor textAnchor, RectData rectData, bool bold = true,
+            bool isOn = false)
         {
             GameObject panel = CreateBasePanel(parent, rectData);
 
@@ -517,28 +418,29 @@ namespace Modding
             };
             toggle.colors = cb;
 
-            toggle.onValueChanged.AddListener(delegate (bool b)
-            {
-                action(b);
-            });
+            toggle.onValueChanged.AddListener(delegate(bool b) { action(b); });
 
             ToggleGroup group = parent.GetComponent<ToggleGroup>();
 
             if (group != null)
+            {
                 toggle.group = group;
+            }
 
             return panel;
         }
 
         /// <summary>
-        /// Allows for a radio button style group of toggles where only 1 can be toggled at once.
+        ///     Allows for a radio button style group of toggles where only 1 can be toggled at once.
         /// </summary>
         /// <returns></returns>
         public static GameObject CreateToggleGroup()
         {
             GameObject panel = new GameObject();
 
-            AddRectTransform(panel, new RectData(new Vector2(0, 0), new Vector2(0, 0), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f)));
+            AddRectTransform(panel,
+                new RectData(new Vector2(0, 0), new Vector2(0, 0), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                    new Vector2(0.5f, 0.5f)));
 
             panel.AddComponent<ToggleGroup>();
 
@@ -546,7 +448,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// Hides everything in this object and children objects that goes outside this objects rect
+        ///     Hides everything in this object and children objects that goes outside this objects rect
         /// </summary>
         /// <param name="parent">Parent Object for this Panel</param>
         /// <param name="rectData">Describes the panel's rectangle</param>
@@ -561,7 +463,7 @@ namespace Modding
 
 
         /// <summary>
-        /// Fades the Canvas Group In When it is &lt; 1f
+        ///     Fades the Canvas Group In When it is &lt; 1f
         /// </summary>
         /// <param name="cg"></param>
         /// <returns></returns>
@@ -579,12 +481,15 @@ namespace Modding
                     cg.alpha = 1f;
                     break;
                 }
+
                 if (loopFailsafe >= 2f)
                 {
                     break;
                 }
+
                 yield return null;
             }
+
             cg.alpha = 1f;
             cg.interactable = true;
             cg.gameObject.SetActive(true);
@@ -592,7 +497,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// Fades the Canvas Group Out When it is &gt; .05f
+        ///     Fades the Canvas Group Out When it is &gt; .05f
         /// </summary>
         /// <param name="cg"></param>
         /// <returns></returns>
@@ -608,15 +513,142 @@ namespace Modding
                 {
                     break;
                 }
+
                 if (loopFailsafe >= 2f)
                 {
                     break;
                 }
+
                 yield return null;
             }
+
             cg.alpha = 0f;
             cg.gameObject.SetActive(false);
             yield return null;
+        }
+
+        /// <summary>
+        ///     Rectangle Helper Class
+        /// </summary>
+        public class RectData
+        {
+            /// <summary>
+            ///     Describes on of the X,Y Positions of the Element
+            /// </summary>
+            public Vector2 AnchorMax;
+
+            /// <summary>
+            ///     Describes on of the X,Y Positions of the Element
+            /// </summary>
+            public Vector2 AnchorMin;
+
+            /// <summary>
+            /// </summary>
+            public Vector2 AnchorPivot;
+
+            /// <summary>
+            ///     Relative Offset Postion where Element is anchored as compared to Min / Max
+            /// </summary>
+            public Vector2 AnchorPosition;
+
+            /// <summary>
+            ///     Difference in size of the rectangle as compared to it's parent.
+            /// </summary>
+            public Vector2 RectSizeDelta;
+
+            /// <inheritdoc />
+            /// <summary>
+            ///     Describes a Rectangle's relative size, shape, and relative position to it's parent.
+            /// </summary>
+            /// <param name="sizeDelta">
+            ///     sizeDelta is size of the difference of the anchors multiplied by screen size so
+            ///     the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
+            ///     so assuming a streched horizontally rectTransform on a 1920 screen, this would be
+            ///     ((1-0)*1920)+sizeDelta.x
+            ///     1920 + sizeDelta.x
+            ///     so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
+            ///     and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
+            ///     the same applies for height
+            /// </param>
+            /// <param name="anchorPosition">Relative Offset Postion where Element is anchored as compared to Min / Max</param>
+            public RectData(Vector2 sizeDelta, Vector2 anchorPosition)
+                : this(sizeDelta, anchorPosition, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+                    new Vector2(0.5f, 0.5f))
+            {
+            }
+
+
+            /// <inheritdoc />
+            /// <summary>
+            ///     Describes a Rectangle's relative size, shape, and relative position to it's parent.
+            /// </summary>
+            /// <param name="sizeDelta">
+            ///     sizeDelta is size of the difference of the anchors multiplied by screen size so
+            ///     the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
+            ///     so assuming a streched horizontally rectTransform on a 1920 screen, this would be
+            ///     ((1-0)*1920)+sizeDelta.x
+            ///     1920 + sizeDelta.x
+            ///     so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
+            ///     and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
+            ///     the same applies for height
+            /// </param>
+            /// <param name="anchorPosition">Relative Offset Postion where Element is anchored as compared to Min / Max</param>
+            /// <param name="min">
+            ///     Describes 1 corner of the rectangle
+            ///     0,0 = bottom left
+            ///     0,1 = top left
+            ///     1,0 = bottom right
+            ///     1,1 = top right
+            /// </param>
+            /// <param name="max">
+            ///     Describes 1 corner of the rectangle
+            ///     0,0 = bottom left
+            ///     0,1 = top left
+            ///     1,0 = bottom right
+            ///     1,1 = top right
+            /// </param>
+            public RectData(Vector2 sizeDelta, Vector2 anchorPosition, Vector2 min, Vector2 max)
+                : this(sizeDelta, anchorPosition, min, max, new Vector2(0.5f, 0.5f))
+            {
+            }
+
+            /// <summary>
+            ///     Describes a Rectangle's relative size, shape, and relative position to it's parent.
+            /// </summary>
+            /// <param name="sizeDelta">
+            ///     sizeDelta is size of the difference of the anchors multiplied by screen size so
+            ///     the sizeDelta width is actually = ((anchorMax.x-anchorMin.x)*screenWidth) + sizeDelta.x
+            ///     so assuming a streched horizontally rectTransform on a 1920 screen, this would be
+            ///     ((1-0)*1920)+sizeDelta.x
+            ///     1920 + sizeDelta.x
+            ///     so if you wanted a 100pixel wide box in the center of the screen you'd do -1820, height as 1920+-1820 = 100
+            ///     and if you wanted a fullscreen wide box, its just 0 because 1920+0 = 1920
+            ///     the same applies for height
+            /// </param>
+            /// <param name="anchorPosition">Relative Offset Postion where Element is anchored as compared to Min / Max</param>
+            /// <param name="min">
+            ///     Describes 1 corner of the rectangle
+            ///     0,0 = bottom left
+            ///     0,1 = top left
+            ///     1,0 = bottom right
+            ///     1,1 = top right
+            /// </param>
+            /// <param name="max">
+            ///     Describes 1 corner of the rectangle
+            ///     0,0 = bottom left
+            ///     0,1 = top left
+            ///     1,0 = bottom right
+            ///     1,1 = top right
+            /// </param>
+            /// <param name="pivot">Controls the location to use to rotate the rectangle if necessary.</param>
+            public RectData(Vector2 sizeDelta, Vector2 anchorPosition, Vector2 min, Vector2 max, Vector2 pivot)
+            {
+                RectSizeDelta = sizeDelta;
+                AnchorPosition = anchorPosition;
+                AnchorMin = min;
+                AnchorMax = max;
+                AnchorPivot = pivot;
+            }
         }
     }
 }

@@ -4,11 +4,12 @@ using System.Text;
 using JetBrains.Annotations;
 using UnityEngine;
 
+// ReSharper disable file UnusedMember.Global
+
 namespace Modding
 {
-
     /// <summary>
-    /// Shared logger for mods to use.
+    ///     Shared logger for mods to use.
     /// </summary>
     [PublicAPI]
     // This is threadsafe, but it's blocking.  Hopefully mods don't try to log so much that it becomes an issue.  If it does we'll have to look at a better system.
@@ -20,100 +21,139 @@ namespace Modding
         private static LogLevel _logLevel;
 
         /// <summary>
-        /// Logger Constructor.  Initializes file to write to.
+        ///     Logger Constructor.  Initializes file to write to.
         /// </summary>
         static Logger()
         {
             Debug.Log("Creating Mod Logger");
             _logLevel = LogLevel.Debug;
-            
-            FileStream fileStream = new FileStream(Application.persistentDataPath + ModHooks.PathSeperator + "ModLog.txt", FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+
+            FileStream fileStream = new FileStream(Application.persistentDataPath + ModHooks.PathSeperator + "ModLog.txt",
+                FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             Writer = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
         }
 
-        internal static void SetLogLevel(LogLevel level) => _logLevel = level;
+        internal static void SetLogLevel(LogLevel level)
+        {
+            _logLevel = level;
+        }
 
         /// <summary>
-        /// Checks to ensure that the logger level is currently high enough for this message, if it is, write it.
+        ///     Checks to ensure that the logger level is currently high enough for this message, if it is, write it.
         /// </summary>
         /// <param name="message">Message to log</param>
         /// <param name="level">Level of Log</param>
         public static void Log(string message, LogLevel level)
         {
             if (_logLevel <= level)
+            {
                 WriteToFile("[" + level.ToString().ToUpper() + "]:" + message + Environment.NewLine);
+            }
         }
 
         /// <summary>
-        /// Checks to ensure that the logger level is currently high enough for this message, if it is, write it.
+        ///     Checks to ensure that the logger level is currently high enough for this message, if it is, write it.
         /// </summary>
         /// <param name="message">Message to log</param>
         /// <param name="level">Level of Log</param>
-        public static void Log(object message, LogLevel level) => Log(message.ToString(), level);
-    
+        public static void Log(object message, LogLevel level)
+        {
+            Log(message.ToString(), level);
+        }
+
 
         /// <summary>
-        /// Finest/Lowest level of logging.  Usually reserved for developmental testing.
+        ///     Finest/Lowest level of logging.  Usually reserved for developmental testing.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public static void LogFine(string message) => Log(message, LogLevel.Fine);
-        
-        /// <summary>
-        /// Finest/Lowest level of logging.  Usually reserved for developmental testing.
-        /// </summary>
-        /// <param name="message">Message to log</param>
-        public static void LogFine(object message) => Log(message.ToString(), LogLevel.Fine);
+        public static void LogFine(string message)
+        {
+            Log(message, LogLevel.Fine);
+        }
 
         /// <summary>
-        /// Log at the debug level.  Usually reserved for diagnostics.
+        ///     Finest/Lowest level of logging.  Usually reserved for developmental testing.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public static void LogDebug(string message) => Log(message, LogLevel.Debug);
+        public static void LogFine(object message)
+        {
+            Log(message.ToString(), LogLevel.Fine);
+        }
 
         /// <summary>
-        /// Log at the debug level.  Usually reserved for diagnostics.
+        ///     Log at the debug level.  Usually reserved for diagnostics.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public static void LogDebug(object message) => Log(message, LogLevel.Debug);
+        public static void LogDebug(string message)
+        {
+            Log(message, LogLevel.Debug);
+        }
 
         /// <summary>
-        /// Log at the info level.
+        ///     Log at the debug level.  Usually reserved for diagnostics.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public static void Log(string message) => Log(message, LogLevel.Info);
+        public static void LogDebug(object message)
+        {
+            Log(message, LogLevel.Debug);
+        }
 
         /// <summary>
-        /// Log at the info level.
+        ///     Log at the info level.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public static void Log(object message) => Log(message, LogLevel.Info);
+        public static void Log(string message)
+        {
+            Log(message, LogLevel.Info);
+        }
 
         /// <summary>
-        /// Log at the warning level.
+        ///     Log at the info level.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public static void LogWarn(string message) => Log(message, LogLevel.Warn);
+        public static void Log(object message)
+        {
+            Log(message, LogLevel.Info);
+        }
 
         /// <summary>
-        /// Log at the warning level.
+        ///     Log at the warning level.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public static void LogWarn(object message) => Log(message, LogLevel.Warn);
+        public static void LogWarn(string message)
+        {
+            Log(message, LogLevel.Warn);
+        }
 
         /// <summary>
-        /// Log at the error level.
+        ///     Log at the warning level.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public static void LogError(string message) => Log(message, LogLevel.Error);
+        public static void LogWarn(object message)
+        {
+            Log(message, LogLevel.Warn);
+        }
 
         /// <summary>
-        /// Log at the error level.
+        ///     Log at the error level.
         /// </summary>
         /// <param name="message">Message to log</param>
-        public static void LogError(object message) => Log(message, LogLevel.Error);
+        public static void LogError(string message)
+        {
+            Log(message, LogLevel.Error);
+        }
 
         /// <summary>
-        /// Locks file to write, writes to file, releases lock.
+        ///     Log at the error level.
+        /// </summary>
+        /// <param name="message">Message to log</param>
+        public static void LogError(object message)
+        {
+            Log(message, LogLevel.Error);
+        }
+
+        /// <summary>
+        ///     Locks file to write, writes to file, releases lock.
         /// </summary>
         /// <param name="text">Text to write</param>
         private static void WriteToFile(string text)
@@ -121,11 +161,12 @@ namespace Modding
             lock (Locker)
             {
                 if (ModHooks.IsInitialized)
+                {
                     ModHooks.Instance.LogConsole(text);
+                }
 
                 Writer.Write(text);
             }
         }
-
     }
 }

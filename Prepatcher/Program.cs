@@ -2,6 +2,7 @@
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+
 // ReSharper disable SuggestVarOrType_SimpleTypes
 
 namespace Prepatcher
@@ -40,7 +41,7 @@ namespace Prepatcher
 
                 MethodDefinition pdGetVariable = pd.Methods.First(method => method.Name == "GetVariable");
                 MethodDefinition pdSetVariable = pd.Methods.First(method => method.Name == "SetVariable");
-                
+
                 MethodDefinition setBoolSwappedArgs = GenerateSwappedMethod(pd, pdSetBool);
                 MethodDefinition setFloatSwappedArgs = GenerateSwappedMethod(pd, pdSetFloat);
                 MethodDefinition setIntSwappedArgs = GenerateSwappedMethod(pd, pdSetInt);
@@ -57,7 +58,8 @@ namespace Prepatcher
 
                     foreach (MethodDefinition method in type.Methods)
                     {
-                        if (!method.HasBody || (method.DeclaringType == pd && (method.Name == "SetupNewPlayerData" || method.Name == "AddGGPlayerDataOverrides")))
+                        if (!method.HasBody || method.DeclaringType == pd &&
+                            (method.Name == "SetupNewPlayerData" || method.Name == "AddGGPlayerDataOverrides"))
                         {
                             continue;
                         }
@@ -73,7 +75,7 @@ namespace Prepatcher
                             {
                                 if (instr.OpCode == OpCodes.Ldfld)
                                 {
-                                    FieldReference field = (FieldReference)instr.Operand;
+                                    FieldReference field = (FieldReference) instr.Operand;
                                     if (field.DeclaringType != pd)
                                     {
                                         continue;
@@ -117,9 +119,10 @@ namespace Prepatcher
                                     changesFound = true;
                                     break;
                                 }
-                                else if (instr.OpCode == OpCodes.Stfld)
+
+                                if (instr.OpCode == OpCodes.Stfld)
                                 {
-                                    FieldReference field = (FieldReference)instr.Operand;
+                                    FieldReference field = (FieldReference) instr.Operand;
                                     if (field.DeclaringType != pd)
                                     {
                                         continue;
@@ -150,7 +153,8 @@ namespace Prepatcher
                                     }
                                     else
                                     {
-                                        GenericInstanceMethod generic = new GenericInstanceMethod(setVariableSwappedArgs);
+                                        GenericInstanceMethod generic =
+                                            new GenericInstanceMethod(setVariableSwappedArgs);
                                         generic.GenericArguments.Add(field.FieldType);
                                         callSet = Instruction.Create(OpCodes.Callvirt, generic);
                                     }
@@ -176,20 +180,24 @@ namespace Prepatcher
 
         private static MethodDefinition GenerateSwappedMethod(TypeDefinition methodParent, MethodDefinition oldMethod)
         {
-            MethodDefinition swapped = new MethodDefinition(oldMethod.Name + "SwappedArgs", MethodAttributes.Assembly | MethodAttributes.HideBySig, methodParent.Module.TypeSystem.Void);
-            swapped.Parameters.Add(new ParameterDefinition(oldMethod.Parameters.ToArray()[1].ParameterType) { Name = "value" });
-            swapped.Parameters.Add(new ParameterDefinition(oldMethod.Parameters.ToArray()[0].ParameterType) { Name = "name" });
+            MethodDefinition swapped = new MethodDefinition(oldMethod.Name + "SwappedArgs",
+                MethodAttributes.Assembly | MethodAttributes.HideBySig, methodParent.Module.TypeSystem.Void);
+            swapped.Parameters.Add(new ParameterDefinition(oldMethod.Parameters.ToArray()[1].ParameterType)
+                {Name = "value"});
+            swapped.Parameters.Add(new ParameterDefinition(oldMethod.Parameters.ToArray()[0].ParameterType)
+                {Name = "name"});
 
             if (oldMethod.HasGenericParameters)
             {
                 int paramCount = 0;
                 foreach (GenericParameter _ in oldMethod.GenericParameters)
                 {
-                    swapped.GenericParameters.Add(new GenericParameter(swapped) { Name = "T" + paramCount });
+                    swapped.GenericParameters.Add(new GenericParameter(swapped) {Name = "T" + paramCount});
                     paramCount++;
                 }
             }
 
+            // ReSharper disable once InconsistentNaming
             ILProcessor swappedIL = swapped.Body.GetILProcessor();
             swappedIL.Emit(OpCodes.Ldarg_0);
             swappedIL.Emit(OpCodes.Ldarg_2);
@@ -211,7 +219,7 @@ namespace Prepatcher
             }
 
             swappedIL.Emit(OpCodes.Ret);
-            
+
             methodParent.Methods.Add(swapped);
 
             return swapped;

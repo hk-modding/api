@@ -1,23 +1,25 @@
 ﻿using System.Collections;
 using UnityEngine;
 
+// ReSharper disable file UnusedMember.Global
+
 namespace Modding.Menu
 {
-    
     /// <inheritdoc />
     /// <summary>
-    /// Provides a menu UI manager
+    ///     Provides a menu UI manager
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     internal class FauxUIManager : MonoBehaviour
     {
+        private static GameManager _gm;
+
+        public static FauxUIManager Instance;
 
         private readonly SimpleLogger _logger = new SimpleLogger("FauxUIManager");
 
-        private static GameManager _gm;
-
+        // ReSharper disable once InconsistentNaming
         private static GameManager gameManager => _gm != null ? _gm : _gm = GameManager.instance;
-
-        public static FauxUIManager Instance;
 
         public void Start()
         {
@@ -32,30 +34,36 @@ namespace Modding.Menu
             {
                 StartCoroutine(CanvasUtil.FadeInCanvasGroup(menu.screenCanvasGroup));
             }
+
             if (menu.title != null)
             {
                 StartCoroutine(CanvasUtil.FadeInCanvasGroup(menu.title));
             }
+
             if (menu.topFleur != null)
             {
                 yield return StartCoroutine(gameManager.timeTool.TimeScaleIndependentWaitForSeconds(0.1f));
                 menu.topFleur.ResetTrigger("hide");
                 menu.topFleur.SetTrigger("show");
             }
+
             yield return StartCoroutine(gameManager.timeTool.TimeScaleIndependentWaitForSeconds(0.1f));
             if (menu.content != null)
             {
                 StartCoroutine(CanvasUtil.FadeInCanvasGroup(menu.content));
             }
+
             if (menu.controls != null)
             {
                 StartCoroutine(CanvasUtil.FadeInCanvasGroup(menu.controls));
             }
+
             if (menu.bottomFleur != null)
             {
                 menu.bottomFleur.ResetTrigger("hide");
                 menu.bottomFleur.SetTrigger("show");
             }
+
             yield return StartCoroutine(gameManager.timeTool.TimeScaleIndependentWaitForSeconds(0.1f));
             gameManager.inputHandler.StartUIInput();
             yield return null;
@@ -70,30 +78,36 @@ namespace Modding.Menu
                 StartCoroutine(CanvasUtil.FadeOutCanvasGroup(menu.title));
                 yield return StartCoroutine(gameManager.timeTool.TimeScaleIndependentWaitForSeconds(0.1f));
             }
+
             if (menu.topFleur != null)
             {
                 menu.topFleur.ResetTrigger("show");
                 menu.topFleur.SetTrigger("hide");
                 yield return StartCoroutine(gameManager.timeTool.TimeScaleIndependentWaitForSeconds(0.1f));
             }
+
             if (menu.content != null)
             {
                 StartCoroutine(CanvasUtil.FadeOutCanvasGroup(menu.content));
             }
+
             if (menu.controls != null)
             {
                 StartCoroutine(CanvasUtil.FadeOutCanvasGroup(menu.controls));
             }
+
             if (menu.bottomFleur != null)
             {
                 menu.bottomFleur.ResetTrigger("show");
                 menu.bottomFleur.SetTrigger("hide");
                 yield return StartCoroutine(_gm.timeTool.TimeScaleIndependentWaitForSeconds(0.1f));
             }
+
             if (menu.screenCanvasGroup != null)
             {
                 yield return StartCoroutine(CanvasUtil.FadeOutCanvasGroup(menu.screenCanvasGroup));
             }
+
             gameManager.inputHandler.StartUIInput();
         }
 

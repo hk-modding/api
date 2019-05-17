@@ -58,12 +58,18 @@ namespace MonoMod
             {
                 Instruction instr = method.Body.Instructions[i];
 
-                if (instr.OpCode != OpCodes.Calli && instr.OpCode != OpCodes.Callvirt && instr.OpCode != OpCodes.Call) continue;
+                if (instr.OpCode != OpCodes.Calli && instr.OpCode != OpCodes.Callvirt && instr.OpCode != OpCodes.Call)
+                {
+                    continue;
+                }
 
-                var mref = (MethodReference) instr.Operand;
+                MethodReference mref = (MethodReference) instr.Operand;
 
-                if (mref.FullName != from.FullName) continue;
-                
+                if (mref.FullName != from.FullName)
+                {
+                    continue;
+                }
+
                 method.Body.Instructions.RemoveAt(i);
                 method.Body.Instructions.Insert(i, call);
 

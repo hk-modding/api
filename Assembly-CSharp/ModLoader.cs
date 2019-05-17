@@ -10,21 +10,36 @@ using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
 using Object = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace Modding
 {
     /// <summary>
-    /// Handles loading of mods.
+    ///     Handles loading of mods.
     /// </summary>
     [SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
     [PublicAPI]
     internal static class ModLoader
     {
         /// <summary>
-        /// Loads the mod by searching for assemblies in hollow_knight_Data\Managed\Mods\
+        ///     Checks if the mod loads are done.
+        /// </summary>
+        public static bool Loaded;
+
+        /// <summary>
+        ///     List of loaded mods.
+        /// </summary>
+        public static List<IMod> LoadedMods = new List<IMod>();
+
+        private static readonly List<string> Errors = new List<string>();
+
+        private static ModVersionDraw _draw;
+
+        private static readonly Dictionary<string, string> ModVersionsCache = new Dictionary<string, string>();
+
+        /// <summary>
+        ///     Loads the mod by searching for assemblies in hollow_knight_Data\Managed\Mods\
         /// </summary>
         public static IEnumerator LoadMods(GameObject coroutineHolder)
         {
@@ -37,49 +52,61 @@ namespace Modding
             Logger.Log("[API] - Trying to load mods");
             string path = string.Empty;
             if (SystemInfo.operatingSystem.Contains("Windows"))
+            {
                 path = Application.dataPath + "\\Managed\\Mods";
+            }
             else if (SystemInfo.operatingSystem.Contains("Mac"))
+            {
                 path = Application.dataPath + "/Resources/Data/Managed/Mods/";
+            }
             else if (SystemInfo.operatingSystem.Contains("Linux"))
+            {
                 path = Application.dataPath + "/Managed/Mods";
-            else
-                Logger.LogWarn($"Operating system of {SystemInfo.operatingSystem} is not known.  Unable to load mods.");
+            }
 
             if (string.IsNullOrEmpty(path))
             {
+                Logger.LogWarn($"Operating system of {SystemInfo.operatingSystem} is not known.  Unable to load mods.");
+
                 Loaded = true;
                 Object.Destroy(coroutineHolder);
                 yield break;
             }
 
-            foreach (string text2 in Directory.GetFiles(path, "*.dll"))
+            foreach (string modPath in Directory.GetFiles(path, "*.dll"))
             {
-                Logger.LogDebug("[API] - Loading assembly: " + text2);
+                Logger.LogDebug("[API] - Loading assembly: " + modPath);
                 try
                 {
-                    foreach (Type type in Assembly.LoadFile(text2).GetExportedTypes())
+                    foreach (Type type in Assembly.LoadFile(modPath).GetExportedTypes())
                     {
                         if (IsSubclassOfRawGeneric(typeof(Mod<>), type))
                         {
                             Logger.LogDebug("[API] - Trying to instantiate mod<T>: " + type);
 
-                            IMod mod = Activator.CreateInstance(type) as IMod;
-                            if (mod == null) continue;
-                            LoadedMods.Add((Mod)mod);
+                            if (!(Activator.CreateInstance(type) is IMod mod))
+                            {
+                                continue;
+                            }
+
+                            LoadedMods.Add((Mod) mod);
                         }
                         else if (!type.IsGenericType && type.IsClass && type.IsSubclassOf(typeof(Mod)))
                         {
                             Logger.LogDebug("[API] - Trying to instantiate mod: " + type);
-                            Mod mod2 = type.GetConstructor(new Type[0])?.Invoke(new object[0]) as Mod;
-                            if (mod2 == null) continue;
-                            LoadedMods.Add(mod2);
+                            if (!(type.GetConstructor(new Type[0])?.Invoke(new object[0]) is Mod mod))
+                            {
+                                continue;
+                            }
+
+                            LoadedMods.Add(mod);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Logger.LogError("[API] - Error: " + ex);
-                    Errors.Add(string.Concat(text2, ": FAILED TO LOAD! Check ModLog.txt."));
+                    Errors.Add(modPath + ": FAILED TO LOAD! Check ModLog.txt.");
                 }
             }
 
@@ -90,13 +117,15 @@ namespace Modding
                 scenes.Add(Path.GetFileNameWithoutExtension(scenePath));
             }
 
-            IEnumerable orderedMods = LoadedMods.OrderBy(x => x.LoadPriority());
+            IMod[] orderedMods = LoadedMods.OrderBy(x => x.LoadPriority()).ToArray();
 
             // dict<scene name, list<(mod, list<objectNames>)>
-            Dictionary<string, List<(IMod, List<string>)>> toPreload = new Dictionary<string, List<(IMod, List<string>)>>();
+            Dictionary<string, List<(IMod, List<string>)>> toPreload =
+                new Dictionary<string, List<(IMod, List<string>)>>();
 
             // dict<mod, dict<scene, dict<objName, object>>>
-            Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects = new Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>>();
+            Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects =
+                new Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>>();
 
             Logger.Log("[API] - Preloading");
 
@@ -114,7 +143,7 @@ namespace Modding
                 // dict<scene, list<objects>>
                 Dictionary<string, List<string>> modPreloads = new Dictionary<string, List<string>>();
 
-                foreach ((string scene, string obj) in preloadNames)
+                foreach (var (scene, obj) in preloadNames)
                 {
                     if (string.IsNullOrEmpty(scene) || string.IsNullOrEmpty(obj))
                     {
@@ -124,7 +153,8 @@ namespace Modding
 
                     if (!scenes.Contains(scene))
                     {
-                        Logger.LogWarn($"[API] - Mod \"{mod.GetName()}\" attempted preload from non-existent scene \"{scene}\"");
+                        Logger.LogWarn(
+                            $"[API] - Mod \"{mod.GetName()}\" attempted preload from non-existent scene \"{scene}\"");
                         continue;
                     }
 
@@ -162,23 +192,25 @@ namespace Modding
                 Object.DontDestroyOnLoad(blanker);
 
                 CanvasUtil.CreateImagePanel(
-                    blanker,
-                    CanvasUtil.NullSprite(new byte[] { 0x00, 0x00, 0x00, 0xFF }),
-                    new CanvasUtil.RectData(Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one))
+                        blanker,
+                        CanvasUtil.NullSprite(new byte[] {0x00, 0x00, 0x00, 0xFF}),
+                        new CanvasUtil.RectData(Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one))
                     .GetComponent<Image>().preserveAspect = false;
 
                 // Create loading bar background
                 CanvasUtil.CreateImagePanel(
-                    blanker,
-                    CanvasUtil.NullSprite(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF }),
-                    new CanvasUtil.RectData(new Vector2(1000, 100), Vector2.zero, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f)))
+                        blanker,
+                        CanvasUtil.NullSprite(new byte[] {0xFF, 0xFF, 0xFF, 0xFF}),
+                        new CanvasUtil.RectData(new Vector2(1000, 100), Vector2.zero, new Vector2(0.5f, 0.5f),
+                            new Vector2(0.5f, 0.5f)))
                     .GetComponent<Image>().preserveAspect = false;
 
                 // Create actual loading bar
                 GameObject loadingBar = CanvasUtil.CreateImagePanel(
                     blanker,
-                    CanvasUtil.NullSprite(new byte[] { 0x99, 0x99, 0x99, 0xFF }),
-                    new CanvasUtil.RectData(new Vector2(0, 75), Vector2.zero, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f)));
+                    CanvasUtil.NullSprite(new byte[] {0x99, 0x99, 0x99, 0xFF}),
+                    new CanvasUtil.RectData(new Vector2(0, 75), Vector2.zero, new Vector2(0.5f, 0.5f),
+                        new Vector2(0.5f, 0.5f)));
 
                 loadingBar.GetComponent<Image>().preserveAspect = false;
                 RectTransform loadingBarRect = loadingBar.GetComponent<RectTransform>();
@@ -189,11 +221,15 @@ namespace Modding
                 {
                     Logger.Log($"[API] - Loading scene \"{sceneName}\"");
 
-                    USceneManager.LoadScene(sceneName, LoadSceneMode.Single);
+                    AsyncOperation load = USceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
 
-                    // LoadScene takes 2 frames to work
-                    yield return new WaitForEndOfFrame();
-                    yield return new WaitForEndOfFrame();
+                    while (!load.isDone)
+                    {
+                        loadingBarRect.sizeDelta =
+                            new Vector2((progress + load.progress / 0.9f) / toPreload.Count * 975,
+                                loadingBarRect.sizeDelta.y);
+                        yield return new WaitForEndOfFrame();
+                    }
 
                     Scene scene = USceneManager.GetSceneByName(sceneName);
                     GameObject[] rootObjects = scene.GetRootGameObjects();
@@ -210,7 +246,7 @@ namespace Modding
                             Logger.Log($"[API] - Fetching object \"{objName}\"");
 
                             // Split object name into root and child names based on '/'
-                            string rootName = null;
+                            string rootName;
                             string childName = null;
 
                             int slashIndex = objName.IndexOf('/');
@@ -220,7 +256,8 @@ namespace Modding
                             }
                             else if (slashIndex == 0 || slashIndex == objName.Length - 1)
                             {
-                                Logger.LogWarn($"[API] - Invalid preload object name given by mod \"{mod.GetName()}\": \"{objName}\"");
+                                Logger.LogWarn(
+                                    $"[API] - Invalid preload object name given by mod \"{mod.GetName()}\": \"{objName}\"");
                                 continue;
                             }
                             else
@@ -233,7 +270,8 @@ namespace Modding
                             GameObject obj = rootObjects.FirstOrDefault(o => o.name == rootName);
                             if (obj == null)
                             {
-                                Logger.LogWarn($"[API] - Could not find object \"{objName}\" in scene \"{sceneName}\", requested by mod \"{mod.GetName()}\"");
+                                Logger.LogWarn(
+                                    $"[API] - Could not find object \"{objName}\" in scene \"{sceneName}\", requested by mod \"{mod.GetName()}\"");
                                 continue;
                             }
 
@@ -243,7 +281,8 @@ namespace Modding
                                 Transform t = obj.transform.Find(childName);
                                 if (t == null)
                                 {
-                                    Logger.LogWarn($"[API] - Could not find object \"{objName}\" in scene \"{sceneName}\", requested by mod \"{mod.GetName()}\"");
+                                    Logger.LogWarn(
+                                        $"[API] - Could not find object \"{objName}\" in scene \"{sceneName}\", requested by mod \"{mod.GetName()}\"");
                                     continue;
                                 }
 
@@ -251,13 +290,15 @@ namespace Modding
                             }
 
                             // Create all sub-dictionaries if necessary (Yes, it's terrible)
-                            if (!preloadedObjects.TryGetValue(mod, out Dictionary<string, Dictionary<string, GameObject>> modPreloadedObjects))
+                            if (!preloadedObjects.TryGetValue(mod,
+                                out Dictionary<string, Dictionary<string, GameObject>> modPreloadedObjects))
                             {
                                 modPreloadedObjects = new Dictionary<string, Dictionary<string, GameObject>>();
                                 preloadedObjects[mod] = modPreloadedObjects;
                             }
 
-                            if (!modPreloadedObjects.TryGetValue(sceneName, out Dictionary<string, GameObject> modScenePreloadedObjects))
+                            if (!modPreloadedObjects.TryGetValue(sceneName,
+                                out Dictionary<string, GameObject> modScenePreloadedObjects))
                             {
                                 modScenePreloadedObjects = new Dictionary<string, GameObject>();
                                 modPreloadedObjects[sceneName] = modScenePreloadedObjects;
@@ -275,7 +316,6 @@ namespace Modding
 
                     // Update loading progress
                     progress++;
-                    loadingBarRect.sizeDelta = new Vector2(progress / (float)toPreload.Count * 975, loadingBarRect.sizeDelta.y);
                 }
 
                 // Restore the audio
@@ -305,48 +345,42 @@ namespace Modding
                 }
             }
 
-            //Clean out the ModEnabledSettings for any mods that don't exist.
-            //Calling ToList means we are not working with the dictionary keys directly, preventing an out of sync error
-            foreach (string modName in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Keys.ToList())
-            {
-                if (LoadedMods.All(x => x.GetName() != modName))
-                    ModHooks.Instance.GlobalSettings.ModEnabledSettings.Remove(modName);
-            }
-            
+            // Clean out the ModEnabledSettings for any mods that don't exist.
+            LoadedMods.RemoveAll(mod =>
+                !ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()));
+
             // Get previously disabled mods and disable them.
-            foreach (KeyValuePair<string, bool> modPair in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Where(x => !x.Value))
+            foreach (KeyValuePair<string, bool> modPair in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Where(
+                x => !x.Value))
             {
                 IMod mod = LoadedMods.FirstOrDefault(x => x.GetName() == modPair.Key);
-                if (!(mod is ITogglableMod togglable)) continue;
+                if (!(mod is ITogglableMod togglable))
+                {
+                    continue;
+                }
+
                 togglable.Unload();
                 Logger.LogDebug($"Mod {modPair.Key} was unloaded.");
             }
-            
+
+            // Create version text
             GameObject gameObject = new GameObject();
             _draw = gameObject.AddComponent<ModVersionDraw>();
             Object.DontDestroyOnLoad(gameObject);
             UpdateModText();
+
             Loaded = true;
-            
+
             ModHooks.Instance.SaveGlobalSettings();
 
             Object.Destroy(coroutineHolder.gameObject);
         }
 
-        private static readonly List<string> Errors = new List<string>();
-
-        static ModLoader()
-        {
-            Loaded = false;
-            Debug = true;
-        }
-
-        private static ModVersionDraw _draw;
-
         private static void UpdateModText()
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine("Modding API: " + ModHooks.Instance.ModVersion + (ModHooks.Instance.IsCurrent ? "" : " - New Version Available!") );
+            builder.AppendLine("Modding API: " + ModHooks.Instance.ModVersion +
+                               (ModHooks.Instance.IsCurrent ? "" : " - New Version Available!"));
             foreach (string error in Errors)
             {
                 builder.AppendLine(error);
@@ -366,7 +400,8 @@ namespace Modding
 
                     if (!ModVersionsCache.ContainsKey(mod.GetName()))
                     {
-                        ModVersionsCache.Add(mod.GetName(), mod.GetVersion() + (mod.IsCurrent() ? string.Empty : " - New Version Available!"));
+                        ModVersionsCache.Add(mod.GetName(),
+                            mod.GetVersion() + (mod.IsCurrent() ? string.Empty : " - New Version Available!"));
                     }
 
                     string ns = mod.GetType().Namespace;
@@ -422,26 +457,37 @@ namespace Modding
             _draw.drawString = builder.ToString();
         }
 
-        internal static void LoadMod(IMod mod, bool updateModText, bool changeSettings = true, Dictionary<string, Dictionary<string, GameObject>> preloadedObjects = null)
+        internal static void LoadMod(IMod mod, bool updateModText, bool changeSettings = true,
+            Dictionary<string, Dictionary<string, GameObject>> preloadedObjects = null)
         {
-            if(changeSettings || !ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()))
+            if (changeSettings || !ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()))
+            {
                 ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = true;
+            }
 
             mod.Initialize(preloadedObjects);
 
             if (!ModHooks.Instance.LoadedModsWithVersions.ContainsKey(mod.GetType().Name))
+            {
                 ModHooks.Instance.LoadedModsWithVersions.Add(mod.GetType().Name, mod.GetVersion());
+            }
             else
+            {
                 ModHooks.Instance.LoadedModsWithVersions[mod.GetType().Name] = mod.GetVersion();
+            }
 
             if (ModHooks.Instance.LoadedMods.All(x => x != mod.GetType().Name))
+            {
                 ModHooks.Instance.LoadedMods.Add(mod.GetType().Name);
+            }
 
             if (updateModText)
+            {
                 UpdateModText();
+            }
         }
 
-        internal static void UnloadMod(ITogglableMod mod) 
+        internal static void UnloadMod(ITogglableMod mod)
         {
             try
             {
@@ -460,12 +506,12 @@ namespace Modding
         }
 
         /// <summary>
-        /// Checks to see if a class is a subclass of a generic class.
+        ///     Checks to see if a class is a subclass of a generic class.
         /// </summary>
         /// <param name="generic">Generic to compare against.</param>
         /// <param name="toCheck">Type to check</param>
         /// <returns></returns>
-        private static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
+        internal static bool IsSubclassOfRawGeneric(Type generic, Type toCheck)
         {
             while (toCheck != null && toCheck != typeof(object))
             {
@@ -474,26 +520,11 @@ namespace Modding
                 {
                     return true;
                 }
+
                 toCheck = toCheck.BaseType;
             }
+
             return false;
         }
-        /// <summary>
-        /// Checks if the mod loads are done.
-        /// </summary>
-        public static bool Loaded;
-
-        /// <summary>
-        /// Is Debug Enabled
-        /// </summary>
-        public static bool Debug;
-
-        /// <summary>
-        /// List of loaded mods.
-        /// </summary>
-        public static List<IMod> LoadedMods = new List<IMod>();
-
-        private static readonly Dictionary<string, string> ModVersionsCache = new Dictionary<string, string>();
-        
     }
 }
