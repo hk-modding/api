@@ -34,7 +34,6 @@ namespace Modding
                 catch (Exception e)
                 {
                     Logger.LogError("[API] - " + e);
-                    throw;
                 }
             }
         }
