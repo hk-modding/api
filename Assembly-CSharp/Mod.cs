@@ -210,23 +210,24 @@ namespace Modding
                 File.Move(_globalSettingsPath, _globalSettingsPath + ".bak");
             }
 
+            ModSettings settings = GlobalSettings;
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (settings is ISerializationCallbackReceiver receiver)
+            {
+                receiver.OnBeforeSerialize();
+            }
+            else if (settings == null)
+            {
+                return;
+            }
+
             using (FileStream fileStream = File.Create(_globalSettingsPath))
             {
                 using (StreamWriter writer = new StreamWriter(fileStream))
                 {
                     try
                     {
-                        ModSettings settings = GlobalSettings;
-                        // ReSharper disable once SuspiciousTypeConversion.Global
-                        if (settings is ISerializationCallbackReceiver receiver)
-                        {
-                            receiver.OnBeforeSerialize();
-                        }
-                        else if (settings == null)
-                        {
-                            return;
-                        }
-
                         string text4 = JsonUtility.ToJson(settings, true);
                         writer.Write(text4);
                     }
