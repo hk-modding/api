@@ -28,6 +28,11 @@ namespace Modding
         public static bool Loaded;
 
         /// <summary>
+        ///     Checks if the mod preloads are done
+        /// </summary>
+        public static bool Preloaded;
+
+        /// <summary>
         ///     List of loaded mods.
         /// </summary>
         public static List<IMod> LoadedMods = new List<IMod>();
@@ -43,7 +48,7 @@ namespace Modding
         /// </summary>
         public static IEnumerator LoadMods(GameObject coroutineHolder)
         {
-            if (Loaded)
+            if (Preloaded || Loaded)
             {
                 Object.Destroy(coroutineHolder);
                 yield break;
@@ -323,7 +328,14 @@ namespace Modding
 
                 // Reload the main menu to fix the music/shaders
                 Logger.Log("[API] - Preload done, returning to main menu");
-                yield return GameManager.instance.ReturnToMainMenu(GameManager.ReturnToMainMenuSaveModes.DontSave);
+                Preloaded = true;
+
+                yield return USceneManager.LoadSceneAsync("Quit_To_Menu");
+
+                while (USceneManager.GetActiveScene().name != Constants.MENU_SCENE)
+                {
+                    yield return new WaitForEndOfFrame();
+                }
 
                 // Remove the black screen
                 Object.Destroy(blanker);
