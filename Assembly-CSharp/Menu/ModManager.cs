@@ -144,14 +144,22 @@ namespace Modding.Menu
                                 ModHooks.Instance.GlobalSettings.ModEnabledSettings.Add(name, true);
                             }
 
-                            if (optionIndex == 1)
+                            try
                             {
-                                ModLoader.UnloadMod(mod);
+                                if (optionIndex == 1)
+                                {
+                                    ModLoader.UnloadMod(mod);
+                                }
+                                else
+                                {
+                                    ModLoader.LoadMod(mod, true);
+                                }
                             }
-                            else
+                            catch (Exception e)
                             {
-                                ModLoader.LoadMod(mod, true);
+                                LogError($"Could not load/unload mod \"{name}\":\n{e}");
                             }
+                            
                         };
                         //dataDump(modArray[i].gameObject, 1);                    
 

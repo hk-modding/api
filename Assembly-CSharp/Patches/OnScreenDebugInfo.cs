@@ -13,7 +13,7 @@ namespace Modding.Patches
 
         private void Awake()
         {
-            Logger.Log("GameLoading");
+            Logger.Log("[API] - Main menu loading");
 
             GameObject obj = new GameObject();
             DontDestroyOnLoad(obj);

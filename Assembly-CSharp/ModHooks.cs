@@ -657,7 +657,7 @@ namespace Modding
         /// </summary>
         internal void SaveGlobalSettings()
         {
-            Logger.Log("Saving Global Settings");
+            Logger.Log("[API] - Saving Global Settings");
             if (File.Exists(SettingsPath + ".bak"))
             {
                 File.Delete(SettingsPath + ".bak");
@@ -683,7 +683,7 @@ namespace Modding
         /// </summary>
         internal void LoadGlobalSettings()
         {
-            Logger.Log("Loading ModdingApi Global Settings.");
+            Logger.Log("[API] - Loading ModdingApi Global Settings.");
 
             if (!File.Exists(SettingsPath))
             {

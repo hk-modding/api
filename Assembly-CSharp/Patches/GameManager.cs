@@ -41,11 +41,9 @@ namespace Modding.Patches
 
         public void LoadScene(string destScene)
         {
-            Logger.Log( "Entered LoadScene!" );
             destScene = ModHooks.Instance.BeforeSceneLoad(destScene);
             orig_LoadScene(destScene);
             ModHooks.Instance.OnSceneChanged(destScene);
-            Logger.Log( "Finished LoadScene!" );
         }
 
         public void orig_ClearSaveFile(int saveSlot, Action<bool> callback) { }
@@ -61,11 +59,9 @@ namespace Modding.Patches
 
         public IEnumerator PlayerDead(float waitTime)
         {
-            Logger.Log( "Entered player dead!" );
             ModHooks.Instance.OnBeforePlayerDead();
             yield return orig_PlayerDead(waitTime);
             ModHooks.Instance.OnAfterPlayerDead();
-            Logger.Log( "Finished player dead!" );
         }
     }
 }
