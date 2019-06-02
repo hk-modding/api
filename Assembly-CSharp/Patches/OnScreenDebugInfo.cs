@@ -18,6 +18,9 @@ namespace Modding.Patches
             GameObject obj = new GameObject();
             DontDestroyOnLoad(obj);
 
+            // Preload reflection
+            ReflectionHelper.PreloadCommonTypes();
+
             // NonBouncer does absolutely nothing, which makes it a good dummy to run the loader
             obj.AddComponent<NonBouncer>().StartCoroutine(ModLoader.LoadMods(obj));
 

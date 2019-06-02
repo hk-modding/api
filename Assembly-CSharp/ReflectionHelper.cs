@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 using JetBrains.Annotations;
@@ -17,6 +18,43 @@ namespace Modding
         private static readonly Dictionary<FieldInfo, Delegate> Getters = new Dictionary<FieldInfo, Delegate>();
 
         private static readonly Dictionary<FieldInfo, Delegate> Setters = new Dictionary<FieldInfo, Delegate>();
+
+        private static bool _preloaded;
+
+        /// <summary>
+        ///     Caches all fields on a type to frontload cost of reflection
+        /// </summary>
+        /// <typeparam name="T">The type to cache</typeparam>
+        public static void CacheFields<T>()
+        {
+            Type t = typeof(T);
+            if (!Fields.TryGetValue(t, out Dictionary<string, FieldInfo> tFields))
+            {
+                tFields = new Dictionary<string, FieldInfo>();
+            }
+
+            // Not gonna redesign this class to avoid reflection, this shouldn't be called during gameplay anyway
+            MethodInfo getGetter =
+                typeof(ReflectionHelper).GetMethod(nameof(GetGetter), BindingFlags.NonPublic | BindingFlags.Static);
+            MethodInfo getSetter =
+                typeof(ReflectionHelper).GetMethod(nameof(GetSetter), BindingFlags.NonPublic | BindingFlags.Static);
+
+            foreach (FieldInfo field in t.GetFields(BindingFlags.NonPublic | BindingFlags.Public |
+                                                    BindingFlags.Instance | BindingFlags.Static))
+            {
+                tFields[field.Name] = field;
+
+                if (!field.IsLiteral)
+                {
+                    getGetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] {field});
+                }
+
+                if (!field.IsLiteral && !field.IsInitOnly)
+                {
+                    getSetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
+                }
+            }
+        }
 
         /// <summary>
         ///     Gets a field on a type
@@ -49,6 +87,27 @@ namespace Modding
             return fi;
         }
 
+        internal static void PreloadCommonTypes()
+        {
+            if (_preloaded)
+            {
+                return;
+            }
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+            CacheFields<PlayerData>();
+            CacheFields<HeroController>();
+            CacheFields<GameManager>();
+            CacheFields<UIManager>();
+
+            watch.Stop();
+
+            Logger.Log($"[API] - Preloaded reflection in {watch.ElapsedMilliseconds}ms");
+
+            _preloaded = true;
+        }
 
         /// <summary>
         ///     Gets delegate getting field on type
@@ -60,6 +119,11 @@ namespace Modding
             if (Getters.TryGetValue(fi, out Delegate d))
             {
                 return d;
+            }
+
+            if (fi.IsLiteral)
+            {
+                throw new ArgumentException("Field cannot be const", nameof(fi));
             }
 
             d = fi.IsStatic
@@ -83,6 +147,11 @@ namespace Modding
                 return d;
             }
 
+            if (fi.IsLiteral || fi.IsInitOnly)
+            {
+                throw new ArgumentException("Field cannot be readonly or const", nameof(fi));
+            }
+
             d = fi.IsStatic
                 ? CreateSetStaticFieldDelegate<TType, TField>(fi)
                 : CreateSetFieldDelegate<TType, TField>(fi);
@@ -99,7 +168,6 @@ namespace Modding
         /// <typeparam name="TField">Field type</typeparam>
         /// <typeparam name="TType">Type which field resides upon</typeparam>
         /// <returns>Function returning static field</returns>
-        [PublicAPI]
         private static Delegate CreateGetStaticFieldDelegate<TType, TField>(FieldInfo fi)
         {
             DynamicMethod dm = new DynamicMethod
@@ -125,7 +193,6 @@ namespace Modding
         /// <typeparam name="TType"></typeparam>
         /// <typeparam name="TField"></typeparam>
         /// <returns>Function which returns value of field of object parameter</returns>
-        [PublicAPI]
         private static Delegate CreateGetFieldDelegate<TType, TField>(FieldInfo fi)
         {
             DynamicMethod dm = new DynamicMethod
@@ -177,6 +244,7 @@ namespace Modding
 
             ILGenerator gen = dm.GetILGenerator();
 
+            gen.Emit(OpCodes.Ldarg_0);
             gen.Emit(OpCodes.Stsfld, fi);
             gen.Emit(OpCodes.Ret);
 
