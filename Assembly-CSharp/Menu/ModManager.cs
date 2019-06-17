@@ -29,6 +29,13 @@ namespace Modding.Menu
             GameObject go = new GameObject();
             _fauxUim = go.AddComponent<FauxUIManager>();
 
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                Logger.Log($"[API] Couldn't resolve assembly {args.Name}, with sender {sender}");
+
+                return null;
+            };
+
             Log("Initialized");
         }
 

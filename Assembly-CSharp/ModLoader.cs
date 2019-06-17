@@ -85,7 +85,9 @@ namespace Modding
                 {
                     foreach (Type type in Assembly.LoadFile(modPath).GetExportedTypes())
                     {
+                        #pragma warning disable 618
                         if (IsSubclassOfRawGeneric(typeof(Mod<>), type))
+                        #pragma warning restore 618
                         {
                             Logger.LogDebug("[API] - Trying to instantiate mod<T>: " + type);
 
