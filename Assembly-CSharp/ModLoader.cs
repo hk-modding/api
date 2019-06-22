@@ -43,6 +43,15 @@ namespace Modding
 
         private static readonly Dictionary<string, string> ModVersionsCache = new Dictionary<string, string>();
 
+        // Event subscription cache
+        private static readonly Dictionary<string, EventInfo> ModHooksEvents =
+            typeof(ModHooks).GetEvents().ToDictionary(e => e.Name);
+
+        private static readonly List<FieldInfo> EventSubscribers = new List<FieldInfo>();
+
+        // Hook name, method hooked, ITogglableMod used by hook
+        private static readonly List<(EventInfo, MethodInfo, Type)> EventSubscriptions = new List<(EventInfo, MethodInfo, Type)>();
+
         /// <summary>
         ///     Loads the mod by searching for assemblies in hollow_knight_Data\Managed\Mods\
         /// </summary>
@@ -85,7 +94,9 @@ namespace Modding
                 {
                     foreach (Type type in Assembly.LoadFile(modPath).GetExportedTypes())
                     {
+#pragma warning disable 618 // Backwards compatibility
                         if (IsSubclassOfRawGeneric(typeof(Mod<>), type))
+#pragma warning restore 618
                         {
                             Logger.LogDebug("[API] - Trying to instantiate mod<T>: " + type);
 
@@ -105,6 +116,79 @@ namespace Modding
                             }
 
                             LoadedMods.Add(mod);
+                        }
+
+                        // Search for method annotations
+                        foreach (MethodInfo method in type.GetMethods(
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
+                        {
+                            foreach (SubscribeEventAttribute attr in method.GetCustomAttributes(typeof(SubscribeEventAttribute),
+                        false))
+                            {
+                                if (attr.ModType != null && !attr.ModType.IsSubclassOf(typeof(Mod)))
+                                {
+                                    Logger.LogWarn($"[API] - Mod type '{attr.ModType.FullName}' on '{type.FullName}.{method.Name}' is not a Mod.");
+                                    continue;
+                                }
+
+                                if (string.IsNullOrEmpty(attr.HookName))
+                                {
+                                    Logger.LogWarn($"[API] - Null hook specified on method '{type.FullName}.{method.Name}'.");
+                                    continue;
+                                }
+
+                                if (method.ContainsGenericParameters)
+                                {
+                                    Logger.LogWarn($"[API] - Cannot subscribe method '{type.FullName}.{method.Name}', it contains generic parameters.");
+                                    continue;
+                                }
+
+                                if (!ModHooksEvents.TryGetValue(attr.HookName, out EventInfo e))
+                                {
+                                    Logger.LogWarn($"[API] - Cannot subscribe method '{type.FullName}.{method.Name}' to nonexistent event '{attr.HookName}'.");
+                                    continue;
+                                }
+
+                                MethodInfo invoke = e.EventHandlerType.GetMethod("Invoke");
+
+                                if (invoke == null)
+                                {
+                                    // This should never happen
+                                    Logger.LogWarn($"[API] - Event '{attr.HookName}' has no public method 'Invoke'.");
+                                    continue;
+                                }
+
+                                if (invoke.ReturnType != method.ReturnType)
+                                {
+                                    Logger.LogWarn($"[API] - Cannot subscribe method '{type.FullName}.{method.Name}' to event '{attr.HookName}', return types do not match.");
+                                    continue;
+                                }
+
+                                ParameterInfo[] invokeParams = invoke.GetParameters();
+                                ParameterInfo[] subscriberParams = method.GetParameters();
+
+                                if (invokeParams.Length != subscriberParams.Length
+                                    || invokeParams.Where((param, index) => param.ParameterType != subscriberParams[index].ParameterType).Any())
+                                {
+                                    Logger.LogWarn($"[API] - Cannot subscribe method '{type.FullName}.{method.Name}' to event '{attr.HookName}', parameters do not match.");
+                                    continue;
+                                }
+
+                                EventSubscriptions.Add((e, method, attr.ModType));
+                            }
+                        }
+
+                        // Search for field annotations
+                        foreach (FieldInfo field in type.GetFields(
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
+                        {
+                            if (!field.IsStatic && !type.IsSubclassOf(typeof(Mod)))
+                            {
+                                Logger.LogWarn($"[API] - '{type.FullName}.{field.Name}' cannot be an event subscriber, it is an instance method on a non-Mod.");
+                                continue;
+                            }
+
+                            EventSubscribers.Add(field);
                         }
                     }
                 }
@@ -357,6 +441,9 @@ namespace Modding
                 }
             }
 
+            // Subscribe events without a parent Mod
+            SubscribeEvents(null, true);
+
             // Clean out the ModEnabledSettings for any mods that don't exist.
             LoadedMods.RemoveAll(mod =>
                 !ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()));
@@ -478,6 +565,7 @@ namespace Modding
             }
 
             mod.Initialize(preloadedObjects);
+            SubscribeEvents(mod, true);
 
             if (!ModHooks.Instance.LoadedModsWithVersions.ContainsKey(mod.GetType().Name))
             {
@@ -507,6 +595,7 @@ namespace Modding
                 ModHooks.Instance.LoadedModsWithVersions.Remove(mod.GetType().Name);
                 ModHooks.Instance.LoadedMods.Remove(mod.GetType().Name);
 
+                SubscribeEvents(mod, false);
                 mod.Unload();
             }
             catch (Exception ex)
@@ -537,6 +626,101 @@ namespace Modding
             }
 
             return false;
+        }
+
+        // TODO: Cache delegates
+        private static void SubscribeEvents([CanBeNull] IMod mod, bool subscribe)
+        {
+            if (!subscribe && !(mod is ITogglableMod))
+            {
+                Logger.LogWarn($"[API] - Cannot unsubscribe events for non-togglable mod '{mod?.GetName()}'");
+                return;
+            }
+
+            foreach ((EventInfo e, MethodInfo method, Type modType) in EventSubscriptions)
+            {
+                if (mod == null && modType != null)
+                {
+                    continue;
+                }
+
+                if (mod != null && modType != mod.GetType())
+                {
+                    continue;
+                }
+
+                if (method.IsStatic)
+                {
+                    if (subscribe)
+                    {
+                        e.AddEventHandler(ModHooks.Instance, Delegate.CreateDelegate(e.EventHandlerType, method));
+                    }
+                    else
+                    {
+                        e.RemoveEventHandler(ModHooks.Instance, Delegate.CreateDelegate(e.EventHandlerType, method));
+                    }
+                }
+                else if (mod != null && method.DeclaringType == mod.GetType())
+                {
+                    if (subscribe)
+                    {
+                        e.AddEventHandler(ModHooks.Instance, Delegate.CreateDelegate(e.EventHandlerType, mod, method));
+                    }
+                    else
+                    {
+                        e.RemoveEventHandler(ModHooks.Instance, Delegate.CreateDelegate(e.EventHandlerType, mod, method));
+                    }
+                }
+                else
+                {
+                    foreach (FieldInfo field in EventSubscribers)
+                    {
+                        if (field.FieldType != method.DeclaringType)
+                        {
+                            continue;
+                        }
+
+                        if (field.IsStatic)
+                        {
+                            if (subscribe)
+                            {
+                                e.AddEventHandler(ModHooks.Instance,
+                                    Delegate.CreateDelegate(e.EventHandlerType, field.GetValue(null), method));
+                            }
+                            else
+                            {
+                                e.RemoveEventHandler(ModHooks.Instance,
+                                    Delegate.CreateDelegate(e.EventHandlerType, field.GetValue(null), method));
+                            }
+                        }
+                        else
+                        {
+                            IMod fieldMod = LoadedMods.FirstOrDefault(imod => imod.GetType() == field.DeclaringType);
+
+                            if (fieldMod == null)
+                            {
+                                // Shouldn't ever happen
+                                Logger.LogWarn(
+                                    $"[API] - Cannot find Mod '{field.DeclaringType}', requested by '{method.DeclaringType.FullName}.{method.Name}'");
+                                break;
+                            }
+
+                            if (subscribe)
+                            {
+                                e.AddEventHandler(ModHooks.Instance,
+                                    Delegate.CreateDelegate(e.EventHandlerType, field.GetValue(fieldMod), method));
+                            }
+                            else
+                            {
+                                e.RemoveEventHandler(ModHooks.Instance,
+                                    Delegate.CreateDelegate(e.EventHandlerType, field.GetValue(fieldMod), method));
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
         }
     }
 }

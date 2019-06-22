@@ -14,7 +14,7 @@ namespace Modding
     ///     Base mod class.
     /// </summary>
     [PublicAPI]
-    public class Mod : Loggable, IMod
+    public abstract class Mod : Loggable, IMod
     {
         private readonly string _globalSettingsPath;
 
@@ -47,7 +47,7 @@ namespace Modding
         /// <summary>
         ///     Legacy constructor instead of optional argument to not break old mods
         /// </summary>
-        public Mod() : this(null)
+        protected Mod() : this(null)
         {
         }
 
@@ -55,7 +55,7 @@ namespace Modding
         /// <summary>
         ///     Constructs the mod, assigns the instance and sets the name.
         /// </summary>
-        public Mod(string name)
+        protected Mod(string name)
         {
             if (string.IsNullOrEmpty(name))
             {

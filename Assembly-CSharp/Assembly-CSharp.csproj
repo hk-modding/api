@@ -72,6 +72,7 @@
     <Compile Include="CallerMemberName.cs" />
     <Compile Include="CanvasUtil.cs" />
     <Compile Include="Console.cs" />
+    <Compile Include="EventSubscriberAttribute.cs" />
     <Compile Include="GithubVersionHelper.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Handlers.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="SerializableIntDictionary.cs" />
     <Compile Include="SerializableStringDictionary.cs" />
     <Compile Include="SimpleLogger.cs" />
+    <Compile Include="SubscribeEventAttribute.cs" />
     <Compile Include="TogglableMod.cs" />
     <Compile Include="VoidModSettings.cs" />
     <Compile Include="ReflectionHelper.cs" />
