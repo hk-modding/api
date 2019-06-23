@@ -92,7 +92,7 @@ namespace Modding
                 Logger.LogDebug("[API] - Loading assembly: " + modPath);
                 try
                 {
-                    foreach (Type type in Assembly.LoadFile(modPath).GetExportedTypes())
+                    foreach (Type type in Assembly.LoadFile(modPath).GetTypes())
                     {
 #pragma warning disable 618 // Backwards compatibility
                         if (IsSubclassOfRawGeneric(typeof(Mod<>), type))
@@ -649,26 +649,31 @@ namespace Modding
                     continue;
                 }
 
+                Delegate del = null;
                 if (method.IsStatic)
                 {
-                    if (subscribe)
+                    try
                     {
-                        e.AddEventHandler(ModHooks.Instance, Delegate.CreateDelegate(e.EventHandlerType, method));
+                        del = Delegate.CreateDelegate(e.EventHandlerType, method);
                     }
-                    else
+                    catch (Exception exception)
                     {
-                        e.RemoveEventHandler(ModHooks.Instance, Delegate.CreateDelegate(e.EventHandlerType, method));
+                        Logger.LogError(
+                            $"[API] - Could not create delegate for event subscriber '{method.DeclaringType?.FullName}.{method.Name}':\n{exception}");
+                        continue;
                     }
                 }
                 else if (mod != null && method.DeclaringType == mod.GetType())
                 {
-                    if (subscribe)
+                    try
                     {
-                        e.AddEventHandler(ModHooks.Instance, Delegate.CreateDelegate(e.EventHandlerType, mod, method));
+                        del = Delegate.CreateDelegate(e.EventHandlerType, mod, method);
                     }
-                    else
+                    catch (Exception exception)
                     {
-                        e.RemoveEventHandler(ModHooks.Instance, Delegate.CreateDelegate(e.EventHandlerType, mod, method));
+                        Logger.LogError(
+                            $"[API] - Could not create delegate for event subscriber '{method.DeclaringType.FullName}.{method.Name}':\n{exception}");
+                        continue;
                     }
                 }
                 else
@@ -680,18 +685,10 @@ namespace Modding
                             continue;
                         }
 
+                        object target;
                         if (field.IsStatic)
                         {
-                            if (subscribe)
-                            {
-                                e.AddEventHandler(ModHooks.Instance,
-                                    Delegate.CreateDelegate(e.EventHandlerType, field.GetValue(null), method));
-                            }
-                            else
-                            {
-                                e.RemoveEventHandler(ModHooks.Instance,
-                                    Delegate.CreateDelegate(e.EventHandlerType, field.GetValue(null), method));
-                            }
+                            target = field.GetValue(null);
                         }
                         else
                         {
@@ -705,20 +702,53 @@ namespace Modding
                                 break;
                             }
 
-                            if (subscribe)
-                            {
-                                e.AddEventHandler(ModHooks.Instance,
-                                    Delegate.CreateDelegate(e.EventHandlerType, field.GetValue(fieldMod), method));
-                            }
-                            else
-                            {
-                                e.RemoveEventHandler(ModHooks.Instance,
-                                    Delegate.CreateDelegate(e.EventHandlerType, field.GetValue(fieldMod), method));
-                            }
+                            target = field.GetValue(fieldMod);
+                        }
+
+                        if (target == null)
+                        {
+                            Logger.LogWarn(
+                                $"[API] - Event subscriber '{field.DeclaringType?.FullName}.{field.Name}' returned null.");
+                            continue;
+                        }
+
+                        try
+                        {
+                            del = Delegate.CreateDelegate(e.EventHandlerType, target, method);
+                        }
+                        catch (Exception exception)
+                        {
+                            Logger.LogError(
+                                $"[API] - Could not create delegate for event subscriber '{method.DeclaringType.FullName}.{method.Name}':\n{exception}");
+                            continue;
                         }
 
                         break;
                     }
+                }
+
+                if (del == null)
+                {
+                    Logger.LogWarn(
+                        $"[API] - Could not handle event subscription for '{method.DeclaringType?.FullName}.{method.Name}'.");
+                    continue;
+                }
+
+                try
+                {
+                    if (subscribe)
+                    {
+                        e.AddEventHandler(ModHooks.Instance, del);
+                    }
+                    else
+                    {
+                        e.RemoveEventHandler(ModHooks.Instance, del);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Logger.LogError(
+                        $"[API] - Could not {(subscribe ? "subscribe" : "unsubscribe")} event '{method.DeclaringType?.FullName}.{method.Name}':\n{exception}");
                 }
             }
         }
