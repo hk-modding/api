@@ -53,27 +53,16 @@ namespace Modding.Menu
             MenuButton defButton = (MenuButton) _uim.optionsMenuScreen.defaultHighlight;
             MenuButton modButton = Object.Instantiate(defButton.gameObject).GetComponent<MenuButton>();
 
-            Navigation nav = modButton.navigation;
-            nav.selectOnUp = defButton.FindSelectableOnDown().FindSelectableOnDown().FindSelectableOnDown()
-                .FindSelectableOnDown();
-            nav.selectOnDown = defButton.FindSelectableOnDown().FindSelectableOnDown().FindSelectableOnDown()
-                .FindSelectableOnDown().FindSelectableOnDown();
-            modButton.navigation = nav;
-
-            nav = modButton.FindSelectableOnUp().navigation;
-            nav.selectOnDown = modButton;
-            modButton.FindSelectableOnUp().navigation = nav;
-
-            nav = modButton.FindSelectableOnDown().navigation;
-            nav.selectOnUp = modButton;
-            modButton.FindSelectableOnDown().navigation = nav;
+            _uim.optionsMenuScreen.GetComponent<Patches.MenuButtonList>().AddSelectable(modButton, 5);
 
             modButton.name = "Mods";
 
-            modButton.transform.SetParent(modButton.FindSelectableOnUp().transform.parent);
+            modButton.transform.SetParent(defButton.FindSelectableOnDown().FindSelectableOnDown().FindSelectableOnDown()
+                .FindSelectableOnDown().transform.parent);
 
             modButton.transform.localPosition = new Vector2(0, -120);
-            modButton.transform.localScale = modButton.FindSelectableOnUp().transform.localScale;
+            modButton.transform.localScale = defButton.FindSelectableOnDown().FindSelectableOnDown().FindSelectableOnDown()
+                .FindSelectableOnDown().transform.localScale;
 
             Object.Destroy(modButton.gameObject.GetComponent<AutoLocalizeTextUI>());
             modButton.gameObject.transform.Find("Text").GetComponent<Text>().text = "Mods";
@@ -86,6 +75,9 @@ namespace Modding.Menu
             ModMenuScreen.topFleur = ModMenuScreen.gameObject.transform.Find("TopFleur").GetComponent<Animator>();
             ModMenuScreen.content = ModMenuScreen.gameObject.transform.Find("Content").GetComponent<CanvasGroup>();
 
+            Patches.MenuButtonList modButtons = go.GetComponent<Patches.MenuButtonList>();
+            modButtons.ClearSelectables();
+
             ModMenuScreen.title.gameObject.GetComponent<Text>().text = "Mods";
             Object.Destroy(ModMenuScreen.title.gameObject.GetComponent<AutoLocalizeTextUI>());
 
@@ -97,12 +89,8 @@ namespace Modding.Menu
                 .Cast<ITogglableMod>()
                 .ToList();
 
-            //modMenuScreen.content = modMenuScreen.gameObject.transform.GetChild()
             ModMenuScreen.defaultHighlight = ModMenuScreen.content.gameObject.transform.GetChild(0).GetChild(0)
                 .GetComponent<MenuButton>();
-            Object.Destroy(ModMenuScreen.defaultHighlight.FindSelectableOnDown().FindSelectableOnDown()
-                .FindSelectableOnDown().FindSelectableOnDown().FindSelectableOnDown().gameObject.transform.parent
-                .gameObject);
             Object.Destroy(ModMenuScreen.defaultHighlight.FindSelectableOnDown().FindSelectableOnDown()
                 .FindSelectableOnDown().FindSelectableOnDown().gameObject.transform.parent.gameObject);
             Object.Destroy(ModMenuScreen.defaultHighlight.FindSelectableOnDown().FindSelectableOnDown()
@@ -129,7 +117,13 @@ namespace Modding.Menu
                         GameObject menuItemParent = Object.Instantiate(item.gameObject);
                         FauxMenuOptionHorizontal menuItem = menuItemParent.AddComponent<FauxMenuOptionHorizontal>();
 
-                        menuItem.navigation = Navigation.defaultNavigation;
+                        menuItem.navigation = new Navigation
+                        {
+                            mode = Navigation.Mode.Explicit
+                        };
+
+                        modButtons.AddSelectable(menuItem);
+
                         int modIndex = i;
 
                         //Manages what should happen when the menu option changes (the user clicks and the mod is toggled On/Off)
@@ -161,7 +155,6 @@ namespace Modding.Menu
                             }
                             
                         };
-                        //dataDump(modArray[i].gameObject, 1);                    
 
                         menuItem.OptionList = new[] {"On", "Off"};
                         menuItem.OptionText = menuItem.gameObject.transform.GetChild(1).GetComponent<Text>();
@@ -189,36 +182,10 @@ namespace Modding.Menu
                         rt.anchorMin = new Vector2(0.5f, 1.0f);
                         rt.anchorMax = new Vector2(0.5f, 1.0f);
 
-                        //Image img = menuItem.AddComponent<Image>();
-                        //img.sprite = nullSprite();
-
                         menuItem.cancelAction = CancelAction.QuitModMenu;
 
                         _modArray[i] = menuItem;
-
-                        //AutoLocalizeTextUI localizeUI = modArray[i].GetComponent<AutoLocalizeTextUI>();
-                        //modArray[i].transform.GetChild(0).GetComponent<Text>().text = mods[i];
-                        //GameObject.Destroy(localizeUI);
                     }
-
-                    Navigation[] navs = new Navigation[_modArray.Length];
-                    for (int i = 0; i < _modArray.Length; i++)
-                    {
-                        navs[i] = new Navigation
-                        {
-                            mode = Navigation.Mode.Explicit,
-                            selectOnUp = i == 0 ? _back : _modArray[i - 1],
-                            selectOnDown = i == _modArray.Length - 1 ? _back : _modArray[i + 1]
-                        };
-
-                        _modArray[i].navigation = navs[i];
-                    }
-
-                    ModMenuScreen.defaultHighlight = _modArray[0];
-                    Navigation nav2 = _back.navigation;
-                    nav2.selectOnUp = _modArray[_modArray.Length - 1];
-                    nav2.selectOnDown = _modArray[0];
-                    _back.navigation = nav2;
                 }
             }
             catch (Exception ex)
@@ -226,6 +193,14 @@ namespace Modding.Menu
                 LogError(ex);
             }
 
+            _back.navigation = new Navigation
+            {
+                mode = Navigation.Mode.Explicit
+            };
+
+            modButtons.AddSelectable(_back);
+
+            modButtons.RecalculateNavigation();
 
             ((MenuSelectable) _back).cancelAction = CancelAction.QuitModMenu;
             EventTrigger backEvents = _back.gameObject.GetComponent<EventTrigger>();

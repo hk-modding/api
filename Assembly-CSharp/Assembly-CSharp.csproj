@@ -109,6 +109,7 @@
     <Compile Include="Patches\GradeMarker.cs" />
     <Compile Include="Patches\DRM\HealthManager.cs" />
     <Compile Include="Patches\HasComponent.cs" />
+    <Compile Include="Patches\MenuButtonList.cs" />
     <Compile Include="Patches\MenuSelectable.cs" />
     <Compile Include="Patches\ObjectPool.cs" />
     <Compile Include="Patches\GameManager.cs" />
