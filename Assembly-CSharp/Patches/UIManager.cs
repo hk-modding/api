@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Modding.Menu;
+using UnityEngine;
 using MonoMod;
 
 // ReSharper disable All
@@ -30,6 +31,20 @@ namespace Modding.Patches
             }
 
             return UIManager._instance;
+        }
+
+        [MonoModOriginalName("UIClosePauseMenu")]
+        public extern void orig_UIClosePauseMenu();
+
+        public void UIClosePauseMenu()
+        {
+            if (FauxUIManager.Instance != null && ModManager.ModMenuScreen != null &&
+                ModManager.ModMenuScreen.isActiveAndEnabled)
+            {
+                FauxUIManager.Instance.UIquitModMenu(false);
+            }
+
+            orig_UIClosePauseMenu();
         }
     }
 }
