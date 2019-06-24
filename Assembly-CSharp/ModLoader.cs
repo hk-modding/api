@@ -182,6 +182,11 @@ namespace Modding
                         foreach (FieldInfo field in type.GetFields(
                             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
                         {
+                            if (!field.GetCustomAttributes(typeof(EventSubscriberAttribute), false).Any())
+                            {
+                                continue;
+                            }
+
                             if (!field.IsStatic && !type.IsSubclassOf(typeof(Mod)))
                             {
                                 Logger.LogWarn($"[API] - '{type.FullName}.{field.Name}' cannot be an event subscriber, it is an instance method on a non-Mod.");
