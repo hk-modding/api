@@ -105,6 +105,14 @@ namespace Modding
             ModVersion = version.GetGameVersionString() + "-" + _modVersion;
 
             ApplicationQuitHook += SaveGlobalSettings;
+            
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                Logger.Log($"[API] Couldn't resolve assembly {args.Name}, with sender {sender}");
+
+                return null;
+            };
+
 
             // Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
             // try
