@@ -55,23 +55,9 @@ namespace Modding.Menu
 
             modButton.name = "Mods";
 
-            Navigation nav = modButton.navigation;
-            nav.selectOnUp = FindSelectable(defButton, 4, FindSelectableOnDown);
-            nav.selectOnDown = FindSelectable(defButton, 5, FindSelectableOnDown);
-
-            modButton.navigation = nav;
-
+            _uim.optionsMenuScreen.GetComponent<Patches.MenuButtonList>().AddSelectable(modButton, 5);
+            
             Selectable up = modButton.FindSelectableOnUp();
-
-            Navigation upNav = up.navigation;
-            upNav.selectOnDown = modButton;
-            up.navigation = upNav;
-
-            Selectable down = modButton.FindSelectableOnDown();
-
-            Navigation downNav = down.navigation;
-            downNav.selectOnUp = modButton;
-            down.navigation = downNav;
 
             modButton.transform.parent = up.transform.parent;
             modButton.transform.localPosition = new Vector2(0, -120);
@@ -86,6 +72,9 @@ namespace Modding.Menu
             ModMenuScreen.title = ModMenuScreen.transform.Find("Title").GetComponent<CanvasGroup>();
             ModMenuScreen.topFleur = ModMenuScreen.transform.Find("TopFleur").GetComponent<Animator>();
             ModMenuScreen.content = ModMenuScreen.transform.Find("Content").GetComponent<CanvasGroup>();
+
+            Patches.MenuButtonList modButtons = go.GetComponent<Patches.MenuButtonList>();
+            modButtons.ClearSelectables();
 
             ModMenuScreen.title.gameObject.GetComponent<Text>().text = "Mods";
 

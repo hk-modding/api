@@ -16,7 +16,7 @@ namespace Modding.Menu
     /// </summary>
     [PublicAPI]
     // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
-    public class FauxMenuOptionHorizontal : MenuSelectable, IPointerClickHandler, IMoveHandler
+    public class FauxMenuOptionHorizontal : MenuSelectable, IPointerClickHandler, IMoveHandler, ISubmitHandler
     {
         /// <summary>
         ///     Delegate for OnUpdate for when the settings for the menu option change.
@@ -249,6 +249,16 @@ namespace Modding.Menu
 
                 UpdateText();
             }
+        }
+
+        /// <summary>
+        ///     Called when Enter/A is pressed
+        /// </summary>
+        /// <param name="eventData">The event data for the submit</param>
+        public void OnSubmit(BaseEventData eventData)
+        {
+            IncrementOption();
+            uiAudioPlayer.PlaySlider();
         }
     }
 }

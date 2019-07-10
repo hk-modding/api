@@ -116,10 +116,10 @@ namespace Modding.Menu
             StartCoroutine(LoadModMenu());
         }
 
-        public void UIquitModMenu()
+        public void UIquitModMenu(bool showOptions = true)
         {
             ModHooks.Instance.SaveGlobalSettings();
-            StartCoroutine(QuitModMenu());
+            StartCoroutine(QuitModMenu(showOptions));
         }
 
         private IEnumerator LoadModMenu()
@@ -130,12 +130,16 @@ namespace Modding.Menu
             gameManager.inputHandler.StartUIInput();
         }
 
-        private IEnumerator QuitModMenu()
+        private IEnumerator QuitModMenu(bool showOptions)
         {
             _logger.Log("Quitting Mod Menu");
             yield return StartCoroutine(HideMenu(ModManager.ModMenuScreen));
-            yield return StartCoroutine(ShowMenu(UIManager.instance.optionsMenuScreen));
-            gameManager.inputHandler.StartUIInput();
+
+            if (showOptions)
+            {
+                yield return StartCoroutine(ShowMenu(UIManager.instance.optionsMenuScreen));
+                gameManager.inputHandler.StartUIInput();
+            }
         }
     }
 }
