@@ -142,8 +142,4 @@
             <HintPath>../Vanilla/UnityEngine.UIModule.dll</HintPath>
         </Reference>
     </ItemGroup>
-    <ItemGroup>
-        <EmbeddedResource Include="github.crt" />
-        <EmbeddedResource Include="github2.crt" />
-    </ItemGroup>
 </Project>
