@@ -365,28 +365,5 @@ namespace Modding.Patches
                 return sceneLoad;
             }
         }
-
-
-#pragma warning disable 1587
-	    ///This allows a mod (or anything else) to "queue" a scene transition
-        ///TODO: After some testing without this, see if we should put it back in
-#pragma warning restore 1587
-        //[MonoModOriginalName( "BeginSceneTransitionRoutine" )]
-        //public void orig_BeginSceneTransitionRoutine( GameManager.SceneLoadInfo info ) { }
-        //[MonoModReplace]
-        //private IEnumerator BeginSceneTransitionRoutine( GameManager.SceneLoadInfo info )
-        //{
-        //    //this will allow 
-        //    while( sceneLoad != null )
-        //    {
-        //        Debug.LogErrorFormat( this, "Cannot scene transition to {0}, while a scene transition is in progress", new object[]
-        //        {
-        //             info.SceneName
-        //        } );
-        //        yield return new WaitForEndOfFrame();
-        //    }
-        //    orig_BeginSceneTransitionRoutine( info );            
-        //    yield break;
-        //}
     }
 }
