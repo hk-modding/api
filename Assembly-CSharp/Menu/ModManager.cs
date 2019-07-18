@@ -54,14 +54,14 @@ namespace Modding.Menu
             var modButton = UObject.Instantiate(defButton.gameObject).GetComponent<MenuButton>();
 
             modButton.name = "Mods";
-
-            _uim.optionsMenuScreen.GetComponent<Patches.MenuButtonList>().AddSelectable(modButton, 5);
             
-            Selectable up = modButton.FindSelectableOnUp();
+            _uim.optionsMenuScreen.GetComponent<Patches.MenuButtonList>().AddSelectable(modButton, 5);
 
-            modButton.transform.parent = up.transform.parent;
+            Selectable sel = FindSelectable(defButton, 4, FindSelectableOnDown);
+
+            modButton.transform.parent = sel.transform.parent;
             modButton.transform.localPosition = new Vector2(0, -120);
-            modButton.transform.localScale = up.transform.localScale;
+            modButton.transform.localScale = sel.transform.localScale;
 
             UObject.Destroy(modButton.gameObject.GetComponent<AutoLocalizeTextUI>());
 
@@ -90,7 +90,7 @@ namespace Modding.Menu
                                                           .GetChild(0)
                                                           .GetComponent<MenuButton>();
 
-            for (int i = 5; i >= 1; i--)
+            for (int i = 4; i >= 1; i--)
             {
                 DestroyParent
                 (
@@ -115,6 +115,15 @@ namespace Modding.Menu
             {
                 LogError(ex);
             }
+
+            _back.navigation = new Navigation
+            {
+                mode = Navigation.Mode.Explicit
+                
+            };
+            
+            modButtons.AddSelectable(_back);
+            modButtons.RecalculateNavigation();
 
             ((MenuSelectable) _back).cancelAction = CancelAction.QuitModMenu;
 
@@ -217,26 +226,6 @@ namespace Modding.Menu
 
                 _modArray[i] = menuItem;
             }
-
-            Navigation[] navs = new Navigation[_modArray.Length];
-            for (int i = 0; i < _modArray.Length; i++)
-            {
-                navs[i] = new Navigation
-                {
-                    mode = Navigation.Mode.Explicit,
-                    selectOnUp = i   == 0 ? _back : _modArray[i                    - 1],
-                    selectOnDown = i == _modArray.Length - 1 ? _back : _modArray[i + 1]
-                };
-
-                _modArray[i].navigation = navs[i];
-            }
-
-            ModMenuScreen.defaultHighlight = _modArray[0];
-
-            Navigation backNav = _back.navigation;
-            backNav.selectOnUp = _modArray[_modArray.Length - 1];
-            backNav.selectOnDown = _modArray[0];
-            _back.navigation = backNav;
         }
 
         private static Selectable FindSelectable(Selectable s, int offset, Func<Selectable, Selectable> func)
