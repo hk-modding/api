@@ -48,7 +48,7 @@
         <!-- Rename files so the assembly name is correct and game loads !-->
         <Move SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(TargetDir)MONOMODDED.dll" />
         <Move SourceFiles="$(TargetDir)Assembly-CSharp.dll" DestinationFiles="$(TargetDir)OriginalAssembly-CSharp.dll.dll" />
-        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) $(ILRepack) /out:Assembly-CSharp.dll MONOModded.dll Merge.dll" />
+        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) $(ILRepack) /out:Assembly-CSharp.dll MONOModded.dll $(Merge)" />
         <Move SourceFiles="$(TargetDir)Assembly-CSharp.dll" DestinationFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" />
 
         <!-- Folder structure such that you can just merge dirs to install the api, not really necessary with the installer now !-->
