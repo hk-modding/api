@@ -199,15 +199,8 @@ namespace Modding
         /// <returns></returns>
         public static GameObject CreateCanvas(RenderMode renderMode, int referencePixelsPerUnit)
         {
-            GameObject c = new GameObject();
-            c.AddComponent<Canvas>().renderMode = renderMode;
-            CanvasScaler cs = c.AddComponent<CanvasScaler>();
-            cs.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            cs.referencePixelsPerUnit = referencePixelsPerUnit;
-            c.AddComponent<GraphicRaycaster>();
-            c.AddComponent<CanvasGroup>();
-            c.GetComponent<CanvasGroup>().blocksRaycasts = false;
-            c.GetComponent<CanvasGroup>().interactable = false;
+            GameObject c = CreateCanvas(renderMode);
+            c.GetComponent<CanvasScaler>().referencePixelsPerUnit = referencePixelsPerUnit;
             return c;
         }
 
@@ -220,15 +213,19 @@ namespace Modding
         /// <returns></returns>
         public static GameObject CreateCanvas(RenderMode renderMode, Vector2 size)
         {
+            GameObject c = CreateCanvas(renderMode);
+            c.GetComponent<CanvasScaler>().referenceResolution = size;
+            return c;
+        }
+
+        private static GameObject CreateCanvas(RenderMode renderMode)
+        {
             GameObject c = new GameObject();
             c.AddComponent<Canvas>().renderMode = renderMode;
             CanvasScaler cs = c.AddComponent<CanvasScaler>();
             cs.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            cs.referenceResolution = size;
             c.AddComponent<GraphicRaycaster>();
             c.AddComponent<CanvasGroup>();
-            c.GetComponent<CanvasGroup>().blocksRaycasts = false;
-            c.GetComponent<CanvasGroup>().interactable = false;
             return c;
         }
 
@@ -337,8 +334,7 @@ namespace Modding
         {
             GameObject panel = CreateBasePanel(parent, rectData);
 
-            CreateTextPanel(panel, text, fontSize, textAnchor, new RectData(new Vector2(0, 0), new Vector2(0, 0)),
-                bold);
+            CreateTextPanel(panel, text, fontSize, textAnchor, rectData, bold);
 
             Image img = panel.AddComponent<Image>();
             img.sprite = spr;
