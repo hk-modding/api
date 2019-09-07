@@ -1,38 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net472</TargetFramework>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <AssemblyTitle>Prepatcher</AssemblyTitle>
-    <Product>Prepatcher</Product>
-    <Copyright>Copyright ©  2019</Copyright>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <PostBuildEvent>move PrePatcher.exe ../../PrePatcher.exe</PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>move /y $(TargetDir)PrePatcher.exe ../../../PrePatcher.exe</PostBuildEvent>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\MonoMod\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Mdb">
-      <HintPath>..\MonoMod\Mono.Cecil.Mdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>..\MonoMod\Mono.Cecil.Pdb.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>..\MonoMod\Mono.Cecil.Rocks.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net472</TargetFramework>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <AssemblyTitle>Prepatcher</AssemblyTitle>
+        <Product>Prepatcher</Product>
+        <Copyright>Copyright © 2019</Copyright>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
+        <PostBuildEvent>move PrePatcher.exe ../../PrePatcher.exe</PostBuildEvent>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <DebugType>full</DebugType>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <DebugType>pdbonly</DebugType>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <PostBuildEvent>move /y $(TargetDir)PrePatcher.exe ../../../PrePatcher.exe</PostBuildEvent>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <Reference Include="System.Data.DataSetExtensions"/>
+        <Reference Include="Microsoft.CSharp"/>
+        <Reference Include="System.Net.Http"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Mono.Cecil" Version="0.10.4">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 </Project>

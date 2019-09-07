@@ -13,9 +13,6 @@
 
     <ItemGroup>
         <Files Include="$(SolutionDir)Vanilla/*" />
-        <Files Include="$(SolutionDir)MonoMod/*" />
-        <Files Include="$(SolutionDir)ILRepack/*" />
-        <Files Include="$(SolutionDir)packages/ValueTupleBridge.*/lib/net35/ValueTupleBridge.dll" />
         <Files Include="$(SolutionDir)Prepatcher/PrePatcher.exe" />
         
         <BuildDir Include="$(TargetDir)" />
@@ -71,26 +68,31 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="JSON" Version="1.0.1" />
-        <PackageReference Include="MonoMod" Version="19.7.4.3" />
-        <PackageReference Include="MonoMod.RuntimeDetour" Version="19.7.4.3" />
-        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="19.7.4.3" />
-        <PackageReference Include="MonoMod.Utils" Version="19.7.4.3" />
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-        <PackageReference Include="ValueTupleBridge" Version="0.1.5" />
+        <PackageReference Include="ILRepack" Version="2.1.0-beta1">
+            <IncludeAssets>build;compile</IncludeAssets>
+        </PackageReference>
+        
+        <PackageReference Include="MonoMod" Version="19.9.1.6">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="*">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+        
+        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="*">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+        
+        <PackageReference Include="ValueTupleBridge" Version="0.1.5">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
         <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
             <HintPath>../Vanilla/Assembly-CSharp.dll</HintPath>
             <SpecificVersion>False</SpecificVersion>
-        </Reference>
-        <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-            <HintPath>../MonoMod/Mono.Cecil.dll</HintPath>
-            <SpecificVersion>False</SpecificVersion>
-        </Reference>
-        <Reference Include="MonoMod">
-            <HintPath>../MonoMod/MonoMod.exe</HintPath>
         </Reference>
         <Reference Include="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <HintPath>../Vanilla/mscorlib.dll</HintPath>
