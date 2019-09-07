@@ -215,7 +215,14 @@ namespace Modding
             // ReSharper disable once SuspiciousTypeConversion.Global
             if (settings is ISerializationCallbackReceiver receiver)
             {
-                receiver.OnBeforeSerialize();
+                try
+                {
+                    receiver.OnBeforeSerialize();
+                }
+                catch (Exception e)
+                {
+                    LogError(e);
+                }
             }
             else if (settings == null)
             {
