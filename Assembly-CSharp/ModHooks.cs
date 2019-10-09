@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using GlobalEnums;
 using HutongGames.PlayMaker;
 using JetBrains.Annotations;
@@ -14,7 +10,6 @@ using UnityEngine;
 using Object = UnityEngine.Object;
 
 // ReSharper disable PossibleInvalidCastExceptionInForeachLoop
-// ReSharper disable file UnusedMember.Global
 // ReSharper disable SuggestVarOrType_SimpleTypes
 #pragma warning disable 1591
 
@@ -28,6 +23,7 @@ namespace Modding
     {
         // ReSharper disable once InconsistentNaming
         private const int _modVersion = 52;
+        
         internal static bool IsInitialized;
 
         /// <summary>
@@ -73,13 +69,10 @@ namespace Modding
 
         private ModHooks()
         {
-            Logger.Log("[API] - Adding GitHub SSL Cert to Allow for Checking of Mod Versions");
-
-            SetupServicePointAuthorizor();
             ModManager _ = new ModManager();
             Logger.SetLogLevel(GlobalSettings.LoggingLevel);
+            
             GameVersion gameVersion;
-
             try
             {
                 string[] versionNums = Constants.GAME_VERSION.Split('.');
@@ -105,25 +98,13 @@ namespace Modding
             ModVersion = version.GetGameVersionString() + "-" + _modVersion;
 
             ApplicationQuitHook += SaveGlobalSettings;
+            
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                Logger.Log($"[API] Couldn't resolve assembly {args.Name}, with sender {sender}");
 
-            // Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
-            // try
-            // {
-            //     GithubVersionHelper githubVersionHelper = new GithubVersionHelper("seanpr96/HollowKnight.Modding");
-
-            //     string currentGithubVersion = githubVersionHelper.GetVersion();
-            //     string[] temp = currentGithubVersion.Split('-');
-            //     int modVersionRevision = Convert.ToInt32(temp[1]);
-            //     Version tempNewVersion = new Version(temp[0]);
-            //     Version tempGameVersion = new Version(gameVersion.major, gameVersion.minor, gameVersion.revision, gameVersion.package);
-            //     Logger.LogDebug("[API] - Checking Game Version: " + tempGameVersion + " < " + tempNewVersion);
-            //     if(tempNewVersion.CompareTo(tempGameVersion ) < 0 || (tempNewVersion.CompareTo(tempGameVersion) == 0 && modVersionRevision > _modVersion))
-            //         IsCurrent = false;
-            // }
-            // catch(Exception ex)
-            // {
-            //     Logger.LogError("[API] - Couldn't check for new version." + ex);
-            // }
+                return null;
+            };
 
             IsInitialized = true;
         }
@@ -186,43 +167,6 @@ namespace Modding
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-            }
-        }
-
-        // Used to make the Github Certificate valid so that we can check for new versions.
-        // Used this command in linux: openssl s_client -connect api.github.com:443
-        private static void SetupServicePointAuthorizor()
-        {
-            X509Certificate2 gitHubCertificate = new X509Certificate2();
-            gitHubCertificate.Import(GetEmbeddedCertBytes("github.crt"));
-
-            X509Certificate2 gitHubCertificate2 = new X509Certificate2();
-            gitHubCertificate2.Import(GetEmbeddedCertBytes("github2.crt"));
-
-            ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, errors) =>
-            {
-                Logger.LogDebug(errors.ToString());
-                Logger.Log(certificate.Subject);
-                return certificate.Equals(gitHubCertificate) || certificate.Equals(gitHubCertificate2);
-            };
-        }
-
-        private static byte[] GetEmbeddedCertBytes(string name)
-        {
-            string resourceName = "Modding." + name;
-
-            using (Stream stream = Assembly.GetCallingAssembly().GetManifestResourceStream(resourceName))
-            {
-                if (stream == null)
-                {
-                    return null;
-                }
-
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    string result = reader.ReadToEnd();
-                    return Encoding.ASCII.GetBytes(result);
-                }
             }
         }
 

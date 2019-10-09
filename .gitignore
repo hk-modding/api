@@ -261,12 +261,7 @@ __pycache__/
 *.pyc
 
 Vanilla/
-VanillaMac/
-VanillaLinux/
-Output1/
 OutputFinal/
-OutputFinalMac/
-OutputFinalLinux/
 
 ###############
 #    folder   #
@@ -276,10 +271,6 @@ OutputFinalLinux/
 /**/packages/
 /**/bin/
 /**/obj/
-_site
 ExampleMods/**/*.zip
 ExampleMods/**/Distribution/*
 ModdingAPI.zip
-ModdingAPIMac.zip
-ModdingAPILinux.zip
-localzip.bat
