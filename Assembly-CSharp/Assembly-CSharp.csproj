@@ -13,8 +13,8 @@
 
     <ItemGroup>
         <Files Include="$(SolutionDir)Vanilla/*" />
-        <Files Include="$(SolutionDir)Prepatcher/PrePatcher.exe" />
-        
+        <Files Include="$(SolutionDir)PrePatcher/PrePatcher.exe" />
+
         <BuildDir Include="$(TargetDir)" />
     </ItemGroup>
 
@@ -25,11 +25,11 @@
         <ILRepack>$(SolutionDir)ILRepack/ILRepack.exe</ILRepack>
         <Merge>MMHOOK_Assembly-CSharp.dll MMHOOK_PlayMaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll ValueTupleBridge.dll</Merge>
     </PropertyGroup>
-    
+
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <Delete Condition="Exists('$(OutputDir)')" Files="$(OutputDir)" />
         <Delete Condition="Exists('$(SolutionDir)ModdingAPI.zip')" Files="$(SolutionDir)ModdingAPI.zip" />
-        
+
         <Copy SkipUnchangedFiles="true" SourceFiles="@(Files)" DestinationFolder="@(BuildDir)" />
 
         <Exec Condition="!Exists('$(TargetDir)Assembly-CSharp-patched.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
@@ -45,7 +45,7 @@
         <!-- Rename files so the assembly name is correct and game loads !-->
         <Move SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(TargetDir)MONOMODDED.dll" />
         <Move SourceFiles="$(TargetDir)Assembly-CSharp.dll" DestinationFiles="$(TargetDir)OriginalAssembly-CSharp.dll.dll" />
-        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) $(ILRepack) /out:Assembly-CSharp.dll MONOModded.dll $(Merge)" />
+        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) $(ILRepack) /out:Assembly-CSharp.dll MONOMODDED.dll $(Merge)" />
         <Move SourceFiles="$(TargetDir)Assembly-CSharp.dll" DestinationFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" />
 
         <!-- Folder structure such that you can just merge dirs to install the api, not really necessary with the installer now !-->
@@ -53,7 +53,7 @@
         <Copy SourceFiles="$(SolutionDir)/readme.moddingapi.md" DestinationFiles="$(OutputDir)/README.md" />
         <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(OutputDir)/hollow_knight_Data/Managed/Assembly-CSharp.dll" />
         <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(OutputDir)/hollow_knight_Data/Managed/Assembly-CSharp.xml" />
-        
+
         <!-- Zip the Distribution Folder !-->
         <ZipDirectory SourceDirectory="$(OutputDir)" DestinationFile="$(SolutionDir)ModdingAPI.zip" />
     </Target>
@@ -71,19 +71,19 @@
         <PackageReference Include="ILRepack" Version="2.1.0-beta1">
             <IncludeAssets>build;compile</IncludeAssets>
         </PackageReference>
-        
+
         <PackageReference Include="MonoMod" Version="19.9.1.6">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
 
-        <PackageReference Include="MonoMod.RuntimeDetour" Version="*">
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="19.9.1.6">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
-        
-        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="*">
+
+        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="19.9.1.6">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
-        
+
         <PackageReference Include="ValueTupleBridge" Version="0.1.5">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>

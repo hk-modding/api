@@ -3,31 +3,30 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net472</TargetFramework>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-        <AssemblyTitle>Prepatcher</AssemblyTitle>
-        <Product>Prepatcher</Product>
+        <AssemblyTitle>PrePatcher</AssemblyTitle>
+        <Product>PrePatcher</Product>
         <Copyright>Copyright © 2019</Copyright>
         <OutputPath>bin\$(Configuration)\</OutputPath>
-        <PostBuildEvent>move PrePatcher.exe ../../PrePatcher.exe</PostBuildEvent>
     </PropertyGroup>
-    
+
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <DebugType>full</DebugType>
     </PropertyGroup>
-    
+
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <DebugType>pdbonly</DebugType>
     </PropertyGroup>
-    
-    <PropertyGroup>
-        <PostBuildEvent>move /y $(TargetDir)PrePatcher.exe ../../../PrePatcher.exe</PostBuildEvent>
-    </PropertyGroup>
-    
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Copy SourceFiles="$(TargetDir)PrePatcher.exe" DestinationFiles="$(TargetDir)../../../PrePatcher.exe" />
+    </Target>
+
     <ItemGroup>
-        <Reference Include="System.Data.DataSetExtensions"/>
-        <Reference Include="Microsoft.CSharp"/>
-        <Reference Include="System.Net.Http"/>
+        <Reference Include="System.Data.DataSetExtensions" />
+        <Reference Include="Microsoft.CSharp" />
+        <Reference Include="System.Net.Http" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="Mono.Cecil" Version="0.10.4">
             <IncludeAssets>all</IncludeAssets>
