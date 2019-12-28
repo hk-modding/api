@@ -21,8 +21,7 @@ namespace Modding
     [PublicAPI]
     public class ModHooks
     {
-        // ReSharper disable once InconsistentNaming
-        private const int _modVersion = 52;
+        private const int _modVersion = 53;
         
         internal static bool IsInitialized;
 
