@@ -814,13 +814,11 @@ namespace Modding
         }
 
 
-        [HookInfo(
-            "Called when an enemy recieves a death event. " +
-            "It looks like this event may be called multiple times on an enemy, " +
-            "so check \"eventAlreadyRecieved\" to see if the event has been fired more than once.",
-            "EnemyDeathEffects.RecieveDeathEvent"
-        )]
+        [Obsolete("Use OnReceiveDeathEventHook.")]
+        // Wrong return type but it's already used so we have this hook for compatability reasons...
+        #pragma warning disable 618
         public event OnRecieveDeathEventHandler OnRecieveDeathEventHook
+        #pragma warning restore 618
         {
             add
             {
@@ -833,8 +831,33 @@ namespace Modding
                 _OnRecieveDeathEventHook -= value;
             }
         }
+        
+        [HookInfo(
+            "Called when an enemy recieves a death event. " +
+            "It looks like this event may be called multiple times on an enemy, " +
+            "so check \"eventAlreadyRecieved\" to see if the event has been fired more than once.",
+            "EnemyDeathEffects.RecieveDeathEvent"
+        )]
+        public event OnReceiveDeathEventHandler OnReceiveDeathEventHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnReceiveDeathEventHook");
+                _OnReceiveDeathEventHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnReceiveDeathEventHook");
+                _OnReceiveDeathEventHook -= value;
+            }
+        }
 
+        // Compatability.
+        #pragma warning disable 618
         private event OnRecieveDeathEventHandler _OnRecieveDeathEventHook;
+        #pragma warning restore 618
+        
+        private event OnReceiveDeathEventHandler _OnReceiveDeathEventHook;
 
         /// <summary>
         ///     Called when an enemy recieves a death event. It looks like this event may be called multiple times on an enemy, so
@@ -853,34 +876,65 @@ namespace Modding
         {
             Logger.LogFine("[API] - OnRecieveDeathEvent Invoked");
 
-            if (_OnRecieveDeathEventHook == null)
+            if (_OnReceiveDeathEventHook != null)
             {
-                return;
+                Delegate[] invocationList = _OnReceiveDeathEventHook.GetInvocationList();
+
+                foreach (OnReceiveDeathEventHandler toInvoke in invocationList)
+                {
+                    try
+                    {
+                        toInvoke.Invoke
+                        (
+                            enemyDeathEffects,
+                            eventAlreadyRecieved,
+                            ref attackDirection,
+                            ref resetDeathEvent,
+                            ref spellBurn,
+                            ref isWatery
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("[API] - " + ex);
+                    }
+                }
             }
 
-            Delegate[] invocationList = _OnRecieveDeathEventHook.GetInvocationList();
-
-            foreach (OnRecieveDeathEventHandler toInvoke in invocationList)
+            if (_OnRecieveDeathEventHook == null) return;
+            
             {
-                try
+                Delegate[] invocationList = _OnRecieveDeathEventHook.GetInvocationList();
+
+                #pragma warning disable 618
+                foreach (OnRecieveDeathEventHandler toInvoke in invocationList)
+                    #pragma warning restore 618
                 {
-                    toInvoke.Invoke(enemyDeathEffects, eventAlreadyRecieved, ref attackDirection, ref resetDeathEvent,
-                        ref spellBurn, ref isWatery);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError("[API] - " + ex);
+                    try
+                    {
+                        toInvoke.Invoke
+                        (
+                            enemyDeathEffects,
+                            eventAlreadyRecieved,
+                            ref attackDirection,
+                            ref resetDeathEvent,
+                            ref spellBurn,
+                            ref isWatery
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("[API] - " + ex);
+                    }
                 }
             }
         }
 
 
-        [HookInfo(
-            "Called when an enemy dies and a journal kill is recorded. " +
-            "You may use the \"playerDataName\" string or one of the additional pre-formatted player data strings to look up values in playerData.",
-            "EnemyDeathEffects.OnRecordKillForJournal"
-        )]
+        [Obsolete("Use RecordKillForJournalHook")]
+        #pragma warning disable 618
         public event OnRecordKillForJournalHandler OnRecordKillForJournalHook
+        #pragma warning restore 618
         {
             add
             {
@@ -894,7 +948,30 @@ namespace Modding
             }
         }
 
+        #pragma warning disable 618
         private event OnRecordKillForJournalHandler _OnRecordKillForJournalHook;
+        #pragma warning restore 618
+        
+        [HookInfo(
+            "Called when an enemy dies and a journal kill is recorded. " +
+            "You may use the \"playerDataName\" string or one of the additional pre-formatted player data strings to look up values in playerData.",
+            "EnemyDeathEffects.OnRecordKillForJournal"
+        )]
+        public event RecordKillForJournalHandler RecordKillForJournalHook
+        {
+            add
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnRecordKillForJournalHook");
+                _RecordKillForJournalHook += value;
+            }
+            remove
+            {
+                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnRecordKillForJournalHook");
+                _RecordKillForJournalHook -= value;
+            }
+        }
+        
+        private event RecordKillForJournalHandler _RecordKillForJournalHook;
 
         /// <summary>
         ///     Called when an enemy dies and a journal kill is recorded. You may use the "playerDataName" string or one of the
@@ -912,29 +989,53 @@ namespace Modding
         {
             Logger.LogFine("[API] - RecordKillForJournal Invoked");
 
-            if (_OnRecordKillForJournalHook == null)
+            if (_OnRecordKillForJournalHook != null)
             {
-                return;
+                Delegate[] invocationList = _OnRecordKillForJournalHook.GetInvocationList();
+
+                #pragma warning disable 618
+                foreach (OnRecordKillForJournalHandler toInvoke in invocationList)
+                #pragma warning restore 618
+                {
+                    try
+                    {
+                        toInvoke.Invoke
+                        (
+                            enemyDeathEffects,
+                            playerDataName,
+                            killedBoolPlayerDataLookupKey,
+                            killCountIntPlayerDataLookupKey,
+                            newDataBoolPlayerDataLookupKey
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("[API] - " + ex);
+                    }
+                }
             }
 
-            Delegate[] invocationList = _OnRecordKillForJournalHook.GetInvocationList();
-
-            foreach (OnRecordKillForJournalHandler toInvoke in invocationList)
+            if (_RecordKillForJournalHook == null) return;
             {
-                try
+                Delegate[] invocationList = _RecordKillForJournalHook.GetInvocationList();
+
+                foreach (RecordKillForJournalHandler toInvoke in invocationList)
                 {
-                    toInvoke.Invoke
-                    (
-                        enemyDeathEffects,
-                        playerDataName,
-                        killedBoolPlayerDataLookupKey,
-                        killCountIntPlayerDataLookupKey,
-                        newDataBoolPlayerDataLookupKey
-                    );
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogError("[API] - " + ex);
+                    try
+                    {
+                        toInvoke.Invoke
+                        (
+                            enemyDeathEffects,
+                            playerDataName,
+                            killedBoolPlayerDataLookupKey,
+                            killCountIntPlayerDataLookupKey,
+                            newDataBoolPlayerDataLookupKey
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError("[API] - " + ex);
+                    }
                 }
             }
         }
