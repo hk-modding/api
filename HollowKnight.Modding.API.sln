@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly
 		{E06FBDDA-0A27-45EC-AC28-259C23715C50} = {E06FBDDA-0A27-45EC-AC28-259C23715C50}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prepatcher", "Prepatcher\Prepatcher.csproj", "{E06FBDDA-0A27-45EC-AC28-259C23715C50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrePatcher", "PrePatcher\PrePatcher.csproj", "{E06FBDDA-0A27-45EC-AC28-259C23715C50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
