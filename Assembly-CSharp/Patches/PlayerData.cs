@@ -212,8 +212,8 @@ namespace Modding.Patches
 
         public void UpdateBlueHealth()
         {
-            healthBlue = ModHooks.Instance.OnBlueHealth();
             orig_UpdateBlueHealth();
+            healthBlue += ModHooks.Instance.OnBlueHealth();
         }
     
         [MonoModOriginalName("AddHealth")]
