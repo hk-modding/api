@@ -311,25 +311,29 @@ namespace Modding
 
                 // Preload all needed objects
                 int progress = 0;
-                foreach (string sceneName in toPreload.Keys)
-                {
-                    Logger.Log($"[API] - Loading scene \"{sceneName}\"");
 
-                    AsyncOperation load = USceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
+                IEnumerator Enumerator(string s)
+                {
+                    Logger.Log($"[API] - Loading scene \"{s}\"");
+
+                    AsyncOperation load = USceneManager.LoadSceneAsync(s, LoadSceneMode.Additive);
 
                     while (!load.isDone)
                     {
                         loadingBarRect.sizeDelta =
-                            new Vector2((progress + load.progress / 0.9f) / toPreload.Count * 975,
-                                loadingBarRect.sizeDelta.y);
+                            new Vector2
+                            (
+                                (progress + load.progress / 0.9f) / toPreload.Count * 975,
+                                loadingBarRect.sizeDelta.y
+                            );
                         yield return new WaitForEndOfFrame();
                     }
 
-                    Scene scene = USceneManager.GetSceneByName(sceneName);
+                    Scene scene = USceneManager.GetSceneByName(s);
                     GameObject[] rootObjects = scene.GetRootGameObjects();
 
                     // Fetch object names to preload
-                    List<(IMod, List<string>)> sceneObjects = toPreload[sceneName];
+                    List<(IMod, List<string>)> sceneObjects = toPreload[s];
 
                     foreach ((IMod mod, List<string> objNames) in sceneObjects)
                     {
@@ -350,8 +354,10 @@ namespace Modding
                             }
                             else if (slashIndex == 0 || slashIndex == objName.Length - 1)
                             {
-                                Logger.LogWarn(
-                                    $"[API] - Invalid preload object name given by mod \"{mod.GetName()}\": \"{objName}\"");
+                                Logger.LogWarn
+                                (
+                                    $"[API] - Invalid preload object name given by mod \"{mod.GetName()}\": \"{objName}\""
+                                );
                                 continue;
                             }
                             else
@@ -364,8 +370,10 @@ namespace Modding
                             GameObject obj = rootObjects.FirstOrDefault(o => o.name == rootName);
                             if (obj == null)
                             {
-                                Logger.LogWarn(
-                                    $"[API] - Could not find object \"{objName}\" in scene \"{sceneName}\", requested by mod \"{mod.GetName()}\"");
+                                Logger.LogWarn
+                                (
+                                    $"[API] - Could not find object \"{objName}\" in scene \"{s}\", requested by mod \"{mod.GetName()}\""
+                                );
                                 continue;
                             }
 
@@ -375,8 +383,10 @@ namespace Modding
                                 Transform t = obj.transform.Find(childName);
                                 if (t == null)
                                 {
-                                    Logger.LogWarn(
-                                        $"[API] - Could not find object \"{objName}\" in scene \"{sceneName}\", requested by mod \"{mod.GetName()}\"");
+                                    Logger.LogWarn
+                                    (
+                                        $"[API] - Could not find object \"{objName}\" in scene \"{s}\", requested by mod \"{mod.GetName()}\""
+                                    );
                                     continue;
                                 }
 
@@ -384,18 +394,24 @@ namespace Modding
                             }
 
                             // Create all sub-dictionaries if necessary (Yes, it's terrible)
-                            if (!preloadedObjects.TryGetValue(mod,
-                                out Dictionary<string, Dictionary<string, GameObject>> modPreloadedObjects))
+                            if (!preloadedObjects.TryGetValue
+                            (
+                                mod,
+                                out Dictionary<string, Dictionary<string, GameObject>> modPreloadedObjects
+                            ))
                             {
                                 modPreloadedObjects = new Dictionary<string, Dictionary<string, GameObject>>();
                                 preloadedObjects[mod] = modPreloadedObjects;
                             }
 
-                            if (!modPreloadedObjects.TryGetValue(sceneName,
-                                out Dictionary<string, GameObject> modScenePreloadedObjects))
+                            if (!modPreloadedObjects.TryGetValue
+                            (
+                                s,
+                                out Dictionary<string, GameObject> modScenePreloadedObjects
+                            ))
                             {
                                 modScenePreloadedObjects = new Dictionary<string, GameObject>();
-                                modPreloadedObjects[sceneName] = modScenePreloadedObjects;
+                                modPreloadedObjects[s] = modScenePreloadedObjects;
                             }
 
                             // Create inactive duplicate of requested object
@@ -411,6 +427,16 @@ namespace Modding
                     // Update loading progress
                     progress++;
                 }
+
+                foreach (string sceneName in toPreload.Keys)
+                {
+                    coroutineHolder.GetComponent<NonBouncer>().StartCoroutine(Enumerator(sceneName));
+                }
+
+                int len = toPreload.Keys.Count;
+
+                while (progress != len)
+                    yield return null;
 
                 // Restore the audio
                 AudioListener.pause = false;
