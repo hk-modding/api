@@ -438,9 +438,6 @@ namespace Modding
                 while (progress != len)
                     yield return null;
 
-                // Restore the audio
-                AudioListener.pause = false;
-
                 // Reload the main menu to fix the music/shaders
                 Logger.Log("[API] - Preload done, returning to main menu");
                 Preloaded = true;
@@ -454,6 +451,9 @@ namespace Modding
 
                 // Remove the black screen
                 Object.Destroy(blanker);
+                
+                // Restore the audio
+                AudioListener.pause = false;
             }
 
             ModHooks.Instance.LoadGlobalSettings();
