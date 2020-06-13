@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using JetBrains.Annotations;
@@ -20,6 +21,8 @@ namespace Modding
 
         private static LogLevel _logLevel;
 
+        internal static readonly SimpleLogger APILogger = new SimpleLogger("API");
+
         /// <summary>
         ///     Logger Constructor.  Initializes file to write to.
         /// </summary>
@@ -28,8 +31,29 @@ namespace Modding
             Debug.Log("Creating Mod Logger");
             _logLevel = LogLevel.Debug;
 
-            FileStream fileStream = new FileStream(Application.persistentDataPath + ModHooks.PathSeperator + "ModLog.txt",
-                FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+            string oldLogDir = Path.Combine(Application.persistentDataPath, "Old ModLogs");
+            if (!Directory.Exists(oldLogDir))
+            {
+                Directory.CreateDirectory(oldLogDir);
+            }
+
+            foreach (string fileName in Directory.GetFiles(oldLogDir))
+            {
+                if (File.GetCreationTimeUtc(fileName) < DateTime.UtcNow.AddDays(-7))
+                {
+                    File.Delete(fileName);
+                }
+            }
+
+            string currLogName = Path.Combine(Application.persistentDataPath, "ModLog.txt");
+            if (File.Exists(currLogName))
+            {
+                string oldLogName = "ModLog " + File.GetCreationTimeUtc(currLogName)
+                                        .ToString("MM dd yyyy (HH mm ss)", CultureInfo.InvariantCulture) + ".txt";
+                File.Move(currLogName, Path.Combine(oldLogDir, oldLogName));
+            }
+
+            FileStream fileStream = new FileStream(currLogName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             Writer = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
         }
 
@@ -47,7 +71,8 @@ namespace Modding
         {
             if (_logLevel <= level)
             {
-                WriteToFile("[" + level.ToString().ToUpper() + "]:" + message + Environment.NewLine);
+                string levelText = "[" + level.ToString().ToUpper() + "]:";
+                WriteToFile(levelText + message.Replace("\n", "\n" + levelText) + Environment.NewLine);
             }
         }
 

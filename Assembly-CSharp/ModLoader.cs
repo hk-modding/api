@@ -63,7 +63,7 @@ namespace Modding
                 yield break;
             }
 
-            Logger.Log("[API] - Trying to load mods");
+            Logger.APILogger.Log("Trying to load mods");
             string path = string.Empty;
             if (SystemInfo.operatingSystem.Contains("Windows"))
             {
@@ -89,7 +89,7 @@ namespace Modding
 
             foreach (string modPath in Directory.GetFiles(path, "*.dll"))
             {
-                Logger.LogDebug("[API] - Loading assembly: " + modPath);
+                Logger.APILogger.LogDebug("Loading assembly: " + modPath);
                 try
                 {
                     foreach (Type type in Assembly.LoadFile(modPath).GetTypes())
@@ -98,7 +98,7 @@ namespace Modding
                         if (IsSubclassOfRawGeneric(typeof(Mod<>), type))
 #pragma warning restore 618
                         {
-                            Logger.LogDebug("[API] - Trying to instantiate mod<T>: " + type);
+                            Logger.APILogger.LogDebug("Trying to instantiate mod<T>: " + type);
 
                             if (!(Activator.CreateInstance(type) is IMod mod))
                             {
@@ -109,7 +109,7 @@ namespace Modding
                         }
                         else if (!type.IsGenericType && type.IsClass && type.IsSubclassOf(typeof(Mod)))
                         {
-                            Logger.LogDebug("[API] - Trying to instantiate mod: " + type);
+                            Logger.APILogger.LogDebug("Trying to instantiate mod: " + type);
                             if (!(type.GetConstructor(new Type[0])?.Invoke(new object[0]) is Mod mod))
                             {
                                 continue;
@@ -127,25 +127,25 @@ namespace Modding
                             {
                                 if (attr.ModType != null && !attr.ModType.IsSubclassOf(typeof(Mod)))
                                 {
-                                    Logger.LogWarn($"[API] - Mod type '{attr.ModType.FullName}' on '{type.FullName}.{method.Name}' is not a Mod.");
+                                    Logger.APILogger.LogWarn($"Mod type '{attr.ModType.FullName}' on '{type.FullName}.{method.Name}' is not a Mod.");
                                     continue;
                                 }
 
                                 if (string.IsNullOrEmpty(attr.HookName))
                                 {
-                                    Logger.LogWarn($"[API] - Null hook specified on method '{type.FullName}.{method.Name}'.");
+                                    Logger.APILogger.LogWarn($"Null hook specified on method '{type.FullName}.{method.Name}'.");
                                     continue;
                                 }
 
                                 if (method.ContainsGenericParameters)
                                 {
-                                    Logger.LogWarn($"[API] - Cannot subscribe method '{type.FullName}.{method.Name}', it contains generic parameters.");
+                                    Logger.APILogger.LogWarn($"Cannot subscribe method '{type.FullName}.{method.Name}', it contains generic parameters.");
                                     continue;
                                 }
 
                                 if (!ModHooksEvents.TryGetValue(attr.HookName, out EventInfo e))
                                 {
-                                    Logger.LogWarn($"[API] - Cannot subscribe method '{type.FullName}.{method.Name}' to nonexistent event '{attr.HookName}'.");
+                                    Logger.APILogger.LogWarn($"Cannot subscribe method '{type.FullName}.{method.Name}' to nonexistent event '{attr.HookName}'.");
                                     continue;
                                 }
 
@@ -154,13 +154,13 @@ namespace Modding
                                 if (invoke == null)
                                 {
                                     // This should never happen
-                                    Logger.LogWarn($"[API] - Event '{attr.HookName}' has no public method 'Invoke'.");
+                                    Logger.APILogger.LogWarn($"Event '{attr.HookName}' has no public method 'Invoke'.");
                                     continue;
                                 }
 
                                 if (invoke.ReturnType != method.ReturnType)
                                 {
-                                    Logger.LogWarn($"[API] - Cannot subscribe method '{type.FullName}.{method.Name}' to event '{attr.HookName}', return types do not match.");
+                                    Logger.APILogger.LogWarn($"Cannot subscribe method '{type.FullName}.{method.Name}' to event '{attr.HookName}', return types do not match.");
                                     continue;
                                 }
 
@@ -170,7 +170,7 @@ namespace Modding
                                 if (invokeParams.Length != subscriberParams.Length
                                     || invokeParams.Where((param, index) => param.ParameterType != subscriberParams[index].ParameterType).Any())
                                 {
-                                    Logger.LogWarn($"[API] - Cannot subscribe method '{type.FullName}.{method.Name}' to event '{attr.HookName}', parameters do not match.");
+                                    Logger.APILogger.LogWarn($"Cannot subscribe method '{type.FullName}.{method.Name}' to event '{attr.HookName}', parameters do not match.");
                                     continue;
                                 }
 
@@ -189,7 +189,7 @@ namespace Modding
 
                             if (!field.IsStatic && !type.IsSubclassOf(typeof(Mod)))
                             {
-                                Logger.LogWarn($"[API] - '{type.FullName}.{field.Name}' cannot be an event subscriber, it is an instance method on a non-Mod.");
+                                Logger.APILogger.LogWarn($"'{type.FullName}.{field.Name}' cannot be an event subscriber, it is an instance method on a non-Mod.");
                                 continue;
                             }
 
@@ -199,7 +199,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - Error: " + ex);
+                    Logger.APILogger.LogError("Error: " + ex);
                     Errors.Add(modPath + ": FAILED TO LOAD! Check ModLog.txt.");
                 }
             }
@@ -221,12 +221,12 @@ namespace Modding
             Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects =
                 new Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>>();
 
-            Logger.Log("[API] - Preloading");
+            Logger.APILogger.Log("Preloading");
 
             // Setup dict of scene preloads
             foreach (IMod mod in orderedMods)
             {
-                Logger.Log($"[API] - Checking preloads for mod \"{mod.GetName()}\"");
+                Logger.APILogger.Log($"Checking preloads for mod \"{mod.GetName()}\"");
 
                 List<(string, string)> preloadNames = mod.GetPreloadNames();
                 if (preloadNames == null)
@@ -241,14 +241,13 @@ namespace Modding
                 {
                     if (string.IsNullOrEmpty(scene) || string.IsNullOrEmpty(obj))
                     {
-                        Logger.LogWarn($"[API] - Mod \"{mod.GetName()}\" passed null values to preload");
+                        Logger.APILogger.LogWarn($"Mod \"{mod.GetName()}\" passed null values to preload");
                         continue;
                     }
 
                     if (!scenes.Contains(scene))
                     {
-                        Logger.LogWarn(
-                            $"[API] - Mod \"{mod.GetName()}\" attempted preload from non-existent scene \"{scene}\"");
+                        Logger.APILogger.LogWarn($"Mod \"{mod.GetName()}\" attempted preload from non-existent scene \"{scene}\"");
                         continue;
                     }
 
@@ -258,7 +257,7 @@ namespace Modding
                         modPreloads[scene] = objects;
                     }
 
-                    Logger.Log($"[API] - Found object \"{scene}.{obj}\"");
+                    Logger.APILogger.Log($"Found object \"{scene}.{obj}\"");
 
                     objects.Add(obj);
                 }
@@ -314,7 +313,7 @@ namespace Modding
 
                 IEnumerator Enumerator(string s)
                 {
-                    Logger.Log($"[API] - Loading scene \"{s}\"");
+                    Logger.APILogger.Log($"Loading scene \"{s}\"");
 
                     AsyncOperation load = USceneManager.LoadSceneAsync(s, LoadSceneMode.Additive);
 
@@ -337,11 +336,11 @@ namespace Modding
 
                     foreach ((IMod mod, List<string> objNames) in sceneObjects)
                     {
-                        Logger.Log($"[API] - Fetching objects for mod \"{mod.GetName()}\"");
+                        Logger.APILogger.Log($"Fetching objects for mod \"{mod.GetName()}\"");
 
                         foreach (string objName in objNames)
                         {
-                            Logger.Log($"[API] - Fetching object \"{objName}\"");
+                            Logger.APILogger.Log($"Fetching object \"{objName}\"");
 
                             // Split object name into root and child names based on '/'
                             string rootName;
@@ -354,10 +353,7 @@ namespace Modding
                             }
                             else if (slashIndex == 0 || slashIndex == objName.Length - 1)
                             {
-                                Logger.LogWarn
-                                (
-                                    $"[API] - Invalid preload object name given by mod \"{mod.GetName()}\": \"{objName}\""
-                                );
+                                Logger.APILogger.LogWarn($"Invalid preload object name given by mod \"{mod.GetName()}\": \"{objName}\"");
                                 continue;
                             }
                             else
@@ -370,10 +366,7 @@ namespace Modding
                             GameObject obj = rootObjects.FirstOrDefault(o => o.name == rootName);
                             if (obj == null)
                             {
-                                Logger.LogWarn
-                                (
-                                    $"[API] - Could not find object \"{objName}\" in scene \"{s}\", requested by mod \"{mod.GetName()}\""
-                                );
+                                Logger.APILogger.LogWarn($"Could not find object \"{objName}\" in scene \"{s}\", requested by mod \"{mod.GetName()}\"");
                                 continue;
                             }
 
@@ -383,10 +376,7 @@ namespace Modding
                                 Transform t = obj.transform.Find(childName);
                                 if (t == null)
                                 {
-                                    Logger.LogWarn
-                                    (
-                                        $"[API] - Could not find object \"{objName}\" in scene \"{s}\", requested by mod \"{mod.GetName()}\""
-                                    );
+                                    Logger.APILogger.LogWarn($"Could not find object \"{objName}\" in scene \"{s}\", requested by mod \"{mod.GetName()}\"");
                                     continue;
                                 }
 
@@ -439,7 +429,7 @@ namespace Modding
                     yield return null;
 
                 // Reload the main menu to fix the music/shaders
-                Logger.Log("[API] - Preload done, returning to main menu");
+                Logger.APILogger.Log("Preload done, returning to main menu");
                 Preloaded = true;
 
                 yield return USceneManager.LoadSceneAsync("Quit_To_Menu");
@@ -468,7 +458,7 @@ namespace Modding
                 catch (Exception ex)
                 {
                     Errors.Add(string.Concat(mod.GetName(), ": FAILED TO LOAD! Check ModLog.txt."));
-                    Logger.LogError("[API] - Error: " + ex);
+                    Logger.APILogger.LogError("Error: " + ex);
                 }
             }
 
@@ -547,7 +537,7 @@ namespace Modding
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError($"[API] - Failed to obtain mod namespace:\n{e}");
+                    Logger.APILogger.LogError($"Failed to obtain mod namespace:\n{e}");
                 }
             }
 
@@ -559,7 +549,7 @@ namespace Modding
 
                     if (nsMods == null || nsMods.Count == 0)
                     {
-                        Logger.LogWarn("[API] - Namespace mod list empty, ignoring");
+                        Logger.APILogger.LogWarn("Namespace mod list empty, ignoring");
                     }
                     else if (nsMods.Count == 1)
                     {
@@ -580,7 +570,7 @@ namespace Modding
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError($"[API] - Failed to append mod name text:\n{e}");
+                    Logger.APILogger.LogError($"Failed to append mod name text:\n{e}");
                 }
             }
 
@@ -631,7 +621,7 @@ namespace Modding
             }
             catch (Exception ex)
             {
-                Logger.LogError($"[API] - Failed to unload Mod - {mod.GetName()} - {Environment.NewLine} - {ex} ");
+                Logger.APILogger.LogError($"Failed to unload Mod - {mod.GetName()} - {Environment.NewLine} - {ex} ");
             }
 
             UpdateModText();
@@ -664,7 +654,7 @@ namespace Modding
         {
             if (!subscribe && !(mod is ITogglableMod))
             {
-                Logger.LogWarn($"[API] - Cannot unsubscribe events for non-togglable mod '{mod?.GetName()}'");
+                Logger.APILogger.LogWarn($"Cannot unsubscribe events for non-togglable mod '{mod?.GetName()}'");
                 return;
             }
 
@@ -689,8 +679,7 @@ namespace Modding
                     }
                     catch (Exception exception)
                     {
-                        Logger.LogError(
-                            $"[API] - Could not create delegate for event subscriber '{method.DeclaringType?.FullName}.{method.Name}':\n{exception}");
+                        Logger.APILogger.LogError($"Could not create delegate for event subscriber '{method.DeclaringType?.FullName}.{method.Name}':\n{exception}");
                         continue;
                     }
                 }
@@ -702,8 +691,7 @@ namespace Modding
                     }
                     catch (Exception exception)
                     {
-                        Logger.LogError(
-                            $"[API] - Could not create delegate for event subscriber '{method.DeclaringType.FullName}.{method.Name}':\n{exception}");
+                        Logger.APILogger.LogError($"Could not create delegate for event subscriber '{method.DeclaringType.FullName}.{method.Name}':\n{exception}");
                         continue;
                     }
                 }
@@ -728,8 +716,7 @@ namespace Modding
                             if (fieldMod == null)
                             {
                                 // Shouldn't ever happen
-                                Logger.LogWarn(
-                                    $"[API] - Cannot find Mod '{field.DeclaringType}', requested by '{method.DeclaringType.FullName}.{method.Name}'");
+                                Logger.APILogger.LogWarn($"Cannot find Mod '{field.DeclaringType}', requested by '{method.DeclaringType.FullName}.{method.Name}'");
                                 break;
                             }
 
@@ -738,8 +725,7 @@ namespace Modding
 
                         if (target == null)
                         {
-                            Logger.LogWarn(
-                                $"[API] - Event subscriber '{field.DeclaringType?.FullName}.{field.Name}' returned null.");
+                            Logger.APILogger.LogWarn($"Event subscriber '{field.DeclaringType?.FullName}.{field.Name}' returned null.");
                             continue;
                         }
 
@@ -749,8 +735,7 @@ namespace Modding
                         }
                         catch (Exception exception)
                         {
-                            Logger.LogError(
-                                $"[API] - Could not create delegate for event subscriber '{method.DeclaringType.FullName}.{method.Name}':\n{exception}");
+                            Logger.APILogger.LogError($"Could not create delegate for event subscriber '{method.DeclaringType.FullName}.{method.Name}':\n{exception}");
                             continue;
                         }
 
@@ -760,8 +745,7 @@ namespace Modding
 
                 if (del == null)
                 {
-                    Logger.LogWarn(
-                        $"[API] - Could not handle event subscription for '{method.DeclaringType?.FullName}.{method.Name}'.");
+                    Logger.APILogger.LogWarn($"Could not handle event subscription for '{method.DeclaringType?.FullName}.{method.Name}'.");
                     continue;
                 }
 
@@ -778,8 +762,7 @@ namespace Modding
                 }
                 catch (Exception exception)
                 {
-                    Logger.LogError(
-                        $"[API] - Could not {(subscribe ? "subscribe" : "unsubscribe")} event '{method.DeclaringType?.FullName}.{method.Name}':\n{exception}");
+                    Logger.APILogger.LogError($"Could not {(subscribe ? "subscribe" : "unsubscribe")} event '{method.DeclaringType?.FullName}.{method.Name}':\n{exception}");
                 }
             }
         }

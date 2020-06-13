@@ -123,7 +123,7 @@
         /// <returns>Formatted Message</returns>
         private string FormatLogMessage(string message)
         {
-            return $"[{ClassName}] - {message}";
+            return $"[{ClassName}] - {message}".Replace("\n", $"\n[{ClassName}] - ");
         }
 
         /// <summary>
@@ -133,7 +133,7 @@
         /// <returns>Formatted Message</returns>
         private string FormatLogMessage(object message)
         {
-            return $"[{ClassName}] - {message}";
+            return FormatLogMessage(message?.ToString() ?? "null");
         }
     }
 }

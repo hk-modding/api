@@ -21,7 +21,7 @@ namespace Modding
     [PublicAPI]
     public class ModHooks
     {
-        private const int _modVersion = 53;
+        private const int _modVersion = 54;
         
         internal static bool IsInitialized;
 
@@ -88,7 +88,7 @@ namespace Modding
                 gameVersion.revision = 0;
                 gameVersion.package = 0;
 
-                Logger.LogError("[API] - Failed obtaining game version:\n" + e);
+                Logger.APILogger.LogError("Failed obtaining game version:\n" + e);
             }
 
             // ReSharper disable once Unity.IncorrectScriptableObjectInstantiation idk it works
@@ -100,7 +100,7 @@ namespace Modding
             
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
-                Logger.Log($"[API] Couldn't resolve assembly {args.Name}, with sender {sender}");
+                Logger.APILogger.Log($"Couldn't resolve assembly {args.Name}, with sender {sender}");
 
                 return null;
             };
@@ -233,7 +233,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -311,7 +311,7 @@ namespace Modding
         /// <remarks>PlayMakerUnity2DProxy.Start</remarks>
         internal void OnColliderCreate(GameObject go)
         {
-            Logger.LogFine("[API] - OnColliderCreate Invoked");
+            Logger.APILogger.LogFine("OnColliderCreate Invoked");
 
             if (_ColliderCreateHook == null)
             {
@@ -328,7 +328,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -377,7 +377,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -411,7 +411,7 @@ namespace Modding
         /// </summary>
         internal GameObject OnGetEventSender(GameObject go, Fsm fsm)
         {
-            Logger.LogFine("[API] - OnGetEventSendr Invoked");
+            Logger.APILogger.LogFine("OnGetEventSendr Invoked");
 
             if (_OnGetEventSenderHook == null)
             {
@@ -428,7 +428,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -462,7 +462,7 @@ namespace Modding
         /// <remarks>GameManager.OnApplicationQuit</remarks>
         internal void OnApplicationQuit()
         {
-            Logger.LogFine("[API] - OnApplicationQuit Invoked");
+            Logger.APILogger.LogFine("OnApplicationQuit Invoked");
 
             if (_ApplicationQuitHook == null)
             {
@@ -479,7 +479,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -511,7 +511,7 @@ namespace Modding
         /// <remarks>ChangeFontByLanguage.SetFont</remarks>
         internal void OnSetFont()
         {
-            Logger.LogFine("[API] - OnSetFont Invoked");
+            Logger.APILogger.LogFine("OnSetFont Invoked");
 
             if (_SetFontHook == null)
             {
@@ -528,7 +528,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -561,7 +561,7 @@ namespace Modding
         /// <return>Modified text direction</return>
         internal bool GetTextDirection(bool direction)
         {
-            Logger.LogFine("[API] - GetTextDirection Invoked");
+            Logger.APILogger.LogFine("GetTextDirection Invoked");
 
             bool result = direction;
             bool changedValue = false;
@@ -588,7 +588,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -600,7 +600,7 @@ namespace Modding
         /// </summary>
         internal void SaveGlobalSettings()
         {
-            Logger.Log("[API] - Saving Global Settings");
+            Logger.APILogger.Log("Saving Global Settings");
             if (File.Exists(SettingsPath + ".bak"))
             {
                 File.Delete(SettingsPath + ".bak");
@@ -626,7 +626,7 @@ namespace Modding
         /// </summary>
         internal void LoadGlobalSettings()
         {
-            Logger.Log("[API] - Loading ModdingApi Global Settings.");
+            Logger.APILogger.Log("Loading ModdingApi Global Settings.");
 
             if (!File.Exists(SettingsPath))
             {
@@ -637,7 +637,7 @@ namespace Modding
 
             try
             {
-                //Logger.Log("[API] - Loading Global Settings");
+                //Logger.APILogger.Log("Loading Global Settings");
                 using (FileStream fileStream = File.OpenRead(SettingsPath))
                 {
                     using (StreamReader reader = new StreamReader(fileStream))
@@ -649,7 +649,7 @@ namespace Modding
             }
             catch (Exception e)
             {
-                Logger.LogError("[API] - Failed to load global settings, creating new settings file:\n" + e);
+                Logger.APILogger.LogError("Failed to load global settings, creating new settings file:\n" + e);
 
                 if (File.Exists(SettingsPath))
                 {
@@ -685,7 +685,7 @@ namespace Modding
         /// <remarks>HutongGames.PlayMaker.Actions.TakeDamage</remarks>
         internal HitInstance OnHitInstanceBeforeHit(Fsm owner, HitInstance hit)
         {
-            Logger.LogFine("[API] - OnHitInstance Invoked");
+            Logger.APILogger.LogFine("OnHitInstance Invoked");
 
             if (_HitInstanceHook == null)
             {
@@ -702,7 +702,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -738,7 +738,7 @@ namespace Modding
         /// <remarks>SceneManager.DrawBlackBorders</remarks>
         internal void OnDrawBlackBorders(List<GameObject> borders)
         {
-            Logger.LogFine("[API] - OnDrawBlackBorders Invoked");
+            Logger.APILogger.LogFine("OnDrawBlackBorders Invoked");
 
             if (_DrawBlackBordersHook == null)
             {
@@ -755,7 +755,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -789,7 +789,7 @@ namespace Modding
         /// <remarks>HealthManager.CheckPersistence</remarks>
         internal bool OnEnableEnemy(GameObject enemy, bool isAlreadyDead)
         {
-            Logger.LogFine("[API] - OnEnableEnemy Invoked");
+            Logger.APILogger.LogFine("OnEnableEnemy Invoked");
 
             if (_OnEnableEnemyHook == null)
             {
@@ -806,7 +806,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -874,7 +874,7 @@ namespace Modding
             ref bool isWatery
         )
         {
-            Logger.LogFine("[API] - OnRecieveDeathEvent Invoked");
+            Logger.APILogger.LogFine("OnRecieveDeathEvent Invoked");
 
             if (_OnReceiveDeathEventHook != null)
             {
@@ -896,7 +896,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError("[API] - " + ex);
+                        Logger.APILogger.LogError("" + ex);
                     }
                 }
             }
@@ -924,7 +924,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError("[API] - " + ex);
+                        Logger.APILogger.LogError("" + ex);
                     }
                 }
             }
@@ -987,7 +987,7 @@ namespace Modding
             string newDataBoolPlayerDataLookupKey
         )
         {
-            Logger.LogFine("[API] - RecordKillForJournal Invoked");
+            Logger.APILogger.LogFine("RecordKillForJournal Invoked");
 
             if (_OnRecordKillForJournalHook != null)
             {
@@ -1010,7 +1010,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError("[API] - " + ex);
+                        Logger.APILogger.LogError("" + ex);
                     }
                 }
             }
@@ -1034,7 +1034,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError("[API] - " + ex);
+                        Logger.APILogger.LogError("" + ex);
                     }
                 }
             }
@@ -1083,7 +1083,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError("[API] - " + ex);
+                        Logger.APILogger.LogError("" + ex);
                     }
                 }
 
@@ -1147,7 +1147,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -1194,7 +1194,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError("[API] - " + ex);
+                        Logger.APILogger.LogError("" + ex);
                     }
                 }
 
@@ -1257,7 +1257,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -1304,7 +1304,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError("[API] - " + ex);
+                        Logger.APILogger.LogError("" + ex);
                     }
                 }
 
@@ -1369,7 +1369,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -1416,7 +1416,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError("[API] - " + ex);
+                        Logger.APILogger.LogError("" + ex);
                     }
                 }
 
@@ -1478,7 +1478,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -1525,7 +1525,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError("[API] - " + ex);
+                        Logger.APILogger.LogError("" + ex);
                     }
                 }
 
@@ -1589,7 +1589,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -1677,7 +1677,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogError("[API] - " + ex);
+                        Logger.APILogger.LogError("" + ex);
                     }
                 }
             }
@@ -1767,7 +1767,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -1801,7 +1801,7 @@ namespace Modding
         /// </summary>
         internal void AfterNewPlayerData(PlayerData instance)
         {
-            Logger.LogFine("[API] - AfterNewPlayerData Invoked");
+            Logger.APILogger.LogFine("AfterNewPlayerData Invoked");
 
             if (_NewPlayerDataHook == null)
             {
@@ -1818,7 +1818,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -1848,7 +1848,7 @@ namespace Modding
         /// </summary>
         internal int OnBlueHealth()
         {
-            Logger.LogFine("[API] - OnBlueHealth Invoked");
+            Logger.APILogger.LogFine("OnBlueHealth Invoked");
 
             int result = 0;
             if (_BlueHealthHook == null)
@@ -1866,7 +1866,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -1901,7 +1901,7 @@ namespace Modding
         /// <remarks>HeroController.TakeHealth</remarks>
         internal int OnTakeHealth(int damage)
         {
-            Logger.LogFine("[API] - OnTakeHealth Invoked");
+            Logger.APILogger.LogFine("OnTakeHealth Invoked");
 
             if (_TakeHealthHook == null)
             {
@@ -1918,7 +1918,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -1952,7 +1952,7 @@ namespace Modding
         /// <remarks>HeroController.TakeDamage</remarks>
         internal int OnTakeDamage(ref int hazardType, int damage)
         {
-            Logger.LogFine("[API] - OnTakeDamage Invoked");
+            Logger.APILogger.LogFine("OnTakeDamage Invoked");
 
             if (_TakeDamageHook == null)
             {
@@ -1969,7 +1969,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -2001,7 +2001,7 @@ namespace Modding
         /// </summary>
         internal int AfterTakeDamage(int hazardType, int damageAmount)
         {
-            Logger.LogFine("[API] - AfterTakeDamage Invoked");
+            Logger.APILogger.LogFine("AfterTakeDamage Invoked");
 
             if (_AfterTakeDamageHook == null)
             {
@@ -2018,7 +2018,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -2052,7 +2052,7 @@ namespace Modding
         /// <remarks>GameManager.PlayerDead</remarks>
         internal void OnBeforePlayerDead()
         {
-            Logger.LogFine("[API] - OnBeforePlayerDead Invoked");
+            Logger.APILogger.LogFine("OnBeforePlayerDead Invoked");
 
             if (_BeforePlayerDeadHook == null)
             {
@@ -2069,7 +2069,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2101,7 +2101,7 @@ namespace Modding
         /// <remarks>GameManager.PlayerDead</remarks>
         internal void OnAfterPlayerDead()
         {
-            Logger.LogFine("[API] - OnAfterPlayerDead Invoked");
+            Logger.APILogger.LogFine("OnAfterPlayerDead Invoked");
 
             if (_AfterPlayerDeadHook == null)
             {
@@ -2118,7 +2118,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2150,7 +2150,7 @@ namespace Modding
         /// <remarks>HeroController.Attack</remarks>
         internal void OnAttack(AttackDirection dir)
         {
-            Logger.LogFine("[API] - OnAttack Invoked");
+            Logger.APILogger.LogFine("OnAttack Invoked");
 
             if (_AttackHook == null)
             {
@@ -2167,7 +2167,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2198,7 +2198,7 @@ namespace Modding
         /// </summary>
         internal void OnDoAttack()
         {
-            Logger.LogFine("[API] - OnDoAttack Invoked");
+            Logger.APILogger.LogFine("OnDoAttack Invoked");
 
             if (_DoAttackHook == null)
             {
@@ -2215,7 +2215,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2249,7 +2249,7 @@ namespace Modding
         /// <remarks>HeroController.Attack</remarks>
         internal void AfterAttack(AttackDirection dir)
         {
-            Logger.LogFine("[API] - AfterAttack Invoked");
+            Logger.APILogger.LogFine("AfterAttack Invoked");
 
             if (_AfterAttackHook == null)
             {
@@ -2266,7 +2266,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2296,7 +2296,7 @@ namespace Modding
         /// </summary>
         internal void OnSlashHit(Collider2D otherCollider, GameObject gameObject)
         {
-            Logger.LogFine("[API] - OnSlashHit Invoked");
+            Logger.APILogger.LogFine("OnSlashHit Invoked");
 
             if (otherCollider == null)
             {
@@ -2318,7 +2318,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2351,7 +2351,7 @@ namespace Modding
         /// <remarks>HeroController.CharmUpdate</remarks>
         internal void OnCharmUpdate()
         {
-            Logger.LogFine("[API] - OnCharmUpdate Invoked");
+            Logger.APILogger.LogFine("OnCharmUpdate Invoked");
 
             if (_CharmUpdateHook == null)
             {
@@ -2368,7 +2368,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2400,7 +2400,7 @@ namespace Modding
         /// <remarks>HeroController.Update</remarks>
         internal void OnHeroUpdate()
         {
-            //Logger.LogFine("[API] - OnHeroUpdate Invoked");
+            //Logger.APILogger.LogFine("OnHeroUpdate Invoked");
 
             if (_HeroUpdateHook == null)
             {
@@ -2417,7 +2417,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2448,7 +2448,7 @@ namespace Modding
         /// <remarks>PlayerData.health</remarks>
         internal int BeforeAddHealth(int amount)
         {
-            Logger.LogFine("[API] - BeforeAddHealth Invoked");
+            Logger.APILogger.LogFine("BeforeAddHealth Invoked");
 
             if (_BeforeAddHealthHook == null)
             {
@@ -2465,7 +2465,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -2497,7 +2497,7 @@ namespace Modding
         /// </summary>
         internal float OnFocusCost()
         {
-            Logger.LogFine("[API] - OnFocusCost Invoked");
+            Logger.APILogger.LogFine("OnFocusCost Invoked");
 
             float result = 1f;
 
@@ -2516,7 +2516,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -2549,7 +2549,7 @@ namespace Modding
         /// </summary>
         internal int OnSoulGain(int num)
         {
-            Logger.LogFine("[API] - OnSoulGain Invoked");
+            Logger.APILogger.LogFine("OnSoulGain Invoked");
 
             if (_SoulGainHook == null)
             {
@@ -2566,7 +2566,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -2601,7 +2601,7 @@ namespace Modding
         /// <remarks>HeroController.Dash</remarks>
         internal Vector2 DashVelocityChange(Vector2 change)
         {
-            Logger.LogFine("[API] - DashVelocityChange Invoked");
+            Logger.APILogger.LogFine("DashVelocityChange Invoked");
 
             if (_DashVectorHook == null)
             {
@@ -2618,7 +2618,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -2654,7 +2654,7 @@ namespace Modding
         /// <remarks>HeroController.LookForQueueInput</remarks>
         internal bool OnDashPressed()
         {
-            Logger.LogFine("[API] - OnDashPressed Invoked");
+            Logger.APILogger.LogFine("OnDashPressed Invoked");
 
             if (_DashPressedHook == null)
             {
@@ -2673,7 +2673,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -2713,7 +2713,7 @@ namespace Modding
         /// <remarks>GameManager.LoadGame</remarks>
         internal void OnSavegameLoad(int id)
         {
-            Logger.LogFine("[API] - OnSavegameLoad Invoked");
+            Logger.APILogger.LogFine("OnSavegameLoad Invoked");
 
             if (_SavegameLoadHook == null)
             {
@@ -2730,7 +2730,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2762,7 +2762,7 @@ namespace Modding
         /// <remarks>GameManager.SaveGame</remarks>
         internal void OnSavegameSave(int id)
         {
-            Logger.LogFine("[API] - OnSavegameSave Invoked");
+            Logger.APILogger.LogFine("OnSavegameSave Invoked");
 
             if (_SavegameSaveHook == null)
             {
@@ -2779,7 +2779,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2811,7 +2811,7 @@ namespace Modding
         /// <remarks>GameManager.LoadFirstScene</remarks>
         internal void OnNewGame()
         {
-            Logger.LogFine("[API] - OnNewGame Invoked");
+            Logger.APILogger.LogFine("OnNewGame Invoked");
 
             if (_NewGameHook == null)
             {
@@ -2828,7 +2828,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2860,7 +2860,7 @@ namespace Modding
         /// <remarks>GameManager.ClearSaveFile</remarks>
         internal void OnSavegameClear(int id)
         {
-            Logger.LogFine("[API] - OnSavegameClear Invoked");
+            Logger.APILogger.LogFine("OnSavegameClear Invoked");
 
             if (_SavegameClearHook == null)
             {
@@ -2878,7 +2878,7 @@ namespace Modding
 
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2911,7 +2911,7 @@ namespace Modding
         /// <remarks>GameManager.LoadGame</remarks>
         internal void OnAfterSaveGameLoad(Patches.SaveGameData data)
         {
-            Logger.LogFine("[API] - OnAfterSaveGameLoad Invoked");
+            Logger.APILogger.LogFine("OnAfterSaveGameLoad Invoked");
 
             if (_AfterSavegameLoadHook == null)
             {
@@ -2929,7 +2929,7 @@ namespace Modding
 
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -2962,7 +2962,7 @@ namespace Modding
         /// <remarks>GameManager.SaveGame</remarks>
         internal void OnBeforeSaveGameSave(Patches.SaveGameData data)
         {
-            Logger.LogFine("[API] - OnBeforeSaveGameSave Invoked");
+            Logger.APILogger.LogFine("OnBeforeSaveGameSave Invoked");
             data.LoadedMods = LoadedModsWithVersions;
 
             if (_BeforeSavegameSaveHook == null)
@@ -2981,7 +2981,7 @@ namespace Modding
 
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -3011,7 +3011,7 @@ namespace Modding
         /// </summary>
         internal string GetSaveFileName(int saveSlot)
         {
-            Logger.LogFine("[API] - GetSaveFileName Invoked");
+            Logger.APILogger.LogFine("GetSaveFileName Invoked");
 
             if (_GetSaveFileNameHook == null)
             {
@@ -3031,7 +3031,7 @@ namespace Modding
 
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 
@@ -3063,7 +3063,7 @@ namespace Modding
         /// </summary>
         internal void OnAfterSaveGameClear(int saveSlot)
         {
-            Logger.LogFine("[API] - OnAfterSaveGameClear Invoked");
+            Logger.APILogger.LogFine("OnAfterSaveGameClear Invoked");
 
             if (_AfterSaveGameClearHook == null)
             {
@@ -3080,7 +3080,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -3116,7 +3116,7 @@ namespace Modding
         /// <remarks>N/A</remarks>
         internal void OnSceneChanged(string targetScene)
         {
-            Logger.LogFine("[API] - OnSceneChanged Invoked");
+            Logger.APILogger.LogFine("OnSceneChanged Invoked");
 
             if (_SceneChanged == null)
             {
@@ -3133,7 +3133,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }
@@ -3166,7 +3166,7 @@ namespace Modding
         /// <remarks>N/A</remarks>
         internal string BeforeSceneLoad(string sceneName)
         {
-            Logger.LogFine("[API] - BeforeSceneLoad Invoked");
+            Logger.APILogger.LogFine("BeforeSceneLoad Invoked");
 
             if (_BeforeSceneLoadHook == null)
             {
@@ -3183,7 +3183,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError("[API] - " + ex);
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
 

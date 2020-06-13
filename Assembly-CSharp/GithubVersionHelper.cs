@@ -42,11 +42,11 @@ namespace Modding
             //     //This needs to be added on every call
             //     WebClient.Headers.Add(HttpRequestHeader.UserAgent, "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.121 Safari/535.2");
             //     string url = $"https://api.github.com/repos/{_repositoryName}/releases/latest";
-            //     Logger.LogDebug("[API] - Fetching " + url);
+            //     Logger.APILogger.LogDebug("Fetching " + url);
             //     string json = WebClient.DownloadString(url);
-            //     Logger.LogFine("[API] - " + json);
+            //     Logger.APILogger.LogFine("" + json);
             //     string version = FromJson(json)?.tag_name;
-            //     Logger.LogDebug("[API] Version Found: " + version);
+            //     Logger.APILogger.LogDebug("Version Found: " + version);
             //     return version;
             // }
             // catch (Exception ex)

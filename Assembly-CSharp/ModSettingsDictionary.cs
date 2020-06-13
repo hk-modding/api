@@ -33,7 +33,7 @@ namespace Modding
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError("[API] - " + e);
+                    Logger.APILogger.LogError("" + e);
                 }
             }
         }

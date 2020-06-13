@@ -50,7 +50,7 @@ namespace Modding.Patches
             }
             catch(System.Exception ex)
             {
-                Logger.LogError( "[API] - " + ex );
+                Logger.APILogger.LogError(ex);
                 base.Finish();
             }
         }

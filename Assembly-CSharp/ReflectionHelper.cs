@@ -104,7 +104,7 @@ namespace Modding
 
             watch.Stop();
 
-            Logger.Log($"[API] - Preloaded reflection in {watch.ElapsedMilliseconds}ms");
+            Logger.APILogger.Log($"Preloaded reflection in {watch.ElapsedMilliseconds}ms");
 
             _preloaded = true;
         }
