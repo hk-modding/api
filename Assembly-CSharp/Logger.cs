@@ -55,6 +55,8 @@ namespace Modding
 
             FileStream fileStream = new FileStream(currLogName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             Writer = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
+
+            File.SetCreationTimeUtc(currLogName, DateTime.UtcNow);
         }
 
         internal static void SetLogLevel(LogLevel level)
