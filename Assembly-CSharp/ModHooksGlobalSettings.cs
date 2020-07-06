@@ -21,19 +21,11 @@ namespace Modding
         /// <summary>
         ///     Logging Level to use.
         /// </summary>
-        public LogLevel LoggingLevel
-        {
-            get => (LogLevel) GetInt((int) LogLevel.Info);
-            set => SetInt((int) value);
-        }
+        public LogLevel LoggingLevel = LogLevel.Info;
 
         /// <summary>
         ///     Determines if Debug Console (Which displays Messages from Logger) should be shown.
         /// </summary>
-        public bool ShowDebugLogInGame
-        {
-            get => GetBool(false);
-            set => SetBool(value);
-        }
+        public bool ShowDebugLogInGame;
     }
 }
