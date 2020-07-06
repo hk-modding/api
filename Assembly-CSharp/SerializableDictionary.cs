@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Modding
 {
@@ -15,10 +16,14 @@ namespace Modding
     {
         // readonly kills JsonUtility
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        [SerializeField] private List<TKey> _keys = new List<TKey>();
+        [FormerlySerializedAs("keys")]
+        [SerializeField] 
+        private List<TKey> _keys = new List<TKey>();
 
         // ReSharper disable once FieldCanBeMadeReadOnly.Local
-        [SerializeField] private List<TValue> _values = new List<TValue>();
+        [FormerlySerializedAs("values")]
+        [SerializeField] 
+        private List<TValue> _values = new List<TValue>();
 
         /// <summary>
         ///     Occurse before something isserialized.
