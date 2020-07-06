@@ -71,16 +71,15 @@
         <PackageReference Include="ILRepack" Version="2.1.0-beta1">
             <IncludeAssets>build;compile</IncludeAssets>
         </PackageReference>
-
-        <PackageReference Include="MonoMod" Version="19.9.1.6">
+        <PackageReference Include="MonoMod" Version="20.2.1.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
 
-        <PackageReference Include="MonoMod.RuntimeDetour" Version="19.9.1.6">
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="20.2.1.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
-
-        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="19.9.1.6">
+        
+        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="20.2.1.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
 
