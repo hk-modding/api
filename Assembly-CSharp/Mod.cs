@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // ReSharper disable file UnusedMember.Global
 
@@ -155,6 +156,19 @@ namespace Modding
             ModHooks.Instance.BeforeSavegameSaveHook += SaveSaveSettings;
             ModHooks.Instance.AfterSavegameLoadHook += LoadSaveSettings;
             ModHooks.Instance.ApplicationQuitHook += SaveGlobalSettings;
+            UnityEngine.SceneManagement.SceneManager.activeSceneChanged += SceneChanged;
+        }
+
+        private void SceneChanged(Scene arg0, Scene arg1)
+        {
+            if (arg1.name != Constants.MENU_SCENE) return;
+            
+            Type type = SaveSettings?.GetType();
+
+            if (type == null)
+                return;
+                
+            SaveSettings = (ModSettings) Activator.CreateInstance(type);
         }
 
         private void LoadGlobalSettings()
