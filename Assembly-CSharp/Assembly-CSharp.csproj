@@ -143,4 +143,8 @@
             <HintPath>../Vanilla/UnityEngine.UIModule.dll</HintPath>
         </Reference>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Patches\DRM" />
+    </ItemGroup>
 </Project>
