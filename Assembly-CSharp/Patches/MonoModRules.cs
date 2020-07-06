@@ -28,14 +28,6 @@ namespace MonoMod
         {
             // If the attribute isn't a MonoMod attribute, it's "useful."
             return attribType.Namespace.StartsWith("MonoMod") && attribType.Name.StartsWith("MonoMod") || attribType.Namespace.StartsWith("Modding.Patches");
-
-            /*
-            TypeDefinition type = holder as TypeDefinition ??
-                                  (holder as MethodDefinition)?.DeclaringType ??
-                                  (holder as FieldDefinition)?.DeclaringType ??
-                                  (holder as PropertyDefinition)?.DeclaringType;
-            // If the holding type (or the holding method's type) is inside the Modding namespace, return true.
-            return type == null || type.FullName.StartsWith("Modding.");*/
         }
 
         /// <summary>
@@ -107,7 +99,6 @@ namespace MonoMod
         /// <returns></returns>
         public static FieldDefinition GetClassField(MethodDefinition baseMethod, string fieldName)
         {
-         //   Console.WriteLine("GetClassField");
             foreach (FieldDefinition field in baseMethod.DeclaringType.Fields)
             {
                 if (field.Name == fieldName)
@@ -174,7 +165,6 @@ namespace MonoMod
         /// <returns></returns>
         public static MethodDefinition GetMethodDefinition(MethodDefinition baseMethod, string typeName, string methodName)
         {
-        //    Console.WriteLine("GetMethodDefinition");
             foreach (TypeDefinition type in baseMethod.DeclaringType.Module.Types)
             {
                 if (type.Name != typeName)
