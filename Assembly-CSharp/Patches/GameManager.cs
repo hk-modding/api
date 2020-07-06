@@ -17,23 +17,6 @@ namespace Modding.Patches
 {
     [MonoModPatch("global::GameManager")]
     public class GameManager : global::GameManager {
-        /*DRMDONE: SaveGame(int)
-            Change string text4 = JsonUtility.ToJson(new SaveGameData(this.playerData, this.sceneData), !this.gameConfig.useSaveEncryption);
-                    SaveGameData saveGameData = new SaveGameData(this.playerData, this.sceneData);
-                    Modding.ModHooks.Instance.OnBeforeSaveGameSave(saveGameData);
-                    string text4 = JsonUtility.ToJson(saveGameData, !this.gameConfig.useSaveEncryption);
-                    Modding.Logger.APILogger.LogFine("About to Serialize Save Data\n" + text4);
-            
-            Add this right before the return after the try:
-                  Modding.ModHooks.Instance.OnSavegameSave(saveSlot);
-        */
-
-        /*DRMDONE: LoadGame(int)
-           Add this right after SceneData instance2 = saveGameData.sceneData;
-                Modding.ModHooks.Instance.OnAfterSaveGameLoad(saveGameData);
-           Add this right after this.inputHandler.RefreshPlayerData();
-                Modding.ModHooks.Instance.OnSavegameLoad(saveSlot);
-        */
         public void orig_OnApplicationQuit() { }
 
         public void OnApplicationQuit()
