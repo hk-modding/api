@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +14,9 @@ namespace Modding
         private readonly List<string> _messages = new List<string>(25);
         private bool _enabled = true;
 
-        private static readonly string[] OSFonts = 
+        private const int MSG_LENGTH = 80;
+
+        private static readonly string[] OSFonts =
         {
             // Windows
             "Consolas",
@@ -34,10 +37,10 @@ namespace Modding
                 // Found a monospace OS font.
                 if (_font != null)
                     break;
-                
+
                 Logger.APILogger.Log($"Font {font} not found.");
             }
-            
+
             // Fallback
             if (_font == null)
             {
@@ -52,10 +55,10 @@ namespace Modding
             }
 
             CanvasUtil.CreateFonts();
-            
+
             _overlayCanvas = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
             _overlayCanvas.name = "ModdingApiConsoleLog";
-            
+
             DontDestroyOnLoad(_overlayCanvas);
 
             GameObject background = CanvasUtil.CreateImagePanel
@@ -92,23 +95,32 @@ namespace Modding
                     ? CanvasUtil.FadeOutCanvasGroup(_overlayCanvas.GetComponent<CanvasGroup>())
                     : CanvasUtil.FadeInCanvasGroup(_overlayCanvas.GetComponent<CanvasGroup>())
             );
-            
+
             _enabled = !_enabled;
         }
 
         public void AddText(string message)
         {
-            if (_messages.Count > 24)
+            IEnumerable<string> chunks = Chunks(message, MSG_LENGTH);
+
+            foreach (string s in chunks)
+                _messages.Add(s);
+
+            while (_messages.Count > 24)
             {
                 _messages.RemoveAt(0);
             }
-            
-            _messages.Add(message);
 
             if (_textPanel != null)
             {
                 _textPanel.GetComponent<Text>().text = string.Join(string.Empty, _messages.ToArray());
             }
+        }
+
+        private static IEnumerable<string> Chunks(string str, int maxChunkSize) 
+        {
+            for (int i = 0; i < str.Length; i += maxChunkSize) 
+                yield return str.Substring(i, Math.Min(maxChunkSize, str.Length-i));
         }
     }
 }
