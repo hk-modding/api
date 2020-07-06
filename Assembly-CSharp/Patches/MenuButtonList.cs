@@ -12,8 +12,11 @@ namespace Modding.Patches
     [MonoModPatch("global::MenuButtonList")]
     public class MenuButtonList : global::MenuButtonList
     {
-        [MonoModIgnore] private static List<MenuButtonList> menuButtonLists;
-        [MonoModIgnore] private Entry[] entries;
+        [MonoModIgnore]
+        private static List<MenuButtonList> menuButtonLists;
+
+        [MonoModIgnore]
+        private Entry[] entries;
 
         public void AddSelectable(Selectable sel)
         {
@@ -62,8 +65,6 @@ namespace Modding.Patches
         }
 
         [MonoModIgnore]
-        private class Entry
-        {
-        }
+        private class Entry { }
     }
 }

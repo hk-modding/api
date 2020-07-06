@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using Mono.Cecil;
 using MonoMod.InlineRT;
+
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable once CheckNamespace
 
@@ -37,7 +38,7 @@ namespace MonoMod
         /// <returns></returns>
         public static MethodDefinition ModHooksInstance(MethodDefinition method)
         {
-         //   Console.WriteLine("ModHooksInstance");
+            //   Console.WriteLine("ModHooksInstance");
             TypeDefinition modHookType = null;
 
             foreach (TypeDefinition type in method.Module.Types)
@@ -48,7 +49,6 @@ namespace MonoMod
                     modHookType = type;
                     break;
                 }
-
             }
 
             if (modHookType == null)
@@ -64,10 +64,9 @@ namespace MonoMod
                     return property.GetMethod;
                 }
             }
-            
+
             Console.WriteLine("WARNING - Couldn't find ModHooks Instance Property");
             return null;
-
         }
     }
 }

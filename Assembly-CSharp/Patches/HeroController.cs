@@ -2,27 +2,52 @@
 using GlobalEnums;
 using MonoMod;
 using UnityEngine;
-//We disable a bunch of warnings here because they don't mean anything.  They all relate to not finding proper stuff for methods/properties/fields that are stubs to make the new methods work.
-//We don't care about XML docs for these as they are being patched into the original code
+
 // ReSharper disable All
 #pragma warning disable 1591, 0108, 0169, 0649, 0626
+
 namespace Modding.Patches
 {
     [MonoModPatch("global::HeroController")]
-    public class HeroController : global::HeroController {
+    public class HeroController : global::HeroController
+    {
         #region Attack()
-        [MonoModIgnore] private float attackDuration;
-        [MonoModIgnore] private PlayMakerFSM slashFsm;
-        [MonoModIgnore] private float altAttackTime;
-        [MonoModIgnore] private bool wallSlashing;
-        [MonoModIgnore] private GameObject grubberFlyBeam;
-        [MonoModIgnore] private float MANTIS_CHARM_SCALE = 1.35f;
-        [MonoModIgnore] private bool joniBeam;
-        [MonoModIgnore] public NailSlash wallSlash;
-        [MonoModIgnore] public NailSlash normalSlash;
-        [MonoModIgnore] public NailSlash alternateSlash;
-        [MonoModIgnore] public NailSlash upSlash;
-        [MonoModIgnore] public NailSlash downSlash;
+
+        [MonoModIgnore]
+        private float attackDuration;
+
+        [MonoModIgnore]
+        private PlayMakerFSM slashFsm;
+
+        [MonoModIgnore]
+        private float altAttackTime;
+
+        [MonoModIgnore]
+        private bool wallSlashing;
+
+        [MonoModIgnore]
+        private GameObject grubberFlyBeam;
+
+        [MonoModIgnore]
+        private float MANTIS_CHARM_SCALE = 1.35f;
+
+        [MonoModIgnore]
+        private bool joniBeam;
+
+        [MonoModIgnore]
+        public NailSlash wallSlash;
+
+        [MonoModIgnore]
+        public NailSlash normalSlash;
+
+        [MonoModIgnore]
+        public NailSlash alternateSlash;
+
+        [MonoModIgnore]
+        public NailSlash upSlash;
+
+        [MonoModIgnore]
+        public NailSlash downSlash;
 
         [MonoModReplace]
         public void Attack(AttackDirection attackDir)
@@ -32,6 +57,7 @@ namespace Modding.Patches
             {
                 this.cState.altAttack = false;
             }
+
             this.cState.attacking = true;
             if (this.playerData.equippedCharm_32)
             {
@@ -41,6 +67,7 @@ namespace Modding.Patches
             {
                 this.attackDuration = this.ATTACK_DURATION;
             }
+
             if (this.cState.wallSliding)
             {
                 this.wallSlashing = true;
@@ -64,6 +91,7 @@ namespace Modding.Patches
                         this.slashFsm = this.alternateSlashFsm;
                         this.cState.altAttack = false;
                     }
+
                     if (this.playerData.equippedCharm_35)
                     {
                         if ((this.playerData.health == this.playerData.maxHealth && !this.playerData.equippedCharm_27) || (this.joniBeam && this.playerData.equippedCharm_27))
@@ -76,6 +104,7 @@ namespace Modding.Patches
                             {
                                 this.grubberFlyBeam = this.grubberFlyBeamPrefabL.Spawn(this.transform.position);
                             }
+
                             if (this.playerData.equippedCharm_13)
                             {
                                 Extensions.SetScaleY(this.grubberFlyBeam.transform, this.MANTIS_CHARM_SCALE);
@@ -85,6 +114,7 @@ namespace Modding.Patches
                                 Extensions.SetScaleY(this.grubberFlyBeam.transform, 1f);
                             }
                         }
+
                         if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
                         {
                             if (this.transform.localScale.x < 0f)
@@ -95,6 +125,7 @@ namespace Modding.Patches
                             {
                                 this.grubberFlyBeam = this.grubberFlyBeamPrefabL_fury.Spawn(this.transform.position);
                             }
+
                             if (this.playerData.equippedCharm_13)
                             {
                                 Extensions.SetScaleY(this.grubberFlyBeam.transform, this.MANTIS_CHARM_SCALE);
@@ -123,6 +154,7 @@ namespace Modding.Patches
                                 Extensions.SetScaleY(this.grubberFlyBeam.transform, this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
                             }
                         }
+
                         if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
                         {
                             this.grubberFlyBeam = this.grubberFlyBeamPrefabU_fury.Spawn(this.transform.position);
@@ -152,6 +184,7 @@ namespace Modding.Patches
                                 Extensions.SetScaleY(this.grubberFlyBeam.transform, this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
                             }
                         }
+
                         if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
                         {
                             this.grubberFlyBeam = this.grubberFlyBeamPrefabD_fury.Spawn(this.transform.position);
@@ -165,6 +198,7 @@ namespace Modding.Patches
                     }
                 }
             }
+
             if (this.cState.wallSliding)
             {
                 if (this.cState.facingRight)
@@ -192,6 +226,7 @@ namespace Modding.Patches
             {
                 this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 270f;
             }
+
             this.altAttackTime = Time.timeSinceLevelLoad;
             ModHooks.Instance.AfterAttack(attackDir); //MOD API - Added
             if (!this.cState.attacking) return;       //MOD API - Added
@@ -201,11 +236,13 @@ namespace Modding.Patches
                 this.fsm_orbitShield.SendEvent("SLASH");
             }
         }
+
         #endregion
 
         #region SoulGain
 
-        [MonoModIgnore] private GameManager gm;
+        [MonoModIgnore]
+        private GameManager gm;
 
         [MonoModReplace]
         public void SoulGain()
@@ -219,6 +256,7 @@ namespace Modding.Patches
                 {
                     num += 3;
                 }
+
                 if (this.playerData.GetBool("equippedCharm_21"))
                 {
                     num += 8;
@@ -231,11 +269,13 @@ namespace Modding.Patches
                 {
                     num += 2;
                 }
+
                 if (this.playerData.GetBool("equippedCharm_21"))
                 {
                     num += 6;
                 }
             }
+
             int mpreserve = this.playerData.GetInt("MPReserve");
             num = Modding.ModHooks.Instance.OnSoulGain(num);
             this.playerData.AddMPCharge(num);
@@ -250,36 +290,95 @@ namespace Modding.Patches
 
         #region LookForQueueInput
 
-        [MonoModIgnore] private bool isGameplayScene;
-        [MonoModIgnore] private InputHandler inputHandler;
-        [MonoModIgnore] private extern bool CanWallJump();
-        [MonoModIgnore] private extern bool CanJump();
-        [MonoModIgnore] private extern bool CanDoubleJump();
-        [MonoModIgnore] private extern bool CanInfiniteAirJump();
-        [MonoModIgnore] private extern bool CanDash();
-        [MonoModIgnore] private extern bool CanAttack();
-        [MonoModIgnore] private extern void DoWallJump();
-        [MonoModIgnore] private extern void HeroJump();
-        [MonoModIgnore] private extern void DoDoubleJump();
-        [MonoModIgnore] private extern void CancelJump();
-        [MonoModIgnore] private extern void ResetLook();
-        [MonoModIgnore] private extern void HeroDash();
-        [MonoModIgnore] private extern bool CanSwim();
-        [MonoModIgnore] private extern void SetState(ActorStates newState);
-        [MonoModIgnore] private HeroAudioController audioCtrl;
-        [MonoModIgnore] private int jumpQueueSteps;
-        [MonoModIgnore] private int doubleJumpQueueSteps;
-        [MonoModIgnore] private bool doubleJumpQueuing;
-        [MonoModIgnore] private int jumpReleaseQueueSteps;
-        [MonoModIgnore] private bool jumpReleaseQueuing;
-        [MonoModIgnore] private bool jumpQueuing;
-        [MonoModIgnore] private int dashQueueSteps;
-        [MonoModIgnore] private bool dashQueuing;
-        [MonoModIgnore] private int attackQueueSteps;
-        [MonoModIgnore] private bool attackQueuing;
-        [MonoModIgnore] private int JUMP_QUEUE_STEPS = 2;
-        [MonoModIgnore] private int DOUBLE_JUMP_QUEUE_STEPS = 10;
-        [MonoModIgnore] private int ATTACK_QUEUE_STEPS = 5;
+        [MonoModIgnore]
+        private bool isGameplayScene;
+
+        [MonoModIgnore]
+        private InputHandler inputHandler;
+
+        [MonoModIgnore]
+        private extern bool CanWallJump();
+
+        [MonoModIgnore]
+        private extern bool CanJump();
+
+        [MonoModIgnore]
+        private extern bool CanDoubleJump();
+
+        [MonoModIgnore]
+        private extern bool CanInfiniteAirJump();
+
+        [MonoModIgnore]
+        private extern bool CanDash();
+
+        [MonoModIgnore]
+        private extern bool CanAttack();
+
+        [MonoModIgnore]
+        private extern void DoWallJump();
+
+        [MonoModIgnore]
+        private extern void HeroJump();
+
+        [MonoModIgnore]
+        private extern void DoDoubleJump();
+
+        [MonoModIgnore]
+        private extern void CancelJump();
+
+        [MonoModIgnore]
+        private extern void ResetLook();
+
+        [MonoModIgnore]
+        private extern void HeroDash();
+
+        [MonoModIgnore]
+        private extern bool CanSwim();
+
+        [MonoModIgnore]
+        private extern void SetState(ActorStates newState);
+
+        [MonoModIgnore]
+        private HeroAudioController audioCtrl;
+
+        [MonoModIgnore]
+        private int jumpQueueSteps;
+
+        [MonoModIgnore]
+        private int doubleJumpQueueSteps;
+
+        [MonoModIgnore]
+        private bool doubleJumpQueuing;
+
+        [MonoModIgnore]
+        private int jumpReleaseQueueSteps;
+
+        [MonoModIgnore]
+        private bool jumpReleaseQueuing;
+
+        [MonoModIgnore]
+        private bool jumpQueuing;
+
+        [MonoModIgnore]
+        private int dashQueueSteps;
+
+        [MonoModIgnore]
+        private bool dashQueuing;
+
+        [MonoModIgnore]
+        private int attackQueueSteps;
+
+        [MonoModIgnore]
+        private bool attackQueuing;
+
+        [MonoModIgnore]
+        private int JUMP_QUEUE_STEPS = 2;
+
+        [MonoModIgnore]
+        private int DOUBLE_JUMP_QUEUE_STEPS = 10;
+
+        [MonoModIgnore]
+        private int ATTACK_QUEUE_STEPS = 5;
 
 
         [MonoModReplace]
@@ -316,6 +415,7 @@ namespace Modding.Patches
                         this.doubleJumpQueuing = true;
                     }
                 }
+
                 if (this.inputHandler.inputActions.dash.WasPressed && !ModHooks.Instance.OnDashPressed())
                 {
                     if (this.CanDash())
@@ -328,6 +428,7 @@ namespace Modding.Patches
                         this.dashQueuing = true;
                     }
                 }
+
                 if (this.inputHandler.inputActions.attack.WasPressed)
                 {
                     if (this.CanAttack())
@@ -340,6 +441,7 @@ namespace Modding.Patches
                         this.attackQueuing = true;
                     }
                 }
+
                 if (this.inputHandler.inputActions.jump.IsPressed)
                 {
                     if (this.jumpQueueSteps <= this.JUMP_QUEUE_STEPS && this.CanJump() && this.jumpQueuing)
@@ -357,41 +459,74 @@ namespace Modding.Patches
                             this.DoDoubleJump();
                         }
                     }
+
                     if (this.CanSwim())
                     {
                         if (this.hero_state != ActorStates.airborne)
                         {
                             this.SetState(ActorStates.airborne);
                         }
+
                         this.cState.swimming = true;
                     }
                 }
-                if (this.inputHandler.inputActions.dash.IsPressed && this.dashQueueSteps <= this.DASH_QUEUE_STEPS && this.CanDash() && this.dashQueuing && !ModHooks.Instance.OnDashPressed() && this.CanDash())
+
+                if (this.inputHandler.inputActions.dash.IsPressed
+                    && this.dashQueueSteps <= this.DASH_QUEUE_STEPS
+                    && this.CanDash()
+                    && this.dashQueuing
+                    && !ModHooks.Instance.OnDashPressed()
+                    && this.CanDash())
                 {
                     this.HeroDash();
                 }
+
                 if (this.inputHandler.inputActions.attack.IsPressed && this.attackQueueSteps <= this.ATTACK_QUEUE_STEPS && this.CanAttack() && this.attackQueuing)
                 {
                     this.DoAttack();
                 }
             }
         }
+
         #endregion
 
         #region TakeDamage
 
-        [MonoModIgnore] private int hitsSinceShielded;
-        [MonoModIgnore] private extern bool CanTakeDamage();
-        [MonoModIgnore] private AudioSource audioSource;
-        [MonoModIgnore] private extern void CancelAttack();
-        [MonoModIgnore] private extern void CancelBounce();
-        [MonoModIgnore] private extern void CancelRecoilHorizontal();
-        [MonoModIgnore] private bool takeNoDamage;
-        [MonoModIgnore] private float nailChargeTimer;
-        [MonoModIgnore] private extern IEnumerator                  Die();
-        [MonoModIgnore] private extern IEnumerator                  DieFromHazard(HazardType hazardType, float angle);
-        [MonoModIgnore] private extern IEnumerator                  StartRecoil(CollisionSide impactSide, bool spawnDamageEffect, int damageAmount);
-        [MonoModIgnore] public event HeroController.TakeDamageEvent OnTakenDamage;
+        [MonoModIgnore]
+        private int hitsSinceShielded;
+
+        [MonoModIgnore]
+        private extern bool CanTakeDamage();
+
+        [MonoModIgnore]
+        private AudioSource audioSource;
+
+        [MonoModIgnore]
+        private extern void CancelAttack();
+
+        [MonoModIgnore]
+        private extern void CancelBounce();
+
+        [MonoModIgnore]
+        private extern void CancelRecoilHorizontal();
+
+        [MonoModIgnore]
+        private bool takeNoDamage;
+
+        [MonoModIgnore]
+        private float nailChargeTimer;
+
+        [MonoModIgnore]
+        private extern IEnumerator Die();
+
+        [MonoModIgnore]
+        private extern IEnumerator DieFromHazard(HazardType hazardType, float angle);
+
+        [MonoModIgnore]
+        private extern IEnumerator StartRecoil(CollisionSide impactSide, bool spawnDamageEffect, int damageAmount);
+
+        [MonoModIgnore]
+        public event HeroController.TakeDamageEvent OnTakenDamage;
 
         [MonoModReplace]
         public void TakeDamage(GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
@@ -415,25 +550,30 @@ namespace Modding.Patches
                         damageAmount *= 2;
                     }
                 }
+
                 if (this.CanTakeDamage())
                 {
                     if (this.damageMode == DamageMode.HAZARD_ONLY && hazardType == 1)
                     {
                         return;
                     }
+
                     if (this.cState.shadowDashing && hazardType == 1)
                     {
                         return;
                     }
+
                     if (this.parryInvulnTimer > 0f && hazardType == 1)
                     {
                         return;
                     }
+
                     VibrationMixer mixer = VibrationManager.GetMixer();
                     if (mixer != null)
                     {
                         mixer.StopAllEmissionsWithTag("heroAction");
                     }
+
                     bool flag = false;
                     if (this.carefreeShieldEquipped && hazardType == 1)
                     {
@@ -441,54 +581,63 @@ namespace Modding.Patches
                         {
                             this.hitsSinceShielded = 7;
                         }
+
                         switch (this.hitsSinceShielded)
                         {
                             case 1:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 10f)
+                                if ((float) UnityEngine.Random.Range(1, 100) <= 10f)
                                 {
                                     flag = true;
                                 }
+
                                 break;
                             case 2:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 20f)
+                                if ((float) UnityEngine.Random.Range(1, 100) <= 20f)
                                 {
                                     flag = true;
                                 }
+
                                 break;
                             case 3:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 30f)
+                                if ((float) UnityEngine.Random.Range(1, 100) <= 30f)
                                 {
                                     flag = true;
                                 }
+
                                 break;
                             case 4:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 50f)
+                                if ((float) UnityEngine.Random.Range(1, 100) <= 50f)
                                 {
                                     flag = true;
                                 }
+
                                 break;
                             case 5:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 70f)
+                                if ((float) UnityEngine.Random.Range(1, 100) <= 70f)
                                 {
                                     flag = true;
                                 }
+
                                 break;
                             case 6:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 80f)
+                                if ((float) UnityEngine.Random.Range(1, 100) <= 80f)
                                 {
                                     flag = true;
                                 }
+
                                 break;
                             case 7:
-                                if ((float)UnityEngine.Random.Range(1, 100) <= 90f)
+                                if ((float) UnityEngine.Random.Range(1, 100) <= 90f)
                                 {
                                     flag = true;
                                 }
+
                                 break;
                             default:
                                 flag = false;
                                 break;
                         }
+
                         if (flag)
                         {
                             this.hitsSinceShielded = 0;
@@ -501,6 +650,7 @@ namespace Modding.Patches
                             this.hitsSinceShielded++;
                         }
                     }
+
                     damageAmount = ModHooks.Instance.AfterTakeDamage(hazardType, damageAmount);
                     if (this.playerData.GetBool("equippedCharm_5") && this.playerData.GetInt("blockerHits") > 0 && hazardType == 1 && this.cState.focusing && !flag)
                     {
@@ -513,34 +663,41 @@ namespace Modding.Patches
                     {
                         this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
                     }
+
                     this.CancelAttack();
                     if (this.cState.wallSliding)
                     {
                         this.cState.wallSliding = false;
                         this.wallSlideVibrationPlayer.Stop();
                     }
+
                     if (this.cState.touchingWall)
                     {
                         this.cState.touchingWall = false;
                     }
+
                     if (this.cState.recoilingLeft || this.cState.recoilingRight)
                     {
                         this.CancelRecoilHorizontal();
                     }
+
                     if (this.cState.bouncing)
                     {
                         this.CancelBounce();
                         this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
                     }
+
                     if (this.cState.shroomBouncing)
                     {
                         this.CancelBounce();
                         this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
                     }
+
                     if (!flag)
                     {
                         this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
                     }
+
                     if (!this.takeNoDamage && !this.playerData.GetBool("invinciTest"))
                     {
                         if (this.playerData.GetBool("overcharmed"))
@@ -552,6 +709,7 @@ namespace Modding.Patches
                             this.playerData.TakeHealth(damageAmount);
                         }
                     }
+
                     if (this.playerData.GetBool("equippedCharm_3") && damageAmount > 0)
                     {
                         if (this.playerData.GetBool("equippedCharm_35"))
@@ -563,19 +721,23 @@ namespace Modding.Patches
                             this.AddMPCharge(this.GRUB_SOUL_MP);
                         }
                     }
+
                     if (this.joniBeam && damageAmount > 0)
                     {
                         this.joniBeam = false;
                     }
+
                     if (this.cState.nailCharging || this.nailChargeTimer != 0f)
                     {
                         this.cState.nailCharging = false;
                         this.nailChargeTimer = 0f;
                     }
+
                     if (damageAmount > 0 && this.OnTakenDamage != null)
                     {
                         this.OnTakenDamage();
                     }
+
                     if (this.playerData.GetInt("health") == 0)
                     {
                         base.StartCoroutine(this.Die());
@@ -609,6 +771,7 @@ namespace Modding.Patches
                         {
                             this.playerData.TakeHealth(damageAmount);
                         }
+
                         this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
                         if (this.playerData.GetInt("health") == 0)
                         {
@@ -640,25 +803,24 @@ namespace Modding.Patches
                 }
             }
         }
+
         #endregion
 
-        [MonoModIgnore] private NailSlash slashComponent;
+        [MonoModIgnore]
+        private NailSlash slashComponent;
 
-        [MonoModIgnore] private float focusMP_amount;
+        [MonoModIgnore]
+        private float focusMP_amount;
 
-        private void orig_StartMPDrain(float time)
-        {
-        }
+        private void orig_StartMPDrain(float time) { }
 
         public void StartMPDrain(float time)
         {
             orig_StartMPDrain(time);
             focusMP_amount *= ModHooks.Instance.OnFocusCost();
         }
-       
-        private void orig_Update()
-        {
-        }
+
+        private void orig_Update() { }
 
         private void Update()
         {
@@ -675,8 +837,9 @@ namespace Modding.Patches
         [MonoModIgnore]
         private extern void FinishedDashing();
 
-        [MonoModIgnore] private Rigidbody2D rb2d;
-        
+        [MonoModIgnore]
+        private Rigidbody2D rb2d;
+
         // This is the original dash vector calculating code used by the game
         // It is used to set the input dash velocity vector for the DashVectorHook
         private Vector2 OrigDashVector()
@@ -703,8 +866,11 @@ namespace Modding.Patches
             {
                 if (this.CheckForBump(CollisionSide.right))
                 {
-                    origVector = new Vector2(velocity,
-                                             (!this.cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY);
+                    origVector = new Vector2
+                    (
+                        velocity,
+                        (!this.cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY
+                    );
                 }
                 else
                 {
@@ -713,16 +879,20 @@ namespace Modding.Patches
             }
             else if (this.CheckForBump(CollisionSide.left))
             {
-                origVector = new Vector2(-velocity,
-                                         (!this.cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY);
+                origVector = new Vector2
+                (
+                    -velocity,
+                    (!this.cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY
+                );
             }
             else
             {
                 origVector = new Vector2(-velocity, 0f);
             }
+
             return origVector;
         }
-        
+
         private void Dash()
         {
             AffectedByGravity(false);
@@ -732,16 +902,13 @@ namespace Modding.Patches
                 FinishedDashing();
                 return;
             }
-            
+
             Vector2 vector = OrigDashVector();
             vector = ModHooks.Instance.DashVelocityChange(vector);
-            
+
             rb2d.velocity = vector;
             dash_timer += Time.deltaTime;
         }
-        
-        
-        
 
         #endregion
 
@@ -755,6 +922,7 @@ namespace Modding.Patches
             ModHooks.Instance.OnCharmUpdate();
             playerData.UpdateBlueHealth();
         }
+
         #endregion
 
         [MonoModIgnore]

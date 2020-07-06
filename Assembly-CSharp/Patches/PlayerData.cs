@@ -1,11 +1,10 @@
-﻿using System;
-using MonoMod;
+﻿using MonoMod;
 using UnityEngine;
-//We disable a bunch of warnings here because they don't mean anything.  They all relate to not finding proper stuff for methods/properties/fields that are stubs to make the new methods work.
-//We don't care about XML docs for these as they are being patched into the original code
+
 // ReSharper disable All
 #pragma warning disable 1591
 #pragma warning disable CS0108
+
 namespace Modding.Patches
 {
     [MonoModPatch("global::PlayerData")]
@@ -113,6 +112,7 @@ namespace Modding.Patches
                 ModHooks.Instance.SetPlayerInt(intName, this.GetIntInternal(intName) + 1);
                 return;
             }
+
             Debug.Log("PlayerData: Could not find field named " + intName + ", check variable name exists and FSM variable string is correct.");
         }
 
@@ -133,6 +133,7 @@ namespace Modding.Patches
                 ModHooks.Instance.SetPlayerInt(intName, this.GetIntInternal(intName) + amount);
                 return;
             }
+
             Debug.Log("PlayerData: Could not find field named " + intName + ", check variable name exists and FSM variable string is correct.");
         }
 
@@ -184,8 +185,7 @@ namespace Modding.Patches
             ModHooks.Instance.SetPlayerVariable<T>(varName, value);
         }
 
-        [MonoModOriginalName("TakeHealth")]
-        public void orig_TakeHealth(int amount) { }
+        public extern void orig_TakeHealth(int amount);
 
         public void TakeHealth(int amount)
         {
@@ -193,17 +193,15 @@ namespace Modding.Patches
             orig_TakeHealth(amount);
         }
 
-        [MonoModOriginalName("UpdateBlueHealth")]
-        public void orig_UpdateBlueHealth() { }
+        public extern void orig_UpdateBlueHealth();
 
         public void UpdateBlueHealth()
         {
             orig_UpdateBlueHealth();
             healthBlue += ModHooks.Instance.OnBlueHealth();
         }
-    
-        [MonoModOriginalName("AddHealth")]
-        public void orig_AddHealth(int amount) { }
+
+        public extern void orig_AddHealth(int amount);
 
         public void AddHealth(int amount)
         {

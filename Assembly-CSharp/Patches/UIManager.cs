@@ -12,7 +12,7 @@ namespace Modding.Patches
     {
         [MonoModIgnore]
         private static UIManager _instance;
-        
+
         public static UIManager get_instance()
         {
             if (UIManager._instance == null)
@@ -33,13 +33,11 @@ namespace Modding.Patches
             return UIManager._instance;
         }
 
-        [MonoModOriginalName("UIClosePauseMenu")]
         public extern void orig_UIClosePauseMenu();
 
         public void UIClosePauseMenu()
         {
-            if (FauxUIManager.Instance != null && ModManager.ModMenuScreen != null &&
-                ModManager.ModMenuScreen.isActiveAndEnabled)
+            if (FauxUIManager.Instance != null && ModManager.ModMenuScreen != null && ModManager.ModMenuScreen.isActiveAndEnabled)
             {
                 FauxUIManager.Instance.UIquitModMenu(false);
             }
