@@ -3,7 +3,7 @@ using UnityEngine;
 
 // ReSharper disable All
 #pragma warning disable 1591
-#pragma warning disable CS0108
+#pragma warning disable CS0108, CS0626
 
 namespace Modding.Patches
 {

@@ -4,7 +4,7 @@ using MonoMod;
 using UnityEngine;
 
 // ReSharper disable All
-#pragma warning disable 1591, 0108, 0169, 0649, 0626
+#pragma warning disable 1591, 0108, 0169, 0649, 0626, 414, CS0626
 
 namespace Modding.Patches
 {

@@ -1,7 +1,7 @@
 ﻿using MonoMod;
 
 // ReSharper disable All
-#pragma warning disable 1591, CS0649
+#pragma warning disable 1591, CS0649, CS0626
 
 namespace Modding.Patches
 {
