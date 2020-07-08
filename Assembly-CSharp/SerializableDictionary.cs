@@ -24,14 +24,19 @@ namespace Modding
         [FormerlySerializedAs("values")]
         [SerializeField] 
         private List<TValue> _values = new List<TValue>();
-
+        
+        /*
+         * Note that OnBeforeSerialize and OnAfterDeserialize should not be needed.
+         * I've left them here in the case of Json.NET failing to serialize for the JsonUtility fallback.
+         */
         /// <summary>
-        ///     Occurse before something isserialized.
+        ///     Occurse before something is serialized.
         /// </summary>
         public void OnBeforeSerialize()
         {
             _keys.Clear();
             _values.Clear();
+            
             foreach (KeyValuePair<TKey, TValue> pair in this)
             {
                 _keys.Add(pair.Key);
@@ -45,6 +50,7 @@ namespace Modding
         public void OnAfterDeserialize()
         {
             Clear();
+            
             if (_keys.Count != _values.Count)
             {
                 throw new Exception(

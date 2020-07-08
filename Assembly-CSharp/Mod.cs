@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
+using Modding.Patches;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -184,16 +186,29 @@ namespace Modding
                 using (StreamReader reader = new StreamReader(fileStream))
                 {
                     string json = reader.ReadToEnd();
+                    
                     try
                     {
                         ModSettings oldSettings = GlobalSettings;
+                        
                         if (oldSettings == null)
-                        {
                             return;
-                        }
 
                         Type settingsType = oldSettings.GetType();
-                        ModSettings newSettings = (ModSettings)JsonUtility.FromJson(json, settingsType);
+
+                        ModSettings newSettings;
+
+                        try
+                        {
+                            newSettings = JsonConvert.DeserializeObject(json, settingsType) as ModSettings;
+                        }
+                        catch (Exception e)
+                        {
+                            LogError("Failed to load settings using Json.Net, falling back.");
+                            LogError(e);
+                            
+                            newSettings = JsonUtility.FromJson(json, settingsType) as ModSettings;
+                        }
 
                         // ReSharper disable once SuspiciousTypeConversion.Global
                         if (newSettings is ISerializationCallbackReceiver receiver)
@@ -214,6 +229,7 @@ namespace Modding
         private void SaveGlobalSettings()
         {
             Log("Saving Global Settings");
+            
             if (File.Exists(_globalSettingsPath + ".bak"))
             {
                 File.Delete(_globalSettingsPath + ".bak");
@@ -227,6 +243,7 @@ namespace Modding
             ModSettings settings = GlobalSettings;
 
             // ReSharper disable once SuspiciousTypeConversion.Global
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (settings is ISerializationCallbackReceiver receiver)
             {
                 try
@@ -243,20 +260,30 @@ namespace Modding
                 return;
             }
 
-            using (FileStream fileStream = File.Create(_globalSettingsPath))
+            using FileStream fileStream = File.Create(_globalSettingsPath);
+
+            using var writer = new StreamWriter(fileStream);
+            
+            try
             {
-                using (StreamWriter writer = new StreamWriter(fileStream))
+                try
                 {
-                    try
+                    writer.Write(JsonConvert.SerializeObject(settings, Formatting.Indented, new JsonSerializerSettings
                     {
-                        string text4 = JsonUtility.ToJson(settings, true);
-                        writer.Write(text4);
-                    }
-                    catch (Exception e)
-                    {
-                        LogError(e);
-                    }
+                        ContractResolver = ShouldSerializeContractResolver.Instance
+                    }));
                 }
+                catch (Exception e)
+                {
+                    LogError("Failed to serialize settings using Json.NET, falling back.");
+                    LogError(e);
+
+                    writer.Write(JsonUtility.ToJson(settings, true));
+                }
+            }
+            catch (Exception e)
+            {
+                LogError(e);
             }
         }
 
@@ -265,6 +292,7 @@ namespace Modding
             try
             {
                 string name = GetType().Name;
+                
                 Log("Loading Mod Settings from Save.");
 
                 if (data?.modData == null || !data.modData.ContainsKey(name))
@@ -272,15 +300,12 @@ namespace Modding
                     return;
                 }
 
-                ModSettings oldSettings = SaveSettings;
-                if (oldSettings == null)
-                {
+                Type saveSettingsType = SaveSettings?.GetType();
+
+                if (saveSettingsType == null)
                     return;
-                }
 
-                Type saveSettingsType = oldSettings.GetType();
-
-                ModSettings saveSettings = (ModSettings)Activator.CreateInstance(saveSettingsType);
+                var saveSettings = (ModSettings) Activator.CreateInstance(saveSettingsType);
 
                 saveSettings.SetSettings(data.modData[name]);
 
@@ -300,7 +325,8 @@ namespace Modding
 
         private void SaveSaveSettings(Patches.SaveGameData data)
         {
-            ModSettings saveSettings = null;
+            ModSettings saveSettings;
+            
             try
             {
                 saveSettings = SaveSettings;
@@ -308,27 +334,20 @@ namespace Modding
             catch (Exception e)
             {
                 LogError(e);
-            }
 
-            if (saveSettings == null)
-            {
                 return;
             }
 
             string name = GetType().Name;
+            
             Log("Adding Settings to Save file");
+            
             if (data.modData == null)
             {
                 data.modData = new ModSettingsDictionary();
             }
 
-            if (data.modData.ContainsKey(name))
-            {
-                data.modData[name] = saveSettings;
-                return;
-            }
-
-            data.modData.Add(name, saveSettings);
+            data.modData[name] = saveSettings;
         }
     }
 }

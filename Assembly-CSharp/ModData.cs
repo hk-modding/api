@@ -11,7 +11,7 @@ namespace Modding
     /// </summary>
     [PublicAPI]
     [Serializable]
-    public class ModData
+    public class ModDta
     {
         /// <summary>
         ///     Collection of all mods' settings

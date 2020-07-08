@@ -3,8 +3,6 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using UnityEngine;
 
-// ReSharper disable file UnusedMember.Global
-
 namespace Modding
 {
     /// <summary>
@@ -14,6 +12,10 @@ namespace Modding
     [PublicAPI]
     public class ModSettings
     {
+        /*
+         * Old usage of serializable dictionaries kept for backwards compat.
+         */
+        #pragma warning disable 618
         /// <summary>
         ///     Bools to be Stored
         /// </summary>
@@ -44,6 +46,7 @@ namespace Modding
             BoolValues = new SerializableBoolDictionary();
             FloatValues = new SerializableFloatDictionary();
         }
+        #pragma warning restore 618
 
         /// <summary>
         ///     Hydrates the classes dictionaries with incoming data.

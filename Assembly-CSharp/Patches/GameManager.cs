@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using MonoMod;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -113,9 +114,30 @@ namespace Modding.Patches
                     try
                     {
                         SaveGameData obj = new SaveGameData(this.playerData, this.sceneData);
+                        
                         ModHooks.Instance.OnBeforeSaveGameSave(obj);
-                        string text = JsonUtility.ToJson(obj);
+
+                        string text = null;
+
+                        try
+                        {
+                            text = JsonConvert.SerializeObject(obj, Formatting.Indented, new JsonSerializerSettings()
+                            {
+                                ContractResolver = ShouldSerializeContractResolver.Instance
+                            });
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogError("Failed to serialize save using Json.NET, trying fallback.");
+                            
+                            Logger.APILogger.LogError(e);
+                            
+                            // If this dies, not much we can do about it.
+                            text = JsonUtility.ToJson(obj);
+                        }
+                        
                         bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
+                        
                         if (flag)
                         {
                             string graph = Encryption.Encrypt(text);
@@ -230,7 +252,23 @@ namespace Modding.Patches
                             json = Encoding.UTF8.GetString(fileBytes);
                         }
 
-                        SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
+                        SaveGameData saveGameData;
+                        
+                        try
+                        {
+                            saveGameData = JsonConvert.DeserializeObject<SaveGameData>(json, new JsonSerializerSettings()
+                            {
+                                ContractResolver = ShouldSerializeContractResolver.Instance
+                            });
+                        }
+                        catch (Exception e)
+                        {
+                             Logger.APILogger.LogError("Failed to read save using Json.NET (GameManager::LoadGame), falling back.");
+                             Logger.APILogger.LogError(e);
+                             
+                             saveGameData = JsonUtility.FromJson<SaveGameData>(json);
+                        }
+
                         global::PlayerData instance = saveGameData.playerData;
                         SceneData instance2 = saveGameData.sceneData;
                         global::PlayerData.instance = instance;
@@ -321,7 +359,22 @@ namespace Modding.Patches
                             json = Encoding.UTF8.GetString(fileBytes);
                         }
 
-                        SaveGameData saveGameData = JsonUtility.FromJson<SaveGameData>(json);
+                        SaveGameData saveGameData;
+                        try
+                        {
+                            saveGameData = JsonConvert.DeserializeObject<SaveGameData>(json, new JsonSerializerSettings()
+                            {
+                                ContractResolver = ShouldSerializeContractResolver.Instance
+                            });
+                        } 
+                        catch (Exception)
+                        {
+                            // Not a huge deal, this happens on saves with mod data which haven't been converted yet.
+                            Logger.APILogger.LogWarn($"Failed to get save stats for slot {saveSlot} using Json.NET, falling back");
+                            
+                            saveGameData = JsonUtility.FromJson<SaveGameData>(json);
+                        }
+                        
                         global::PlayerData playerData = saveGameData.playerData;
                         SaveStats saveStats = new SaveStats
                         (
