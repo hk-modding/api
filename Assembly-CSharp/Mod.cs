@@ -337,6 +337,10 @@ namespace Modding
 
                 return;
             }
+            
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (saveSettings is ISerializationCallbackReceiver receiver)
+                receiver.OnBeforeSerialize();
 
             string name = GetType().Name;
             
