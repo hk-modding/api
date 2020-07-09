@@ -123,7 +123,8 @@ namespace Modding.Patches
                         {
                             text = JsonConvert.SerializeObject(obj, Formatting.Indented, new JsonSerializerSettings()
                             {
-                                ContractResolver = ShouldSerializeContractResolver.Instance
+                                ContractResolver = ShouldSerializeContractResolver.Instance,
+                                TypeNameHandling = TypeNameHandling.Auto
                             });
                         }
                         catch (Exception e)
@@ -258,7 +259,8 @@ namespace Modding.Patches
                         {
                             saveGameData = JsonConvert.DeserializeObject<SaveGameData>(json, new JsonSerializerSettings()
                             {
-                                ContractResolver = ShouldSerializeContractResolver.Instance
+                                ContractResolver = ShouldSerializeContractResolver.Instance,
+                                TypeNameHandling = TypeNameHandling.Auto
                             });
                         }
                         catch (Exception e)
@@ -364,7 +366,8 @@ namespace Modding.Patches
                         {
                             saveGameData = JsonConvert.DeserializeObject<SaveGameData>(json, new JsonSerializerSettings()
                             {
-                                ContractResolver = ShouldSerializeContractResolver.Instance
+                                ContractResolver = ShouldSerializeContractResolver.Instance,
+                                TypeNameHandling = TypeNameHandling.Auto
                             });
                         } 
                         catch (Exception)

@@ -296,23 +296,21 @@ namespace Modding
                 Log("Loading Mod Settings from Save.");
 
                 if (data?.modData == null || !data.modData.ContainsKey(name))
-                {
                     return;
-                }
-
-                Type saveSettingsType = SaveSettings?.GetType();
-
-                if (saveSettingsType == null)
+                
+                if (SaveSettings == null)
                     return;
 
-                var saveSettings = (ModSettings) Activator.CreateInstance(saveSettingsType);
-
-                saveSettings.SetSettings(data.modData[name]);
-
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                if (saveSettings is ISerializationCallbackReceiver callbackReceiver)
+                ModSettings saveSettings = data.modData[name];
+                
+                switch (saveSettings) 
                 {
-                    callbackReceiver.OnAfterDeserialize();
+                    case null:
+                        return;
+                    
+                    case ISerializationCallbackReceiver receiver:
+                        receiver.OnAfterDeserialize();
+                        break;
                 }
 
                 SaveSettings = saveSettings;
