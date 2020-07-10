@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
+using Modding.Patches;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Modding
@@ -29,6 +32,7 @@ namespace Modding
         public Mod(string name) : base(name)
         {
             Log("Instantiating Mod");
+            
             ModHooks.Instance.BeforeSavegameSaveHook += SaveSettings;
             ModHooks.Instance.AfterSavegameLoadHook += LoadSettings;
         }
@@ -38,8 +42,29 @@ namespace Modding
         /// </summary>
         public TSaveSettings Settings
         {
-            get => _settings ?? (_settings = Activator.CreateInstance<TSaveSettings>());
+            get => _settings ??= Activator.CreateInstance<TSaveSettings>();
             set => _settings = value;
+        }
+        
+        private bool LoadSettingsDeprecated(Patches.SaveGameData data)
+        {
+            string name = GetType().Name;
+            
+            if (data?.modData == null || !data.modData.ContainsKey(name))
+                return false;
+
+            Settings = new TSaveSettings();
+            Settings.SetSettings(data.modData[name]);
+
+            data.modData.Remove(name);
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (Settings is ISerializationCallbackReceiver callbackReceiver)
+            {
+                callbackReceiver.OnAfterDeserialize();
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -48,16 +73,21 @@ namespace Modding
         /// <param name="data"></param>
         private void LoadSettings(Patches.SaveGameData data)
         {
-            string name = GetType().Name;
-            Log("Loading Mod Settings from Save.");
-
-            if (data?.modData == null || !data.modData.ContainsKey(name))
-            {
+            if (LoadSettingsDeprecated(data))
                 return;
-            }
+            
+            string name = GetType().Name;
+            
+            if (data?.PolymorphicModData == null || !data.PolymorphicModData.ContainsKey(name))
+                return;
+            
+            Log("Loading mod settings from save.");
 
-            Settings = new TSaveSettings();
-            Settings.SetSettings(data.modData[name]);
+            Settings = JsonConvert.DeserializeObject<TSaveSettings>(data.PolymorphicModData[name], new JsonSerializerSettings()
+            {
+                ContractResolver = ShouldSerializeContractResolver.Instance,
+                TypeNameHandling = TypeNameHandling.Auto,
+            });
 
             // ReSharper disable once SuspiciousTypeConversion.Global
             if (Settings is ISerializationCallbackReceiver callbackReceiver)
@@ -76,19 +106,27 @@ namespace Modding
 #pragma warning restore 109
         {
             string name = GetType().Name;
-            Log("Adding Settings to Save file");
-            if (data.modData == null)
-            {
-                data.modData = new ModSettingsDictionary();
-            }
+            
+            Log("Adding settings to save file");
+            
+            if (data.PolymorphicModData == null)
+                data.PolymorphicModData = new Dictionary<string, string>();
+            
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (Settings is ISerializationCallbackReceiver receiver)
+                receiver.OnBeforeSerialize();
 
-            if (data.modData.ContainsKey(name))
-            {
-                data.modData[name] = Settings;
-                return;
-            }
-
-            data.modData.Add(name, Settings);
+            data.PolymorphicModData[name] = JsonConvert.SerializeObject
+            (
+                Settings,
+                typeof(TSaveSettings),
+                Formatting.Indented,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = ShouldSerializeContractResolver.Instance,
+                    TypeNameHandling = TypeNameHandling.Auto,
+                }
+            );
         }
     }
 
@@ -171,6 +209,7 @@ namespace Modding
         public void LoadGlobalSettings()
         {
             Log("Loading Global Settings");
+            
             if (!File.Exists(_globalSettingsFilename))
             {
                 return;
