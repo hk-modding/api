@@ -173,7 +173,7 @@ namespace Modding
         /// </summary>
         public new TGlobalSettings GlobalSettings
         {
-            get => _globalSettings ?? (_globalSettings = Activator.CreateInstance<TGlobalSettings>());
+            get => _globalSettings ??= Activator.CreateInstance<TGlobalSettings>();
             set => _globalSettings = value;
         }
 
@@ -183,6 +183,7 @@ namespace Modding
         public void SaveGlobalSettings()
         {
             Log("Saving Global Settings");
+            
             if (File.Exists(_globalSettingsFilename + ".bak"))
             {
                 File.Delete(_globalSettingsFilename + ".bak");
@@ -193,14 +194,16 @@ namespace Modding
                 File.Move(_globalSettingsFilename, _globalSettingsFilename + ".bak");
             }
 
-            using (FileStream fileStream = File.Create(_globalSettingsFilename))
+            using FileStream fileStream = File.Create(_globalSettingsFilename);
+            
+            using var writer = new StreamWriter(fileStream);
+            
+            string json = JsonConvert.SerializeObject(GlobalSettings, Formatting.Indented, new JsonSerializerSettings
             {
-                using (StreamWriter writer = new StreamWriter(fileStream))
-                {
-                    string text4 = JsonUtility.ToJson(GlobalSettings, true);
-                    writer.Write(text4);
-                }
-            }
+                ContractResolver = ShouldSerializeContractResolver.Instance
+            });
+            
+            writer.Write(json);
         }
 
         /// <summary>
@@ -215,13 +218,27 @@ namespace Modding
                 return;
             }
 
-            using (FileStream fileStream = File.OpenRead(_globalSettingsFilename))
+            using FileStream fileStream = File.OpenRead(_globalSettingsFilename);
+            using var reader = new StreamReader(fileStream);
+            
+            string json = reader.ReadToEnd();
+
+            try
             {
-                using (StreamReader reader = new StreamReader(fileStream))
-                {
-                    string json = reader.ReadToEnd();
-                    _globalSettings = JsonUtility.FromJson<TGlobalSettings>(json);
-                }
+                _globalSettings = JsonConvert.DeserializeObject<TGlobalSettings>
+                (
+                    json,
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = ShouldSerializeContractResolver.Instance
+                    }
+                );
+            }
+            catch (Exception)
+            {
+                Logger.LogWarn("Global settings unable to be deserialized by Json.NET, falling back.");
+                
+                _globalSettings = JsonUtility.FromJson<TGlobalSettings>(json);
             }
         }
     }
