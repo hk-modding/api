@@ -180,7 +180,7 @@ namespace Modding
         /// <summary>
         ///     Save GlobalSettings to disk. (backs up the current global settings if it exists)
         /// </summary>
-        public void SaveGlobalSettings()
+        public new void SaveGlobalSettings()
         {
             Log("Saving Global Settings");
             

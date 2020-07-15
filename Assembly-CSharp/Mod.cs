@@ -170,59 +170,62 @@ namespace Modding
 
         private void LoadGlobalSettings()
         {
-            Log("Loading Global Settings");
             if (!File.Exists(_globalSettingsPath))
-            {
                 return;
-            }
+            
+            Log("Loading Global Settings");
 
-            using (FileStream fileStream = File.OpenRead(_globalSettingsPath))
+            using FileStream fileStream = File.OpenRead(_globalSettingsPath);
+
+            using var reader = new StreamReader(fileStream);
+            
+            string json = reader.ReadToEnd();
+
+            try
             {
-                using (StreamReader reader = new StreamReader(fileStream))
+                Type settingsType = GlobalSettings?.GetType();
+
+                if (settingsType == null)
+                    return;
+
+                ModSettings settings;
+
+                try
                 {
-                    string json = reader.ReadToEnd();
-
-                    try
-                    {
-                        ModSettings oldSettings = GlobalSettings;
-
-                        if (oldSettings == null)
-                            return;
-
-                        Type settingsType = oldSettings.GetType();
-
-                        ModSettings newSettings;
-
-                        try
-                        {
-                            newSettings = JsonConvert.DeserializeObject(json, settingsType) as ModSettings;
-                        }
-                        catch (Exception e)
-                        {
-                            LogError("Failed to load settings using Json.Net, falling back.");
-                            LogError(e);
-
-                            newSettings = JsonUtility.FromJson(json, settingsType) as ModSettings;
-                        }
-
-                        // ReSharper disable once SuspiciousTypeConversion.Global
-                        if (newSettings is ISerializationCallbackReceiver receiver)
-                        {
-                            receiver.OnAfterDeserialize();
-                        }
-
-                        GlobalSettings = newSettings;
-                    }
-                    catch (Exception e)
-                    {
-                        LogError(e);
-                    }
+                    settings = JsonConvert.DeserializeObject(json, settingsType) as ModSettings;
                 }
+                catch (Exception e)
+                {
+                    LogError("Failed to load settings using Json.Net, falling back.");
+                    LogError(e);
+
+                    settings = JsonUtility.FromJson(json, settingsType) as ModSettings;
+                }
+
+                // ReSharper disable once SuspiciousTypeConversion.Global
+                if (settings is ISerializationCallbackReceiver receiver)
+                {
+                    receiver.OnAfterDeserialize();
+                }
+
+                GlobalSettings = settings;
+            }
+            catch (Exception e)
+            {
+                LogError(e);
             }
         }
 
-        private void SaveGlobalSettings()
+        /// <summary>
+        /// Save global settings to saves folder.
+        /// </summary>
+        protected void SaveGlobalSettings()
         {
+            ModSettings settings = GlobalSettings;
+
+            if (settings is null)
+                return;
+
             Log("Saving Global Settings");
 
             if (File.Exists(_globalSettingsPath + ".bak"))
@@ -235,10 +238,7 @@ namespace Modding
                 File.Move(_globalSettingsPath, _globalSettingsPath + ".bak");
             }
 
-            ModSettings settings = GlobalSettings;
-
             // ReSharper disable once SuspiciousTypeConversion.Global
-            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (settings is ISerializationCallbackReceiver receiver)
             {
                 try
@@ -250,10 +250,6 @@ namespace Modding
                     LogError(e);
                 }
             }
-            else if (settings == null)
-            {
-                return;
-            }
 
             using FileStream fileStream = File.Create(_globalSettingsPath);
 
@@ -261,28 +257,18 @@ namespace Modding
 
             try
             {
-                try
-                {
-                    writer.Write
+                writer.Write
+                (
+                    JsonConvert.SerializeObject
                     (
-                        JsonConvert.SerializeObject
-                        (
-                            settings,
-                            Formatting.Indented,
-                            new JsonSerializerSettings
-                            {
-                                ContractResolver = ShouldSerializeContractResolver.Instance
-                            }
-                        )
-                    );
-                }
-                catch (Exception e)
-                {
-                    LogError("Failed to serialize settings using Json.NET, falling back.");
-                    LogError(e);
-
-                    writer.Write(JsonUtility.ToJson(settings, true));
-                }
+                        settings,
+                        Formatting.Indented,
+                        new JsonSerializerSettings
+                        {
+                            ContractResolver = ShouldSerializeContractResolver.Instance
+                        }
+                    )
+                );
             }
             catch (Exception e)
             {
