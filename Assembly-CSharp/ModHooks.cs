@@ -5,7 +5,9 @@ using GlobalEnums;
 using HutongGames.PlayMaker;
 using JetBrains.Annotations;
 using Modding.Menu;
+using Modding.Patches;
 using MonoMod;
+using Newtonsoft.Json;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -21,7 +23,7 @@ namespace Modding
     [PublicAPI]
     public class ModHooks
     {
-        private const int _modVersion = 54;
+        private const int _modVersion = 57;
         
         internal static bool IsInitialized;
 
@@ -601,6 +603,7 @@ namespace Modding
         internal void SaveGlobalSettings()
         {
             Logger.APILogger.Log("Saving Global Settings");
+            
             if (File.Exists(SettingsPath + ".bak"))
             {
                 File.Delete(SettingsPath + ".bak");
@@ -611,13 +614,28 @@ namespace Modding
                 File.Move(SettingsPath, SettingsPath + ".bak");
             }
 
-            using (FileStream fileStream = File.Create(SettingsPath))
+            using FileStream fileStream = File.Create(SettingsPath);
+            
+            using StreamWriter writer = new StreamWriter(fileStream);
+            
+            try
             {
-                using (StreamWriter writer = new StreamWriter(fileStream))
+                string json = JsonConvert.SerializeObject(GlobalSettings, Formatting.Indented, new JsonSerializerSettings
                 {
-                    string text4 = JsonUtility.ToJson(GlobalSettings, true);
-                    writer.Write(text4);
-                }
+                    ContractResolver = ShouldSerializeContractResolver.Instance
+                });
+                        
+                writer.Write(json);
+
+            }
+            catch (Exception e)
+            {
+                Logger.APILogger.LogError("Failed to save global settings using Json.NET.");
+                Logger.APILogger.LogError(e);
+                        
+                string json = JsonUtility.ToJson(GlobalSettings, true);
+                        
+                writer.Write(json);
             }
         }
 
@@ -631,7 +649,10 @@ namespace Modding
             if (!File.Exists(SettingsPath))
             {
                 _globalSettings = new ModHooksGlobalSettings
-                    {LoggingLevel = LogLevel.Info, ModEnabledSettings = new SerializableBoolDictionary()};
+                {
+                    LoggingLevel = LogLevel.Info, ModEnabledSettings = new SerializableBoolDictionary()
+                };
+                
                 return;
             }
 
@@ -643,7 +664,18 @@ namespace Modding
                     using (StreamReader reader = new StreamReader(fileStream))
                     {
                         string json = reader.ReadToEnd();
-                        _globalSettings = JsonUtility.FromJson<ModHooksGlobalSettings>(json);
+
+                        try
+                        {
+                            _globalSettings = JsonConvert.DeserializeObject<ModHooksGlobalSettings>(json);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.APILogger.LogError("Failed to deserialize settings using Json.NET, falling back.");
+                            Logger.APILogger.LogError(e);
+
+                            _globalSettings = JsonUtility.FromJson<ModHooksGlobalSettings>(json);
+                        }
                     }
                 }
             }
@@ -657,7 +689,10 @@ namespace Modding
                 }
 
                 _globalSettings = new ModHooksGlobalSettings
-                    {LoggingLevel = LogLevel.Info, ModEnabledSettings = new SerializableBoolDictionary()};
+                {
+                    LoggingLevel = LogLevel.Info, 
+                    ModEnabledSettings = new SerializableBoolDictionary()
+                };
             }
         }
 

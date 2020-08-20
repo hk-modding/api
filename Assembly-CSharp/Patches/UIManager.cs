@@ -3,7 +3,7 @@ using UnityEngine;
 using MonoMod;
 
 // ReSharper disable All
-#pragma warning disable 1591, 0108, 0169, 0649, 0414
+#pragma warning disable 1591, 0108, 0169, 0649, 0414, CS0626
 
 namespace Modding.Patches
 {
@@ -12,7 +12,7 @@ namespace Modding.Patches
     {
         [MonoModIgnore]
         private static UIManager _instance;
-        
+
         public static UIManager get_instance()
         {
             if (UIManager._instance == null)
@@ -33,13 +33,11 @@ namespace Modding.Patches
             return UIManager._instance;
         }
 
-        [MonoModOriginalName("UIClosePauseMenu")]
         public extern void orig_UIClosePauseMenu();
 
         public void UIClosePauseMenu()
         {
-            if (FauxUIManager.Instance != null && ModManager.ModMenuScreen != null &&
-                ModManager.ModMenuScreen.isActiveAndEnabled)
+            if (FauxUIManager.Instance != null && ModManager.ModMenuScreen != null && ModManager.ModMenuScreen.isActiveAndEnabled)
             {
                 FauxUIManager.Instance.UIquitModMenu(false);
             }

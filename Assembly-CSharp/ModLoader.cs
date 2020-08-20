@@ -119,11 +119,23 @@ namespace Modding
                         }
 
                         // Search for method annotations
-                        foreach (MethodInfo method in type.GetMethods(
-                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
+                        foreach (MethodInfo method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
                         {
-                            foreach (SubscribeEventAttribute attr in method.GetCustomAttributes(typeof(SubscribeEventAttribute),
-                        false))
+                            SubscribeEventAttribute[] attributes;
+
+                            try
+                            {
+                                attributes = (SubscribeEventAttribute[]) method.GetCustomAttributes(typeof(SubscribeEventAttribute), false);
+                            }
+                            catch (FileNotFoundException)
+                            {
+                                // Tried to load an assembly which doesn't exist.
+                                Logger.APILogger.LogWarn($"Skipping method {method.Name} of type {type} for attribute events as it tried to load a non-existent assembly.");
+                                
+                                continue;
+                            }
+                            
+                            foreach (SubscribeEventAttribute attr in attributes)
                             {
                                 if (attr.ModType != null && !attr.ModType.IsSubclassOf(typeof(Mod)))
                                 {

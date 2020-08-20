@@ -3,9 +3,7 @@ using MonoMod;
 using UnityEngine;
 
 // ReSharper disable All
-// XML Docs for patches are useless
-#pragma warning disable 1591
-#pragma warning disable CS0649
+#pragma warning disable 1591, CS0649
 
 namespace Modding.Patches
 {
@@ -49,7 +47,7 @@ namespace Modding.Patches
 
             this.startManagerAnimator.SetBool("WillShowControllerNotice", false);
             this.startManagerAnimator.SetBool("WillShowQuote", true);
-            
+
             StandaloneLoadingSpinner loadSpinner = UnityEngine.Object.Instantiate<StandaloneLoadingSpinner>(this.loadSpinnerPrefab);
             loadSpinner.Setup(null);
             loadOperation.allowSceneActivation = true;

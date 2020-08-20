@@ -10,7 +10,8 @@ namespace Modding.Patches
     [MonoModPatch("UnityEngine.UI.MenuSelectable")]
     public class MenuSelectable : UnityEngine.UI.MenuSelectable
     {
-        [MonoModIgnore] internal CancelAction cancelAction;
+        [MonoModIgnore]
+        internal CancelAction cancelAction;
 
         public extern void orig_OnCancel(BaseEventData eventData);
 

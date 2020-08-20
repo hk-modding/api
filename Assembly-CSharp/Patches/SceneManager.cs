@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using MonoMod;
+
 // ReSharper disable All
-//Sticking this here because right now, we're not sold on the source thing.  But i want to do this to make my life easier.
-#pragma warning disable 1591, 0108, 0169, 0649, 0414
+#pragma warning disable 1591, 0108, 0169, 0649, 0414, CS0626
+
 namespace Modding.Patches
 {
-    [MonoModPatch( "global::SceneManager" )]
+    [MonoModPatch("global::SceneManager")]
     public class SceneManager : global::SceneManager
     {
         [MonoModIgnore]
@@ -18,8 +19,7 @@ namespace Modding.Patches
         [MonoModIgnore]
         private bool heroInfoSent;
 
-        [MonoModOriginalName( "Update" )]
-        private void orig_Update() { }
+        private extern void orig_Update();
 
         [MonoModIgnore]
         private GameManager gm;
@@ -27,11 +27,11 @@ namespace Modding.Patches
         //Added checks for null and an attempt to fix any missing references
         private void Update()
         {
-            if( this.gameplayScene )
+            if (this.gameplayScene)
             {
-                if( !this.heroInfoSent && this.heroCtrl != null && (this.heroCtrl.heroLight == null || this.heroCtrl.heroLight.material == null) )
+                if (!this.heroInfoSent && this.heroCtrl != null && (this.heroCtrl.heroLight == null || this.heroCtrl.heroLight.material == null))
                 {
-                    this.heroCtrl.SetDarkness( this.darknessLevel );
+                    this.heroCtrl.SetDarkness(this.darknessLevel);
                     this.heroInfoSent = true;
                 }
             }
@@ -45,26 +45,26 @@ namespace Modding.Patches
         {
             List<GameObject> borders = new List<GameObject>();
             GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(this.borderPrefab);
-            gameObject.transform.SetPosition2D( this.gm.sceneWidth + 10f, this.gm.sceneHeight / 2f );
-            gameObject.transform.localScale = new Vector2( 20f, this.gm.sceneHeight + 40f );
-            borders.Add( gameObject );
+            gameObject.transform.SetPosition2D(this.gm.sceneWidth + 10f, this.gm.sceneHeight / 2f);
+            gameObject.transform.localScale = new Vector2(20f, this.gm.sceneHeight + 40f);
+            borders.Add(gameObject);
 
-            gameObject = UnityEngine.Object.Instantiate<GameObject>( this.borderPrefab );
-            gameObject.transform.SetPosition2D( -10f, this.gm.sceneHeight / 2f );
-            gameObject.transform.localScale = new Vector2( 20f, this.gm.sceneHeight + 40f );
-            borders.Add( gameObject );
+            gameObject = UnityEngine.Object.Instantiate<GameObject>(this.borderPrefab);
+            gameObject.transform.SetPosition2D(-10f, this.gm.sceneHeight / 2f);
+            gameObject.transform.localScale = new Vector2(20f, this.gm.sceneHeight + 40f);
+            borders.Add(gameObject);
 
-            gameObject = UnityEngine.Object.Instantiate<GameObject>( this.borderPrefab );
-            gameObject.transform.SetPosition2D( this.gm.sceneWidth / 2f, this.gm.sceneHeight + 10f );
-            gameObject.transform.localScale = new Vector2( 40f + this.gm.sceneWidth, 20f );
-            borders.Add( gameObject );
+            gameObject = UnityEngine.Object.Instantiate<GameObject>(this.borderPrefab);
+            gameObject.transform.SetPosition2D(this.gm.sceneWidth / 2f, this.gm.sceneHeight + 10f);
+            gameObject.transform.localScale = new Vector2(40f + this.gm.sceneWidth, 20f);
+            borders.Add(gameObject);
 
-            gameObject = UnityEngine.Object.Instantiate<GameObject>( this.borderPrefab );
-            gameObject.transform.SetPosition2D( this.gm.sceneWidth / 2f, -10f );
-            gameObject.transform.localScale = new Vector2( 40f + this.gm.sceneWidth, 20f );
-            borders.Add( gameObject );
+            gameObject = UnityEngine.Object.Instantiate<GameObject>(this.borderPrefab);
+            gameObject.transform.SetPosition2D(this.gm.sceneWidth / 2f, -10f);
+            gameObject.transform.localScale = new Vector2(40f + this.gm.sceneWidth, 20f);
+            borders.Add(gameObject);
 
-            ModHooks.Instance.OnDrawBlackBorders( borders );
+            ModHooks.Instance.OnDrawBlackBorders(borders);
         }
     }
 }

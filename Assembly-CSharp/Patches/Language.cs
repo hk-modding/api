@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using MonoMod;
 using UnityEngine;
-//We don't care about XML docs for these as they are being patched into the original code
+
 // ReSharper disable All
-#pragma warning disable 1591
-#pragma warning disable CS0649
+#pragma warning disable 1591, CS0649
 
 namespace Modding.Patches
 {
@@ -18,13 +17,15 @@ namespace Modding.Patches
         {
             if (currentEntrySheets == null || !currentEntrySheets.ContainsKey(sheetTitle))
             {
-                Debug.LogError("The sheet with title \"" + sheetTitle + "\" does not exist!");
+                Debug.LogError($"The sheet with title \"{sheetTitle}\" does not exist!");
                 return string.Empty;
             }
+
             if (currentEntrySheets[sheetTitle].ContainsKey(key))
             {
                 return currentEntrySheets[sheetTitle][key];
             }
+
             return "#!#" + key + "#!#";
         }
 

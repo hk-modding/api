@@ -9,11 +9,13 @@
         <OutputPath>bin\$(Configuration)\</OutputPath>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <RestorePackagesPath>packages</RestorePackagesPath>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <Files Include="$(SolutionDir)Vanilla/*" />
         <Files Include="$(SolutionDir)PrePatcher/PrePatcher.exe" />
+        <Files Include="$(SolutionDir)JsonNet/System.Runtime.Serialization.dll" />
 
         <BuildDir Include="$(TargetDir)" />
     </ItemGroup>
@@ -23,7 +25,7 @@
         <Mono Condition="$(OS) == WINDOWS_NT" />
         <Mono Condition="$(OS) != WINDOWS_NT">mono</Mono>
         <ILRepack>$(SolutionDir)ILRepack/ILRepack.exe</ILRepack>
-        <Merge>MMHOOK_Assembly-CSharp.dll MMHOOK_PlayMaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll ValueTupleBridge.dll</Merge>
+        <Merge>System.Runtime.Serialization.dll Newtonsoft.Json.dll MMHOOK_Assembly-CSharp.dll MMHOOK_PlayMaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll ValueTupleBridge.dll</Merge>
     </PropertyGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
@@ -71,16 +73,15 @@
         <PackageReference Include="ILRepack" Version="2.1.0-beta1">
             <IncludeAssets>build;compile</IncludeAssets>
         </PackageReference>
-
-        <PackageReference Include="MonoMod" Version="19.9.1.6">
+        <PackageReference Include="MonoMod" Version="20.2.1.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
 
-        <PackageReference Include="MonoMod.RuntimeDetour" Version="19.9.1.6">
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="20.2.1.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
-
-        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="19.9.1.6">
+        
+        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="20.2.1.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
 
@@ -96,6 +97,9 @@
         </Reference>
         <Reference Include="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
             <HintPath>../Vanilla/mscorlib.dll</HintPath>
+        </Reference>
+        <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\JsonNet\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
             <HintPath>../Vanilla/PlayMaker.dll</HintPath>
