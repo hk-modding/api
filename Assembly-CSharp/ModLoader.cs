@@ -425,6 +425,13 @@ namespace Modding
                             modScenePreloadedObjects[objName] = obj;
                         }
                     }
+                    
+                    AsyncOperation unload = USceneManager.UnloadSceneAsync(scene);
+
+                    while (!unload.isDone)
+                    {
+                        yield return new WaitForEndOfFrame();
+                    }
 
                     // Update loading progress
                     progress++;
