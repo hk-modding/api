@@ -443,7 +443,7 @@ namespace Modding
                 int maxKeys = toPreload.Keys.Count;
                 foreach (string sceneName in toPreload.Keys)
                 {
-                    int batchCount = Math.Min(5, maxKeys);
+                    int batchCount = Math.Min(ModHooks.Instance.GlobalSettings.PreloadBatchSize, maxKeys);
                     batch.Add(Enumerator(sceneName));
                     if (batch.Count >= batchCount)
                     {
