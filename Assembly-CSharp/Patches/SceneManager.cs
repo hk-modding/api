@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using MonoMod;
 
@@ -65,6 +66,17 @@ namespace Modding.Patches
             borders.Add(gameObject);
 
             ModHooks.Instance.OnDrawBlackBorders(borders);
+        }
+
+        private extern void orig_Start();
+        private void Start()
+        {
+            try
+            {
+                orig_Start();
+            }
+            catch (NullReferenceException)
+            { }
         }
     }
 }

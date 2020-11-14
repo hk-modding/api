@@ -1,4 +1,5 @@
-﻿using MonoMod;
+﻿using System;
+using MonoMod;
 using UnityEngine;
 
 // ReSharper disable All
@@ -19,8 +20,26 @@ namespace Modding.Patches
 
         public static GameObject Spawn(GameObject prefab, Transform parent, Vector3 position, Quaternion rotation)
         {
-            GameObject obj = orig_Spawn(prefab, parent, position, rotation);
-            return ModHooks.Instance.OnObjectPoolSpawn(obj);
+            try
+            {
+                GameObject obj = orig_Spawn(prefab, parent, position, rotation);
+                return ModHooks.Instance.OnObjectPoolSpawn(obj);
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            }
+        }
+
+        public static extern void orig_CreatePool(GameObject prefab, int initialPoolSize);
+        public static void CreatePool(GameObject prefab, int initialPoolSize)
+        {
+            try
+            {
+                orig_CreatePool(prefab, initialPoolSize);
+            }
+            catch (NullReferenceException)
+            { }
         }
     }
 }
