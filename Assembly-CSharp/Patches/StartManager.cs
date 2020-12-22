@@ -30,27 +30,6 @@ namespace Modding.Patches
         [MonoModIgnore]
         private extern IEnumerator LanguageSettingDone();
 
-        private bool activated = false;
-
-        private void Update()
-        {
-            if (activated)
-                return;
-
-            Logger.APILogger.Log("Main menu loading");
-
-            GameObject obj = new GameObject();
-            DontDestroyOnLoad(obj);
-
-            // Preload reflection
-            ReflectionHelper.PreloadCommonTypes();
-
-            // NonBouncer does absolutely nothing, which makes it a good dummy to run the loader
-            obj.AddComponent<NonBouncer>().StartCoroutine(ModLoader.LoadMods(obj));
-
-            activated = true;
-        }
-
         private IEnumerator Start()
         {
             this.controllerImage.sprite = this.GetControllerSpriteForPlatform(this.platform);
@@ -71,7 +50,23 @@ namespace Modding.Patches
 
             StandaloneLoadingSpinner loadSpinner = UnityEngine.Object.Instantiate<StandaloneLoadingSpinner>(this.loadSpinnerPrefab);
             loadSpinner.Setup(null);
-            yield break;
+
+            yield return null;
+
+            #region Mod Loading
+
+            Logger.APILogger.Log("Main menu loading");
+
+            GameObject obj = new GameObject();
+            DontDestroyOnLoad(obj);
+
+            // Preload reflection
+            ReflectionHelper.PreloadCommonTypes();
+
+            // NonBouncer does absolutely nothing, which makes it a good dummy to run the loader
+            obj.AddComponent<NonBouncer>().StartCoroutine(ModLoader.LoadMods(obj));
+
+            #endregion
         }
     }
 }
