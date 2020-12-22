@@ -52,6 +52,7 @@ namespace Modding
         // Hook name, method hooked, ITogglableMod used by hook
         private static readonly List<(EventInfo, MethodInfo, Type)> EventSubscriptions = new List<(EventInfo, MethodInfo, Type)>();
 
+        private static List<bool> batchDoneBools = new List<bool>();
         /// <summary>
         ///     Loads the mod by searching for assemblies in hollow_knight_Data\Managed\Mods\
         /// </summary>
@@ -334,7 +335,7 @@ namespace Modding
                         loadingBarRect.sizeDelta =
                             new Vector2
                             (
-                                (progress + load.progress / 0.9f) / toPreload.Count * 975,
+                                ((float)progress) / ((float)toPreload.Count) * 975,
                                 loadingBarRect.sizeDelta.y
                             );
                         yield return new WaitForEndOfFrame();
@@ -425,38 +426,47 @@ namespace Modding
                             modScenePreloadedObjects[objName] = obj;
                         }
                     }
-                    
-                    AsyncOperation unload = USceneManager.UnloadSceneAsync(scene);
 
+                    // Update loading progress
+                    progress++;
+
+                    AsyncOperation unload = USceneManager.UnloadSceneAsync(scene);
                     while (!unload.isDone)
                     {
                         yield return new WaitForEndOfFrame();
                     }
-
-                    // Update loading progress
-                    progress++;
+                    batchDoneBools.Add(true);
                 }
 
+                List<IEnumerator> batch = new List<IEnumerator>();
+                int maxKeys = toPreload.Keys.Count;
                 foreach (string sceneName in toPreload.Keys)
                 {
-                    coroutineHolder.GetComponent<NonBouncer>().StartCoroutine(Enumerator(sceneName));
+                    int batchCount = Math.Min(ModHooks.Instance.GlobalSettings.PreloadBatchSize, maxKeys);
+                    batch.Add(Enumerator(sceneName));
+                    if (batch.Count >= batchCount)
+                    {
+                        foreach (var batchItem in batch)
+                        {
+                            coroutineHolder.GetComponent<NonBouncer>().StartCoroutine(batchItem);
+                        }
+                        while (batchDoneBools.Count < batchCount)
+                        {
+                            yield return new WaitForEndOfFrame();
+                        }
+                        batchDoneBools.Clear();
+                        batch.Clear();
+                        maxKeys -= batchCount;
+                    }
                 }
 
                 int len = toPreload.Keys.Count;
 
                 while (progress != len)
-                    yield return null;
+                    yield return new WaitForEndOfFrame();
 
                 // Reload the main menu to fix the music/shaders
                 Logger.APILogger.Log("Preload done, returning to main menu");
-                Preloaded = true;
-
-                yield return USceneManager.LoadSceneAsync("Quit_To_Menu");
-
-                while (USceneManager.GetActiveScene().name != Constants.MENU_SCENE)
-                {
-                    yield return new WaitForEndOfFrame();
-                }
 
                 // Remove the black screen
                 Object.Destroy(blanker);
@@ -464,6 +474,10 @@ namespace Modding
                 // Restore the audio
                 AudioListener.pause = false;
             }
+            
+            Preloaded = true;
+
+            yield return USceneManager.LoadSceneAsync("Menu_Title");
 
             ModHooks.Instance.LoadGlobalSettings();
 

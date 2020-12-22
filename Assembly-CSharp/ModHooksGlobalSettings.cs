@@ -27,5 +27,10 @@ namespace Modding
         ///     Determines if Debug Console (Which displays Messages from Logger) should be shown.
         /// </summary>
         public bool ShowDebugLogInGame;
+
+        /// <summary>
+        ///     Determines for the preloading how many different scenes should be loaded at once.
+        /// </summary>
+        public int PreloadBatchSize = 5;
     }
 }
