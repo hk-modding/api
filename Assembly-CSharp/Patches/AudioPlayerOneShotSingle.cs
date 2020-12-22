@@ -18,7 +18,7 @@ namespace Modding.Patches
             {
                 orig_DoPlayRandomClip();
             }
-            catch (NullReferenceException) when (ModLoader.Preloading)
+            catch (NullReferenceException)
             {}
         }
     }
