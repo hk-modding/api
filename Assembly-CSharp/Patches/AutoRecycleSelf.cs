@@ -60,7 +60,7 @@ namespace Modding.Patches
             {
                 orig_OnDisable();
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException) when (!ModLoader.Preloaded)
             { }
         }
     }

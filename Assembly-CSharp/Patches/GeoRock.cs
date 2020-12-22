@@ -18,7 +18,7 @@ namespace Modding.Patches
             {
                 orig_OnEnable();
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException) when (!ModLoader.Preloaded)
             {}
         }
     }

@@ -53,7 +53,6 @@ namespace Modding
         private static readonly List<(EventInfo, MethodInfo, Type)> EventSubscriptions = new List<(EventInfo, MethodInfo, Type)>();
 
         private static List<bool> batchDoneBools = new List<bool>();
-
         /// <summary>
         ///     Loads the mod by searching for assemblies in hollow_knight_Data\Managed\Mods\
         /// </summary>
@@ -468,7 +467,6 @@ namespace Modding
 
                 // Reload the main menu to fix the music/shaders
                 Logger.APILogger.Log("Preload done, returning to main menu");
-                Preloaded = true;
 
                 // Remove the black screen
                 Object.Destroy(blanker);
@@ -477,6 +475,8 @@ namespace Modding
                 AudioListener.pause = false;
             }
             
+            Preloaded = true;
+
             yield return USceneManager.LoadSceneAsync("Menu_Title");
 
             ModHooks.Instance.LoadGlobalSettings();

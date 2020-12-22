@@ -25,7 +25,7 @@ namespace Modding.Patches
                 GameObject obj = orig_Spawn(prefab, parent, position, rotation);
                 return ModHooks.Instance.OnObjectPoolSpawn(obj);
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException) when (!ModLoader.Preloaded)
             {
                 return null;
             }
@@ -38,7 +38,7 @@ namespace Modding.Patches
             {
                 orig_CreatePool(prefab, initialPoolSize);
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException) when (!ModLoader.Preloaded)
             { }
         }
     }
