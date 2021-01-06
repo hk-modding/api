@@ -4,6 +4,8 @@ using UnityEngine;
 
 // ReSharper disable All
 #pragma warning disable 1591, CS0649
+// ReSharper disable All
+#pragma warning disable 1591, CS0626
 
 namespace Modding.Patches
 {
@@ -31,8 +33,6 @@ namespace Modding.Patches
         private IEnumerator Start()
         {
             this.controllerImage.sprite = this.GetControllerSpriteForPlatform(this.platform);
-            AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Menu_Title");
-            loadOperation.allowSceneActivation = false;
             bool showLanguageSelect = !this.CheckIsLanguageSet();
             if (showLanguageSelect && Platform.Current.ShowLanguageSelect)
             {
@@ -50,9 +50,23 @@ namespace Modding.Patches
 
             StandaloneLoadingSpinner loadSpinner = UnityEngine.Object.Instantiate<StandaloneLoadingSpinner>(this.loadSpinnerPrefab);
             loadSpinner.Setup(null);
-            loadOperation.allowSceneActivation = true;
-            yield return loadOperation;
-            yield break;
+
+            yield return null;
+
+            #region Mod Loading
+
+            Logger.APILogger.Log("Main menu loading");
+
+            GameObject obj = new GameObject();
+            DontDestroyOnLoad(obj);
+
+            // Preload reflection
+            ReflectionHelper.PreloadCommonTypes();
+
+            // NonBouncer does absolutely nothing, which makes it a good dummy to run the loader
+            obj.AddComponent<NonBouncer>().StartCoroutine(ModLoader.LoadMods(obj));
+
+            #endregion
         }
     }
 }
