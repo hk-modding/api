@@ -17,8 +17,12 @@
         <DebugType>pdbonly</DebugType>
     </PropertyGroup>
 
+    <ItemGroup>
+        <TargetDirFiles Include="$(TargetDir)/*.*" />
+    </ItemGroup>
+
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Copy SourceFiles="$(TargetDir)PrePatcher.exe" DestinationFiles="$(TargetDir)../../../PrePatcher.exe" />
+        <Copy SourceFiles="@(TargetDirFiles)" DestinationFolder="$(ProjectDir)Output/" />
     </Target>
 
     <ItemGroup>
