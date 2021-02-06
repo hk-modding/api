@@ -199,6 +199,7 @@ namespace Modding
                         {
                             ContractResolver = ShouldSerializeContractResolver.Instance,
                             TypeNameHandling = TypeNameHandling.Auto,
+                            ObjectCreationHandling = ObjectCreationHandling.Replace
                         }
                     ) as ModSettings;
                 }
@@ -357,6 +358,7 @@ namespace Modding
                     {
                         ContractResolver = ShouldSerializeContractResolver.Instance,
                         TypeNameHandling = TypeNameHandling.Auto,
+                        ObjectCreationHandling = ObjectCreationHandling.Replace
                     }
                 );
 
