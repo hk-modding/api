@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using JetBrains.Annotations;
+using Mono.Cecil;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -88,7 +89,52 @@ namespace Modding
                 yield break;
             }
 
+            Logger.APILogger.Log("Attempting to determine type of mod assemblies (library/mod/addon)");
+            Dictionary<int, string> modTypeNames = typeof(AssemblyTypeAttribute)
+                .GetFields(BindingFlags.Public | BindingFlags.Static)
+                .ToDictionary(f => (int)f.GetValue(null), f => f.Name);
+
+            Dictionary<int, List<string>> modTypes = new Dictionary<int, List<string>>();
             foreach (string modPath in Directory.GetFiles(path, "*.dll"))
+            {
+                using AssemblyDefinition asmDef = AssemblyDefinition.ReadAssembly(modPath);
+                CustomAttribute attr = asmDef.CustomAttributes
+                    .FirstOrDefault(a => a.AttributeType.FullName == typeof(AssemblyTypeAttribute).FullName);
+
+                bool hasAttr = attr != null;
+                int type = attr == null
+                    ? AssemblyContainsMod(asmDef)
+                        ? AssemblyTypeAttribute.MOD
+                        : AssemblyTypeAttribute.LIBRARY
+                    : (int)attr.ConstructorArguments[0].Value;
+
+                if (!modTypeNames.TryGetValue(type, out string typeName))
+                {
+                    Logger.APILogger.LogWarn($"Invalid type on assembly '{Path.GetFileNameWithoutExtension(modPath)}'! Defaulting to MOD.");
+                    type = AssemblyTypeAttribute.MOD;
+                    hasAttr = false;
+                }
+
+                if (!modTypes.TryGetValue(type, out List<string> typePaths))
+                {
+                    typePaths = new List<string>();
+                    modTypes[type] = typePaths;
+                }
+
+                // Place explicitly defined mods in the front of the queue, since we're more sure of those ones
+                if (hasAttr)
+                {
+                    typePaths.Insert(0, modPath);
+                }
+                else
+                {
+                    typePaths.Add(modPath);
+                }
+
+                Logger.APILogger.Log($"{Path.GetFileNameWithoutExtension(modPath)} - {modTypeNames[type]}");
+            }
+
+            foreach (string modPath in modTypes.OrderBy(p => p.Key).SelectMany(p => p.Value))
             {
                 Logger.APILogger.LogDebug("Loading assembly: " + modPath);
                 try
@@ -677,6 +723,29 @@ namespace Modding
                 }
 
                 toCheck = toCheck.BaseType;
+            }
+
+            return false;
+        }
+
+        private static bool AssemblyContainsMod(AssemblyDefinition asm)
+        {
+            foreach (TypeDefinition type in asm.Modules.SelectMany(m => m.Types))
+            {
+                try
+                {
+                    TypeDefinition parent = type.BaseType?.Resolve();
+                    while (parent != null)
+                    {
+                        if (parent.FullName == typeof(Mod).FullName)
+                        {
+                            return true;
+                        }
+
+                        parent = parent.BaseType?.Resolve();
+                    }
+                }
+                catch (AssemblyResolutionException) { }
             }
 
             return false;
