@@ -36,6 +36,15 @@ namespace Modding.Patches
             ModHooks.Instance.OnSceneChanged(destScene);
         }
 
+        public extern void orig_BeginSceneTransition(GameManager.SceneLoadInfo info);
+
+        public void BeginSceneTransition(GameManager.SceneLoadInfo info)
+        {
+            info.SceneName = ModHooks.Instance.BeforeSceneLoad(info.SceneName);
+
+            orig_BeginSceneTransition(info);
+        }
+
         public extern void orig_ClearSaveFile(int saveSlot, Action<bool> callback);
 
         public void ClearSaveFile(int saveSlot, Action<bool> callback)

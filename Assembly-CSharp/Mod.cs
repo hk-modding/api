@@ -192,7 +192,16 @@ namespace Modding
 
                 try
                 {
-                    settings = JsonConvert.DeserializeObject(json, settingsType) as ModSettings;
+                    settings = JsonConvert.DeserializeObject(
+                        json,
+                        settingsType,
+                        new JsonSerializerSettings
+                        {
+                            ContractResolver = ShouldSerializeContractResolver.Instance,
+                            TypeNameHandling = TypeNameHandling.Auto,
+                            ObjectCreationHandling = ObjectCreationHandling.Replace
+                        }
+                    ) as ModSettings;
                 }
                 catch (Exception e)
                 {
@@ -265,7 +274,8 @@ namespace Modding
                         Formatting.Indented,
                         new JsonSerializerSettings
                         {
-                            ContractResolver = ShouldSerializeContractResolver.Instance
+                            ContractResolver = ShouldSerializeContractResolver.Instance,
+                            TypeNameHandling = TypeNameHandling.Auto,
                         }
                     )
                 );
@@ -348,6 +358,7 @@ namespace Modding
                     {
                         ContractResolver = ShouldSerializeContractResolver.Instance,
                         TypeNameHandling = TypeNameHandling.Auto,
+                        ObjectCreationHandling = ObjectCreationHandling.Replace
                     }
                 );
 

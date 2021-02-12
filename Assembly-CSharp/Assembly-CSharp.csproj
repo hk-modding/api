@@ -14,7 +14,6 @@
 
     <ItemGroup>
         <Files Include="$(SolutionDir)Vanilla/*" />
-        <Files Include="$(SolutionDir)PrePatcher/PrePatcher.exe" />
         <Files Include="$(SolutionDir)JsonNet/System.Runtime.Serialization.dll" />
 
         <BuildDir Include="$(TargetDir)" />
@@ -34,7 +33,7 @@
 
         <Copy SkipUnchangedFiles="true" SourceFiles="@(Files)" DestinationFolder="@(BuildDir)" />
 
-        <Exec Condition="!Exists('$(TargetDir)Assembly-CSharp-patched.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
+        <Exec Condition="!Exists('$(TargetDir)Assembly-CSharp-patched.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) $(SolutionDir)PrePatcher/Output/PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
         <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)Assembly-CSharp-patched.dll" DestinationFiles="$(TargetDir)Assembly-CSharp.dll" />
 
         <Delete Condition="Exists('MONOMODDED_Assembly-CSharp.dll')" Files="MONOMODDED_Assembly-CSharp.dll" />

@@ -297,7 +297,7 @@ namespace Modding
         [PublicAPI]
         public static TField GetAttr<TType, TField>(string name)
         {
-            FieldInfo fi = GetField(typeof(TType), name);
+            FieldInfo fi = GetField(typeof(TType), name, false);
 
             return fi == null ? default(TField) : ((Func<TField>) GetGetter<TType, TField>(fi))();
         }
@@ -350,7 +350,7 @@ namespace Modding
         [PublicAPI]
         public static void SetAttr<TType, TField>(string name, TField value)
         {
-            ((Action<TField>) GetGetter<TType, TField>(GetField(typeof(TType), name)))(value);
+            ((Action<TField>) GetGetter<TType, TField>(GetField(typeof(TType), name, false)))(value);
         }
 
         #region Obsolete

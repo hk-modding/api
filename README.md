@@ -14,18 +14,13 @@ Building the API is fairly straightforward.
   * Windows: `%HollowKnightGameInstallPath%/hollow_knight_Data/Managed/`
   * Linux: `~/.steam/steam/steamapps/common/Hollow Knight/hollow_knight_Data/Managed/`
   * Mac: `~/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/hollow_knight_Data/Managed/`
-3. Open the solution in Visual Studio 2017 or Rider (You can also just use msbuild/xbuild)
+3. Open the solution in Visual Studio or Rider (You can also just use msbuild/xbuild)
 4. Set the build configuration to Debug.
 5. The patched assembly should be in `RepoPath/OutputFinal/hollow_knight_Data/Managed/` (There is also a zip file in `RepoPath/ModdingAPI.zip` ready to upload to Google Drive)
 6. Copy `Assembly-CSharp.dll` to `%HollowKnightGameInstallPath%/hollow_knight_Data/Managed/`
-
-To run msbuild:
+To use msbuild:
 1. Navigate to the root of the project
 2. Run `msbuild -p:Configuration=Debug /restore`
-
-
-Disclaimer: The post build command failed for me `mono PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll`
-Instead I manually ran `wine PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll`, which worked then reran the msbuild command and everything worked
 
 Contributors
 =======
