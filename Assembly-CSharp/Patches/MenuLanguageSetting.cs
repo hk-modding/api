@@ -16,7 +16,7 @@ namespace Modding.Patches
 
         private void orig_RefreshAvailableLanguages() { }
 
-        private void Start()
+        private void RefreshAvailableLanguages()
         {
             orig_RefreshAvailableLanguages();
 
