@@ -217,6 +217,26 @@ namespace Modding.Patches
 
         #endregion
 
+        public extern void orig_SetupSceneRefs(bool refreshTilemapInfo);
+
+        public void SetupSceneRefs(bool refreshTilemapInfo)
+        {
+            orig_SetupSceneRefs(refreshTilemapInfo);
+            
+                        
+            if (IsGameplayScene())
+            {
+                GameObject go = GameCameras.instance.soulOrbFSM.gameObject.transform.Find("SoulOrb_fill").gameObject;
+                GameObject liquid = go.transform.Find("Liquid").gameObject;
+                tk2dSpriteAnimator tk2dsa = liquid.GetComponent<tk2dSpriteAnimator>();
+                tk2dsa.GetClipByName("Fill").fps = 15 * 1.05f;
+                tk2dsa.GetClipByName("Idle").fps = 10 * 1.05f;
+                tk2dsa.GetClipByName("Shrink").fps = 15 * 1.05f;
+                tk2dsa.GetClipByName("Drain").fps = 30 * 1.05f;
+            }
+
+        }
+
         #region LoadGame
 
         [MonoModReplace]
