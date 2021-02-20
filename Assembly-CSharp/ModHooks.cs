@@ -622,7 +622,9 @@ namespace Modding
             {
                 string json = JsonConvert.SerializeObject(GlobalSettings, Formatting.Indented, new JsonSerializerSettings
                 {
-                    ContractResolver = ShouldSerializeContractResolver.Instance
+                    ContractResolver = ShouldSerializeContractResolver.Instance,
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    Converters = JsonConverterTypes.ConverterTypes
                 });
                         
                 writer.Write(json);
@@ -667,7 +669,17 @@ namespace Modding
 
                         try
                         {
-                            _globalSettings = JsonConvert.DeserializeObject<ModHooksGlobalSettings>(json);
+                            _globalSettings = JsonConvert.DeserializeObject<ModHooksGlobalSettings>
+                            (
+                                json,
+                                new JsonSerializerSettings
+                                {
+                                    ContractResolver = ShouldSerializeContractResolver.Instance,
+                                    TypeNameHandling = TypeNameHandling.Auto,
+                                    ObjectCreationHandling = ObjectCreationHandling.Replace,
+                                    Converters = JsonConverterTypes.ConverterTypes
+                                }
+                            );
                         }
                         catch (Exception e)
                         {
