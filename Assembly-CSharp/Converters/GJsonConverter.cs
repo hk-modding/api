@@ -1,25 +1,23 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Newtonsoft.Json.Linq;
 
 namespace Modding.Converters
 {
     /// <inheritdoc />
-    public abstract class JsonConverter<Tclass> : JsonConverter
+    public abstract class JsonConverter<TClass> : JsonConverter
     {
         /// <inheritdoc />
         public override bool CanConvert(Type objectType)
         {
-            return typeof(Tclass) == objectType;
+            return typeof(TClass) == objectType;
         }
 
         /// <inheritdoc />
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (typeof(Tclass) == objectType)
+            if (typeof(TClass) == objectType)
             {
                 Dictionary<string, object> token = new Dictionary<string, object>();
                 reader.Read();
@@ -41,7 +39,7 @@ namespace Modding.Converters
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             writer.WriteStartObject();
-            WriteJson(writer, (Tclass) value);
+            WriteJson(writer, (TClass) value);
             writer.WriteEndObject();
         }
 
@@ -52,7 +50,7 @@ namespace Modding.Converters
         /// <param name="existingValue">Existing value</param>
         /// <returns></returns>
         [PublicAPI]
-        public abstract Tclass ReadJson(Dictionary<string, object> token, object existingValue);
+        public abstract TClass ReadJson(Dictionary<string, object> token, object existingValue);
         
         /// <summary>
         /// Write value into token
@@ -60,6 +58,6 @@ namespace Modding.Converters
         /// <param name="writer">JSON Writer</param>
         /// <param name="value">Value to be written</param>
         [PublicAPI]
-        public abstract void WriteJson(JsonWriter writer, Tclass value);
+        public abstract void WriteJson(JsonWriter writer, TClass value);
     }
 }

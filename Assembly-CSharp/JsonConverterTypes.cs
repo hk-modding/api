@@ -12,7 +12,7 @@ namespace Modding
         /// <summary>
         /// Converters used for serializing Unity vectors.
         /// </summary>
-        public static List<JsonConverter> ConverterTypes { get; private set; }
+        public static List<JsonConverter> ConverterTypes { get; }
 
         static JsonConverterTypes()
         {
