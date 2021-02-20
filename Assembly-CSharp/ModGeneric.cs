@@ -87,6 +87,8 @@ namespace Modding
             {
                 ContractResolver = ShouldSerializeContractResolver.Instance,
                 TypeNameHandling = TypeNameHandling.Auto,
+                ObjectCreationHandling = ObjectCreationHandling.Replace,
+                Converters = JsonConverterTypes.ConverterTypes
             });
 
             // ReSharper disable once SuspiciousTypeConversion.Global
@@ -125,6 +127,7 @@ namespace Modding
                 {
                     ContractResolver = ShouldSerializeContractResolver.Instance,
                     TypeNameHandling = TypeNameHandling.Auto,
+                    Converters = JsonConverterTypes.ConverterTypes
                 }
             );
         }
@@ -200,7 +203,9 @@ namespace Modding
             
             string json = JsonConvert.SerializeObject(GlobalSettings, Formatting.Indented, new JsonSerializerSettings
             {
-                ContractResolver = ShouldSerializeContractResolver.Instance
+                ContractResolver = ShouldSerializeContractResolver.Instance,
+                TypeNameHandling = TypeNameHandling.Auto,
+                Converters = JsonConverterTypes.ConverterTypes
             });
             
             writer.Write(json);
@@ -230,7 +235,10 @@ namespace Modding
                     json,
                     new JsonSerializerSettings
                     {
-                        ContractResolver = ShouldSerializeContractResolver.Instance
+                        ContractResolver = ShouldSerializeContractResolver.Instance,
+                        TypeNameHandling = TypeNameHandling.Auto,
+                        ObjectCreationHandling = ObjectCreationHandling.Replace,
+                        Converters = JsonConverterTypes.ConverterTypes
                     }
                 );
             }

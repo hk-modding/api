@@ -199,7 +199,8 @@ namespace Modding
                         {
                             ContractResolver = ShouldSerializeContractResolver.Instance,
                             TypeNameHandling = TypeNameHandling.Auto,
-                            ObjectCreationHandling = ObjectCreationHandling.Replace
+                            ObjectCreationHandling = ObjectCreationHandling.Replace,
+                            Converters = JsonConverterTypes.ConverterTypes
                         }
                     ) as ModSettings;
                 }
@@ -276,6 +277,7 @@ namespace Modding
                         {
                             ContractResolver = ShouldSerializeContractResolver.Instance,
                             TypeNameHandling = TypeNameHandling.Auto,
+                            Converters = JsonConverterTypes.ConverterTypes
                         }
                     )
                 );
@@ -358,7 +360,8 @@ namespace Modding
                     {
                         ContractResolver = ShouldSerializeContractResolver.Instance,
                         TypeNameHandling = TypeNameHandling.Auto,
-                        ObjectCreationHandling = ObjectCreationHandling.Replace
+                        ObjectCreationHandling = ObjectCreationHandling.Replace,
+                        Converters = JsonConverterTypes.ConverterTypes
                     }
                 );
 
@@ -424,6 +427,7 @@ namespace Modding
                 {
                     ContractResolver = ShouldSerializeContractResolver.Instance,
                     TypeNameHandling = TypeNameHandling.Auto,
+                    Converters = JsonConverterTypes.ConverterTypes
                 }
             );
         }

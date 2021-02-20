@@ -133,7 +133,8 @@ namespace Modding.Patches
                             text = JsonConvert.SerializeObject(obj, Formatting.Indented, new JsonSerializerSettings()
                             {
                                 ContractResolver = ShouldSerializeContractResolver.Instance,
-                                TypeNameHandling = TypeNameHandling.Auto
+                                TypeNameHandling = TypeNameHandling.Auto,
+                                Converters = JsonConverterTypes.ConverterTypes
                             });
                         }
                         catch (Exception e)
@@ -289,7 +290,9 @@ namespace Modding.Patches
                             saveGameData = JsonConvert.DeserializeObject<SaveGameData>(json, new JsonSerializerSettings()
                             {
                                 ContractResolver = ShouldSerializeContractResolver.Instance,
-                                TypeNameHandling = TypeNameHandling.Auto
+                                TypeNameHandling = TypeNameHandling.Auto,
+                                ObjectCreationHandling = ObjectCreationHandling.Replace,
+                                Converters = JsonConverterTypes.ConverterTypes
                             });
                         }
                         catch (Exception e)
@@ -396,7 +399,9 @@ namespace Modding.Patches
                             saveGameData = JsonConvert.DeserializeObject<SaveGameData>(json, new JsonSerializerSettings()
                             {
                                 ContractResolver = ShouldSerializeContractResolver.Instance,
-                                TypeNameHandling = TypeNameHandling.Auto
+                                TypeNameHandling = TypeNameHandling.Auto,
+                                ObjectCreationHandling = ObjectCreationHandling.Replace,
+                                Converters = JsonConverterTypes.ConverterTypes
                             });
                         } 
                         catch (Exception)
