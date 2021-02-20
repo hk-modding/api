@@ -2,17 +2,21 @@
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 
 namespace Modding.Converters
 {
+    /// <inheritdoc />
     public abstract class JsonConverter<Tclass> : JsonConverter
     {
+        /// <inheritdoc />
         public override bool CanConvert(Type objectType)
         {
             return typeof(Tclass) == objectType;
         }
 
+        /// <inheritdoc />
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if (typeof(Tclass) == objectType)
@@ -33,16 +37,29 @@ namespace Modding.Converters
             return serializer.Deserialize(reader);
         }
 
+        /// <inheritdoc />
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             writer.WriteStartObject();
             WriteJson(writer, (Tclass) value);
             writer.WriteEndObject();
-
-            //serializer.Serialize(writer, value);
         }
 
+        /// <summary>
+        /// Read from token 
+        /// </summary>
+        /// <param name="token">JSON object</param>
+        /// <param name="existingValue">Existing value</param>
+        /// <returns></returns>
+        [PublicAPI]
         public abstract Tclass ReadJson(Dictionary<string, object> token, object existingValue);
+        
+        /// <summary>
+        /// Write value into token
+        /// </summary>
+        /// <param name="writer">JSON Writer</param>
+        /// <param name="value">Value to be written</param>
+        [PublicAPI]
         public abstract void WriteJson(JsonWriter writer, Tclass value);
     }
 }

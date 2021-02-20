@@ -5,8 +5,10 @@ using UnityEngine;
 
 namespace Modding.Converters
 {
+    /// <inheritdoc />
     public class Vector2Converter : JsonConverter<Vector2>
     {
+        /// <inheritdoc />
         public override Vector2 ReadJson(Dictionary<string, object> token, object existingValue)
         {
             float x = Convert.ToSingle(token["x"]);
@@ -14,6 +16,7 @@ namespace Modding.Converters
             return new Vector2(x, y);
         }
 
+        /// <inheritdoc />
         public override void WriteJson(JsonWriter writer, Vector2 value)
         {
             writer.WritePropertyName("x");
