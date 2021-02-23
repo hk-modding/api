@@ -356,49 +356,5 @@ namespace Modding
         {
             ((Action<TField>) GetGetter<TType, TField>(GetField(typeof(TType), name, false)))(value);
         }
-
-        #region Obsolete
-
-        /// <summary>
-        ///     Set a field on an object using a string.
-        /// </summary>
-        /// <param name="obj">Object/Object of type which the field is on</param>
-        /// <param name="name">Name of the field</param>
-        /// <param name="val">Value to set the field to to</param>
-        /// <param name="instance">Whether or not to get an instance field or a static field</param>
-        /// <typeparam name="T">Type of the object which the field holds.</typeparam>
-        [PublicAPI]
-        [Obsolete("Use SetAttr<TType, TField> and SetAttr<TObject, TField>.")]
-        public static void SetAttr<T>(object obj, string name, T val, bool instance = true)
-        {
-            if (obj == null || string.IsNullOrEmpty(name))
-            {
-                return;
-            }
-
-            GetField(obj.GetType(), name, instance)?.SetValue(obj, val);
-        }
-
-        /// <summary>
-        ///     Get a field on an object/type using a string.
-        /// </summary>
-        /// <param name="obj">Object/Object of type which the field is on</param>
-        /// <param name="name">Name of the field</param>
-        /// <param name="instance">Whether or not to get an instance field or a static field</param>
-        /// <typeparam name="T">Type of the object which the field holds.</typeparam>
-        /// <returns>The value of a field on an object/type</returns>
-        [PublicAPI]
-        [Obsolete("Use GetAttr<TObject, TField>.")]
-        public static T GetAttr<T>(object obj, string name, bool instance = true)
-        {
-            if (obj == null || string.IsNullOrEmpty(name))
-            {
-                return default(T);
-            }
-
-            return (T) GetField(obj.GetType(), name, instance)?.GetValue(obj);
-        }
-
-        #endregion
     }
 }
