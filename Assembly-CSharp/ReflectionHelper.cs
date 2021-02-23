@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 using JetBrains.Annotations;
+using MonoMod.Utils;
 
 namespace Modding
 {
@@ -94,7 +95,7 @@ namespace Modding
                 return;
             }
 
-            Stopwatch watch = new Stopwatch();
+            var watch = new Stopwatch();
             watch.Start();
 
             CacheFields<PlayerData>();
@@ -170,12 +171,11 @@ namespace Modding
         /// <returns>Function returning static field</returns>
         private static Delegate CreateGetStaticFieldDelegate<TType, TField>(FieldInfo fi)
         {
-            DynamicMethod dm = new DynamicMethod
+            var dm = new DynamicMethodDefinition
             (
                 "FieldAccess" + fi.DeclaringType?.Name + fi.Name,
                 typeof(TField),
-                new Type[0],
-                typeof(TType)
+                new Type[0]
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -183,7 +183,7 @@ namespace Modding
             gen.Emit(OpCodes.Ldsfld, fi);
             gen.Emit(OpCodes.Ret);
 
-            return dm.CreateDelegate(typeof(Func<TField>));
+            return dm.Generate().CreateDelegate(typeof(Func<TField>));
         }
 
         /// <summary>
@@ -195,12 +195,11 @@ namespace Modding
         /// <returns>Function which returns value of field of object parameter</returns>
         private static Delegate CreateGetFieldDelegate<TType, TField>(FieldInfo fi)
         {
-            DynamicMethod dm = new DynamicMethod
+            var dm = new DynamicMethodDefinition
             (
                 "FieldAccess" + fi.DeclaringType?.Name + fi.Name,
                 typeof(TField),
-                new[] {typeof(TType)},
-                typeof(TType)
+                new[] {typeof(TType)}
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -209,17 +208,16 @@ namespace Modding
             gen.Emit(OpCodes.Ldfld, fi);
             gen.Emit(OpCodes.Ret);
 
-            return dm.CreateDelegate(typeof(Func<TType, TField>));
+            return dm.Generate().CreateDelegate(typeof(Func<TType, TField>));
         }
 
         private static Delegate CreateSetFieldDelegate<TType, TField>(FieldInfo fi)
         {
-            DynamicMethod dm = new DynamicMethod
+            var dm = new DynamicMethodDefinition
             (
                 "FieldSet" + fi.DeclaringType?.Name + fi.Name,
                 typeof(void),
-                new[] {typeof(TType), typeof(TField)},
-                typeof(TType)
+                new[] {typeof(TType), typeof(TField)}
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -229,17 +227,16 @@ namespace Modding
             gen.Emit(OpCodes.Stfld, fi);
             gen.Emit(OpCodes.Ret);
 
-            return dm.CreateDelegate(typeof(Action<TType, TField>));
+            return dm.Generate().CreateDelegate(typeof(Action<TType, TField>));
         }
 
         private static Delegate CreateSetStaticFieldDelegate<TType, TField>(FieldInfo fi)
         {
-            DynamicMethod dm = new DynamicMethod
+            var dm = new DynamicMethodDefinition
             (
                 "FieldSet" + fi.DeclaringType?.Name + fi.Name,
                 typeof(void),
-                new[] {typeof(TField)},
-                typeof(TType)
+                new[] {typeof(TField)}
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -248,7 +245,7 @@ namespace Modding
             gen.Emit(OpCodes.Stsfld, fi);
             gen.Emit(OpCodes.Ret);
 
-            return dm.CreateDelegate(typeof(Action<TField>));
+            return dm.Generate().CreateDelegate(typeof(Action<TField>));
         }
 
         /// <summary>

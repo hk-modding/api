@@ -2,7 +2,7 @@
     <PropertyGroup>
         <RootNamespace>Modding</RootNamespace>
         <AssemblyName>Assembly-CSharp.mm</AssemblyName>
-        <TargetFramework>net35</TargetFramework>
+        <TargetFramework>net4.0</TargetFramework>
         <AssemblyTitle>Hollow Knight - Mod API Enabled</AssemblyTitle>
         <Product>Modding API</Product>
         <Copyright>Copyright © 2017</Copyright>
@@ -14,17 +14,21 @@
 
     <ItemGroup>
         <Files Include="$(SolutionDir)Vanilla/*" />
-        <Files Include="$(SolutionDir)JsonNet/System.Runtime.Serialization.dll" />
 
         <BuildDir Include="$(TargetDir)" />
+        
+        <Dependencies Include="$(TargetDir)Newtonsoft.Json.dll" />
+        <Dependencies Include="$(TargetDir)MMHOOK_Assembly-CSharp.dll" />
+        <Dependencies Include="$(TargetDir)MMHOOK_PlayMaker.dll" />
+        <Dependencies Include="$(TargetDir)MonoMod.Utils.dll" />
+        <Dependencies Include="$(TargetDir)Mono.Cecil.dll" />
+        <Dependencies Include="$(TargetDir)MonoMod.RuntimeDetour.dll" />
     </ItemGroup>
 
     <PropertyGroup>
         <OutputDir>$(SolutionDir)OutputFinal</OutputDir>
         <Mono Condition="$(OS) == WINDOWS_NT" />
         <Mono Condition="$(OS) != WINDOWS_NT">mono</Mono>
-        <ILRepack>$(SolutionDir)ILRepack/ILRepack.exe</ILRepack>
-        <Merge>System.Runtime.Serialization.dll Newtonsoft.Json.dll MMHOOK_Assembly-CSharp.dll MMHOOK_PlayMaker.dll MonoMod.Utils.dll Mono.Cecil.dll MonoMod.RuntimeDetour.dll ValueTupleBridge.dll</Merge>
     </PropertyGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
@@ -33,7 +37,7 @@
 
         <Copy SkipUnchangedFiles="true" SourceFiles="@(Files)" DestinationFolder="@(BuildDir)" />
 
-        <Exec Condition="!Exists('$(TargetDir)Assembly-CSharp-patched.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) $(SolutionDir)PrePatcher/Output/PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
+        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) $(SolutionDir)PrePatcher/Output/PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
         <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)Assembly-CSharp-patched.dll" DestinationFiles="$(TargetDir)Assembly-CSharp.dll" />
 
         <Delete Condition="Exists('MONOMODDED_Assembly-CSharp.dll')" Files="MONOMODDED_Assembly-CSharp.dll" />
@@ -42,23 +46,27 @@
         <!-- Generate Hooks !-->
         <Exec Condition="!Exists('$(TargetDir)MMHOOK_Assembly-CSharp.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.RuntimeDetour.HookGen.exe --private Assembly-CSharp.dll" />
         <Exec Condition="!Exists('$(TargetDir)MMHOOK_Playmaker.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.RuntimeDetour.HookGen.exe --private PlayMaker.dll" />
+    </Target>
+    
+    <Target Name="Release" AfterTargets="PostBuild" Condition="'$(Configuration)' == 'Release'">
+        <!-- Cleanup -->
+        <RemoveDir Directories="$(OutputDir)" />
 
-        <!-- Rename files so the assembly name is correct and game loads !-->
-        <Move SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(TargetDir)MONOMODDED.dll" />
-        <Move SourceFiles="$(TargetDir)Assembly-CSharp.dll" DestinationFiles="$(TargetDir)OriginalAssembly-CSharp.dll.dll" />
-        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) $(ILRepack) /out:Assembly-CSharp.dll MONOMODDED.dll $(Merge)" />
-        <Move SourceFiles="$(TargetDir)Assembly-CSharp.dll" DestinationFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" />
+        <!-- Make the output directory -->
+        <MakeDir Directories="$(OutputDir)" />
 
-        <!-- Folder structure such that you can just merge dirs to install the api, not really necessary with the installer now !-->
-        <MakeDir Directories="$(OutputDir)/hollow_knight_Data/Managed/Mods" />
-        <Copy SourceFiles="$(SolutionDir)/readme.moddingapi.md" DestinationFiles="$(OutputDir)/README.md" />
-        <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(OutputDir)/hollow_knight_Data/Managed/Assembly-CSharp.dll" />
-        <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(OutputDir)/hollow_knight_Data/Managed/Assembly-CSharp.xml" />
+        <!-- Copy the API, the documentation, and the README. -->
+        <Copy SourceFiles="$(SolutionDir)/README.ModdingApi.md" DestinationFiles="$(OutputDir)/README.md" />
+        <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(OutputDir)/Assembly-CSharp.dll" />
+        <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(OutputDir)/Assembly-CSharp.xml" />
+        
+        <!-- Copy the dependencies for the API and hooks for mods -->
+        <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutputDir)" />
 
-        <!-- Zip the Distribution Folder !-->
+        <!-- Zip for distribution -->
         <ZipDirectory SourceDirectory="$(OutputDir)" DestinationFile="$(SolutionDir)ModdingAPI.zip" />
     </Target>
-
+    
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <DebugType>full</DebugType>
         <DocumentationFile>bin\$(Configuration)\Assembly-CSharp.mm.xml</DocumentationFile>
@@ -83,10 +91,6 @@
         <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="21.1.11.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
-
-        <PackageReference Include="ValueTupleBridge" Version="0.1.5">
-            <IncludeAssets>all</IncludeAssets>
-        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
@@ -94,21 +98,18 @@
             <HintPath>../Vanilla/Assembly-CSharp.dll</HintPath>
             <SpecificVersion>False</SpecificVersion>
         </Reference>
-        <Reference Include="mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-            <HintPath>../Vanilla/mscorlib.dll</HintPath>
+        <Reference Include="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+          <HintPath>..\Vanilla\mscorlib.dll</HintPath>
         </Reference>
-        <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+          <HintPath>..\Vanilla\netstandard.dll</HintPath>
+        </Reference>
+        <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=null">
           <HintPath>..\JsonNet\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
             <HintPath>../Vanilla/PlayMaker.dll</HintPath>
             <SpecificVersion>False</SpecificVersion>
-        </Reference>
-        <Reference Include="System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-            <HintPath>../../../../../usr/lib64/mono/2.0-api/System.dll</HintPath>
-        </Reference>
-        <Reference Include="System.Xml, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-            <HintPath>../../../../../usr/lib64/mono/2.0-api/System.Xml.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <HintPath>../Vanilla/UnityEngine.dll</HintPath>
@@ -127,6 +128,9 @@
         </Reference>
         <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <HintPath>../Vanilla/UnityEngine.IMGUIModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\Vanilla\UnityEngine.InputLegacyModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.JSONSerializeModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <HintPath>../Vanilla/UnityEngine.JSONSerializeModule.dll</HintPath>
