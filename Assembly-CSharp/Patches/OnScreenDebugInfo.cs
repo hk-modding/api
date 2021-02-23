@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading;
 using MonoMod;
 using UnityEngine;
 
@@ -20,7 +20,7 @@ namespace Modding.Patches
             DontDestroyOnLoad(obj);
 
             // Preload reflection
-            ReflectionHelper.PreloadCommonTypes();
+            new Thread(ReflectionHelper.PreloadCommonTypes).Start();
 
             // NonBouncer does absolutely nothing, which makes it a good dummy to run the loader
             obj.AddComponent<NonBouncer>().StartCoroutine(ModLoader.LoadMods(obj));

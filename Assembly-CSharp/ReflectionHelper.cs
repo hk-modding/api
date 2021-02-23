@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using MonoMod.Utils;
 
@@ -13,12 +15,11 @@ namespace Modding
     /// </summary>
     public static class ReflectionHelper
     {
-        private static readonly Dictionary<Type, Dictionary<string, FieldInfo>> Fields =
-            new Dictionary<Type, Dictionary<string, FieldInfo>>();
+        private static readonly ConcurrentDictionary<Type, Dictionary<string, FieldInfo>> Fields = new();
 
-        private static readonly Dictionary<FieldInfo, Delegate> Getters = new Dictionary<FieldInfo, Delegate>();
+        private static readonly ConcurrentDictionary<FieldInfo, Delegate> Getters = new();
 
-        private static readonly Dictionary<FieldInfo, Delegate> Setters = new Dictionary<FieldInfo, Delegate>();
+        private static readonly ConcurrentDictionary<FieldInfo, Delegate> Setters = new();
 
         private static bool _preloaded;
 
@@ -26,35 +27,40 @@ namespace Modding
         ///     Caches all fields on a type to frontload cost of reflection
         /// </summary>
         /// <typeparam name="T">The type to cache</typeparam>
-        public static void CacheFields<T>()
+        private static void CacheFields<T>()
         {
             Type t = typeof(T);
+
             if (!Fields.TryGetValue(t, out Dictionary<string, FieldInfo> tFields))
             {
                 tFields = new Dictionary<string, FieldInfo>();
             }
 
+            const BindingFlags privStatic = BindingFlags.NonPublic | BindingFlags.Static;
+            const BindingFlags all = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
+
             // Not gonna redesign this class to avoid reflection, this shouldn't be called during gameplay anyway
-            MethodInfo getGetter =
-                typeof(ReflectionHelper).GetMethod(nameof(GetGetter), BindingFlags.NonPublic | BindingFlags.Static);
-            MethodInfo getSetter =
-                typeof(ReflectionHelper).GetMethod(nameof(GetSetter), BindingFlags.NonPublic | BindingFlags.Static);
+            MethodInfo getGetter = typeof(ReflectionHelper).GetMethod(nameof(GetGetter), privStatic);
+            MethodInfo getSetter = typeof(ReflectionHelper).GetMethod(nameof(GetSetter), privStatic);
 
-            foreach (FieldInfo field in t.GetFields(BindingFlags.NonPublic | BindingFlags.Public |
-                                                    BindingFlags.Instance | BindingFlags.Static))
-            {
-                tFields[field.Name] = field;
-
-                if (!field.IsLiteral)
+            Parallel.ForEach
+            (
+                t.GetFields(all),
+                field =>
                 {
-                    getGetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] {field});
-                }
+                    tFields[field.Name] = field;
 
-                if (!field.IsLiteral && !field.IsInitOnly)
-                {
-                    getSetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
+                    if (!field.IsLiteral)
+                    {
+                        getGetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
+                    }
+
+                    if (!field.IsLiteral && !field.IsInitOnly)
+                    {
+                        getSetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
+                    }
                 }
-            }
+            );
         }
 
         /// <summary>
@@ -68,7 +74,7 @@ namespace Modding
         {
             if (!Fields.TryGetValue(t, out Dictionary<string, FieldInfo> typeFields))
             {
-                Fields.Add(t, typeFields = new Dictionary<string, FieldInfo>());
+                Fields[t] = typeFields = new Dictionary<string, FieldInfo>();
             }
 
             if (typeFields.TryGetValue(field, out FieldInfo fi))
@@ -76,9 +82,11 @@ namespace Modding
                 return fi;
             }
 
-            fi = t.GetField(field,
-                BindingFlags.NonPublic | BindingFlags.Public |
-                (instance ? BindingFlags.Instance : BindingFlags.Static));
+            fi = t.GetField
+            (
+                field,
+                BindingFlags.NonPublic | BindingFlags.Public | (instance ? BindingFlags.Instance : BindingFlags.Static)
+            );
 
             if (fi != null)
             {
@@ -91,17 +99,18 @@ namespace Modding
         internal static void PreloadCommonTypes()
         {
             if (_preloaded)
-            {
                 return;
-            }
 
             var watch = new Stopwatch();
             watch.Start();
 
-            CacheFields<PlayerData>();
-            CacheFields<HeroController>();
-            CacheFields<GameManager>();
-            CacheFields<UIManager>();
+            Parallel.Invoke
+            (
+                CacheFields<PlayerData>,
+                CacheFields<HeroController>,
+                CacheFields<GameManager>,
+                CacheFields<UIManager>
+            );
 
             watch.Stop();
 
@@ -128,10 +137,10 @@ namespace Modding
             }
 
             d = fi.IsStatic
-                ? CreateGetStaticFieldDelegate<TType, TField>(fi)
+                ? CreateGetStaticFieldDelegate<TField>(fi)
                 : CreateGetFieldDelegate<TType, TField>(fi);
 
-            Getters.Add(fi, d);
+            Getters[fi] = d;
 
             return d;
         }
@@ -154,10 +163,10 @@ namespace Modding
             }
 
             d = fi.IsStatic
-                ? CreateSetStaticFieldDelegate<TType, TField>(fi)
+                ? CreateSetStaticFieldDelegate<TField>(fi)
                 : CreateSetFieldDelegate<TType, TField>(fi);
 
-            Setters.Add(fi, d);
+            Setters[fi] = d;
 
             return d;
         }
@@ -167,9 +176,8 @@ namespace Modding
         /// </summary>
         /// <param name="fi">FieldInfo of field</param>
         /// <typeparam name="TField">Field type</typeparam>
-        /// <typeparam name="TType">Type which field resides upon</typeparam>
         /// <returns>Function returning static field</returns>
-        private static Delegate CreateGetStaticFieldDelegate<TType, TField>(FieldInfo fi)
+        private static Delegate CreateGetStaticFieldDelegate<TField>(FieldInfo fi)
         {
             var dm = new DynamicMethodDefinition
             (
@@ -199,7 +207,7 @@ namespace Modding
             (
                 "FieldAccess" + fi.DeclaringType?.Name + fi.Name,
                 typeof(TField),
-                new[] {typeof(TType)}
+                new[] { typeof(TType) }
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -217,7 +225,7 @@ namespace Modding
             (
                 "FieldSet" + fi.DeclaringType?.Name + fi.Name,
                 typeof(void),
-                new[] {typeof(TType), typeof(TField)}
+                new[] { typeof(TType), typeof(TField) }
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -230,13 +238,13 @@ namespace Modding
             return dm.Generate().CreateDelegate(typeof(Action<TType, TField>));
         }
 
-        private static Delegate CreateSetStaticFieldDelegate<TType, TField>(FieldInfo fi)
+        private static Delegate CreateSetStaticFieldDelegate<TField>(FieldInfo fi)
         {
             var dm = new DynamicMethodDefinition
             (
                 "FieldSet" + fi.DeclaringType?.Name + fi.Name,
                 typeof(void),
-                new[] {typeof(TField)}
+                new[] { typeof(TField) }
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -331,8 +339,7 @@ namespace Modding
         [PublicAPI]
         public static void SetAttr<TObject, TField>(TObject obj, string name, TField value)
         {
-            FieldInfo fi = GetField(typeof(TObject), name) ??
-                           throw new MissingFieldException($"Field {name} does not exist!");
+            FieldInfo fi = GetField(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
 
             ((Action<TObject, TField>) GetSetter<TObject, TField>(fi))(obj, value);
         }
