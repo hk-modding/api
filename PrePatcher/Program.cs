@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 
 namespace Prepatcher
@@ -11,26 +11,6 @@ namespace Prepatcher
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class Program
     {
-        private static readonly Dictionary<OpCode, OpCode> ShortBranch = new()
-        {
-            [OpCodes.Br_S] = OpCodes.Br,
-
-            [OpCodes.Beq_S] = OpCodes.Beq,
-            [OpCodes.Bge_S] = OpCodes.Bge,
-            [OpCodes.Bgt_S] = OpCodes.Bgt,
-            [OpCodes.Ble_S] = OpCodes.Ble,
-            [OpCodes.Blt_S] = OpCodes.Blt,
-
-            [OpCodes.Brfalse_S] = OpCodes.Brfalse,
-            [OpCodes.Brtrue_S] = OpCodes.Brtrue,
-
-            [OpCodes.Bge_Un_S] = OpCodes.Bge_Un,
-            [OpCodes.Bgt_Un_S] = OpCodes.Bgt_Un,
-            [OpCodes.Ble_Un_S] = OpCodes.Ble_Un,
-            [OpCodes.Blt_Un_S] = OpCodes.Blt_Un,
-            [OpCodes.Bne_Un_S] = OpCodes.Bne_Un
-        };
-
         private static void Main(string[] args)
         {
             if (args.Length < 2)
@@ -83,6 +63,11 @@ namespace Prepatcher
                         continue;
 
                     ILProcessor il = method.Body.GetILProcessor();
+                    
+                    // Replace short branches with normal branches, etc.
+                    // This ensures that inserting instructions won't cause
+                    // short branch offsets to overflow and become null
+                    method.Body.SimplifyMacros();
 
                     bool changesFound = true;
 
@@ -140,25 +125,16 @@ namespace Prepatcher
                             }
                         }
                     }
-
-                    foreach (Instruction instr in method.Body.Instructions.Where(instr => ShortBranch.ContainsKey(instr.OpCode)))
-                    {
-                        if (instr.Operand is not Instruction target)
-                            throw new InvalidOperationException("Branch doesn't target an instruction!");
-
-                        // One-byte signed offset.
-                        if (target.Offset >= 127)
-                        {
-                            // Convert to non-short variant.
-                            instr.OpCode = ShortBranch[instr.OpCode];
-                        }
-                    }
+                    
+                    // After inserting instructions, replace branches
+                    // with short branches where possible for optimization
+                    method.Body.OptimizeMacros();
                 }
-
-                module.Write(args[1]);
-
-                Console.WriteLine("Changed " + changes + " get/set calls");
             }
+
+            module.Write(args[1]);
+
+            Console.WriteLine("Changed " + changes + " get/set calls");
         }
 
         private static void SwapStFld
