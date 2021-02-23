@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using MonoMod;
-using Newtonsoft.Json;
+﻿using MonoMod;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 // ReSharper disable all
 #pragma warning disable 1591, 649, 414, 169, CS0108, CS0626
 
-namespace Modding.Patches
+namespace Modding.Patches.SuppressPreloadException
 {
     [MonoModPatch("global::GameCameras")]
     public class GameCameras : global::GameCameras

@@ -15,7 +15,7 @@ namespace Modding.Patches
     public class CameraLockArea : global::CameraLockArea
     {
         [MonoModIgnore]
-        private GameCameras gcams;
+        private SuppressPreloadException.GameCameras gcams;
         [MonoModIgnore]
         private CameraController cameraCtrl;
         [MonoModIgnore]
@@ -35,7 +35,7 @@ namespace Modding.Patches
 
         private IEnumerator Start()
         {
-            this.gcams = GameCameras.instance;
+            this.gcams = SuppressPreloadException.GameCameras.instance;
             if (this.gcams == null)
                 yield break;
             this.cameraCtrl = this.gcams.cameraController;
