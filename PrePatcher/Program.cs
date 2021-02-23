@@ -1,15 +1,34 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-
-// ReSharper disable SuggestVarOrType_SimpleTypes
 
 namespace Prepatcher
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class Program
     {
+        private static readonly Dictionary<OpCode, OpCode> ShortBranch = new()
+        {
+            [OpCodes.Br_S] = OpCodes.Br,
+            
+            [OpCodes.Beq_S] = OpCodes.Beq,
+            [OpCodes.Bge_S] = OpCodes.Bge,
+            [OpCodes.Bgt_S] = OpCodes.Bgt,
+            [OpCodes.Ble_S] = OpCodes.Ble,
+            [OpCodes.Blt_S] = OpCodes.Blt,
+            
+            [OpCodes.Brfalse_S] = OpCodes.Brfalse,
+            [OpCodes.Brtrue_S] = OpCodes.Brtrue,
+            
+            [OpCodes.Bge_Un_S] = OpCodes.Bge_Un,
+            [OpCodes.Bgt_Un_S] = OpCodes.Bgt_Un,
+            [OpCodes.Ble_Un_S] = OpCodes.Ble_Un,
+            [OpCodes.Blt_Un_S] = OpCodes.Blt_Un,
+            [OpCodes.Bne_Un_S] = OpCodes.Bne_Un
+        };
+
         private static void Main(string[] args)
         {
             if (args.Length < 2)
@@ -58,8 +77,7 @@ namespace Prepatcher
 
                     foreach (MethodDefinition method in type.Methods)
                     {
-                        if (!method.HasBody || method.DeclaringType == pd &&
-                            (method.Name == "SetupNewPlayerData" || method.Name == "AddGGPlayerDataOverrides"))
+                        if (!method.HasBody || method.DeclaringType == pd && (method.Name == "SetupNewPlayerData" || method.Name == "AddGGPlayerDataOverrides"))
                         {
                             continue;
                         }
@@ -169,30 +187,57 @@ namespace Prepatcher
                                 }
                             }
                         }
+
+                        foreach (var instr in method.Body.Instructions)
+                        {
+                            // Short branch.
+                            if (!ShortBranch.ContainsKey(instr.OpCode))
+                                continue;
+
+                            if (instr.Operand is not Instruction target)
+                                throw new InvalidOperationException("Branch doesn't target an instruction!");
+
+                            // One-byte signed offset.
+                            if (target.Offset >= 127)
+                            {
+                                // Convert to non-short variant.
+                                instr.OpCode = ShortBranch[instr.OpCode];
+                            }
+                        }
                     }
+
+                    module.Write(args[1]);
+
+                    Console.WriteLine("Changed " + changes + " get/set calls");
                 }
-
-                module.Write(args[1]);
-
-                Console.WriteLine("Changed " + changes + " get/set calls");
             }
         }
 
         private static MethodDefinition GenerateSwappedMethod(TypeDefinition methodParent, MethodDefinition oldMethod)
         {
-            MethodDefinition swapped = new MethodDefinition(oldMethod.Name + "SwappedArgs",
-                MethodAttributes.Assembly | MethodAttributes.HideBySig, methodParent.Module.TypeSystem.Void);
-            swapped.Parameters.Add(new ParameterDefinition(oldMethod.Parameters.ToArray()[1].ParameterType)
-                {Name = "value"});
-            swapped.Parameters.Add(new ParameterDefinition(oldMethod.Parameters.ToArray()[0].ParameterType)
-                {Name = "name"});
+            MethodDefinition swapped = new MethodDefinition
+            (
+                oldMethod.Name + "SwappedArgs",
+                MethodAttributes.Assembly | MethodAttributes.HideBySig,
+                methodParent.Module.TypeSystem.Void
+            );
+            swapped.Parameters.Add
+            (
+                new ParameterDefinition(oldMethod.Parameters.ToArray()[1].ParameterType)
+                    { Name = "value" }
+            );
+            swapped.Parameters.Add
+            (
+                new ParameterDefinition(oldMethod.Parameters.ToArray()[0].ParameterType)
+                    { Name = "name" }
+            );
 
             if (oldMethod.HasGenericParameters)
             {
                 int paramCount = 0;
                 foreach (GenericParameter _ in oldMethod.GenericParameters)
                 {
-                    swapped.GenericParameters.Add(new GenericParameter(swapped) {Name = "T" + paramCount});
+                    swapped.GenericParameters.Add(new GenericParameter(swapped) { Name = "T" + paramCount });
                     paramCount++;
                 }
             }
