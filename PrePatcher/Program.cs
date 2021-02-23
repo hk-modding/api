@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using MethodAttributes = Mono.Cecil.MethodAttributes;
 
 namespace Prepatcher
 {
@@ -12,16 +14,16 @@ namespace Prepatcher
         private static readonly Dictionary<OpCode, OpCode> ShortBranch = new()
         {
             [OpCodes.Br_S] = OpCodes.Br,
-            
+
             [OpCodes.Beq_S] = OpCodes.Beq,
             [OpCodes.Bge_S] = OpCodes.Bge,
             [OpCodes.Bgt_S] = OpCodes.Bgt,
             [OpCodes.Ble_S] = OpCodes.Ble,
             [OpCodes.Blt_S] = OpCodes.Blt,
-            
+
             [OpCodes.Brfalse_S] = OpCodes.Brfalse,
             [OpCodes.Brtrue_S] = OpCodes.Brtrue,
-            
+
             [OpCodes.Bge_Un_S] = OpCodes.Bge_Un,
             [OpCodes.Bgt_Un_S] = OpCodes.Bgt_Un,
             [OpCodes.Ble_Un_S] = OpCodes.Ble_Un,
@@ -39,197 +41,254 @@ namespace Prepatcher
 
             int changes = 0;
 
-            using (ModuleDefinition module = ModuleDefinition.ReadModule(args[0]))
+            using ModuleDefinition module = ModuleDefinition.ReadModule(args[0]);
+            
+            TypeDefinition pd = module.GetType("", "PlayerData");
+
+            MethodDefinition pdGetBool = pd.Methods.First(method => method.Name == "GetBool");
+            MethodDefinition pdSetBool = pd.Methods.First(method => method.Name == "SetBool");
+
+            MethodDefinition pdGetFloat = pd.Methods.First(method => method.Name == "GetFloat");
+            MethodDefinition pdSetFloat = pd.Methods.First(method => method.Name == "SetFloat");
+
+            MethodDefinition pdGetInt = pd.Methods.First(method => method.Name == "GetInt");
+            MethodDefinition pdSetInt = pd.Methods.First(method => method.Name == "SetInt");
+
+            MethodDefinition pdGetString = pd.Methods.First(method => method.Name == "GetString");
+            MethodDefinition pdSetString = pd.Methods.First(method => method.Name == "SetString");
+
+            MethodDefinition pdGetVector3 = pd.Methods.First(method => method.Name == "GetVector3");
+            MethodDefinition pdSetVector3 = pd.Methods.First(method => method.Name == "SetVector3");
+
+            MethodDefinition pdGetVariable = pd.Methods.First(method => method.Name == "GetVariable");
+            MethodDefinition pdSetVariable = pd.Methods.First(method => method.Name == "SetVariable");
+
+            MethodDefinition setBoolSwappedArgs = GenerateSwappedMethod(pd, pdSetBool);
+            MethodDefinition setFloatSwappedArgs = GenerateSwappedMethod(pd, pdSetFloat);
+            MethodDefinition setIntSwappedArgs = GenerateSwappedMethod(pd, pdSetInt);
+            MethodDefinition setStringSwappedArgs = GenerateSwappedMethod(pd, pdSetString);
+            MethodDefinition setVector3SwappedArgs = GenerateSwappedMethod(pd, pdSetVector3);
+            MethodDefinition setVariableSwappedArgs = GenerateSwappedMethod(pd, pdSetVariable);
+
+            foreach (TypeDefinition type in module.Types.Where(type => type.HasMethods))
             {
-                TypeDefinition pd = module.GetType("", "PlayerData");
-
-                MethodDefinition pdGetBool = pd.Methods.First(method => method.Name == "GetBool");
-                MethodDefinition pdSetBool = pd.Methods.First(method => method.Name == "SetBool");
-
-                MethodDefinition pdGetFloat = pd.Methods.First(method => method.Name == "GetFloat");
-                MethodDefinition pdSetFloat = pd.Methods.First(method => method.Name == "SetFloat");
-
-                MethodDefinition pdGetInt = pd.Methods.First(method => method.Name == "GetInt");
-                MethodDefinition pdSetInt = pd.Methods.First(method => method.Name == "SetInt");
-
-                MethodDefinition pdGetString = pd.Methods.First(method => method.Name == "GetString");
-                MethodDefinition pdSetString = pd.Methods.First(method => method.Name == "SetString");
-
-                MethodDefinition pdGetVector3 = pd.Methods.First(method => method.Name == "GetVector3");
-                MethodDefinition pdSetVector3 = pd.Methods.First(method => method.Name == "SetVector3");
-
-                MethodDefinition pdGetVariable = pd.Methods.First(method => method.Name == "GetVariable");
-                MethodDefinition pdSetVariable = pd.Methods.First(method => method.Name == "SetVariable");
-
-                MethodDefinition setBoolSwappedArgs = GenerateSwappedMethod(pd, pdSetBool);
-                MethodDefinition setFloatSwappedArgs = GenerateSwappedMethod(pd, pdSetFloat);
-                MethodDefinition setIntSwappedArgs = GenerateSwappedMethod(pd, pdSetInt);
-                MethodDefinition setStringSwappedArgs = GenerateSwappedMethod(pd, pdSetString);
-                MethodDefinition setVector3SwappedArgs = GenerateSwappedMethod(pd, pdSetVector3);
-                MethodDefinition setVariableSwappedArgs = GenerateSwappedMethod(pd, pdSetVariable);
-
-                foreach (TypeDefinition type in module.Types)
+                foreach (MethodDefinition method in type.Methods)
                 {
-                    if (!type.HasMethods)
-                    {
+                    if
+                    (
+                        !method.HasBody
+                        || method.DeclaringType == pd
+                        && (method.Name == "SetupNewPlayerData" || method.Name == "AddGGPlayerDataOverrides")
+                    )
                         continue;
-                    }
 
-                    foreach (MethodDefinition method in type.Methods)
+                    ILProcessor il = method.Body.GetILProcessor();
+
+                    bool changesFound = true;
+
+                    while (changesFound)
                     {
-                        if (!method.HasBody || method.DeclaringType == pd && (method.Name == "SetupNewPlayerData" || method.Name == "AddGGPlayerDataOverrides"))
+                        changesFound = false;
+
+                        foreach (Instruction instr in il.Body.Instructions)
                         {
-                            continue;
-                        }
-
-                        ILProcessor il = method.Body.GetILProcessor();
-
-                        bool changesFound = true;
-                        while (changesFound)
-                        {
-                            changesFound = false;
-
-                            foreach (Instruction instr in il.Body.Instructions)
-                            {
-                                if (instr.OpCode == OpCodes.Ldfld)
-                                {
-                                    FieldReference field = (FieldReference) instr.Operand;
-                                    if (field.DeclaringType != pd)
-                                    {
-                                        continue;
-                                    }
-
-                                    Instruction ldstr = Instruction.Create(OpCodes.Ldstr, field.Name);
-                                    Instruction callGet;
-
-                                    if (field.FieldType == module.TypeSystem.Boolean)
-                                    {
-                                        callGet = Instruction.Create(OpCodes.Callvirt, pdGetBool);
-                                    }
-                                    else if (field.FieldType == module.TypeSystem.Single)
-                                    {
-                                        callGet = Instruction.Create(OpCodes.Callvirt, pdGetFloat);
-                                    }
-                                    else if (field.FieldType == module.TypeSystem.Int32)
-                                    {
-                                        callGet = Instruction.Create(OpCodes.Callvirt, pdGetInt);
-                                    }
-                                    else if (field.FieldType == module.TypeSystem.String)
-                                    {
-                                        callGet = Instruction.Create(OpCodes.Callvirt, pdGetString);
-                                    }
-                                    else if (field.FieldType.Name == "Vector3")
-                                    {
-                                        callGet = Instruction.Create(OpCodes.Callvirt, pdGetVector3);
-                                    }
-                                    else
-                                    {
-                                        GenericInstanceMethod generic = new GenericInstanceMethod(pdGetVariable);
-                                        generic.GenericArguments.Add(field.FieldType);
-                                        callGet = Instruction.Create(OpCodes.Callvirt, generic);
-                                    }
-
-                                    instr.OpCode = callGet.OpCode;
-                                    instr.Operand = callGet.Operand;
-                                    il.InsertBefore(instr, ldstr);
-
-                                    changes++;
-                                    changesFound = true;
-                                    break;
-                                }
-
-                                if (instr.OpCode == OpCodes.Stfld)
-                                {
-                                    FieldReference field = (FieldReference) instr.Operand;
-                                    if (field.DeclaringType != pd)
-                                    {
-                                        continue;
-                                    }
-
-                                    Instruction ldstr = Instruction.Create(OpCodes.Ldstr, field.Name);
-                                    Instruction callSet;
-
-                                    if (field.FieldType == module.TypeSystem.Boolean)
-                                    {
-                                        callSet = Instruction.Create(OpCodes.Callvirt, setBoolSwappedArgs);
-                                    }
-                                    else if (field.FieldType == module.TypeSystem.Single)
-                                    {
-                                        callSet = Instruction.Create(OpCodes.Callvirt, setFloatSwappedArgs);
-                                    }
-                                    else if (field.FieldType == module.TypeSystem.Int32)
-                                    {
-                                        callSet = Instruction.Create(OpCodes.Callvirt, setIntSwappedArgs);
-                                    }
-                                    else if (field.FieldType == module.TypeSystem.String)
-                                    {
-                                        callSet = Instruction.Create(OpCodes.Callvirt, setStringSwappedArgs);
-                                    }
-                                    else if (field.FieldType.Name == "Vector3")
-                                    {
-                                        callSet = Instruction.Create(OpCodes.Callvirt, setVector3SwappedArgs);
-                                    }
-                                    else
-                                    {
-                                        GenericInstanceMethod generic =
-                                            new GenericInstanceMethod(setVariableSwappedArgs);
-                                        generic.GenericArguments.Add(field.FieldType);
-                                        callSet = Instruction.Create(OpCodes.Callvirt, generic);
-                                    }
-
-                                    instr.OpCode = callSet.OpCode;
-                                    instr.Operand = callSet.Operand;
-                                    il.InsertBefore(instr, ldstr);
-
-                                    changes++;
-                                    changesFound = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        foreach (var instr in method.Body.Instructions)
-                        {
-                            // Short branch.
-                            if (!ShortBranch.ContainsKey(instr.OpCode))
+                            if (instr.Operand is not FieldReference field || field.DeclaringType != pd)
                                 continue;
 
-                            if (instr.Operand is not Instruction target)
-                                throw new InvalidOperationException("Branch doesn't target an instruction!");
-
-                            // One-byte signed offset.
-                            if (target.Offset >= 127)
+                            if (instr.OpCode == OpCodes.Ldfld)
                             {
-                                // Convert to non-short variant.
-                                instr.OpCode = ShortBranch[instr.OpCode];
+                                SwapLdFld
+                                (
+                                    field,
+                                    module,
+                                    pdGetBool,
+                                    pdGetFloat,
+                                    pdGetInt,
+                                    pdGetString,
+                                    pdGetVector3,
+                                    pdGetVariable,
+                                    instr,
+                                    il
+                                );
+
+                                changes++;
+                                changesFound = true;
+
+                                break;
+                            }
+
+                            if (instr.OpCode == OpCodes.Stfld)
+                            {
+                                SwapStFld
+                                (
+                                    field,
+                                    module,
+                                    setBoolSwappedArgs,
+                                    setFloatSwappedArgs,
+                                    setIntSwappedArgs,
+                                    setStringSwappedArgs,
+                                    setVector3SwappedArgs,
+                                    setVariableSwappedArgs,
+                                    instr,
+                                    il
+                                );
+
+                                changes++;
+                                changesFound = true;
+
+                                break;
                             }
                         }
                     }
 
-                    module.Write(args[1]);
+                    foreach (Instruction instr in method.Body.Instructions.Where(instr => ShortBranch.ContainsKey(instr.OpCode)))
+                    {
+                        if (instr.Operand is not Instruction target)
+                            throw new InvalidOperationException("Branch doesn't target an instruction!");
 
-                    Console.WriteLine("Changed " + changes + " get/set calls");
+                        // One-byte signed offset.
+                        if (target.Offset >= 127)
+                        {
+                            // Convert to non-short variant.
+                            instr.OpCode = ShortBranch[instr.OpCode];
+                        }
+                    }
                 }
+
+                module.Write(args[1]);
+
+                Console.WriteLine("Changed " + changes + " get/set calls");
             }
+        }
+
+        private static void SwapStFld
+        (
+            FieldReference field,
+            ModuleDefinition module,
+            MethodReference setBoolSwappedArgs,
+            MethodReference setFloatSwappedArgs,
+            MethodReference setIntSwappedArgs,
+            MethodReference setStringSwappedArgs,
+            MethodReference setVector3SwappedArgs,
+            MethodReference setVariableSwappedArgs,
+            Instruction instr,
+            ILProcessor il
+        )
+        {
+            var ldstr = Instruction.Create(OpCodes.Ldstr, field.Name);
+
+            Instruction callSet;
+
+            if (field.FieldType == module.TypeSystem.Boolean)
+            {
+                callSet = Instruction.Create(OpCodes.Callvirt, setBoolSwappedArgs);
+            }
+            else if (field.FieldType == module.TypeSystem.Single)
+            {
+                callSet = Instruction.Create(OpCodes.Callvirt, setFloatSwappedArgs);
+            }
+            else if (field.FieldType == module.TypeSystem.Int32)
+            {
+                callSet = Instruction.Create(OpCodes.Callvirt, setIntSwappedArgs);
+            }
+            else if (field.FieldType == module.TypeSystem.String)
+            {
+                callSet = Instruction.Create(OpCodes.Callvirt, setStringSwappedArgs);
+            }
+            else if (field.FieldType.Name == "Vector3")
+            {
+                callSet = Instruction.Create(OpCodes.Callvirt, setVector3SwappedArgs);
+            }
+            else
+            {
+                var generic = new GenericInstanceMethod(setVariableSwappedArgs);
+                generic.GenericArguments.Add(field.FieldType);
+                callSet = Instruction.Create(OpCodes.Callvirt, generic);
+            }
+
+            instr.OpCode = callSet.OpCode;
+            instr.Operand = callSet.Operand;
+
+            il.InsertBefore(instr, ldstr);
+        }
+
+        private static void SwapLdFld
+        (
+            FieldReference field,
+            ModuleDefinition module,
+            MethodReference pdGetBool,
+            MethodReference pdGetFloat,
+            MethodReference pdGetInt,
+            MethodReference pdGetString,
+            MethodReference pdGetVector3,
+            MethodReference pdGetVariable,
+            Instruction instr,
+            ILProcessor il
+        )
+        {
+            var ldstr = Instruction.Create(OpCodes.Ldstr, field.Name);
+
+            Instruction callGet;
+
+            if (field.FieldType == module.TypeSystem.Boolean)
+            {
+                callGet = Instruction.Create(OpCodes.Callvirt, pdGetBool);
+            }
+            else if (field.FieldType == module.TypeSystem.Single)
+            {
+                callGet = Instruction.Create(OpCodes.Callvirt, pdGetFloat);
+            }
+            else if (field.FieldType == module.TypeSystem.Int32)
+            {
+                callGet = Instruction.Create(OpCodes.Callvirt, pdGetInt);
+            }
+            else if (field.FieldType == module.TypeSystem.String)
+            {
+                callGet = Instruction.Create(OpCodes.Callvirt, pdGetString);
+            }
+            else if (field.FieldType.Name == "Vector3")
+            {
+                callGet = Instruction.Create(OpCodes.Callvirt, pdGetVector3);
+            }
+            else
+            {
+                var generic = new GenericInstanceMethod(pdGetVariable);
+                generic.GenericArguments.Add(field.FieldType);
+                callGet = Instruction.Create(OpCodes.Callvirt, generic);
+            }
+
+            instr.OpCode = callGet.OpCode;
+            instr.Operand = callGet.Operand;
+
+            il.InsertBefore(instr, ldstr);
         }
 
         private static MethodDefinition GenerateSwappedMethod(TypeDefinition methodParent, MethodDefinition oldMethod)
         {
-            MethodDefinition swapped = new MethodDefinition
+            MethodDefinition swapped = new
             (
                 oldMethod.Name + "SwappedArgs",
                 MethodAttributes.Assembly | MethodAttributes.HideBySig,
                 methodParent.Module.TypeSystem.Void
             );
+
+            ParameterDefinition[] @params = oldMethod.Parameters.ToArray();
+
+            Debug.Assert(@params.Length == 2);
+
             swapped.Parameters.Add
             (
-                new ParameterDefinition(oldMethod.Parameters.ToArray()[1].ParameterType)
-                    { Name = "value" }
+                new ParameterDefinition(@params[1].ParameterType)
+                {
+                    Name = "value"
+                }
             );
             swapped.Parameters.Add
             (
-                new ParameterDefinition(oldMethod.Parameters.ToArray()[0].ParameterType)
-                    { Name = "name" }
+                new ParameterDefinition(@params[0].ParameterType)
+                {
+                    Name = "name"
+                }
             );
 
             if (oldMethod.HasGenericParameters)
@@ -242,19 +301,18 @@ namespace Prepatcher
                 }
             }
 
-            // ReSharper disable once InconsistentNaming
             ILProcessor swappedIL = swapped.Body.GetILProcessor();
+
             swappedIL.Emit(OpCodes.Ldarg_0);
             swappedIL.Emit(OpCodes.Ldarg_2);
             swappedIL.Emit(OpCodes.Ldarg_1);
 
             if (oldMethod.ContainsGenericParameter)
             {
-                GenericInstanceMethod generic = new GenericInstanceMethod(oldMethod);
+                GenericInstanceMethod generic = new(oldMethod);
+
                 foreach (GenericParameter param in swapped.GenericParameters)
-                {
                     generic.GenericArguments.Add(param);
-                }
 
                 swappedIL.Emit(OpCodes.Call, generic);
             }
