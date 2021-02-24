@@ -281,57 +281,8 @@ namespace Modding
             }
         }
 
-        // All my homies hate backwards compatability
-        #pragma warning disable 618
-        private bool DeprecatedSaveSettings(Patches.SaveGameData data)
-        {
-            try
-            {
-                string name = GetType().Name;
-
-                if (data?.modData == null || !data.modData.ContainsKey(name))
-                    return false;
-
-                if (SaveSettings == null)
-                {
-                    data.modData.Remove(name);
-                    
-                    return false;
-                }
-
-                ModSettings saveSettings = data.modData[name];
-                
-                data.modData.Remove(name);
-                
-                switch (saveSettings)
-                {
-                    case null:
-                        return false;
-
-                    case ISerializationCallbackReceiver receiver:
-                        receiver.OnAfterDeserialize();
-                        break;
-                }
-
-                SaveSettings = saveSettings;
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                LogError(e);
-
-                return false;
-            }
-        }
-        #pragma warning restore 618
-
-
         private void LoadSaveSettings(Patches.SaveGameData data)
         {
-            if (DeprecatedSaveSettings(data))
-                return;
-
             try
             {
                 string name = GetType().Name;
@@ -393,6 +344,7 @@ namespace Modding
                 case null:
                     return;
 
+                // ReSharper disable once SuspiciousTypeConversion.Global
                 case ISerializationCallbackReceiver receiver:
                     receiver.OnBeforeSerialize();
                     break;
