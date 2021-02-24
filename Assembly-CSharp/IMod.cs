@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Modding
@@ -35,7 +34,7 @@ namespace Modding
         string GetVersion();
 
         /// <summary>
-        ///     Denotes if the running version is the current version.  Set this with <see cref="GithubVersionHelper" />
+        ///     Denotes if the running version is the current version.
         /// </summary>
         /// <returns>If the version is current or not.</returns>
         bool IsCurrent();

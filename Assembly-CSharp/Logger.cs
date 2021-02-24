@@ -53,7 +53,7 @@ namespace Modding
                 File.Move(currLogName, Path.Combine(oldLogDir, oldLogName));
             }
 
-            FileStream fileStream = new FileStream(currLogName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+            var fileStream = new FileStream(currLogName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
             Writer = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
 
             File.SetCreationTimeUtc(currLogName, DateTime.UtcNow);
@@ -71,11 +71,12 @@ namespace Modding
         /// <param name="level">Level of Log</param>
         public static void Log(string message, LogLevel level)
         {
-            if (_logLevel <= level)
-            {
-                string levelText = "[" + level.ToString().ToUpper() + "]:";
-                WriteToFile(levelText + message.Replace("\n", "\n" + levelText) + Environment.NewLine);
-            }
+            if (_logLevel > level) 
+                return;
+            
+            string levelText = $"[{level.ToString().ToUpper()}]:";
+            
+            WriteToFile(levelText + message.Replace("\n", "\n" + levelText) + Environment.NewLine);
         }
 
         /// <summary>

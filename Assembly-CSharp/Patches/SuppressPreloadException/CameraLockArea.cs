@@ -1,7 +1,5 @@
 ﻿using MonoMod;
-using System;
 using System.Collections;
-using GlobalEnums;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 

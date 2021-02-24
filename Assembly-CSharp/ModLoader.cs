@@ -93,7 +93,7 @@ namespace Modding
                 .GetFields(BindingFlags.Public | BindingFlags.Static)
                 .ToDictionary(f => (int)f.GetValue(null), f => f.Name);
 
-            Dictionary<int, List<string>> modTypes = new Dictionary<int, List<string>>();
+            Dictionary<int, List<string>> modTypes = new ();
             foreach (string modPath in Directory.GetFiles(path, "*.dll"))
             {
                 using AssemblyDefinition asmDef = AssemblyDefinition.ReadAssembly(modPath);
@@ -101,13 +101,11 @@ namespace Modding
                     .FirstOrDefault(a => a.AttributeType.FullName == typeof(AssemblyTypeAttribute).FullName);
 
                 bool hasAttr = attr != null;
-                int type = attr == null
-                    ? AssemblyContainsMod(asmDef)
-                        ? AssemblyTypeAttribute.MOD
-                        : AssemblyTypeAttribute.LIBRARY
-                    : (int)attr.ConstructorArguments[0].Value;
+                int type = (int?) attr?.ConstructorArguments[0].Value ?? (AssemblyContainsMod(asmDef)
+                    ? AssemblyTypeAttribute.MOD
+                    : AssemblyTypeAttribute.LIBRARY);
 
-                if (!modTypeNames.TryGetValue(type, out string typeName))
+                if (!modTypeNames.TryGetValue(type, out string _))
                 {
                     Logger.APILogger.LogWarn($"Invalid type on assembly '{Path.GetFileNameWithoutExtension(modPath)}'! Defaulting to MOD.");
                     type = AssemblyTypeAttribute.MOD;
@@ -249,7 +247,8 @@ namespace Modding
                 }
             }
 
-            List<string> scenes = new List<string>();
+            List<string> scenes = new ();
+            
             for (int i = 0; i < USceneManager.sceneCountInBuildSettings; i++)
             {
                 string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
@@ -259,12 +258,10 @@ namespace Modding
             IMod[] orderedMods = LoadedMods.OrderBy(x => x.LoadPriority()).ToArray();
 
             // dict<scene name, list<(mod, list<objectNames>)>
-            Dictionary<string, List<(IMod, List<string>)>> toPreload =
-                new Dictionary<string, List<(IMod, List<string>)>>();
+            Dictionary<string, List<(IMod, List<string> objectNames)>> toPreload = new ();
 
             // dict<mod, dict<scene, dict<objName, object>>>
-            Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects =
-                new Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>>();
+            Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects = new ();
 
             Logger.APILogger.Log("Preloading");
 
@@ -280,9 +277,9 @@ namespace Modding
                 }
 
                 // dict<scene, list<objects>>
-                Dictionary<string, List<string>> modPreloads = new Dictionary<string, List<string>>();
+                Dictionary<string, List<string>> modPreloads = new ();
 
-                foreach (var (scene, obj) in preloadNames)
+                foreach ((string scene, string obj) in preloadNames)
                 {
                     if (string.IsNullOrEmpty(scene) || string.IsNullOrEmpty(obj))
                     {
@@ -307,16 +304,16 @@ namespace Modding
                     objects.Add(obj);
                 }
 
-                foreach (KeyValuePair<string, List<string>> pair in modPreloads)
+                foreach ((string scene, List<string> objects) in modPreloads)
                 {
-                    if (!toPreload.TryGetValue(pair.Key, out List<(IMod, List<string>)> scenePreloads))
+                    if (!toPreload.TryGetValue(scene, out List<(IMod, List<string>)> scenePreloads))
                     {
                         scenePreloads = new List<(IMod, List<string>)>();
-                        toPreload[pair.Key] = scenePreloads;
+                        toPreload[scene] = scenePreloads;
                     }
 
-                    scenePreloads.Add((mod, pair.Value));
-                    toPreload[pair.Key] = scenePreloads;
+                    scenePreloads.Add((mod, objects));
+                    toPreload[scene] = scenePreloads;
                 }
             }
 
@@ -345,21 +342,21 @@ namespace Modding
             SubscribeEvents(null, true);
 
             // Clean out the ModEnabledSettings for any mods that don't exist.
-            LoadedMods.RemoveAll(mod =>
-                !ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()));
+            LoadedMods.RemoveAll(mod => !ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()));
 
             // Get previously disabled mods and disable them.
-            foreach (KeyValuePair<string, bool> modPair in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Where(
-                x => !x.Value))
+            foreach ((string modName, bool _) in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Where(x => !x.Value))
             {
-                IMod mod = LoadedMods.FirstOrDefault(x => x.GetName() == modPair.Key);
+                IMod mod = LoadedMods.FirstOrDefault(x => x.GetName() == modName);
+                
                 if (mod is not ITogglableMod togglable)
                 {
                     continue;
                 }
 
                 togglable.Unload();
-                Logger.LogDebug($"Mod {modPair.Key} was unloaded.");
+                
+                Logger.LogDebug($"Mod {mod} was unloaded.");
             }
 
             // Create version text
@@ -545,7 +542,7 @@ namespace Modding
                 yield return USceneManager.UnloadSceneAsync(scene);
             }
 
-            List<IEnumerator> batch = new List<IEnumerator>();
+            List<IEnumerator> batch = new ();
             int maxKeys = toPreload.Keys.Count;
 
             foreach (string sceneName in toPreload.Keys)
@@ -597,7 +594,7 @@ namespace Modding
             }
 
             // 56 you made me do this, I hope you're happy
-            Dictionary<string, List<IMod>> modsByNamespace = new Dictionary<string, List<IMod>>();
+            Dictionary<string, List<IMod>> modsByNamespace = new ();
 
             foreach (IMod mod in LoadedMods)
             {
@@ -810,13 +807,8 @@ namespace Modding
                 }
                 else
                 {
-                    foreach (FieldInfo field in EventSubscribers)
+                    foreach (FieldInfo field in EventSubscribers.Where(field => field.FieldType == method.DeclaringType))
                     {
-                        if (field.FieldType != method.DeclaringType)
-                        {
-                            continue;
-                        }
-
                         object target;
                         if (field.IsStatic)
                         {

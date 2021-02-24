@@ -102,6 +102,7 @@ namespace Prepatcher
                                 break;
                             }
 
+                            // ReSharper disable once InvertIf
                             if (instr.OpCode == OpCodes.Stfld)
                             {
                                 SwapStFld
@@ -239,7 +240,7 @@ namespace Prepatcher
             il.InsertBefore(instr, ldstr);
         }
 
-        private static MethodDefinition GenerateSwappedMethod(TypeDefinition methodParent, MethodDefinition oldMethod)
+        private static MethodDefinition GenerateSwappedMethod(TypeDefinition methodParent, MethodReference oldMethod)
         {
             MethodDefinition swapped = new
             (

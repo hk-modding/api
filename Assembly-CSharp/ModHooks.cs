@@ -472,35 +472,31 @@ namespace Modding
 
             try
             {
-                //Logger.APILogger.Log("Loading Global Settings");
-                using (FileStream fileStream = File.OpenRead(SettingsPath))
+                using FileStream fileStream = File.OpenRead(SettingsPath);
+                using StreamReader reader = new StreamReader(fileStream);
+                
+                string json = reader.ReadToEnd();
+
+                try
                 {
-                    using (StreamReader reader = new StreamReader(fileStream))
-                    {
-                        string json = reader.ReadToEnd();
-
-                        try
+                    _globalSettings = JsonConvert.DeserializeObject<ModHooksGlobalSettings>
+                    (
+                        json,
+                        new JsonSerializerSettings
                         {
-                            _globalSettings = JsonConvert.DeserializeObject<ModHooksGlobalSettings>
-                            (
-                                json,
-                                new JsonSerializerSettings
-                                {
-                                    ContractResolver = ShouldSerializeContractResolver.Instance,
-                                    TypeNameHandling = TypeNameHandling.Auto,
-                                    ObjectCreationHandling = ObjectCreationHandling.Replace,
-                                    Converters = JsonConverterTypes.ConverterTypes
-                                }
-                            );
+                            ContractResolver = ShouldSerializeContractResolver.Instance,
+                            TypeNameHandling = TypeNameHandling.Auto,
+                            ObjectCreationHandling = ObjectCreationHandling.Replace,
+                            Converters = JsonConverterTypes.ConverterTypes
                         }
-                        catch (Exception e)
-                        {
-                            Logger.APILogger.LogError("Failed to deserialize settings using Json.NET, falling back.");
-                            Logger.APILogger.LogError(e);
+                    );
+                }
+                catch (Exception e)
+                {
+                    Logger.APILogger.LogError("Failed to deserialize settings using Json.NET, falling back.");
+                    Logger.APILogger.LogError(e);
 
-                            _globalSettings = JsonUtility.FromJson<ModHooksGlobalSettings>(json);
-                        }
-                    }
+                    _globalSettings = JsonUtility.FromJson<ModHooksGlobalSettings>(json);
                 }
             }
             catch (Exception e)
@@ -635,28 +631,27 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnRecieveDeathEvent Invoked");
 
-            if (OnReceiveDeathEventHook != null)
-            {
-                Delegate[] invocationList = OnReceiveDeathEventHook.GetInvocationList();
+            if (OnReceiveDeathEventHook == null) return;
+            
+            Delegate[] invocationList = OnReceiveDeathEventHook.GetInvocationList();
 
-                foreach (OnReceiveDeathEventHandler toInvoke in invocationList)
+            foreach (OnReceiveDeathEventHandler toInvoke in invocationList)
+            {
+                try
                 {
-                    try
-                    {
-                        toInvoke.Invoke
-                        (
-                            enemyDeathEffects,
-                            eventAlreadyRecieved,
-                            ref attackDirection,
-                            ref resetDeathEvent,
-                            ref spellBurn,
-                            ref isWatery
-                        );
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.APILogger.LogError("" + ex);
-                    }
+                    toInvoke.Invoke
+                    (
+                        enemyDeathEffects,
+                        eventAlreadyRecieved,
+                        ref attackDirection,
+                        ref resetDeathEvent,
+                        ref spellBurn,
+                        ref isWatery
+                    );
+                }
+                catch (Exception ex)
+                {
+                    Logger.APILogger.LogError("" + ex);
                 }
             }
         }

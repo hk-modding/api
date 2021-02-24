@@ -267,7 +267,7 @@ namespace Modding
         /// <typeparam name="TCast">Type of return.</typeparam>
         /// <returns>The value of a field on an object/type</returns>
         [PublicAPI]
-        public static TCast GetAttr<TObject, TField, TCast>(TObject obj, string name, TCast @default = default(TCast))
+        public static TCast GetAttr<TObject, TField, TCast>(TObject obj, string name, TCast @default = default)
         {
             FieldInfo fi = GetField(typeof(TObject), name);
 
@@ -304,7 +304,7 @@ namespace Modding
         {
             FieldInfo fi = GetField(typeof(TType), name, false);
 
-            return fi == null ? default(TField) : ((Func<TField>) GetGetter<TType, TField>(fi))();
+            return fi == null ? default : ((Func<TField>) GetGetter<TType, TField>(fi))();
         }
 
         /// <summary>

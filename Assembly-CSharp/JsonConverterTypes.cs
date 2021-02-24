@@ -16,7 +16,7 @@ namespace Modding
 
         static JsonConverterTypes()
         {
-            ConverterTypes = new List<JsonConverter>()
+            ConverterTypes = new List<JsonConverter>
             {
                 new Vector2Converter(),
                 new Vector3Converter()
