@@ -46,38 +46,4 @@ namespace Modding
         /// <returns></returns>
         int LoadPriority();
     }
-
-    /// <inheritdoc />
-    /// <summary>
-    ///     Generic implementation of Mod which allows for settings
-    /// </summary>
-    /// <typeparam name="T">Implementation of <see cref="ModSettings" /></typeparam>
-    [PublicAPI]
-    public interface IMod<T> : IMod where T : ModSettings
-    {
-        /// <summary>
-        ///     Settings For the Mod that would be saved with the save file.
-        /// </summary>
-        T Settings { get; set; }
-    }
-
-    /// <inheritdoc />
-    /// <summary>
-    ///     Generic implementation of Mod which allows for settings
-    /// </summary>
-    /// <typeparam name="T">Implementation of <see cref="ModSettings" /></typeparam>
-    /// <typeparam name="TG">Implementation of <see cref="ModSettings" /></typeparam>
-    [PublicAPI]
-    public interface IMod<T, TG> : IMod where T : ModSettings where TG : ModSettings
-    {
-        /// <summary>
-        ///     Settings For the Mod that would be saved with the save file.
-        /// </summary>
-        T Settings { get; set; }
-
-        /// <summary>
-        ///     Global Settings which are stored independently of saves.
-        /// </summary>
-        TG GlobalSettings { get; set; }
-    }
 }
