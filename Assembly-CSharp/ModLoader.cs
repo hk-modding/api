@@ -143,7 +143,7 @@ namespace Modding
                         if (type.IsClass && type.IsSubclassOf(typeof(Mod)))
                         {
                             Logger.APILogger.LogDebug("Trying to instantiate mod: " + type);
-                            if (!(type.GetConstructor(new Type[0])?.Invoke(new object[0]) is Mod mod))
+                            if (type.GetConstructor(new Type[0])?.Invoke(new object[0]) is not Mod mod)
                             {
                                 continue;
                             }
@@ -353,7 +353,7 @@ namespace Modding
                 x => !x.Value))
             {
                 IMod mod = LoadedMods.FirstOrDefault(x => x.GetName() == modPair.Key);
-                if (!(mod is ITogglableMod togglable))
+                if (mod is not ITogglableMod togglable)
                 {
                     continue;
                 }
@@ -765,7 +765,7 @@ namespace Modding
         // TODO: Cache delegates
         private static void SubscribeEvents([CanBeNull] IMod mod, bool subscribe)
         {
-            if (!subscribe && !(mod is ITogglableMod))
+            if (!subscribe && mod is not ITogglableMod)
             {
                 Logger.APILogger.LogWarn($"Cannot unsubscribe events for non-togglable mod '{mod?.GetName()}'");
                 return;
