@@ -226,21 +226,6 @@ namespace Modding
 
     /// <summary>
     ///     Called when an enemy recieves a death event. It looks like this event may be called multiple times on an enemy, so
-    ///     check "eventAlreadyRecieved" to see if the event has been fired more than once.
-    /// </summary>
-    [Obsolete("Use " + nameof(OnReceiveDeathEventHandler))]
-    public delegate bool OnRecieveDeathEventHandler
-    (
-        EnemyDeathEffects enemyDeathEffects,
-        bool eventAlreadyRecieved,
-        ref float? attackDirection,
-        ref bool resetDeathEvent,
-        ref bool spellBurn,
-        ref bool isWatery
-    );
-    
-    /// <summary>
-    ///     Called when an enemy recieves a death event. It looks like this event may be called multiple times on an enemy, so
     ///     check "eventAlreadyReceived" to see if the event has been fired more than once.
     /// </summary>
     public delegate void OnReceiveDeathEventHandler
@@ -253,20 +238,6 @@ namespace Modding
         ref bool isWatery
     );
 
-    /// <summary>
-    ///     Called when an enemy dies and a journal kill is recorded. You may use the "playerDataName" string or one of the
-    ///     additional pre-formatted player data strings to look up values in playerData.
-    /// </summary>
-    [Obsolete("Use " + nameof(RecordKillForJournalHandler))]
-    public delegate bool OnRecordKillForJournalHandler
-    (
-        EnemyDeathEffects enemyDeathEffects,
-        string playerDataName,
-        string killedBoolPlayerDataLookupKey,
-        string killCountIntPlayerDataLookupKey,
-        string newDataBoolPlayerDataLookupKey
-    );
-    
     /// <summary>
     ///     Called when an enemy dies and a journal kill is recorded. You may use the "playerDataName" string or one of the
     ///     additional pre-formatted player data strings to look up values in playerData.

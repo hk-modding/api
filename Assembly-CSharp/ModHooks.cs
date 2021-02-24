@@ -172,36 +172,11 @@ namespace Modding
         }
 
         /// <summary>
-        ///     Logs the message to ModLog.txt in the save file path.
-        /// </summary>
-        /// <param name="info">Message To Log</param>
-        [Obsolete(
-            "This method is obsolete and will be removed in future Mod API Versions. Use Logger instead for global calls and just Log for mod calls..")]
-        public static void ModLog(string info)
-        {
-            Logger.Log(info);
-        }
-
-        /// <summary>
         ///     Called whenever localization specific strings are requested
         /// </summary>
         /// <remarks>N/A</remarks>
         [HookInfo("Called whenever localization specific strings are requested", "N/A")]
-        public event LanguageGetHandler LanguageGetHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding LanguageGetHook");
-                _LanguageGetHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing LanguageGetHook");
-                _LanguageGetHook -= value;
-            }
-        }
-
-        private event LanguageGetHandler _LanguageGetHook;
+        public event LanguageGetHandler LanguageGetHook;
 
         /// <summary>
         ///     Called whenever localization specific strings are requested
@@ -213,12 +188,12 @@ namespace Modding
             string result = @internal;
             bool gotText = false;
 
-            if (_LanguageGetHook == null)
+            if (LanguageGetHook == null)
             {
                 return result;
             }
 
-            Delegate[] invocationList = _LanguageGetHook.GetInvocationList();
+            Delegate[] invocationList = LanguageGetHook.GetInvocationList();
 
             foreach (LanguageGetHandler toInvoke in invocationList)
             {
@@ -246,21 +221,7 @@ namespace Modding
         ///     Called whenever game tries to show cursor
         /// </summary>
         [HookInfo("Called whenever game tries to show cursor", "InputHandler.OnGUI")]
-        public event CursorHandler CursorHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding CursorHook");
-                _CursorHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing CursorHook");
-                _CursorHook -= value;
-            }
-        }
-
-        private event CursorHandler _CursorHook;
+        public event CursorHandler CursorHook;
 
         /// <summary>
         ///     Called whenever game tries to show cursor
@@ -269,9 +230,9 @@ namespace Modding
         {
             Cursor.lockState = CursorLockMode.None;
 
-            if (_CursorHook != null)
+            if (CursorHook != null)
             {
-                _CursorHook.Invoke();
+                CursorHook.Invoke();
                 return;
             }
 
@@ -291,21 +252,7 @@ namespace Modding
         /// <remarks>PlayMakerUnity2DProxy.Start</remarks>
         [HookInfo("Called whenever a new gameobject is created with a collider and playmaker2d",
             "PlayMakerUnity2DProxy.Start")]
-        public event ColliderCreateHandler ColliderCreateHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding ColliderCreateHook");
-                _ColliderCreateHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing ColliderCreateHook");
-                _ColliderCreateHook -= value;
-            }
-        }
-
-        private event ColliderCreateHandler _ColliderCreateHook;
+        public event ColliderCreateHandler ColliderCreateHook;
 
         /// <summary>
         ///     Called whenever a new gameobject is created with a collider and playmaker2d
@@ -315,12 +262,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnColliderCreate Invoked");
 
-            if (_ColliderCreateHook == null)
+            if (ColliderCreateHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _ColliderCreateHook.GetInvocationList();
+            Delegate[] invocationList = ColliderCreateHook.GetInvocationList();
 
             foreach (ColliderCreateHandler toInvoke in invocationList)
             {
@@ -341,21 +288,7 @@ namespace Modding
         /// </summary>
         [HookInfo("Called whenever game tries to create a new gameobject.  This happens often, care should be taken.",
             "ObjectPool.Spawn")]
-        public event GameObjectHandler ObjectPoolSpawnHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding ObjectPoolSpawnHook");
-                _ObjectPoolSpawnHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing ObjectPoolSpawnHook");
-                _ObjectPoolSpawnHook -= value;
-            }
-        }
-
-        private event GameObjectHandler _ObjectPoolSpawnHook;
+        public event GameObjectHandler ObjectPoolSpawnHook;
 
         /// <summary>
         ///     Called whenever game tries to show cursor
@@ -364,12 +297,12 @@ namespace Modding
         {
             // No log because it's too spammy
 
-            if (_ObjectPoolSpawnHook == null)
+            if (ObjectPoolSpawnHook == null)
             {
                 return go;
             }
 
-            Delegate[] invocationList = _ObjectPoolSpawnHook.GetInvocationList();
+            Delegate[] invocationList = ObjectPoolSpawnHook.GetInvocationList();
 
             foreach (GameObjectHandler toInvoke in invocationList)
             {
@@ -392,21 +325,7 @@ namespace Modding
         /// </summary>
         /// <remarks>HutongGames.PlayMaker.Actions.GetEventSender</remarks>
         [HookInfo("Called whenever game sends GetEventSender. ", "HutongGames.PlayMaker.Actions.GetEventSender")]
-        public event GameObjectFsmHandler OnGetEventSenderHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnGetEventSenderHook");
-                _OnGetEventSenderHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnGetEventSenderHook");
-                _OnGetEventSenderHook -= value;
-            }
-        }
-
-        private event GameObjectFsmHandler _OnGetEventSenderHook;
+        public event GameObjectFsmHandler OnGetEventSenderHook;
 
         /// <summary>
         ///     Called whenever the FSM OnGetEvent is ran (only done during attacks/spells right now).
@@ -415,12 +334,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnGetEventSendr Invoked");
 
-            if (_OnGetEventSenderHook == null)
+            if (OnGetEventSenderHook == null)
             {
                 return go;
             }
 
-            Delegate[] invocationList = _OnGetEventSenderHook.GetInvocationList();
+            Delegate[] invocationList = OnGetEventSenderHook.GetInvocationList();
 
             foreach (GameObjectFsmHandler toInvoke in invocationList)
             {
@@ -442,21 +361,7 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.OnApplicationQuit</remarks>
         [HookInfo("Called when the game is fully closed", "GameManager.OnApplicationQuit")]
-        public event ApplicationQuitHandler ApplicationQuitHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding ApplicationQuitHook");
-                _ApplicationQuitHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing ApplicationQuitHook");
-                _ApplicationQuitHook -= value;
-            }
-        }
-
-        private event ApplicationQuitHandler _ApplicationQuitHook;
+        public event ApplicationQuitHandler ApplicationQuitHook;
 
         /// <summary>
         ///     Called when the game is fully closed
@@ -466,12 +371,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnApplicationQuit Invoked");
 
-            if (_ApplicationQuitHook == null)
+            if (ApplicationQuitHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _ApplicationQuitHook.GetInvocationList();
+            Delegate[] invocationList = ApplicationQuitHook.GetInvocationList();
 
             foreach (ApplicationQuitHandler toInvoke in invocationList)
             {
@@ -491,21 +396,7 @@ namespace Modding
         /// </summary>
         /// <remarks>ChangeFontByLanguage.SetFont</remarks>
         [HookInfo("Called when the game changes to a new regional font", "ChangeFontByLanguage.SetFont")]
-        public event SetFontHandler SetFontHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetFontHook");
-                _SetFontHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetFontHook");
-                _SetFontHook -= value;
-            }
-        }
-
-        private event SetFontHandler _SetFontHook;
+        public event SetFontHandler SetFontHook;
 
         /// <summary>
         ///     Called when the game changes to a new regional font
@@ -515,12 +406,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnSetFont Invoked");
 
-            if (_SetFontHook == null)
+            if (SetFontHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _SetFontHook.GetInvocationList();
+            Delegate[] invocationList = SetFontHook.GetInvocationList();
 
             foreach (SetFontHandler toInvoke in invocationList)
             {
@@ -533,68 +424,6 @@ namespace Modding
                     Logger.APILogger.LogError("" + ex);
                 }
             }
-        }
-
-        /// <summary>
-        ///     Called when TMP_Text.isRightToLeftText is requested
-        /// </summary>
-        /// <remarks>TMPro.TMP_Text.isRightToLeftText</remarks>
-        [HookInfo("Called when TMP_Text.isRightToLeftText is requested", "TMPro.TMP_Text.isRightToLeftText")]
-        public event TextDirectionProxy TextDirectionHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding TextDirectionHook");
-                _TextDirectionHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing TextDirectionHook");
-                _TextDirectionHook -= value;
-            }
-        }
-
-        private event TextDirectionProxy _TextDirectionHook;
-
-        /// <summary>
-        ///     Called when TMP_Text.isRightToLeftText is requested
-        /// </summary>
-        /// <param name="direction">The currently set text direction</param>
-        /// <return>Modified text direction</return>
-        internal bool GetTextDirection(bool direction)
-        {
-            Logger.APILogger.LogFine("GetTextDirection Invoked");
-
-            bool result = direction;
-            bool changedValue = false;
-            if (_TextDirectionHook == null)
-            {
-                return result;
-            }
-
-            Delegate[] invocationList = _TextDirectionHook.GetInvocationList();
-
-            foreach (TextDirectionProxy toInvoke in invocationList)
-            {
-                try
-                {
-                    bool invokeValue = toInvoke.Invoke(direction);
-
-                    if (invokeValue == direction || changedValue)
-                    {
-                        continue;
-                    }
-
-                    result = invokeValue;
-                    changedValue = true;
-                }
-                catch (Exception ex)
-                {
-                    Logger.APILogger.LogError("" + ex);
-                }
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -710,21 +539,7 @@ namespace Modding
 
         [HookInfo("Called whenever a HitInstance is created. Overrides normal functionality",
             "HutongGames.PlayMaker.Actions.TakeDamage")]
-        public event HitInstanceHandler HitInstanceHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding HitInstanceHook");
-                _HitInstanceHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing HitInstanceHook");
-                _HitInstanceHook -= value;
-            }
-        }
-
-        private event HitInstanceHandler _HitInstanceHook;
+        public event HitInstanceHandler HitInstanceHook;
 
         /// <summary>
         ///     Called whenever a HitInstance is created. Overrides normal functionality
@@ -734,12 +549,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnHitInstance Invoked");
 
-            if (_HitInstanceHook == null)
+            if (HitInstanceHook == null)
             {
                 return hit;
             }
 
-            Delegate[] invocationList = _HitInstanceHook.GetInvocationList();
+            Delegate[] invocationList = HitInstanceHook.GetInvocationList();
 
             foreach (HitInstanceHandler toInvoke in invocationList)
             {
@@ -762,21 +577,7 @@ namespace Modding
             "You may use or modify the bounds of an area of the scene with these.",
             "SceneManager.DrawBlackBorders"
         )]
-        public event DrawBlackBordersHandler DrawBlackBordersHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding DrawBlackBordersHook");
-                _DrawBlackBordersHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing DrawBlackBordersHook");
-                _DrawBlackBordersHook -= value;
-            }
-        }
-
-        private event DrawBlackBordersHandler _DrawBlackBordersHook;
+        public event DrawBlackBordersHandler DrawBlackBordersHook;
 
         /// <summary>
         ///     Called when a SceneManager calls DrawBlackBorders and creates boarders for a scene. You may use or modify the
@@ -787,12 +588,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnDrawBlackBorders Invoked");
 
-            if (_DrawBlackBordersHook == null)
+            if (DrawBlackBordersHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _DrawBlackBordersHook.GetInvocationList();
+            Delegate[] invocationList = DrawBlackBordersHook.GetInvocationList();
 
             foreach (DrawBlackBordersHandler toInvoke in invocationList)
             {
@@ -813,21 +614,7 @@ namespace Modding
             "If you return true, this will mark the enemy as already dead on load. Default behavior is to return the value inside \"isAlreadyDead\".",
             "HealthManager.CheckPersistence"
         )]
-        public event OnEnableEnemyHandler OnEnableEnemyHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnEnableEnemyHook");
-                _OnEnableEnemyHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnEnableEnemyHook");
-                _OnEnableEnemyHook -= value;
-            }
-        }
-
-        private event OnEnableEnemyHandler _OnEnableEnemyHook;
+        public event OnEnableEnemyHandler OnEnableEnemyHook;
 
         /// <summary>
         ///     Called when an enemy is enabled. Check this isDead flag to see if they're already dead. If you return true, this
@@ -838,12 +625,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnEnableEnemy Invoked");
 
-            if (_OnEnableEnemyHook == null)
+            if (OnEnableEnemyHook == null)
             {
                 return isAlreadyDead;
             }
 
-            Delegate[] invocationList = _OnEnableEnemyHook.GetInvocationList();
+            Delegate[] invocationList = OnEnableEnemyHook.GetInvocationList();
 
             foreach (OnEnableEnemyHandler toInvoke in invocationList)
             {
@@ -860,51 +647,13 @@ namespace Modding
             return isAlreadyDead;
         }
 
-
-        [Obsolete("Use OnReceiveDeathEventHook.")]
-        // Wrong return type but it's already used so we have this hook for compatability reasons...
-        #pragma warning disable 618
-        public event OnRecieveDeathEventHandler OnRecieveDeathEventHook
-        #pragma warning restore 618
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnRecieveDeathEventHook");
-                _OnRecieveDeathEventHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnRecieveDeathEventHook");
-                _OnRecieveDeathEventHook -= value;
-            }
-        }
-        
         [HookInfo(
             "Called when an enemy recieves a death event. " +
             "It looks like this event may be called multiple times on an enemy, " +
             "so check \"eventAlreadyRecieved\" to see if the event has been fired more than once.",
             "EnemyDeathEffects.RecieveDeathEvent"
         )]
-        public event OnReceiveDeathEventHandler OnReceiveDeathEventHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnReceiveDeathEventHook");
-                _OnReceiveDeathEventHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnReceiveDeathEventHook");
-                _OnReceiveDeathEventHook -= value;
-            }
-        }
-
-        // Compatability.
-        #pragma warning disable 618
-        private event OnRecieveDeathEventHandler _OnRecieveDeathEventHook;
-        #pragma warning restore 618
-        
-        private event OnReceiveDeathEventHandler _OnReceiveDeathEventHook;
+        public event OnReceiveDeathEventHandler OnReceiveDeathEventHook;
 
         /// <summary>
         ///     Called when an enemy recieves a death event. It looks like this event may be called multiple times on an enemy, so
@@ -923,9 +672,9 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnRecieveDeathEvent Invoked");
 
-            if (_OnReceiveDeathEventHook != null)
+            if (OnReceiveDeathEventHook != null)
             {
-                Delegate[] invocationList = _OnReceiveDeathEventHook.GetInvocationList();
+                Delegate[] invocationList = OnReceiveDeathEventHook.GetInvocationList();
 
                 foreach (OnReceiveDeathEventHandler toInvoke in invocationList)
                 {
@@ -947,78 +696,15 @@ namespace Modding
                     }
                 }
             }
-
-            if (_OnRecieveDeathEventHook == null) return;
-            
-            {
-                Delegate[] invocationList = _OnRecieveDeathEventHook.GetInvocationList();
-
-                #pragma warning disable 618
-                foreach (OnRecieveDeathEventHandler toInvoke in invocationList)
-                    #pragma warning restore 618
-                {
-                    try
-                    {
-                        toInvoke.Invoke
-                        (
-                            enemyDeathEffects,
-                            eventAlreadyRecieved,
-                            ref attackDirection,
-                            ref resetDeathEvent,
-                            ref spellBurn,
-                            ref isWatery
-                        );
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.APILogger.LogError("" + ex);
-                    }
-                }
-            }
         }
 
 
-        [Obsolete("Use RecordKillForJournalHook")]
-        #pragma warning disable 618
-        public event OnRecordKillForJournalHandler OnRecordKillForJournalHook
-        #pragma warning restore 618
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnRecordKillForJournalHook");
-                _OnRecordKillForJournalHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnRecordKillForJournalHook");
-                _OnRecordKillForJournalHook -= value;
-            }
-        }
-
-        #pragma warning disable 618
-        private event OnRecordKillForJournalHandler _OnRecordKillForJournalHook;
-        #pragma warning restore 618
-        
         [HookInfo(
             "Called when an enemy dies and a journal kill is recorded. " +
             "You may use the \"playerDataName\" string or one of the additional pre-formatted player data strings to look up values in playerData.",
             "EnemyDeathEffects.OnRecordKillForJournal"
         )]
-        public event RecordKillForJournalHandler RecordKillForJournalHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding OnRecordKillForJournalHook");
-                _RecordKillForJournalHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing OnRecordKillForJournalHook");
-                _RecordKillForJournalHook -= value;
-            }
-        }
-        
-        private event RecordKillForJournalHandler _RecordKillForJournalHook;
+        public event RecordKillForJournalHandler RecordKillForJournalHook;
 
         /// <summary>
         ///     Called when an enemy dies and a journal kill is recorded. You may use the "playerDataName" string or one of the
@@ -1036,35 +722,9 @@ namespace Modding
         {
             Logger.APILogger.LogFine("RecordKillForJournal Invoked");
 
-            if (_OnRecordKillForJournalHook != null)
+            if (RecordKillForJournalHook == null) return;
             {
-                Delegate[] invocationList = _OnRecordKillForJournalHook.GetInvocationList();
-
-                #pragma warning disable 618
-                foreach (OnRecordKillForJournalHandler toInvoke in invocationList)
-                #pragma warning restore 618
-                {
-                    try
-                    {
-                        toInvoke.Invoke
-                        (
-                            enemyDeathEffects,
-                            playerDataName,
-                            killedBoolPlayerDataLookupKey,
-                            killCountIntPlayerDataLookupKey,
-                            newDataBoolPlayerDataLookupKey
-                        );
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.APILogger.LogError("" + ex);
-                    }
-                }
-            }
-
-            if (_RecordKillForJournalHook == null) return;
-            {
-                Delegate[] invocationList = _RecordKillForJournalHook.GetInvocationList();
+                Delegate[] invocationList = RecordKillForJournalHook.GetInvocationList();
 
                 foreach (RecordKillForJournalHandler toInvoke in invocationList)
                 {
@@ -1095,21 +755,7 @@ namespace Modding
         /// <remarks>PlayerData.SetBool</remarks>
         /// <see cref="SetBoolProxy" />
         [HookInfo("Called when anything in the game tries to set a bool in player data", "PlayerData.SetBool")]
-        public event SetBoolProxy SetPlayerBoolHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerBoolHook");
-                _SetPlayerBoolHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerBoolHook");
-                _SetPlayerBoolHook -= value;
-            }
-        }
-
-        private event SetBoolProxy _SetPlayerBoolHook;
+        public event SetBoolProxy SetPlayerBoolHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetBool
@@ -1118,9 +764,9 @@ namespace Modding
         /// <param name="val">Value to set</param>
         internal void SetPlayerBool(string target, bool val)
         {
-            if (_SetPlayerBoolHook != null)
+            if (SetPlayerBoolHook != null)
             {
-                Delegate[] invocationList = _SetPlayerBoolHook.GetInvocationList();
+                Delegate[] invocationList = SetPlayerBoolHook.GetInvocationList();
 
                 foreach (SetBoolProxy toInvoke in invocationList)
                 {
@@ -1146,21 +792,7 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.GetBool</remarks>
         [HookInfo("Called when anything in the game tries to get a bool from player data", "PlayerData.GetBool")]
-        public event GetBoolProxy GetPlayerBoolHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerBoolHook");
-                _GetPlayerBoolHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerBoolHook");
-                _GetPlayerBoolHook -= value;
-            }
-        }
-
-        private event GetBoolProxy _GetPlayerBoolHook;
+        public event GetBoolProxy GetPlayerBoolHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetBool
@@ -1171,12 +803,12 @@ namespace Modding
             bool boolInternal = Patches.PlayerData.instance.GetBoolInternal(target);
             bool result = boolInternal;
             bool gotValue = false;
-            if (_GetPlayerBoolHook == null)
+            if (GetPlayerBoolHook == null)
             {
                 return result;
             }
 
-            Delegate[] invocationList = _GetPlayerBoolHook.GetInvocationList();
+            Delegate[] invocationList = GetPlayerBoolHook.GetInvocationList();
 
             foreach (GetBoolProxy toInvoke in invocationList)
             {
@@ -1206,21 +838,7 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.SetInt</remarks>
         [HookInfo("Called when anything in the game tries to set an int in player data", "PlayerData.SetInt")]
-        public event SetIntProxy SetPlayerIntHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerIntHook");
-                _SetPlayerIntHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerIntHook");
-                _SetPlayerIntHook -= value;
-            }
-        }
-
-        private event SetIntProxy _SetPlayerIntHook;
+        public event SetIntProxy SetPlayerIntHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetInt
@@ -1229,9 +847,9 @@ namespace Modding
         /// <param name="val">Value to set</param>
         internal void SetPlayerInt(string target, int val)
         {
-            if (_SetPlayerIntHook != null)
+            if (SetPlayerIntHook != null)
             {
-                Delegate[] invocationList = _SetPlayerIntHook.GetInvocationList();
+                Delegate[] invocationList = SetPlayerIntHook.GetInvocationList();
 
                 foreach (SetIntProxy toInvoke in invocationList)
                 {
@@ -1256,21 +874,7 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.GetInt</remarks>
         [HookInfo("Called when anything in the game tries to get an int from player data", "PlayerData.GetInt")]
-        public event GetIntProxy GetPlayerIntHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerIntHook");
-                _GetPlayerIntHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerIntHook");
-                _GetPlayerIntHook -= value;
-            }
-        }
-
-        private event GetIntProxy _GetPlayerIntHook;
+        public event GetIntProxy GetPlayerIntHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetInt
@@ -1282,12 +886,12 @@ namespace Modding
             int result = intInternal;
             bool gotValue = false;
 
-            if (_GetPlayerIntHook == null)
+            if (GetPlayerIntHook == null)
             {
                 return result;
             }
 
-            Delegate[] invocationList = _GetPlayerIntHook.GetInvocationList();
+            Delegate[] invocationList = GetPlayerIntHook.GetInvocationList();
 
             foreach (GetIntProxy toInvoke in invocationList)
             {
@@ -1316,21 +920,7 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.SetFloat</remarks>
         [HookInfo("Called when anything in the game tries to set a float in player data", "PlayerData.SetFloat")]
-        public event SetFloatProxy SetPlayerFloatHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerFloatHook");
-                _SetPlayerFloatHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerFloatHook");
-                _SetPlayerFloatHook -= value;
-            }
-        }
-
-        private event SetFloatProxy _SetPlayerFloatHook;
+        public event SetFloatProxy SetPlayerFloatHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetFloat
@@ -1339,9 +929,9 @@ namespace Modding
         /// <param name="val">Value to set</param>
         internal void SetPlayerFloat(string target, float val)
         {
-            if (_SetPlayerFloatHook != null)
+            if (SetPlayerFloatHook != null)
             {
-                Delegate[] invocationList = _SetPlayerFloatHook.GetInvocationList();
+                Delegate[] invocationList = SetPlayerFloatHook.GetInvocationList();
 
                 foreach (SetFloatProxy toInvoke in invocationList)
                 {
@@ -1366,21 +956,7 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.GetFloat</remarks>
         [HookInfo("Called when anything in the game tries to get a float from player data", "PlayerData.GetFloat")]
-        public event GetFloatProxy GetPlayerFloatHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerFloatHook");
-                _GetPlayerFloatHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerFloatHook");
-                _GetPlayerFloatHook -= value;
-            }
-        }
-
-        private event GetFloatProxy _GetPlayerFloatHook;
+        public event GetFloatProxy GetPlayerFloatHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetFloat
@@ -1392,12 +968,12 @@ namespace Modding
             float result = floatInternal;
             bool gotValue = false;
 
-            if (_GetPlayerFloatHook == null)
+            if (GetPlayerFloatHook == null)
             {
                 return result;
             }
 
-            Delegate[] invocationList = _GetPlayerFloatHook.GetInvocationList();
+            Delegate[] invocationList = GetPlayerFloatHook.GetInvocationList();
 
             foreach (GetFloatProxy toInvoke in invocationList)
             {
@@ -1428,21 +1004,7 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.SetString</remarks>
         [HookInfo("Called when anything in the game tries to set a string in player data", "PlayerData.SetString")]
-        public event SetStringProxy SetPlayerStringHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerStringHook");
-                _SetPlayerStringHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerStringHook");
-                _SetPlayerStringHook -= value;
-            }
-        }
-
-        private event SetStringProxy _SetPlayerStringHook;
+        public event SetStringProxy SetPlayerStringHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetString
@@ -1451,9 +1013,9 @@ namespace Modding
         /// <param name="val">Value to set</param>
         internal void SetPlayerString(string target, string val)
         {
-            if (_SetPlayerStringHook != null)
+            if (SetPlayerStringHook != null)
             {
-                Delegate[] invocationList = _SetPlayerStringHook.GetInvocationList();
+                Delegate[] invocationList = SetPlayerStringHook.GetInvocationList();
 
                 foreach (SetStringProxy toInvoke in invocationList)
                 {
@@ -1478,21 +1040,7 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.GetString</remarks>
         [HookInfo("Called when anything in the game tries to get a string from player data", "PlayerData.GetString")]
-        public event GetStringProxy GetPlayerStringHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerStringHook");
-                _GetPlayerStringHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerStringHook");
-                _GetPlayerStringHook -= value;
-            }
-        }
-
-        private event GetStringProxy _GetPlayerStringHook;
+        public event GetStringProxy GetPlayerStringHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetString
@@ -1503,12 +1051,12 @@ namespace Modding
             string stringInternal = Patches.PlayerData.instance.GetStringInternal(target);
             string result = stringInternal;
             bool gotValue = false;
-            if (_GetPlayerStringHook == null)
+            if (GetPlayerStringHook == null)
             {
                 return result;
             }
 
-            Delegate[] invocationList = _GetPlayerStringHook.GetInvocationList();
+            Delegate[] invocationList = GetPlayerStringHook.GetInvocationList();
 
             foreach (GetStringProxy toInvoke in invocationList)
             {
@@ -1537,21 +1085,7 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.SetVector3</remarks>
         [HookInfo("Called when anything in the game tries to set a Vector3 in player data", "PlayerData.SetVector3")]
-        public event SetVector3Proxy SetPlayerVector3Hook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerVector3Hook");
-                _SetPlayerVector3Hook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerVector3Hook");
-                _SetPlayerVector3Hook -= value;
-            }
-        }
-
-        private event SetVector3Proxy _SetPlayerVector3Hook;
+        public event SetVector3Proxy SetPlayerVector3Hook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetVector3
@@ -1560,9 +1094,9 @@ namespace Modding
         /// <param name="val">Value to set</param>
         internal void SetPlayerVector3(string target, Vector3 val)
         {
-            if (_SetPlayerVector3Hook != null)
+            if (SetPlayerVector3Hook != null)
             {
-                Delegate[] invocationList = _SetPlayerVector3Hook.GetInvocationList();
+                Delegate[] invocationList = SetPlayerVector3Hook.GetInvocationList();
 
                 foreach (SetVector3Proxy toInvoke in invocationList)
                 {
@@ -1587,21 +1121,7 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.GetVector3</remarks>
         [HookInfo("Called when anything in the game tries to get a Vector3 from player data", "PlayerData.GetVector3")]
-        public event GetVector3Proxy GetPlayerVector3Hook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerVector3Hook");
-                _GetPlayerVector3Hook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerVector3Hook");
-                _GetPlayerVector3Hook -= value;
-            }
-        }
-
-        private event GetVector3Proxy _GetPlayerVector3Hook;
+        public event GetVector3Proxy GetPlayerVector3Hook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetVector3
@@ -1613,12 +1133,12 @@ namespace Modding
             Vector3 result = vecInternal;
             bool gotValue = false;
 
-            if (_GetPlayerVector3Hook == null)
+            if (GetPlayerVector3Hook == null)
             {
                 return result;
             }
 
-            Delegate[] invocationList = _GetPlayerVector3Hook.GetInvocationList();
+            Delegate[] invocationList = GetPlayerVector3Hook.GetInvocationList();
 
             foreach (GetVector3Proxy toInvoke in invocationList)
             {
@@ -1649,21 +1169,7 @@ namespace Modding
         /// <remarks>PlayerData.SetVariable</remarks>
         [HookInfo("Called when anything in the game tries to set a generic variable in player data",
             "PlayerData.SetVariable")]
-        public event SetVariableProxy SetPlayerVariableHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SetPlayerVariableHook");
-                _SetPlayerVariableHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SetPlayerVariableHook");
-                _SetPlayerVariableHook -= value;
-            }
-        }
-
-        private event SetVariableProxy _SetPlayerVariableHook;
+        public event SetVariableProxy SetPlayerVariableHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetVariable
@@ -1704,10 +1210,10 @@ namespace Modding
                 return;
             }
 
-            if (_SetPlayerVariableHook != null)
+            if (SetPlayerVariableHook != null)
             {
                 bool gotValue = false;
-                Delegate[] invocationList = _SetPlayerVariableHook.GetInvocationList();
+                Delegate[] invocationList = SetPlayerVariableHook.GetInvocationList();
 
                 foreach (SetVariableProxy toInvoke in invocationList)
                 {
@@ -1739,21 +1245,7 @@ namespace Modding
         [HookInfo("Called when anything in the game tries to get a generic variable from player data",
             "PlayerData.GetVariable")]
         [PublicAPI]
-        public event GetVariableProxy GetPlayerVariableHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetPlayerVariableHook");
-                _GetPlayerVariableHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetPlayerVariableHook");
-                _GetPlayerVariableHook -= value;
-            }
-        }
-
-        private event GetVariableProxy _GetPlayerVariableHook;
+        public event GetVariableProxy GetPlayerVariableHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetVariable
@@ -1792,12 +1284,12 @@ namespace Modding
             T result = varInternal;
             bool gotValue = false;
 
-            if (_GetPlayerVariableHook == null)
+            if (GetPlayerVariableHook == null)
             {
                 return result;
             }
 
-            Delegate[] invocationList = _GetPlayerVariableHook.GetInvocationList();
+            Delegate[] invocationList = GetPlayerVariableHook.GetInvocationList();
 
             foreach (GetVariableProxy toInvoke in invocationList)
             {
@@ -1821,74 +1313,11 @@ namespace Modding
             return result;
         }
 
-        private event NewPlayerDataHandler _NewPlayerDataHook;
-
-        /// <summary>
-        ///     Called after setting up a new PlayerData
-        /// </summary>
-        /// <remarks>PlayerData.SetupNewPlayerData</remarks>
-        [HookInfo("Called after setting up a new PlayerData", "PlayerData.SetupNewPlayerData")]
-        [Obsolete("Do Not Use - This is called too often due to a bug in the vanilla game's FSM handling.", true)]
-        public event NewPlayerDataHandler NewPlayerDataHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding NewPlayerDataHook");
-                _NewPlayerDataHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing NewPlayerDataHook");
-                _NewPlayerDataHook -= value;
-            }
-        }
-
-        /// <summary>
-        ///     Called after setting up a new PlayerData.SetupNewPlayerData
-        /// </summary>
-        internal void AfterNewPlayerData(PlayerData instance)
-        {
-            Logger.APILogger.LogFine("AfterNewPlayerData Invoked");
-
-            if (_NewPlayerDataHook == null)
-            {
-                return;
-            }
-
-            Delegate[] invocationList = _NewPlayerDataHook.GetInvocationList();
-
-            foreach (NewPlayerDataHandler toInvoke in invocationList)
-            {
-                try
-                {
-                    toInvoke.Invoke(instance);
-                }
-                catch (Exception ex)
-                {
-                    Logger.APILogger.LogError("" + ex);
-                }
-            }
-        }
-
         /// <summary>
         ///     Called whenever blue health is updated
         /// </summary>
         [HookInfo("Called whenever blue health is updated", "PlayerData.UpdateBlueHealth")]
-        public event BlueHealthHandler BlueHealthHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding BlueHealthHook");
-                _BlueHealthHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing BlueHealthHook");
-                _BlueHealthHook -= value;
-            }
-        }
-
-        private event BlueHealthHandler _BlueHealthHook;
+        public event BlueHealthHandler BlueHealthHook;
 
         /// <summary>
         ///     Called whenever blue health is updated
@@ -1898,12 +1327,12 @@ namespace Modding
             Logger.APILogger.LogFine("OnBlueHealth Invoked");
 
             int result = 0;
-            if (_BlueHealthHook == null)
+            if (BlueHealthHook == null)
             {
                 return result;
             }
 
-            Delegate[] invocationList = _BlueHealthHook.GetInvocationList();
+            Delegate[] invocationList = BlueHealthHook.GetInvocationList();
 
             foreach (BlueHealthHandler toInvoke in invocationList)
             {
@@ -1926,21 +1355,7 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.TakeHealth</remarks>
         [HookInfo("Called when health is taken from the player", "PlayerData.TakeHealth")]
-        public event TakeHealthProxy TakeHealthHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding TakeHealthHook");
-                _TakeHealthHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing TakeHealthHook");
-                _TakeHealthHook -= value;
-            }
-        }
-
-        private event TakeHealthProxy _TakeHealthHook;
+        public event TakeHealthProxy TakeHealthHook;
 
         /// <summary>
         ///     Called when health is taken from the player
@@ -1950,12 +1365,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnTakeHealth Invoked");
 
-            if (_TakeHealthHook == null)
+            if (TakeHealthHook == null)
             {
                 return damage;
             }
 
-            Delegate[] invocationList = _TakeHealthHook.GetInvocationList();
+            Delegate[] invocationList = TakeHealthHook.GetInvocationList();
 
             foreach (TakeHealthProxy toInvoke in invocationList)
             {
@@ -1977,21 +1392,7 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.TakeDamage</remarks>
         [HookInfo("Called when damage is dealt to the player", "HeroController.TakeDamage")]
-        public event TakeDamageProxy TakeDamageHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding TakeDamageHook");
-                _TakeDamageHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing TakeDamageHook");
-                _TakeDamageHook -= value;
-            }
-        }
-
-        private event TakeDamageProxy _TakeDamageHook;
+        public event TakeDamageProxy TakeDamageHook;
 
         /// <summary>
         ///     Called when damage is dealt to the player
@@ -2001,12 +1402,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnTakeDamage Invoked");
 
-            if (_TakeDamageHook == null)
+            if (TakeDamageHook == null)
             {
                 return damage;
             }
 
-            Delegate[] invocationList = _TakeDamageHook.GetInvocationList();
+            Delegate[] invocationList = TakeDamageHook.GetInvocationList();
 
             foreach (TakeDamageProxy toInvoke in invocationList)
             {
@@ -2027,21 +1428,7 @@ namespace Modding
         ///     Called at the end of the take damage function
         /// </summary>
         [HookInfo("Called at the end of the take damage function", "HeroController.TakeDamage")]
-        public event AfterTakeDamageHandler AfterTakeDamageHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AfterTakeDamageHook");
-                _AfterTakeDamageHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AfterTakeDamageHook");
-                _AfterTakeDamageHook -= value;
-            }
-        }
-
-        private event AfterTakeDamageHandler _AfterTakeDamageHook;
+        public event AfterTakeDamageHandler AfterTakeDamageHook;
 
         /// <summary>
         ///     Called at the end of the take damage function
@@ -2050,12 +1437,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("AfterTakeDamage Invoked");
 
-            if (_AfterTakeDamageHook == null)
+            if (AfterTakeDamageHook == null)
             {
                 return damageAmount;
             }
 
-            Delegate[] invocationList = _AfterTakeDamageHook.GetInvocationList();
+            Delegate[] invocationList = AfterTakeDamageHook.GetInvocationList();
 
             foreach (AfterTakeDamageHandler toInvoke in invocationList)
             {
@@ -2077,21 +1464,7 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.PlayerDead</remarks>
         [HookInfo("Called when the player dies", "GameManager.PlayerDead")]
-        public event VoidHandler BeforePlayerDeadHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding BeforePlayerDeadHook");
-                _BeforePlayerDeadHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing BeforePlayerDeadHook");
-                _BeforePlayerDeadHook -= value;
-            }
-        }
-
-        private event VoidHandler _BeforePlayerDeadHook;
+        public event VoidHandler BeforePlayerDeadHook;
 
         /// <summary>
         ///     Called when the player dies (at the beginning of the method)
@@ -2101,12 +1474,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnBeforePlayerDead Invoked");
 
-            if (_BeforePlayerDeadHook == null)
+            if (BeforePlayerDeadHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _BeforePlayerDeadHook.GetInvocationList();
+            Delegate[] invocationList = BeforePlayerDeadHook.GetInvocationList();
 
             foreach (VoidHandler toInvoke in invocationList)
             {
@@ -2126,21 +1499,7 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.PlayerDead</remarks>
         [HookInfo("Called after the player dies", "GameManager.PlayerDead")]
-        public event VoidHandler AfterPlayerDeadHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AfterPlayerDeadHook");
-                _AfterPlayerDeadHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AfterPlayerDeadHook");
-                _AfterPlayerDeadHook -= value;
-            }
-        }
-
-        private event VoidHandler _AfterPlayerDeadHook;
+        public event VoidHandler AfterPlayerDeadHook;
 
         /// <summary>
         ///     Called after the player dies (at the end of the method)
@@ -2150,12 +1509,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnAfterPlayerDead Invoked");
 
-            if (_AfterPlayerDeadHook == null)
+            if (AfterPlayerDeadHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _AfterPlayerDeadHook.GetInvocationList();
+            Delegate[] invocationList = AfterPlayerDeadHook.GetInvocationList();
 
             foreach (VoidHandler toInvoke in invocationList)
             {
@@ -2175,21 +1534,7 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
         [HookInfo("Called whenever the player attacks", "HeroController.Attack")]
-        public event AttackHandler AttackHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AttackHook");
-                _AttackHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AttackHook");
-                _AttackHook -= value;
-            }
-        }
-
-        private event AttackHandler _AttackHook;
+        public event AttackHandler AttackHook;
 
         /// <summary>
         ///     Called whenever the player attacks
@@ -2199,12 +1544,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnAttack Invoked");
 
-            if (_AttackHook == null)
+            if (AttackHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _AttackHook.GetInvocationList();
+            Delegate[] invocationList = AttackHook.GetInvocationList();
 
             foreach (AttackHandler toInvoke in invocationList)
             {
@@ -2223,22 +1568,7 @@ namespace Modding
         ///     Called at the start of the DoAttack function
         /// </summary>
         [HookInfo("Called at the start of the DoAttack function", "HeroController.DoAttack")]
-        public event DoAttackHandler DoAttackHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding DoAttackHook");
-                _DoAttackHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing DoAttackHook");
-                _DoAttackHook -= value;
-            }
-        }
-
-        private event DoAttackHandler _DoAttackHook;
-
+        public event DoAttackHandler DoAttackHook;
 
         /// <summary>
         ///     Called at the start of the DoAttack function
@@ -2247,12 +1577,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnDoAttack Invoked");
 
-            if (_DoAttackHook == null)
+            if (DoAttackHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _DoAttackHook.GetInvocationList();
+            Delegate[] invocationList = DoAttackHook.GetInvocationList();
 
             foreach (DoAttackHandler toInvoke in invocationList)
             {
@@ -2274,21 +1604,7 @@ namespace Modding
         /// <remarks>HeroController.Attack</remarks>
         [HookInfo("Called at the end of the attack function", "HeroController.Attack")]
         [MonoModPublic]
-        public event AfterAttackHandler AfterAttackHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AfterAttackHook");
-                _AfterAttackHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AfterAttackHook");
-                _AfterAttackHook -= value;
-            }
-        }
-
-        private event AfterAttackHandler _AfterAttackHook;
+        public event AfterAttackHandler AfterAttackHook;
 
         /// <summary>
         ///     Called at the end of the attack function
@@ -2298,12 +1614,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("AfterAttack Invoked");
 
-            if (_AfterAttackHook == null)
+            if (AfterAttackHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _AfterAttackHook.GetInvocationList();
+            Delegate[] invocationList = AfterAttackHook.GetInvocationList();
 
             foreach (AfterAttackHandler toInvoke in invocationList)
             {
@@ -2322,21 +1638,7 @@ namespace Modding
         ///     Called whenever nail strikes something
         /// </summary>
         [HookInfo("Called whenever nail strikes something", "NailSlash.OnTriggerEnter2D")]
-        public event SlashHitHandler SlashHitHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SlashHitHook");
-                _SlashHitHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SlashHitHook");
-                _SlashHitHook -= value;
-            }
-        }
-
-        private event SlashHitHandler _SlashHitHook;
+        public event SlashHitHandler SlashHitHook;
 
         /// <summary>
         ///     Called whenever nail strikes something
@@ -2350,12 +1652,12 @@ namespace Modding
                 return;
             }
 
-            if (_SlashHitHook == null)
+            if (SlashHitHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _SlashHitHook.GetInvocationList();
+            Delegate[] invocationList = SlashHitHook.GetInvocationList();
 
             foreach (SlashHitHandler toInvoke in invocationList)
             {
@@ -2375,22 +1677,7 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.CharmUpdate</remarks>
         [HookInfo("Called after player values for charms have been set", "HeroController.CharmUpdate")]
-        public event CharmUpdateHandler CharmUpdateHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding CharmUpdateHook");
-                _CharmUpdateHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing CharmUpdateHook");
-                _CharmUpdateHook -= value;
-            }
-        }
-
-        private event CharmUpdateHandler _CharmUpdateHook;
-
+        public event CharmUpdateHandler CharmUpdateHook;
 
         /// <summary>
         ///     Called after player values for charms have been set
@@ -2400,12 +1687,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnCharmUpdate Invoked");
 
-            if (_CharmUpdateHook == null)
+            if (CharmUpdateHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _CharmUpdateHook.GetInvocationList();
+            Delegate[] invocationList = CharmUpdateHook.GetInvocationList();
 
             foreach (CharmUpdateHandler toInvoke in invocationList)
             {
@@ -2425,21 +1712,7 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.Update</remarks>
         [HookInfo("Called whenever the hero updates", "HeroController.Update")]
-        public event HeroUpdateHandler HeroUpdateHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding HeroUpdateHook");
-                _HeroUpdateHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing HeroUpdateHook");
-                _HeroUpdateHook -= value;
-            }
-        }
-
-        private event HeroUpdateHandler _HeroUpdateHook;
+        public event HeroUpdateHandler HeroUpdateHook;
 
         /// <summary>
         ///     Called whenever the hero updates
@@ -2449,12 +1722,12 @@ namespace Modding
         {
             //Logger.APILogger.LogFine("OnHeroUpdate Invoked");
 
-            if (_HeroUpdateHook == null)
+            if (HeroUpdateHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _HeroUpdateHook.GetInvocationList();
+            Delegate[] invocationList = HeroUpdateHook.GetInvocationList();
 
             foreach (HeroUpdateHandler toInvoke in invocationList)
             {
@@ -2473,21 +1746,7 @@ namespace Modding
         ///     Called whenever the player heals
         /// </summary>
         /// <remarks>PlayerData.health</remarks>
-        public event BeforeAddHealthHandler BeforeAddHealthHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding BeforeAddHealthHook");
-                _BeforeAddHealthHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing BeforeAddHealthHook");
-                _BeforeAddHealthHook -= value;
-            }
-        }
-
-        public event BeforeAddHealthHandler _BeforeAddHealthHook;
+        public event BeforeAddHealthHandler BeforeAddHealthHook;
 
         /// <summary>
         ///     Called whenever the player heals
@@ -2497,12 +1756,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("BeforeAddHealth Invoked");
 
-            if (_BeforeAddHealthHook == null)
+            if (BeforeAddHealthHook == null)
             {
                 return amount;
             }
 
-            Delegate[] invocationList = _BeforeAddHealthHook.GetInvocationList();
+            Delegate[] invocationList = BeforeAddHealthHook.GetInvocationList();
 
             foreach (BeforeAddHealthHandler toInvoke in invocationList)
             {
@@ -2523,21 +1782,7 @@ namespace Modding
         ///     Called whenever focus cost is calculated
         /// </summary>
         [HookInfo("Called whenever focus cost is calculated", "HeroController.StartMPDrain")]
-        public event FocusCostHandler FocusCostHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding FocusCostHook");
-                _FocusCostHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing FocusCostHook");
-                _FocusCostHook -= value;
-            }
-        }
-
-        private event FocusCostHandler _FocusCostHook;
+        public event FocusCostHandler FocusCostHook;
 
         /// <summary>
         ///     Called whenever focus cost is calculated
@@ -2548,12 +1793,12 @@ namespace Modding
 
             float result = 1f;
 
-            if (_FocusCostHook == null)
+            if (FocusCostHook == null)
             {
                 return result;
             }
 
-            Delegate[] invocationList = _FocusCostHook.GetInvocationList();
+            Delegate[] invocationList = FocusCostHook.GetInvocationList();
 
             foreach (FocusCostHandler toInvoke in invocationList)
             {
@@ -2574,22 +1819,7 @@ namespace Modding
         ///     Called when Hero recovers Soul from hitting enemies
         /// </summary>
         [HookInfo("Called when Hero recovers Soul from hitting enemies", "HeroController.SoulGain")]
-        public event SoulGainHandler SoulGainHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SoulGainHook");
-                _SoulGainHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SoulGainHook");
-                _SoulGainHook -= value;
-            }
-        }
-
-        private event SoulGainHandler _SoulGainHook;
-
+        public event SoulGainHandler SoulGainHook;
 
         /// <summary>
         ///     Called when Hero recovers Soul from hitting enemies
@@ -2598,12 +1828,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnSoulGain Invoked");
 
-            if (_SoulGainHook == null)
+            if (SoulGainHook == null)
             {
                 return num;
             }
 
-            Delegate[] invocationList = _SoulGainHook.GetInvocationList();
+            Delegate[] invocationList = SoulGainHook.GetInvocationList();
 
             foreach (SoulGainHandler toInvoke in invocationList)
             {
@@ -2626,21 +1856,7 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.Dash</remarks>
         [HookInfo("Called during dash function to change velocity", "HeroController.Dash")]
-        public event DashVelocityHandler DashVectorHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding DashVectorHook");
-                _DashVectorHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing DashVectorHook");
-                _DashVectorHook -= value;
-            }
-        }
-
-        private event DashVelocityHandler _DashVectorHook;
+        public event DashVelocityHandler DashVectorHook;
 
         /// <summary>
         ///     Called during dash function to change velocity
@@ -2650,12 +1866,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("DashVelocityChange Invoked");
 
-            if (_DashVectorHook == null)
+            if (DashVectorHook == null)
             {
                 return change;
             }
 
-            Delegate[] invocationList = _DashVectorHook.GetInvocationList();
+            Delegate[] invocationList = DashVectorHook.GetInvocationList();
 
             foreach (DashVelocityHandler toInvoke in invocationList)
             {
@@ -2676,24 +1892,12 @@ namespace Modding
         ///     Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality
         /// </summary>
         /// <remarks>HeroController.LookForQueueInput</remarks>
-        [HookInfo(
+        [HookInfo
+        (
             "Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality",
-            "HeroController.LookForQueueInput")]
-        public event DashPressedHandler DashPressedHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding DashPressedHook");
-                _DashPressedHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing DashPressedHook");
-                _DashPressedHook -= value;
-            }
-        }
-
-        private event DashPressedHandler _DashPressedHook;
+            "HeroController.LookForQueueInput"
+        )]
+        public event DashPressedHandler DashPressedHook;
 
         /// <summary>
         ///     Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality
@@ -2703,14 +1907,14 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnDashPressed Invoked");
 
-            if (_DashPressedHook == null)
+            if (DashPressedHook == null)
             {
                 return false;
             }
 
             bool ret = false;
 
-            Delegate[] invocationList = _DashPressedHook.GetInvocationList();
+            Delegate[] invocationList = DashPressedHook.GetInvocationList();
 
             foreach (DashPressedHandler toInvoke in invocationList)
             {
@@ -2737,22 +1941,7 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
         [HookInfo("Called directly after a save has been loaded", "GameManager.LoadGame")]
-        public event SavegameLoadHandler SavegameLoadHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SavegameLoadHook");
-                _SavegameLoadHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SavegameLoadHook");
-                _SavegameLoadHook -= value;
-            }
-        }
-
-        private event SavegameLoadHandler _SavegameLoadHook;
-
+        public event SavegameLoadHandler SavegameLoadHook;
 
         /// <summary>
         ///     Called directly after a save has been loaded
@@ -2762,12 +1951,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnSavegameLoad Invoked");
 
-            if (_SavegameLoadHook == null)
+            if (SavegameLoadHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _SavegameLoadHook.GetInvocationList();
+            Delegate[] invocationList = SavegameLoadHook.GetInvocationList();
 
             foreach (SavegameLoadHandler toInvoke in invocationList)
             {
@@ -2787,22 +1976,8 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
         [HookInfo("Called directly after a save has been saved", "GameManager.SaveGame")]
-        public event SavegameSaveHandler SavegameSaveHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SavegameSaveHook");
-                _SavegameSaveHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SavegameSaveHook");
-                _SavegameSaveHook -= value;
-            }
-        }
-
-        private event SavegameSaveHandler _SavegameSaveHook;
-
+        public event SavegameSaveHandler SavegameSaveHook;
+        
         /// <summary>
         ///     Called directly after a save has been saved
         /// </summary>
@@ -2811,12 +1986,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnSavegameSave Invoked");
 
-            if (_SavegameSaveHook == null)
+            if (SavegameSaveHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _SavegameSaveHook.GetInvocationList();
+            Delegate[] invocationList = SavegameSaveHook.GetInvocationList();
 
             foreach (SavegameSaveHandler toInvoke in invocationList)
             {
@@ -2836,21 +2011,7 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.LoadFirstScene</remarks>
         [HookInfo("Called whenever a new game is started", "GameManager.LoadFirstScene")]
-        public event NewGameHandler NewGameHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding NewGameHook");
-                _NewGameHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing NewGameHook");
-                _NewGameHook -= value;
-            }
-        }
-
-        private event NewGameHandler _NewGameHook;
+        public event NewGameHandler NewGameHook;
 
         /// <summary>
         ///     Called whenever a new game is started
@@ -2860,12 +2021,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnNewGame Invoked");
 
-            if (_NewGameHook == null)
+            if (NewGameHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _NewGameHook.GetInvocationList();
+            Delegate[] invocationList = NewGameHook.GetInvocationList();
 
             foreach (NewGameHandler toInvoke in invocationList)
             {
@@ -2885,21 +2046,7 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.ClearSaveFile</remarks>
         [HookInfo("Called whenever a save file is deleted", "GameManager.ClearSaveFile")]
-        public event ClearSaveGameHandler SavegameClearHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SavegameClearHook");
-                _SavegameClearHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SavegameClearHook");
-                _SavegameClearHook -= value;
-            }
-        }
-
-        private event ClearSaveGameHandler _SavegameClearHook;
+        public event ClearSaveGameHandler SavegameClearHook;
 
         /// <summary>
         ///     Called before a save file is deleted
@@ -2909,12 +2056,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnSavegameClear Invoked");
 
-            if (_SavegameClearHook == null)
+            if (SavegameClearHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _SavegameClearHook.GetInvocationList();
+            Delegate[] invocationList = SavegameClearHook.GetInvocationList();
 
             foreach (ClearSaveGameHandler toInvoke in invocationList)
             {
@@ -2934,23 +2081,12 @@ namespace Modding
         ///     Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        [HookInfo("Called directly after a save has been loaded.  Allows for accessing SaveGame instance.",
-            "GameManager.LoadGame")]
-        public event AfterSavegameLoadHandler AfterSavegameLoadHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AfterSavegameLoadHook");
-                _AfterSavegameLoadHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AfterSavegameLoadHook");
-                _AfterSavegameLoadHook -= value;
-            }
-        }
-
-        private event AfterSavegameLoadHandler _AfterSavegameLoadHook;
+        [HookInfo
+        (
+            "Called directly after a save has been loaded.  Allows for accessing SaveGame instance.",
+            "GameManager.LoadGame"
+        )]
+        public event AfterSavegameLoadHandler AfterSavegameLoadHook;
 
         /// <summary>
         ///     Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
@@ -2960,12 +2096,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnAfterSaveGameLoad Invoked");
 
-            if (_AfterSavegameLoadHook == null)
+            if (AfterSavegameLoadHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _AfterSavegameLoadHook.GetInvocationList();
+            Delegate[] invocationList = AfterSavegameLoadHook.GetInvocationList();
 
             foreach (AfterSavegameLoadHandler toInvoke in invocationList)
             {
@@ -2985,23 +2121,12 @@ namespace Modding
         ///     Called directly before save has been saved to allow for changes to the data before persisted.
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        [HookInfo("Called directly before save has been saved to allow for changes to the data before persisted.",
-            "GameManager.SaveGame")]
-        public event BeforeSavegameSaveHandler BeforeSavegameSaveHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding BeforeSavegameSaveHook");
-                _BeforeSavegameSaveHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing BeforeSavegameSaveHook");
-                _BeforeSavegameSaveHook -= value;
-            }
-        }
-
-        private event BeforeSavegameSaveHandler _BeforeSavegameSaveHook;
+        [HookInfo
+        (
+            "Called directly before save has been saved to allow for changes to the data before persisted.",
+            "GameManager.SaveGame"
+        )]
+        public event BeforeSavegameSaveHandler BeforeSavegameSaveHook;
 
         /// <summary>
         ///     Called directly before save has been saved to allow for changes to the data before persisted.
@@ -3012,12 +2137,12 @@ namespace Modding
             Logger.APILogger.LogFine("OnBeforeSaveGameSave Invoked");
             data.LoadedMods = LoadedModsWithVersions;
 
-            if (_BeforeSavegameSaveHook == null)
+            if (BeforeSavegameSaveHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _BeforeSavegameSaveHook.GetInvocationList();
+            Delegate[] invocationList = BeforeSavegameSaveHook.GetInvocationList();
 
             foreach (BeforeSavegameSaveHandler toInvoke in invocationList)
             {
@@ -3037,21 +2162,7 @@ namespace Modding
         ///     Overrides the filename to load for a given slot.  Return null to use vanilla names.
         /// </summary>
         [HookInfo("Overrides the filename for a slot.", "GameManager.SaveGameClear")]
-        public event GetSaveFileNameHandler GetSaveFileNameHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding GetSaveFileNameHook");
-                _GetSaveFileNameHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing GetSaveFileNameHook");
-                _GetSaveFileNameHook -= value;
-            }
-        }
-
-        private event GetSaveFileNameHandler _GetSaveFileNameHook;
+        public event GetSaveFileNameHandler GetSaveFileNameHook;
 
         /// <summary>
         ///     Overrides the filename to load for a given slot.  Return null to use vanilla names.
@@ -3060,14 +2171,14 @@ namespace Modding
         {
             Logger.APILogger.LogFine("GetSaveFileName Invoked");
 
-            if (_GetSaveFileNameHook == null)
+            if (GetSaveFileNameHook == null)
             {
                 return null;
             }
 
             string ret = null;
 
-            Delegate[] invocationList = _GetSaveFileNameHook.GetInvocationList();
+            Delegate[] invocationList = GetSaveFileNameHook.GetInvocationList();
 
             foreach (GetSaveFileNameHandler toInvoke in invocationList)
             {
@@ -3089,21 +2200,7 @@ namespace Modding
         ///     Called after a game has been cleared from a slot.
         /// </summary>
         [HookInfo("Called after a savegame has been cleared.", "GameManager.GetSaveFilename")]
-        public event AfterClearSaveGameHandler AfterSaveGameClearHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding AfterSaveGameClearHook");
-                _AfterSaveGameClearHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing AfterSaveGameClearHook");
-                _AfterSaveGameClearHook -= value;
-            }
-        }
-
-        private event AfterClearSaveGameHandler _AfterSaveGameClearHook;
+        public event AfterClearSaveGameHandler AfterSaveGameClearHook;
 
         /// <summary>
         ///     Called after a game has been cleared from a slot.
@@ -3112,12 +2209,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnAfterSaveGameClear Invoked");
 
-            if (_AfterSaveGameClearHook == null)
+            if (AfterSaveGameClearHook == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _AfterSaveGameClearHook.GetInvocationList();
+            Delegate[] invocationList = AfterSaveGameClearHook.GetInvocationList();
 
             foreach (AfterClearSaveGameHandler toInvoke in invocationList)
             {
@@ -3141,21 +2238,7 @@ namespace Modding
         /// </summary>
         /// <remarks>N/A</remarks>
         [HookInfo("Called after a new Scene has been loaded", "GameManager.LoadScene")]
-        public event SceneChangedHandler SceneChanged
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding SceneChanged");
-                _SceneChanged += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing SceneChanged");
-                _SceneChanged -= value;
-            }
-        }
-
-        private event SceneChangedHandler _SceneChanged;
+        public event SceneChangedHandler SceneChanged;
 
         /// <summary>
         ///     Called after a new Scene has been loaded
@@ -3165,12 +2248,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("OnSceneChanged Invoked");
 
-            if (_SceneChanged == null)
+            if (SceneChanged == null)
             {
                 return;
             }
 
-            Delegate[] invocationList = _SceneChanged.GetInvocationList();
+            Delegate[] invocationList = SceneChanged.GetInvocationList();
 
             foreach (SceneChangedHandler toInvoke in invocationList)
             {
@@ -3189,24 +2272,13 @@ namespace Modding
         ///     Called right before a scene gets loaded, can change which scene gets loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        [HookInfo("Called right before a scene gets loaded, can change which scene gets loaded",
-            "GameManager.LoadScene")]
-        public event BeforeSceneLoadHandler BeforeSceneLoadHook
-        {
-            add
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Adding BeforeSceneLoadHook");
-                _BeforeSceneLoadHook += value;
-            }
-            remove
-            {
-                Logger.LogDebug($"[{value.Method.DeclaringType?.Name}] - Removing BeforeSceneLoadHook");
-                _BeforeSceneLoadHook -= value;
-            }
-        }
-
-        private event BeforeSceneLoadHandler _BeforeSceneLoadHook;
-
+        [HookInfo
+        (
+            "Called right before a scene gets loaded, can change which scene gets loaded",
+            "GameManager.LoadScene"
+        )]
+        public event BeforeSceneLoadHandler BeforeSceneLoadHook;
+        
         /// <summary>
         ///     Called right before a scene gets loaded, can change which scene gets loaded
         /// </summary>
@@ -3215,12 +2287,12 @@ namespace Modding
         {
             Logger.APILogger.LogFine("BeforeSceneLoad Invoked");
 
-            if (_BeforeSceneLoadHook == null)
+            if (BeforeSceneLoadHook == null)
             {
                 return sceneName;
             }
 
-            Delegate[] invocationList = _BeforeSceneLoadHook.GetInvocationList();
+            Delegate[] invocationList = BeforeSceneLoadHook.GetInvocationList();
 
             foreach (BeforeSceneLoadHandler toInvoke in invocationList)
             {
