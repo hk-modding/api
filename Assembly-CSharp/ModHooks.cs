@@ -175,7 +175,6 @@ namespace Modding
         ///     Called whenever localization specific strings are requested
         /// </summary>
         /// <remarks>N/A</remarks>
-        [HookInfo("Called whenever localization specific strings are requested", "N/A")]
         public event LanguageGetHandler LanguageGetHook;
 
         /// <summary>
@@ -220,7 +219,6 @@ namespace Modding
         /// <summary>
         ///     Called whenever game tries to show cursor
         /// </summary>
-        [HookInfo("Called whenever game tries to show cursor", "InputHandler.OnGUI")]
         public event CursorHandler CursorHook;
 
         /// <summary>
@@ -250,8 +248,6 @@ namespace Modding
         ///     Called whenever a new gameobject is created with a collider and playmaker2d
         /// </summary>
         /// <remarks>PlayMakerUnity2DProxy.Start</remarks>
-        [HookInfo("Called whenever a new gameobject is created with a collider and playmaker2d",
-            "PlayMakerUnity2DProxy.Start")]
         public event ColliderCreateHandler ColliderCreateHook;
 
         /// <summary>
@@ -286,8 +282,6 @@ namespace Modding
         /// <summary>
         ///     Called whenever game tries to create a new gameobject.  This happens often, care should be taken.
         /// </summary>
-        [HookInfo("Called whenever game tries to create a new gameobject.  This happens often, care should be taken.",
-            "ObjectPool.Spawn")]
         public event GameObjectHandler ObjectPoolSpawnHook;
 
         /// <summary>
@@ -324,7 +318,6 @@ namespace Modding
         ///     Called whenever game sends GetEventSender.
         /// </summary>
         /// <remarks>HutongGames.PlayMaker.Actions.GetEventSender</remarks>
-        [HookInfo("Called whenever game sends GetEventSender. ", "HutongGames.PlayMaker.Actions.GetEventSender")]
         public event GameObjectFsmHandler OnGetEventSenderHook;
 
         /// <summary>
@@ -360,7 +353,6 @@ namespace Modding
         ///     Called when the game is fully closed
         /// </summary>
         /// <remarks>GameManager.OnApplicationQuit</remarks>
-        [HookInfo("Called when the game is fully closed", "GameManager.OnApplicationQuit")]
         public event ApplicationQuitHandler ApplicationQuitHook;
 
         /// <summary>
@@ -395,7 +387,6 @@ namespace Modding
         ///     Called when the game changes to a new regional font
         /// </summary>
         /// <remarks>ChangeFontByLanguage.SetFont</remarks>
-        [HookInfo("Called when the game changes to a new regional font", "ChangeFontByLanguage.SetFont")]
         public event SetFontHandler SetFontHook;
 
         /// <summary>
@@ -538,8 +529,6 @@ namespace Modding
             }
         }
 
-        [HookInfo("Called whenever a HitInstance is created. Overrides normal functionality",
-            "HutongGames.PlayMaker.Actions.TakeDamage")]
         public event HitInstanceHandler HitInstanceHook;
 
         /// <summary>
@@ -572,19 +561,13 @@ namespace Modding
             return hit;
         }
 
-
-        [HookInfo(
-            "Called when a SceneManager calls DrawBlackBorders and creates boarders for a scene. " +
-            "You may use or modify the bounds of an area of the scene with these.",
-            "SceneManager.DrawBlackBorders"
-        )]
-        public event DrawBlackBordersHandler DrawBlackBordersHook;
-
         /// <summary>
         ///     Called when a SceneManager calls DrawBlackBorders and creates boarders for a scene. You may use or modify the
         ///     bounds of an area of the scene with these.
         /// </summary>
         /// <remarks>SceneManager.DrawBlackBorders</remarks>
+        public event DrawBlackBordersHandler DrawBlackBordersHook;
+
         internal void OnDrawBlackBorders(List<GameObject> borders)
         {
             Logger.APILogger.LogFine("OnDrawBlackBorders Invoked");
@@ -609,19 +592,13 @@ namespace Modding
             }
         }
 
-        [HookInfo(
-            "Called when an enemy is enabled. " +
-            "Check this isDead flag to see if they're already dead. " +
-            "If you return true, this will mark the enemy as already dead on load. Default behavior is to return the value inside \"isAlreadyDead\".",
-            "HealthManager.CheckPersistence"
-        )]
-        public event OnEnableEnemyHandler OnEnableEnemyHook;
-
         /// <summary>
         ///     Called when an enemy is enabled. Check this isDead flag to see if they're already dead. If you return true, this
         ///     will mark the enemy as already dead on load. Default behavior is to return the value inside "isAlreadyDead".
         /// </summary>
         /// <remarks>HealthManager.CheckPersistence</remarks>
+        public event OnEnableEnemyHandler OnEnableEnemyHook;
+
         internal bool OnEnableEnemy(GameObject enemy, bool isAlreadyDead)
         {
             Logger.APILogger.LogFine("OnEnableEnemy Invoked");
@@ -648,19 +625,13 @@ namespace Modding
             return isAlreadyDead;
         }
 
-        [HookInfo(
-            "Called when an enemy recieves a death event. " +
-            "It looks like this event may be called multiple times on an enemy, " +
-            "so check \"eventAlreadyRecieved\" to see if the event has been fired more than once.",
-            "EnemyDeathEffects.RecieveDeathEvent"
-        )]
-        public event OnReceiveDeathEventHandler OnReceiveDeathEventHook;
-
         /// <summary>
         ///     Called when an enemy recieves a death event. It looks like this event may be called multiple times on an enemy, so
         ///     check "eventAlreadyRecieved" to see if the event has been fired more than once.
         /// </summary>
         /// <remarks>EnemyDeathEffects.RecieveDeathEvent</remarks>
+        public event OnReceiveDeathEventHandler OnReceiveDeathEventHook;
+
         internal void OnRecieveDeathEvent
         (
             EnemyDeathEffects enemyDeathEffects,
@@ -699,19 +670,13 @@ namespace Modding
             }
         }
 
-
-        [HookInfo(
-            "Called when an enemy dies and a journal kill is recorded. " +
-            "You may use the \"playerDataName\" string or one of the additional pre-formatted player data strings to look up values in playerData.",
-            "EnemyDeathEffects.OnRecordKillForJournal"
-        )]
-        public event RecordKillForJournalHandler RecordKillForJournalHook;
-
         /// <summary>
         ///     Called when an enemy dies and a journal kill is recorded. You may use the "playerDataName" string or one of the
         ///     additional pre-formatted player data strings to look up values in playerData.
         /// </summary>
         /// <remarks>EnemyDeathEffects.OnRecordKillForJournal</remarks>
+        public event RecordKillForJournalHandler RecordKillForJournalHook;
+
         internal void OnRecordKillForJournal
         (
             EnemyDeathEffects enemyDeathEffects,
@@ -755,7 +720,6 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.SetBool</remarks>
         /// <see cref="SetBoolProxy" />
-        [HookInfo("Called when anything in the game tries to set a bool in player data", "PlayerData.SetBool")]
         public event SetBoolProxy SetPlayerBoolHook;
 
         /// <summary>
@@ -792,7 +756,6 @@ namespace Modding
         ///     Called when anything in the game tries to get a bool from player data
         /// </summary>
         /// <remarks>PlayerData.GetBool</remarks>
-        [HookInfo("Called when anything in the game tries to get a bool from player data", "PlayerData.GetBool")]
         public event GetBoolProxy GetPlayerBoolHook;
 
         /// <summary>
@@ -838,7 +801,6 @@ namespace Modding
         ///     Called when anything in the game tries to set an int in player data
         /// </summary>
         /// <remarks>PlayerData.SetInt</remarks>
-        [HookInfo("Called when anything in the game tries to set an int in player data", "PlayerData.SetInt")]
         public event SetIntProxy SetPlayerIntHook;
 
         /// <summary>
@@ -874,7 +836,6 @@ namespace Modding
         ///     Called when anything in the game tries to get an int from player data
         /// </summary>
         /// <remarks>PlayerData.GetInt</remarks>
-        [HookInfo("Called when anything in the game tries to get an int from player data", "PlayerData.GetInt")]
         public event GetIntProxy GetPlayerIntHook;
 
         /// <summary>
@@ -920,7 +881,6 @@ namespace Modding
         ///     Called when anything in the game tries to set a float in player data
         /// </summary>
         /// <remarks>PlayerData.SetFloat</remarks>
-        [HookInfo("Called when anything in the game tries to set a float in player data", "PlayerData.SetFloat")]
         public event SetFloatProxy SetPlayerFloatHook;
 
         /// <summary>
@@ -956,7 +916,6 @@ namespace Modding
         ///     Called when anything in the game tries to get a float from player data
         /// </summary>
         /// <remarks>PlayerData.GetFloat</remarks>
-        [HookInfo("Called when anything in the game tries to get a float from player data", "PlayerData.GetFloat")]
         public event GetFloatProxy GetPlayerFloatHook;
 
         /// <summary>
@@ -1004,7 +963,6 @@ namespace Modding
         ///     Called when anything in the game tries to set a string in player data
         /// </summary>
         /// <remarks>PlayerData.SetString</remarks>
-        [HookInfo("Called when anything in the game tries to set a string in player data", "PlayerData.SetString")]
         public event SetStringProxy SetPlayerStringHook;
 
         /// <summary>
@@ -1040,7 +998,6 @@ namespace Modding
         ///     Called when anything in the game tries to get a string from player data
         /// </summary>
         /// <remarks>PlayerData.GetString</remarks>
-        [HookInfo("Called when anything in the game tries to get a string from player data", "PlayerData.GetString")]
         public event GetStringProxy GetPlayerStringHook;
 
         /// <summary>
@@ -1085,7 +1042,6 @@ namespace Modding
         ///     Called when anything in the game tries to set a Vector3 in player data
         /// </summary>
         /// <remarks>PlayerData.SetVector3</remarks>
-        [HookInfo("Called when anything in the game tries to set a Vector3 in player data", "PlayerData.SetVector3")]
         public event SetVector3Proxy SetPlayerVector3Hook;
 
         /// <summary>
@@ -1121,7 +1077,6 @@ namespace Modding
         ///     Called when anything in the game tries to get a Vector3 from player data
         /// </summary>
         /// <remarks>PlayerData.GetVector3</remarks>
-        [HookInfo("Called when anything in the game tries to get a Vector3 from player data", "PlayerData.GetVector3")]
         public event GetVector3Proxy GetPlayerVector3Hook;
 
         /// <summary>
@@ -1168,8 +1123,6 @@ namespace Modding
         ///     Called when anything in the game tries to set a generic variable in player data
         /// </summary>
         /// <remarks>PlayerData.SetVariable</remarks>
-        [HookInfo("Called when anything in the game tries to set a generic variable in player data",
-            "PlayerData.SetVariable")]
         public event SetVariableProxy SetPlayerVariableHook;
 
         /// <summary>
@@ -1243,8 +1196,6 @@ namespace Modding
         ///     Called when anything in the game tries to get a generic variable from player data
         /// </summary>
         /// <remarks>PlayerData.GetVariable</remarks>
-        [HookInfo("Called when anything in the game tries to get a generic variable from player data",
-            "PlayerData.GetVariable")]
         [PublicAPI]
         public event GetVariableProxy GetPlayerVariableHook;
 
@@ -1317,7 +1268,6 @@ namespace Modding
         /// <summary>
         ///     Called whenever blue health is updated
         /// </summary>
-        [HookInfo("Called whenever blue health is updated", "PlayerData.UpdateBlueHealth")]
         public event BlueHealthHandler BlueHealthHook;
 
         /// <summary>
@@ -1355,7 +1305,6 @@ namespace Modding
         ///     Called when health is taken from the player
         /// </summary>
         /// <remarks>HeroController.TakeHealth</remarks>
-        [HookInfo("Called when health is taken from the player", "PlayerData.TakeHealth")]
         public event TakeHealthProxy TakeHealthHook;
 
         /// <summary>
@@ -1392,7 +1341,6 @@ namespace Modding
         ///     Called when damage is dealt to the player
         /// </summary>
         /// <remarks>HeroController.TakeDamage</remarks>
-        [HookInfo("Called when damage is dealt to the player", "HeroController.TakeDamage")]
         public event TakeDamageProxy TakeDamageHook;
 
         /// <summary>
@@ -1428,7 +1376,6 @@ namespace Modding
         /// <summary>
         ///     Called at the end of the take damage function
         /// </summary>
-        [HookInfo("Called at the end of the take damage function", "HeroController.TakeDamage")]
         public event AfterTakeDamageHandler AfterTakeDamageHook;
 
         /// <summary>
@@ -1464,7 +1411,6 @@ namespace Modding
         ///     Called when the player dies
         /// </summary>
         /// <remarks>GameManager.PlayerDead</remarks>
-        [HookInfo("Called when the player dies", "GameManager.PlayerDead")]
         public event VoidHandler BeforePlayerDeadHook;
 
         /// <summary>
@@ -1499,7 +1445,6 @@ namespace Modding
         ///     Called after the player dies
         /// </summary>
         /// <remarks>GameManager.PlayerDead</remarks>
-        [HookInfo("Called after the player dies", "GameManager.PlayerDead")]
         public event VoidHandler AfterPlayerDeadHook;
 
         /// <summary>
@@ -1534,7 +1479,6 @@ namespace Modding
         ///     Called whenever the player attacks
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
-        [HookInfo("Called whenever the player attacks", "HeroController.Attack")]
         public event AttackHandler AttackHook;
 
         /// <summary>
@@ -1568,7 +1512,6 @@ namespace Modding
         /// <summary>
         ///     Called at the start of the DoAttack function
         /// </summary>
-        [HookInfo("Called at the start of the DoAttack function", "HeroController.DoAttack")]
         public event DoAttackHandler DoAttackHook;
 
         /// <summary>
@@ -1603,7 +1546,6 @@ namespace Modding
         ///     Called at the end of the attack function
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
-        [HookInfo("Called at the end of the attack function", "HeroController.Attack")]
         [MonoModPublic]
         public event AfterAttackHandler AfterAttackHook;
 
@@ -1638,7 +1580,6 @@ namespace Modding
         /// <summary>
         ///     Called whenever nail strikes something
         /// </summary>
-        [HookInfo("Called whenever nail strikes something", "NailSlash.OnTriggerEnter2D")]
         public event SlashHitHandler SlashHitHook;
 
         /// <summary>
@@ -1677,7 +1618,6 @@ namespace Modding
         ///     Called after player values for charms have been set
         /// </summary>
         /// <remarks>HeroController.CharmUpdate</remarks>
-        [HookInfo("Called after player values for charms have been set", "HeroController.CharmUpdate")]
         public event CharmUpdateHandler CharmUpdateHook;
 
         /// <summary>
@@ -1712,7 +1652,6 @@ namespace Modding
         ///     Called whenever the hero updates
         /// </summary>
         /// <remarks>HeroController.Update</remarks>
-        [HookInfo("Called whenever the hero updates", "HeroController.Update")]
         public event HeroUpdateHandler HeroUpdateHook;
 
         /// <summary>
@@ -1782,7 +1721,6 @@ namespace Modding
         /// <summary>
         ///     Called whenever focus cost is calculated
         /// </summary>
-        [HookInfo("Called whenever focus cost is calculated", "HeroController.StartMPDrain")]
         public event FocusCostHandler FocusCostHook;
 
         /// <summary>
@@ -1819,7 +1757,6 @@ namespace Modding
         /// <summary>
         ///     Called when Hero recovers Soul from hitting enemies
         /// </summary>
-        [HookInfo("Called when Hero recovers Soul from hitting enemies", "HeroController.SoulGain")]
         public event SoulGainHandler SoulGainHook;
 
         /// <summary>
@@ -1856,7 +1793,6 @@ namespace Modding
         ///     Called during dash function to change velocity
         /// </summary>
         /// <remarks>HeroController.Dash</remarks>
-        [HookInfo("Called during dash function to change velocity", "HeroController.Dash")]
         public event DashVelocityHandler DashVectorHook;
 
         /// <summary>
@@ -1893,11 +1829,6 @@ namespace Modding
         ///     Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality
         /// </summary>
         /// <remarks>HeroController.LookForQueueInput</remarks>
-        [HookInfo
-        (
-            "Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality",
-            "HeroController.LookForQueueInput"
-        )]
         public event DashPressedHandler DashPressedHook;
 
         /// <summary>
@@ -1941,7 +1872,6 @@ namespace Modding
         ///     Called directly after a save has been loaded
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        [HookInfo("Called directly after a save has been loaded", "GameManager.LoadGame")]
         public event SavegameLoadHandler SavegameLoadHook;
 
         /// <summary>
@@ -1976,7 +1906,6 @@ namespace Modding
         ///     Called directly after a save has been saved
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        [HookInfo("Called directly after a save has been saved", "GameManager.SaveGame")]
         public event SavegameSaveHandler SavegameSaveHook;
         
         /// <summary>
@@ -2011,7 +1940,6 @@ namespace Modding
         ///     Called whenever a new game is started
         /// </summary>
         /// <remarks>GameManager.LoadFirstScene</remarks>
-        [HookInfo("Called whenever a new game is started", "GameManager.LoadFirstScene")]
         public event NewGameHandler NewGameHook;
 
         /// <summary>
@@ -2046,7 +1974,6 @@ namespace Modding
         ///     Called before a save file is deleted
         /// </summary>
         /// <remarks>GameManager.ClearSaveFile</remarks>
-        [HookInfo("Called whenever a save file is deleted", "GameManager.ClearSaveFile")]
         public event ClearSaveGameHandler SavegameClearHook;
 
         /// <summary>
@@ -2082,11 +2009,6 @@ namespace Modding
         ///     Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        [HookInfo
-        (
-            "Called directly after a save has been loaded.  Allows for accessing SaveGame instance.",
-            "GameManager.LoadGame"
-        )]
         public event AfterSavegameLoadHandler AfterSavegameLoadHook;
 
         /// <summary>
@@ -2122,11 +2044,6 @@ namespace Modding
         ///     Called directly before save has been saved to allow for changes to the data before persisted.
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        [HookInfo
-        (
-            "Called directly before save has been saved to allow for changes to the data before persisted.",
-            "GameManager.SaveGame"
-        )]
         public event BeforeSavegameSaveHandler BeforeSavegameSaveHook;
 
         /// <summary>
@@ -2162,7 +2079,6 @@ namespace Modding
         /// <summary>
         ///     Overrides the filename to load for a given slot.  Return null to use vanilla names.
         /// </summary>
-        [HookInfo("Overrides the filename for a slot.", "GameManager.SaveGameClear")]
         public event GetSaveFileNameHandler GetSaveFileNameHook;
 
         /// <summary>
@@ -2200,7 +2116,6 @@ namespace Modding
         /// <summary>
         ///     Called after a game has been cleared from a slot.
         /// </summary>
-        [HookInfo("Called after a savegame has been cleared.", "GameManager.GetSaveFilename")]
         public event AfterClearSaveGameHandler AfterSaveGameClearHook;
 
         /// <summary>
@@ -2238,7 +2153,6 @@ namespace Modding
         ///     Called after a new Scene has been loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        [HookInfo("Called after a new Scene has been loaded", "GameManager.LoadScene")]
         public event SceneChangedHandler SceneChanged;
 
         /// <summary>
@@ -2273,11 +2187,6 @@ namespace Modding
         ///     Called right before a scene gets loaded, can change which scene gets loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        [HookInfo
-        (
-            "Called right before a scene gets loaded, can change which scene gets loaded",
-            "GameManager.LoadScene"
-        )]
         public event BeforeSceneLoadHandler BeforeSceneLoadHook;
         
         /// <summary>
