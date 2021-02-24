@@ -51,7 +51,7 @@ namespace Modding
         /// <summary>
         ///     Dictionary of mods and their version #s
         /// </summary>
-        public readonly SerializableStringDictionary LoadedModsWithVersions = new SerializableStringDictionary();
+        public readonly Dictionary<string, string> LoadedModsWithVersions = new ();
 
         private Console _console;
 
@@ -123,7 +123,7 @@ namespace Modding
 
                 if (_globalSettings.ModEnabledSettings == null)
                 {
-                    _globalSettings.ModEnabledSettings = new SerializableBoolDictionary();
+                    _globalSettings.ModEnabledSettings = new Dictionary<string, bool>();
                 }
 
                 return _globalSettings;
@@ -481,7 +481,8 @@ namespace Modding
             {
                 _globalSettings = new ModHooksGlobalSettings
                 {
-                    LoggingLevel = LogLevel.Info, ModEnabledSettings = new SerializableBoolDictionary()
+                    LoggingLevel = LogLevel.Info,
+                    ModEnabledSettings = new Dictionary<string, bool>()
                 };
                 
                 return;
@@ -532,7 +533,7 @@ namespace Modding
                 _globalSettings = new ModHooksGlobalSettings
                 {
                     LoggingLevel = LogLevel.Info, 
-                    ModEnabledSettings = new SerializableBoolDictionary()
+                    ModEnabledSettings = new Dictionary<string, bool>()
                 };
             }
         }

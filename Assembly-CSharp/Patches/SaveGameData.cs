@@ -18,7 +18,7 @@ namespace Modding.Patches
         [MonoModIgnore]
         public SaveGameData(global::PlayerData playerData, SceneData sceneData) : base(playerData, sceneData) { }
 
-        public SerializableStringDictionary LoadedMods;
+        public Dictionary<string, string> LoadedMods;
 
         public string Name;
     }

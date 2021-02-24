@@ -67,13 +67,6 @@ namespace Modding
 
             Log("Initializing");
 
-            #pragma warning disable 618 // Using obsolete Mod<> for backwards compatibility
-            if (ModLoader.IsSubclassOfRawGeneric(typeof(Mod<>), GetType()))
-            {
-                return;
-            }
-            #pragma warning restore 618
-
             if (_globalSettingsPath == null)
             {
                 _globalSettingsPath = Application.persistentDataPath + ModHooks.PathSeperator + GetType().Name + ".GlobalSettings.json";

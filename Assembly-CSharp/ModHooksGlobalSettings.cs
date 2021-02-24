@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace Modding
         ///     Lists the known mods that are currently installed and whether or not they've been enabled or disabled via the Mod
         ///     Manager Menu.
         /// </summary>
-        [SerializeField] public SerializableBoolDictionary ModEnabledSettings;
+        public Dictionary<string, bool> ModEnabledSettings;
 
         /// <summary>
         ///     Logging Level to use.

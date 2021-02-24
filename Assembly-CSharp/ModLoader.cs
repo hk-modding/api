@@ -140,20 +140,7 @@ namespace Modding
                 {
                     foreach (Type type in Assembly.LoadFile(modPath).GetTypes())
                     {
-#pragma warning disable 618 // Backwards compatibility
-                        if (IsSubclassOfRawGeneric(typeof(Mod<>), type))
-#pragma warning restore 618
-                        {
-                            Logger.APILogger.LogDebug("Trying to instantiate mod<T>: " + type);
-
-                            if (!(Activator.CreateInstance(type) is IMod mod))
-                            {
-                                continue;
-                            }
-
-                            LoadedMods.Add((Mod) mod);
-                        }
-                        else if (!type.IsGenericType && type.IsClass && type.IsSubclassOf(typeof(Mod)))
+                        if (type.IsClass && type.IsSubclassOf(typeof(Mod)))
                         {
                             Logger.APILogger.LogDebug("Trying to instantiate mod: " + type);
                             if (!(type.GetConstructor(new Type[0])?.Invoke(new object[0]) is Mod mod))
