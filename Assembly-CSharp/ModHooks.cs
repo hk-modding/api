@@ -121,10 +121,7 @@ namespace Modding
 
                 LoadGlobalSettings();
 
-                if (_globalSettings.ModEnabledSettings == null)
-                {
-                    _globalSettings.ModEnabledSettings = new Dictionary<string, bool>();
-                }
+                _globalSettings.ModEnabledSettings ??= new Dictionary<string, bool>();
 
                 return _globalSettings;
             }

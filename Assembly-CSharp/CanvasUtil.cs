@@ -79,10 +79,8 @@ namespace Modding
         public static Sprite NullSprite(byte[] data = null)
         {
             Texture2D tex = new Texture2D(1, 1);
-            if (data == null)
-            {
-                data = new byte[] {0x00, 0x00, 0x00, 0x00};
-            }
+            
+            data ??= new byte[] { 0x00, 0x00, 0x00, 0x00 };
 
             tex.LoadRawTextureData(data);
             tex.Apply();

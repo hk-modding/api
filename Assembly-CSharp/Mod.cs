@@ -67,10 +67,7 @@ namespace Modding
 
             Log("Initializing");
 
-            if (_globalSettingsPath == null)
-            {
-                _globalSettingsPath = Application.persistentDataPath + ModHooks.PathSeperator + GetType().Name + ".GlobalSettings.json";
-            }
+            _globalSettingsPath ??= Application.persistentDataPath + ModHooks.PathSeperator + GetType().Name + ".GlobalSettings.json";
 
             LoadGlobalSettings();
             HookSaveMethods();
@@ -354,8 +351,7 @@ namespace Modding
 
             Log("Adding settings to save file");
 
-            if (data.PolymorphicModData == null)
-                data.PolymorphicModData = new Dictionary<string, string>();
+            data.PolymorphicModData ??= new Dictionary<string, string>();
 
             /*
              * This looks kinda dumb because it kinda is.
