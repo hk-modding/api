@@ -10,7 +10,7 @@ namespace Modding.Patches
         /// <summary>
         /// Instance to cache reflection calls.
         /// </summary>
-        public static readonly ShouldSerializeContractResolver Instance = new ShouldSerializeContractResolver();
+        public static readonly ShouldSerializeContractResolver Instance = new();
         
         /// <inheritdoc />
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)

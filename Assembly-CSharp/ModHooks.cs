@@ -46,7 +46,7 @@ namespace Modding
         /// <summary>
         ///     Currently Loaded Mods
         /// </summary>
-        public readonly List<string> LoadedMods = new List<string>();
+        public readonly List<string> LoadedMods = new();
 
         /// <summary>
         ///     Dictionary of mods and their version #s

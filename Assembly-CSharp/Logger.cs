@@ -16,12 +16,12 @@ namespace Modding
     // This is threadsafe, but it's blocking.  Hopefully mods don't try to log so much that it becomes an issue.  If it does we'll have to look at a better system.
     public static class Logger
     {
-        private static readonly object Locker = new object();
+        private static readonly object Locker = new();
         private static readonly StreamWriter Writer;
 
         private static LogLevel _logLevel;
 
-        internal static readonly SimpleLogger APILogger = new SimpleLogger("API");
+        internal static readonly SimpleLogger APILogger = new("API");
 
         /// <summary>
         ///     Logger Constructor.  Initializes file to write to.

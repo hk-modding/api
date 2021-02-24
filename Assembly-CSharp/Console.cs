@@ -11,7 +11,7 @@ namespace Modding
         private static GameObject _overlayCanvas;
         private static GameObject _textPanel;
         private static Font _font;
-        private readonly List<string> _messages = new List<string>(25);
+        private readonly List<string> _messages = new(25);
         private bool _enabled = true;
 
         private const int MSG_LENGTH = 80;

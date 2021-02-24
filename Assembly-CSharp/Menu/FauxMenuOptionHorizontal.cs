@@ -24,7 +24,7 @@ namespace Modding.Menu
         /// <param name="selectedOption"></param>
         public delegate void OnUpdateHandler(int selectedOption);
 
-        private readonly SimpleLogger _log = new SimpleLogger("FauxMenuOptionHorizontal");
+        private readonly SimpleLogger _log = new("FauxMenuOptionHorizontal");
 
         /// <summary>
         /// </summary>

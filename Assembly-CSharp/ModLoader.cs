@@ -36,22 +36,22 @@ namespace Modding
         /// <summary>
         ///     List of loaded mods.
         /// </summary>
-        public static List<IMod> LoadedMods = new List<IMod>();
+        public static List<IMod> LoadedMods = new();
 
-        private static readonly List<string> Errors = new List<string>();
+        private static readonly List<string> Errors = new();
 
         private static ModVersionDraw _draw;
 
-        private static readonly Dictionary<string, string> ModVersionsCache = new Dictionary<string, string>();
+        private static readonly Dictionary<string, string> ModVersionsCache = new();
 
         // Event subscription cache
         private static readonly Dictionary<string, EventInfo> ModHooksEvents =
             typeof(ModHooks).GetEvents().ToDictionary(e => e.Name);
 
-        private static readonly List<FieldInfo> EventSubscribers = new List<FieldInfo>();
+        private static readonly List<FieldInfo> EventSubscribers = new();
 
         // Hook name, method hooked, ITogglableMod used by hook
-        private static readonly List<(EventInfo, MethodInfo, Type)> EventSubscriptions = new List<(EventInfo, MethodInfo, Type)>();
+        private static readonly List<(EventInfo, MethodInfo, Type)> EventSubscriptions = new();
 
         /// <summary>
         ///     Loads the mod by searching for assemblies in hollow_knight_Data\Managed\Mods\

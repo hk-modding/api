@@ -26,7 +26,7 @@ namespace Modding
         /// </summary>
         public static Font TrajanNormal;
 
-        private static readonly Dictionary<string, Font> Fonts = new Dictionary<string, Font>();
+        private static readonly Dictionary<string, Font> Fonts = new();
 
         /// <summary>
         ///     Fetches the Trajan fonts to be cached and used.

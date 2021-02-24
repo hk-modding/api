@@ -16,7 +16,7 @@ namespace Modding.Menu
 
         public static FauxUIManager Instance;
 
-        private readonly SimpleLogger _logger = new SimpleLogger("FauxUIManager");
+        private readonly SimpleLogger _logger = new("FauxUIManager");
 
         // ReSharper disable once InconsistentNaming
         private static GameManager gameManager => _gm != null ? _gm : _gm = GameManager.instance;
