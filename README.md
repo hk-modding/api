@@ -26,13 +26,14 @@ Contributors
 =======
 Original Authors:  
 MyEyes / Firzen  
-Seanpr  
+Seresharp  
 
 Contributors:  
 iamwyza  
 esipode  
 Kerr1291  
-5FiftySix6  
+fifty-six  
 natis1  
 Ayugradow  
-KayDeeTee  
+Katie  
+SFGrenade
