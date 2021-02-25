@@ -440,21 +440,22 @@ namespace Modding
             {
                 Logger.APILogger.Log($"Loading scene \"{s}\"");
 
-                AsyncOperation load = USceneManager.LoadSceneAsync(s, LoadSceneMode.Additive);
-
-                while (!load.isDone)
-                {
-                    loadingBarRect.sizeDelta =
-                        new Vector2
-                        (
-                            progress / (float) toPreload.Count * 975,
-                            loadingBarRect.sizeDelta.y
-                        );
-                    yield return new WaitForEndOfFrame();
-                }
+                loadingBarRect.sizeDelta = new Vector2(
+                    progress / (float) toPreload.Count * 975,
+                    loadingBarRect.sizeDelta.y
+                );
+                yield return USceneManager.LoadSceneAsync(s, LoadSceneMode.Additive);
+                loadingBarRect.sizeDelta = new Vector2(
+                        progress / (float) toPreload.Count * 975,
+                        loadingBarRect.sizeDelta.y
+                );
 
                 Scene scene = USceneManager.GetSceneByName(s);
                 GameObject[] rootObjects = scene.GetRootGameObjects();
+                foreach (var go in rootObjects)
+                {
+                    go.SetActive(false);
+                }
 
                 // Fetch object names to preload
                 List<(IMod, List<string>)> sceneObjects = toPreload[s];
@@ -542,7 +543,15 @@ namespace Modding
                 // Update loading progress
                 progress++;
 
+                loadingBarRect.sizeDelta = new Vector2(
+                    progress / (float) toPreload.Count * 975,
+                    loadingBarRect.sizeDelta.y
+                );
                 yield return USceneManager.UnloadSceneAsync(scene);
+                loadingBarRect.sizeDelta = new Vector2(
+                    progress / (float) toPreload.Count * 975,
+                    loadingBarRect.sizeDelta.y
+                );
             }
 
             List<IEnumerator> batch = new List<IEnumerator>();
