@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Mono.Cecil;
 using MonoMod.InlineRT;
 
@@ -29,44 +28,6 @@ namespace MonoMod
         {
             // If the attribute isn't a MonoMod attribute, it's "useful."
             return attribType.Namespace.StartsWith("MonoMod") && attribType.Name.StartsWith("MonoMod") || attribType.Namespace.StartsWith("Modding.Patches");
-        }
-
-        /// <summary>
-        /// Returns the get_Instance method for ModHooks.Instance
-        /// </summary>
-        /// <param name="method">method being worked on</param>
-        /// <returns></returns>
-        public static MethodDefinition ModHooksInstance(MethodDefinition method)
-        {
-            //   Console.WriteLine("ModHooksInstance");
-            TypeDefinition modHookType = null;
-
-            foreach (TypeDefinition type in method.Module.Types)
-            {
-                // ReSharper disable once InvertIf
-                if (type.Name == "ModHooks")
-                {
-                    modHookType = type;
-                    break;
-                }
-            }
-
-            if (modHookType == null)
-            {
-                Console.WriteLine("WARNING - Couldn't find ModHooks type");
-                return null;
-            }
-
-            foreach (PropertyDefinition property in modHookType.Properties)
-            {
-                if (property.Name == "Instance")
-                {
-                    return property.GetMethod;
-                }
-            }
-
-            Console.WriteLine("WARNING - Couldn't find ModHooks Instance Property");
-            return null;
         }
     }
 }
