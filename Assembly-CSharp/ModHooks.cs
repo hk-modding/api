@@ -210,7 +210,7 @@ namespace Modding
         /// <summary>
         ///     Called whenever game tries to show cursor
         /// </summary>
-        public event CursorHandler CursorHook;
+        public event Action CursorHook;
 
         /// <summary>
         ///     Called whenever game tries to show cursor
@@ -239,7 +239,7 @@ namespace Modding
         ///     Called whenever a new gameobject is created with a collider and playmaker2d
         /// </summary>
         /// <remarks>PlayMakerUnity2DProxy.Start</remarks>
-        public event ColliderCreateHandler ColliderCreateHook;
+        public event Action<GameObject> ColliderCreateHook;
 
         /// <summary>
         ///     Called whenever a new gameobject is created with a collider and playmaker2d
@@ -256,7 +256,7 @@ namespace Modding
 
             Delegate[] invocationList = ColliderCreateHook.GetInvocationList();
 
-            foreach (ColliderCreateHandler toInvoke in invocationList)
+            foreach (Action<GameObject> toInvoke in invocationList)
             {
                 try
                 {
@@ -273,7 +273,7 @@ namespace Modding
         /// <summary>
         ///     Called whenever game tries to create a new gameobject.  This happens often, care should be taken.
         /// </summary>
-        public event GameObjectHandler ObjectPoolSpawnHook;
+        public event Func<GameObject, GameObject> ObjectPoolSpawnHook;
 
         /// <summary>
         ///     Called whenever game tries to show cursor
@@ -289,7 +289,7 @@ namespace Modding
 
             Delegate[] invocationList = ObjectPoolSpawnHook.GetInvocationList();
 
-            foreach (GameObjectHandler toInvoke in invocationList)
+            foreach (Func<GameObject, GameObject> toInvoke in invocationList)
             {
                 try
                 {
@@ -304,47 +304,11 @@ namespace Modding
             return go;
         }
 
-
-        /// <summary>
-        ///     Called whenever game sends GetEventSender.
-        /// </summary>
-        /// <remarks>HutongGames.PlayMaker.Actions.GetEventSender</remarks>
-        public event GameObjectFsmHandler OnGetEventSenderHook;
-
-        /// <summary>
-        ///     Called whenever the FSM OnGetEvent is ran (only done during attacks/spells right now).
-        /// </summary>
-        internal GameObject OnGetEventSender(GameObject go, Fsm fsm)
-        {
-            Logger.APILogger.LogFine("OnGetEventSendr Invoked");
-
-            if (OnGetEventSenderHook == null)
-            {
-                return go;
-            }
-
-            Delegate[] invocationList = OnGetEventSenderHook.GetInvocationList();
-
-            foreach (GameObjectFsmHandler toInvoke in invocationList)
-            {
-                try
-                {
-                    go = toInvoke.Invoke(go, fsm);
-                }
-                catch (Exception ex)
-                {
-                    Logger.APILogger.LogError("" + ex);
-                }
-            }
-
-            return go;
-        }
-
         /// <summary>
         ///     Called when the game is fully closed
         /// </summary>
         /// <remarks>GameManager.OnApplicationQuit</remarks>
-        public event ApplicationQuitHandler ApplicationQuitHook;
+        public event Action ApplicationQuitHook;
 
         /// <summary>
         ///     Called when the game is fully closed
@@ -361,41 +325,7 @@ namespace Modding
 
             Delegate[] invocationList = ApplicationQuitHook.GetInvocationList();
 
-            foreach (ApplicationQuitHandler toInvoke in invocationList)
-            {
-                try
-                {
-                    toInvoke.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    Logger.APILogger.LogError("" + ex);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Called when the game changes to a new regional font
-        /// </summary>
-        /// <remarks>ChangeFontByLanguage.SetFont</remarks>
-        public event SetFontHandler SetFontHook;
-
-        /// <summary>
-        ///     Called when the game changes to a new regional font
-        /// </summary>
-        /// <remarks>ChangeFontByLanguage.SetFont</remarks>
-        internal void OnSetFont()
-        {
-            Logger.APILogger.LogFine("OnSetFont Invoked");
-
-            if (SetFontHook == null)
-            {
-                return;
-            }
-
-            Delegate[] invocationList = SetFontHook.GetInvocationList();
-
-            foreach (SetFontHandler toInvoke in invocationList)
+            foreach (Action toInvoke in invocationList)
             {
                 try
                 {
@@ -553,7 +483,7 @@ namespace Modding
         ///     bounds of an area of the scene with these.
         /// </summary>
         /// <remarks>SceneManager.DrawBlackBorders</remarks>
-        public event DrawBlackBordersHandler DrawBlackBordersHook;
+        public event Action<List<GameObject>> DrawBlackBordersHook;
 
         internal void OnDrawBlackBorders(List<GameObject> borders)
         {
@@ -566,7 +496,7 @@ namespace Modding
 
             Delegate[] invocationList = DrawBlackBordersHook.GetInvocationList();
 
-            foreach (DrawBlackBordersHandler toInvoke in invocationList)
+            foreach (Action<List<GameObject>> toInvoke in invocationList)
             {
                 try
                 {
@@ -1254,7 +1184,7 @@ namespace Modding
         /// <summary>
         ///     Called whenever blue health is updated
         /// </summary>
-        public event BlueHealthHandler BlueHealthHook;
+        public event Func<int> BlueHealthHook;
 
         /// <summary>
         ///     Called whenever blue health is updated
@@ -1271,7 +1201,7 @@ namespace Modding
 
             Delegate[] invocationList = BlueHealthHook.GetInvocationList();
 
-            foreach (BlueHealthHandler toInvoke in invocationList)
+            foreach (Func<int> toInvoke in invocationList)
             {
                 try
                 {
@@ -1397,7 +1327,7 @@ namespace Modding
         ///     Called when the player dies
         /// </summary>
         /// <remarks>GameManager.PlayerDead</remarks>
-        public event VoidHandler BeforePlayerDeadHook;
+        public event Action BeforePlayerDeadHook;
 
         /// <summary>
         ///     Called when the player dies (at the beginning of the method)
@@ -1414,7 +1344,7 @@ namespace Modding
 
             Delegate[] invocationList = BeforePlayerDeadHook.GetInvocationList();
 
-            foreach (VoidHandler toInvoke in invocationList)
+            foreach (Action toInvoke in invocationList)
             {
                 try
                 {
@@ -1431,7 +1361,7 @@ namespace Modding
         ///     Called after the player dies
         /// </summary>
         /// <remarks>GameManager.PlayerDead</remarks>
-        public event VoidHandler AfterPlayerDeadHook;
+        public event Action AfterPlayerDeadHook;
 
         /// <summary>
         ///     Called after the player dies (at the end of the method)
@@ -1448,7 +1378,7 @@ namespace Modding
 
             Delegate[] invocationList = AfterPlayerDeadHook.GetInvocationList();
 
-            foreach (VoidHandler toInvoke in invocationList)
+            foreach (Action toInvoke in invocationList)
             {
                 try
                 {
@@ -1465,7 +1395,7 @@ namespace Modding
         ///     Called whenever the player attacks
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
-        public event AttackHandler AttackHook;
+        public event Action<AttackDirection> AttackHook;
 
         /// <summary>
         ///     Called whenever the player attacks
@@ -1482,7 +1412,7 @@ namespace Modding
 
             Delegate[] invocationList = AttackHook.GetInvocationList();
 
-            foreach (AttackHandler toInvoke in invocationList)
+            foreach (Action<AttackDirection> toInvoke in invocationList)
             {
                 try
                 {
@@ -1498,7 +1428,7 @@ namespace Modding
         /// <summary>
         ///     Called at the start of the DoAttack function
         /// </summary>
-        public event DoAttackHandler DoAttackHook;
+        public event Action DoAttackHook;
 
         /// <summary>
         ///     Called at the start of the DoAttack function
@@ -1514,7 +1444,7 @@ namespace Modding
 
             Delegate[] invocationList = DoAttackHook.GetInvocationList();
 
-            foreach (DoAttackHandler toInvoke in invocationList)
+            foreach (Action toInvoke in invocationList)
             {
                 try
                 {
@@ -1533,7 +1463,7 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
         [MonoModPublic]
-        public event AfterAttackHandler AfterAttackHook;
+        public event Action<AttackDirection> AfterAttackHook;
 
         /// <summary>
         ///     Called at the end of the attack function
@@ -1550,7 +1480,7 @@ namespace Modding
 
             Delegate[] invocationList = AfterAttackHook.GetInvocationList();
 
-            foreach (AfterAttackHandler toInvoke in invocationList)
+            foreach (Action<AttackDirection> toInvoke in invocationList)
             {
                 try
                 {
@@ -1638,7 +1568,7 @@ namespace Modding
         ///     Called whenever the hero updates
         /// </summary>
         /// <remarks>HeroController.Update</remarks>
-        public event HeroUpdateHandler HeroUpdateHook;
+        public event Action HeroUpdateHook;
 
         /// <summary>
         ///     Called whenever the hero updates
@@ -1655,7 +1585,7 @@ namespace Modding
 
             Delegate[] invocationList = HeroUpdateHook.GetInvocationList();
 
-            foreach (HeroUpdateHandler toInvoke in invocationList)
+            foreach (Action toInvoke in invocationList)
             {
                 try
                 {
@@ -1672,7 +1602,7 @@ namespace Modding
         ///     Called whenever the player heals
         /// </summary>
         /// <remarks>PlayerData.health</remarks>
-        public event BeforeAddHealthHandler BeforeAddHealthHook;
+        public event Func<int, int> BeforeAddHealthHook;
 
         /// <summary>
         ///     Called whenever the player heals
@@ -1689,7 +1619,7 @@ namespace Modding
 
             Delegate[] invocationList = BeforeAddHealthHook.GetInvocationList();
 
-            foreach (BeforeAddHealthHandler toInvoke in invocationList)
+            foreach (Func<int, int> toInvoke in invocationList)
             {
                 try
                 {
@@ -1707,7 +1637,7 @@ namespace Modding
         /// <summary>
         ///     Called whenever focus cost is calculated
         /// </summary>
-        public event FocusCostHandler FocusCostHook;
+        public event Func<float> FocusCostHook;
 
         /// <summary>
         ///     Called whenever focus cost is calculated
@@ -1725,7 +1655,7 @@ namespace Modding
 
             Delegate[] invocationList = FocusCostHook.GetInvocationList();
 
-            foreach (FocusCostHandler toInvoke in invocationList)
+            foreach (Func<float> toInvoke in invocationList)
             {
                 try
                 {
@@ -1742,8 +1672,9 @@ namespace Modding
 
         /// <summary>
         ///     Called when Hero recovers Soul from hitting enemies
+        ///     <returns>The amount of soul to recover</returns>
         /// </summary>
-        public event SoulGainHandler SoulGainHook;
+        public event Func<int, int> SoulGainHook;
 
         /// <summary>
         ///     Called when Hero recovers Soul from hitting enemies
@@ -1759,7 +1690,7 @@ namespace Modding
 
             Delegate[] invocationList = SoulGainHook.GetInvocationList();
 
-            foreach (SoulGainHandler toInvoke in invocationList)
+            foreach (Func<int, int> toInvoke in invocationList)
             {
                 try
                 {
@@ -1779,7 +1710,7 @@ namespace Modding
         ///     Called during dash function to change velocity
         /// </summary>
         /// <remarks>HeroController.Dash</remarks>
-        public event DashVelocityHandler DashVectorHook;
+        public event Func<Vector2, Vector2> DashVectorHook;
 
         /// <summary>
         ///     Called during dash function to change velocity
@@ -1796,7 +1727,7 @@ namespace Modding
 
             Delegate[] invocationList = DashVectorHook.GetInvocationList();
 
-            foreach (DashVelocityHandler toInvoke in invocationList)
+            foreach (Func<Vector2, Vector2> toInvoke in invocationList)
             {
                 try
                 {
@@ -1815,7 +1746,7 @@ namespace Modding
         ///     Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality
         /// </summary>
         /// <remarks>HeroController.LookForQueueInput</remarks>
-        public event DashPressedHandler DashPressedHook;
+        public event Func<bool> DashPressedHook;
 
         /// <summary>
         ///     Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality
@@ -1834,7 +1765,7 @@ namespace Modding
 
             Delegate[] invocationList = DashPressedHook.GetInvocationList();
 
-            foreach (DashPressedHandler toInvoke in invocationList)
+            foreach (Func<bool> toInvoke in invocationList)
             {
                 try
                 {
@@ -1858,7 +1789,7 @@ namespace Modding
         ///     Called directly after a save has been loaded
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        public event SavegameLoadHandler SavegameLoadHook;
+        public event Action<int> SavegameLoadHook;
 
         /// <summary>
         ///     Called directly after a save has been loaded
@@ -1875,7 +1806,7 @@ namespace Modding
 
             Delegate[] invocationList = SavegameLoadHook.GetInvocationList();
 
-            foreach (SavegameLoadHandler toInvoke in invocationList)
+            foreach (Action<int> toInvoke in invocationList)
             {
                 try
                 {
@@ -1892,7 +1823,7 @@ namespace Modding
         ///     Called directly after a save has been saved
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        public event SavegameSaveHandler SavegameSaveHook;
+        public event Action<int> SavegameSaveHook;
         
         /// <summary>
         ///     Called directly after a save has been saved
@@ -1909,7 +1840,7 @@ namespace Modding
 
             Delegate[] invocationList = SavegameSaveHook.GetInvocationList();
 
-            foreach (SavegameSaveHandler toInvoke in invocationList)
+            foreach (Action<int> toInvoke in invocationList)
             {
                 try
                 {
@@ -1926,7 +1857,7 @@ namespace Modding
         ///     Called whenever a new game is started
         /// </summary>
         /// <remarks>GameManager.LoadFirstScene</remarks>
-        public event NewGameHandler NewGameHook;
+        public event Action NewGameHook;
 
         /// <summary>
         ///     Called whenever a new game is started
@@ -1943,7 +1874,7 @@ namespace Modding
 
             Delegate[] invocationList = NewGameHook.GetInvocationList();
 
-            foreach (NewGameHandler toInvoke in invocationList)
+            foreach (Action toInvoke in invocationList)
             {
                 try
                 {
@@ -1960,7 +1891,7 @@ namespace Modding
         ///     Called before a save file is deleted
         /// </summary>
         /// <remarks>GameManager.ClearSaveFile</remarks>
-        public event ClearSaveGameHandler SavegameClearHook;
+        public event Action<int> SavegameClearHook;
 
         /// <summary>
         ///     Called before a save file is deleted
@@ -1977,7 +1908,7 @@ namespace Modding
 
             Delegate[] invocationList = SavegameClearHook.GetInvocationList();
 
-            foreach (ClearSaveGameHandler toInvoke in invocationList)
+            foreach (Action<int> toInvoke in invocationList)
             {
                 try
                 {
@@ -1995,7 +1926,7 @@ namespace Modding
         ///     Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        public event AfterSavegameLoadHandler AfterSavegameLoadHook;
+        public event Action<Patches.SaveGameData> AfterSavegameLoadHook;
 
         /// <summary>
         ///     Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
@@ -2012,7 +1943,7 @@ namespace Modding
 
             Delegate[] invocationList = AfterSavegameLoadHook.GetInvocationList();
 
-            foreach (AfterSavegameLoadHandler toInvoke in invocationList)
+            foreach (Action<Patches.SaveGameData> toInvoke in invocationList)
             {
                 try
                 {
@@ -2030,7 +1961,7 @@ namespace Modding
         ///     Called directly before save has been saved to allow for changes to the data before persisted.
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        public event BeforeSavegameSaveHandler BeforeSavegameSaveHook;
+        public event Action<Patches.SaveGameData> BeforeSavegameSaveHook;
 
         /// <summary>
         ///     Called directly before save has been saved to allow for changes to the data before persisted.
@@ -2048,7 +1979,7 @@ namespace Modding
 
             Delegate[] invocationList = BeforeSavegameSaveHook.GetInvocationList();
 
-            foreach (BeforeSavegameSaveHandler toInvoke in invocationList)
+            foreach (Action<Patches.SaveGameData> toInvoke in invocationList)
             {
                 try
                 {
@@ -2065,7 +1996,7 @@ namespace Modding
         /// <summary>
         ///     Overrides the filename to load for a given slot.  Return null to use vanilla names.
         /// </summary>
-        public event GetSaveFileNameHandler GetSaveFileNameHook;
+        public event Func<int, string> GetSaveFileNameHook;
 
         /// <summary>
         ///     Overrides the filename to load for a given slot.  Return null to use vanilla names.
@@ -2083,7 +2014,7 @@ namespace Modding
 
             Delegate[] invocationList = GetSaveFileNameHook.GetInvocationList();
 
-            foreach (GetSaveFileNameHandler toInvoke in invocationList)
+            foreach (Func<int, string> toInvoke in invocationList)
             {
                 try
                 {
@@ -2102,7 +2033,7 @@ namespace Modding
         /// <summary>
         ///     Called after a game has been cleared from a slot.
         /// </summary>
-        public event AfterClearSaveGameHandler AfterSaveGameClearHook;
+        public event Action<int> AfterSaveGameClearHook;
 
         /// <summary>
         ///     Called after a game has been cleared from a slot.
@@ -2118,7 +2049,7 @@ namespace Modding
 
             Delegate[] invocationList = AfterSaveGameClearHook.GetInvocationList();
 
-            foreach (AfterClearSaveGameHandler toInvoke in invocationList)
+            foreach (Action<int> toInvoke in invocationList)
             {
                 try
                 {
@@ -2139,7 +2070,7 @@ namespace Modding
         ///     Called after a new Scene has been loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        public event SceneChangedHandler SceneChanged;
+        public event Action<string> SceneChanged;
 
         /// <summary>
         ///     Called after a new Scene has been loaded
@@ -2156,7 +2087,7 @@ namespace Modding
 
             Delegate[] invocationList = SceneChanged.GetInvocationList();
 
-            foreach (SceneChangedHandler toInvoke in invocationList)
+            foreach (Action<string> toInvoke in invocationList)
             {
                 try
                 {
@@ -2173,7 +2104,7 @@ namespace Modding
         ///     Called right before a scene gets loaded, can change which scene gets loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        public event BeforeSceneLoadHandler BeforeSceneLoadHook;
+        public event Func<string, string> BeforeSceneLoadHook;
         
         /// <summary>
         ///     Called right before a scene gets loaded, can change which scene gets loaded
@@ -2190,7 +2121,7 @@ namespace Modding
 
             Delegate[] invocationList = BeforeSceneLoadHook.GetInvocationList();
 
-            foreach (BeforeSceneLoadHandler toInvoke in invocationList)
+            foreach (Func<string, string> toInvoke in invocationList)
             {
                 try
                 {
