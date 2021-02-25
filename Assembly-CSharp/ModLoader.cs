@@ -436,19 +436,20 @@ namespace Modding
             // Preload all needed objects
             int progress = 0;
 
-            IEnumerator PreloadScene(string s)
+            void updateLoadingBarProgress()
             {
-                Logger.APILogger.Log($"Loading scene \"{s}\"");
-
                 loadingBarRect.sizeDelta = new Vector2(
                     progress / (float) toPreload.Count * 975,
                     loadingBarRect.sizeDelta.y
                 );
+            }
+            IEnumerator PreloadScene(string s)
+            {
+                Logger.APILogger.Log($"Loading scene \"{s}\"");
+
+                updateLoadingBarProgress();
                 yield return USceneManager.LoadSceneAsync(s, LoadSceneMode.Additive);
-                loadingBarRect.sizeDelta = new Vector2(
-                        progress / (float) toPreload.Count * 975,
-                        loadingBarRect.sizeDelta.y
-                );
+                updateLoadingBarProgress();
 
                 Scene scene = USceneManager.GetSceneByName(s);
                 GameObject[] rootObjects = scene.GetRootGameObjects();
@@ -543,15 +544,9 @@ namespace Modding
                 // Update loading progress
                 progress++;
 
-                loadingBarRect.sizeDelta = new Vector2(
-                    progress / (float) toPreload.Count * 975,
-                    loadingBarRect.sizeDelta.y
-                );
+                updateLoadingBarProgress();
                 yield return USceneManager.UnloadSceneAsync(scene);
-                loadingBarRect.sizeDelta = new Vector2(
-                    progress / (float) toPreload.Count * 975,
-                    loadingBarRect.sizeDelta.y
-                );
+                updateLoadingBarProgress();
             }
 
             List<IEnumerator> batch = new List<IEnumerator>();
