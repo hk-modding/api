@@ -23,6 +23,7 @@ namespace Modding.Patches
         [MonoModReplace]
         private void OnGUI()
         {
+            /*
             Cursor.lockState = CursorLockMode.None;
             if (isTitleScreenScene)
             {
@@ -40,6 +41,52 @@ namespace Modding.Patches
                 return;
             }
             Cursor.visible = true;
+            */
+
+
+            if (isTitleScreenScene)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = true;
+                //Cursor.set_lockState(1);
+                //Cursor.set_visible(true);
+                return;
+
+
+            }
+            if (this.isMenuScene)
+            {
+                if (this.controllerPressed)
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+
+                    //Cursor.set_lockState(1);
+                    //Cursor.set_visible(false);
+                    return;
+                }
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+
+                //Cursor.set_lockState(0);
+                //Cursor.set_visible(true);
+                return;
+            }
+            if (!GameManager.instance.isPaused)
+            //if (!this.gm.isPaused)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                //Cursor.set_lockState(1);
+                //Cursor.set_visible(false);
+                return;
+            }
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            //Cursor.set_lockState(0);
+            //Cursor.set_visible(true);
+
         }
     }
 }
