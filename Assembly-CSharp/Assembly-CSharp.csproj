@@ -1,260 +1,115 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1CACEA6A-D114-46B1-8C47-F2F92062B844}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Modding</RootNamespace>
-    <AssemblyName>Assembly-CSharp.mm</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <!-- <NoStdLib>True</NoStdLib>-->
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Assembly-CSharp.mm.xml</DocumentationFile>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugMac|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\DebugMac\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugDeploy|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\DebugDeploy\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DebugLinux|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\DebugLinux\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DocumentationFile>bin\Debug\Assembly-CSharp.mm.xml</DocumentationFile>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="CallerMemberName.cs" />
-    <Compile Include="CanvasUtil.cs" />
-    <Compile Include="Console.cs" />
-    <Compile Include="GithubVersionHelper.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Handlers.cs" />
-    <Compile Include="HookInfoAttribute.cs" />
-    <Compile Include="ILogger.cs" />
-    <Compile Include="IMod.cs" />
-    <Compile Include="IModSettings.cs" />
-    <Compile Include="Loggable.cs" />
-    <Compile Include="Logger.cs" />
-    <Compile Include="LogLevel.cs" />
-    <Compile Include="Menu\FauxMenuOptionHorizontal.cs" />
-    <Compile Include="Menu\FauxUIManager.cs" />
-    <Compile Include="Menu\ModManager.cs" />
-    <Compile Include="Mod.cs" />
-    <Compile Include="ModData.cs" />
-    <Compile Include="ModHooks.cs" />
-    <Compile Include="ModHooksGlobalSettings.cs" />
-    <Compile Include="ModLoader.cs" />
-    <Compile Include="ModSettingsDictionary.cs" />
-    <Compile Include="ModVersionDraw.cs" />
-    <Compile Include="Patches\ChangeFontByLanguage.cs" />
-    <Compile Include="Patches\DialogueBox.cs" />
-    <Compile Include="Patches\DRM\GameManager.cs" />
-    <Compile Include="Patches\DRM\HeroController.cs" />
-    <Compile Include="Patches\DRM\GetEventSender.cs" />
-    <Compile Include="Patches\MenuSelectable.cs" />
-    <Compile Include="Patches\ObjectPool.cs" />
-    <Compile Include="Patches\GameManager.cs" />
-    <Compile Include="Patches\HeroController.cs" />
-    <Compile Include="Patches\InputHandler.cs" />
-    <Compile Include="Patches\Language.cs" />
-    <Compile Include="Patches\MonoModRules.cs" />
-    <Compile Include="Patches\OnScreenDebugInfo.cs" />
-    <Compile Include="Patches\OnTriggerEnter2D.cs" />
-    <Compile Include="Patches\PlayerData.cs" />
-    <Compile Include="Patches\PlayMakerUnity2DProxy.cs" />
-    <Compile Include="Patches\SaveGameData.cs" />
-    <Compile Include="Patches\SaveStats.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Proxies.cs" />
-    <Compile Include="SerializableBoolDictionary.cs" />
-    <Compile Include="SerializableDictionary.cs" />
-    <Compile Include="SerializableFloatDictionary.cs" />
-    <Compile Include="SerializableIntDictionary.cs" />
-    <Compile Include="SerializableStringDictionary.cs" />
-    <Compile Include="SimpleLogger.cs" />
-    <Compile Include="TogglableMod.cs" />
-    <Compile Include="VoidModSettings.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Vanilla\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\MonoMod\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoMod, Version=17.4.6530.30093, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\MonoMod\MonoMod.exe</HintPath>
-    </Reference>
-    <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Vanilla\PlayMaker.dll</HintPath>
-    </Reference>
-    <Reference Include="System">
-      <HintPath>..\Vanilla\System.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml">
-      <HintPath>..\Vanilla\System.Xml.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Vanilla\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Vanilla\UnityEngine.UI.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="github.crt" />
-    <EmbeddedResource Include="github2.crt" />
-  </ItemGroup>
-  <Target Name="ILMerge">
-    <!-- the ILMergePath property points to the location of ILMerge.exe console application -->
-    <Exec Command="$(ILMergeConsolePath) /out:$(SolutionDir)/Output/Assembly-CSharp.dll Assembly-CSharp.dll ModdingBase.dll" />
-  </Target>
-  <PropertyGroup>
-    <PostBuildEvent>move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.dll" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.dll"
-move "$(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.pdb" "$(ProjectDir)$(OutputPath)\Assembly-CSharp.dll.mm.pdb"
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>Modding</RootNamespace>
+        <AssemblyName>Assembly-CSharp.mm</AssemblyName>
+        <TargetFramework>net35</TargetFramework>
+        <AssemblyTitle>Hollow Knight - Mod API Enabled</AssemblyTitle>
+        <Product>Modding API</Product>
+        <Copyright>Copyright © 2017</Copyright>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <RestorePackagesPath>packages</RestorePackagesPath>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
 
-if "$(ConfigurationName)" == "Debug" or "$(ConfigurationName)" == "DebugDeploy"  goto :Debug
-if "$(ConfigurationName)" == "DebugMac" goto :DebugMac
-if "$(ConfigurationName)" == "DebugLinux" goto :DebugLinux
+    <ItemGroup>
+        <Files Include="$(SolutionDir)Vanilla/*" />
 
-:Debug
-copy /Y "$(SolutionDir)Vanilla\*" "$(ProjectDir)$(OutputPath)\"
-copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
-cd "$(ProjectDir)$(OutputPath)"
-MonoMod.exe Assembly-CSharp.dll
-rem "Create the folder structure prefered by mods"
-md "$(SolutionDir)OutputFinal\hollow_knight_Data\Managed\Mods"
-rem "Copy the Mod's dll into the Mods folder"
-copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinal\readme.md"
-copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinal\hollow_knight_Data\Managed\Assembly-CSharp.dll"
-powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
-copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinal\hollow_knight_Data\Managed\"
+        <BuildDir Include="$(TargetDir)" />
+        
+        <Dependencies Include="$(TargetDir)MMHOOK_Assembly-CSharp.dll" />
+        <Dependencies Include="$(TargetDir)MMHOOK_PlayMaker.dll" />
+        <Dependencies Include="$(TargetDir)MonoMod.Utils.dll" />
+        <Dependencies Include="$(TargetDir)Mono.Cecil.dll" />
+        <Dependencies Include="$(TargetDir)MonoMod.RuntimeDetour.dll" />
+    </ItemGroup>
 
-rem "Zip the Distribution Folder"
-call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPI.zip" "$(SolutionDir)OutputFinal\*"
+    <PropertyGroup>
+        <OutputDir>$(SolutionDir)OutputFinal</OutputDir>
+        <Mono Condition="$(OS) == WINDOWS_NT" />
+        <Mono Condition="$(OS) != WINDOWS_NT">mono</Mono>
+    </PropertyGroup>
 
-if "$(ConfigurationName)" == "DebugDeploy"  goto :Deploy
-goto :Exit
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Delete Condition="Exists('$(OutputDir)')" Files="$(OutputDir)" />
+        <Delete Condition="Exists('$(SolutionDir)ModdingAPI.zip')" Files="$(SolutionDir)ModdingAPI.zip" />
 
-:Deploy
-copy /Y "$(SolutionDir)OutputFinal\hollow_knight_Data\Managed\Assembly-CSharp.*" "C:\Program Files (x86)\Steam\steamapps\common\Hollow Knight\hollow_knight_Data\Managed\"
-goto :Exit
+        <Copy SkipUnchangedFiles="true" SourceFiles="@(Files)" DestinationFolder="@(BuildDir)" />
 
-:DebugMac
-copy /Y "$(SolutionDir)VanillaMac\*" "$(ProjectDir)$(OutputPath)\"
-copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
-cd "$(ProjectDir)$(OutputPath)"
-MonoMod.exe Assembly-CSharp.dll
-rem "Create the folder structure prefered by mods"
-md "$(SolutionDir)OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\Mods"
-rem "Copy the Mod's dll into the Mods folder"
-copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinalMac\readme.md"
-copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\Assembly-CSharp.dll"
-powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
-copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinalMac\hollow_knight.app\Contents\Resources\Data\Managed\"
+        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) $(SolutionDir)PrePatcher/Output/PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
+        <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)Assembly-CSharp-patched.dll" DestinationFiles="$(TargetDir)Assembly-CSharp.dll" />
 
-rem "Zip the Distribution Folder"
-call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPIMac.zip" "$(SolutionDir)OutputFinalMac\hollow_knight.app\*"
+        <Delete Condition="Exists('MONOMODDED_Assembly-CSharp.dll')" Files="MONOMODDED_Assembly-CSharp.dll" />
+        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.exe Assembly-CSharp.dll" />
 
-goto :Exit
+        <!-- Generate Hooks !-->
+        <Exec Condition="!Exists('$(TargetDir)MMHOOK_Assembly-CSharp.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.RuntimeDetour.HookGen.exe --private Assembly-CSharp.dll" />
+        <Exec Condition="!Exists('$(TargetDir)MMHOOK_Playmaker.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.RuntimeDetour.HookGen.exe --private PlayMaker.dll" />
+    </Target>
+    
+    <Target Name="Release" AfterTargets="PostBuild" Condition="'$(Configuration)' == 'Release'">
+        <!-- Cleanup -->
+        <RemoveDir Directories="$(OutputDir)" />
 
-:DebugLinux
-copy /Y "$(SolutionDir)VanillaLinux\*" "$(ProjectDir)$(OutputPath)\"
-copy /Y "$(SolutionDir)MonoMod\*" "$(ProjectDir)$(OutputPath)\"
-cd "$(ProjectDir)$(OutputPath)"
-MonoMod.exe Assembly-CSharp.dll
-rem "Create the folder structure prefered by mods"
-md "$(SolutionDir)OutputFinalLinux\hollow_knight_Data\Managed\Mods"
-rem "Copy the Mod's dll into the Mods folder"
-copy /Y "$(SolutionDir)\readme.moddingapi.md" "$(SolutionDir)\OutputFinalLinux\readme.md"
-copy /Y "$(ProjectDir)$(OutputPath)\MONOMODDED_Assembly-Csharp.dll" "$(SolutionDir)OutputFinalLinux\hollow_knight_Data\Managed\Assembly-CSharp.dll"
-powershell -Command "(gc $(ProjectDir)$(OutputPath)\Assembly-CSharp.mm.xml) -replace 'Assembly-CSharp.mm', 'Assembly-CSharp' | Out-File $(ProjectDir)$(OutputPath)\Assembly-CSharp.xml"
-copy /Y "$(ProjectDir)$(OutputPath)\Assembly-CSharp.xml" "$(SolutionDir)\OutputFinalLinux\hollow_knight_Data\Managed\"
+        <!-- Make the output directory -->
+        <MakeDir Directories="$(OutputDir)" />
 
-rem "Zip the Distribution Folder"
-call "$(SolutionDir)zip.bat" "$(SolutionDir)ModdingAPILinux.zip" "$(SolutionDir)OutputFinalLinux\*"
+        <!-- Copy the API, the documentation, and the README. -->
+        <Copy SourceFiles="$(SolutionDir)/README.ModdingApi.md" DestinationFiles="$(OutputDir)/README.md" />
+        <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(OutputDir)/Assembly-CSharp.dll" />
+        <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(OutputDir)/Assembly-CSharp.xml" />
+        
+        <!-- Copy the dependencies for the API and hooks for mods -->
+        <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutputDir)" />
 
-goto :Exit
+        <!-- Zip for distribution -->
+        <ZipDirectory SourceDirectory="$(OutputDir)" DestinationFile="$(SolutionDir)ModdingAPI.zip" />
+    </Target>
+    
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <DebugType>full</DebugType>
+        <DocumentationFile>bin\$(Configuration)\Assembly-CSharp.mm.xml</DocumentationFile>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <DebugType>pdbonly</DebugType>
+        <DocumentationFile>bin\$(Configuration)\Assembly-CSharp.mm.xml</DocumentationFile>
+    </PropertyGroup>
 
+    <ItemGroup>
+        <PackageReference Include="ILRepack" Version="2.1.0-beta1">
+            <IncludeAssets>build;compile</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="MonoMod" Version="21.1.11.1">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
 
-:Exit</PostBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PreBuildEvent>rd "$(ProjectDir)$(OutputPath)" /s /q
-rem "If Distribution exists, delete it"
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="21.1.11.1">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+        
+        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="21.1.11.1">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 
-if "$(ConfigurationName)" == "Debug" or "$(ConfigurationName)" == "DebugDeploy"  goto :Debug
-if "$(ConfigurationName)" == "DebugMac" goto :DebugMac
-if "$(ConfigurationName)" == "DebugLinux" goto :DebugLinux
-
-:Debug
-rd /q /s "$(SolutionDir)OutputFinal\" 2&gt;nul
-del "$(SolutionDir)ModdingAPI.zip" 2&gt;nul
-goto :Exit
-
-:DebugMac
-rd /q /s "$(SolutionDir)OutputFinalMac\" 2&gt;nul
-del "$(SolutionDir)ModdingAPIMac.zip" 2&gt;nul
-goto :Exit
-
-:DebugLinux
-rd /q /s "$(SolutionDir)OutputFinalLinux\" 2&gt;nul
-del "$(SolutionDir)ModdingAPILinux.zip" 2&gt;nul
-goto :Exit
-
-:Exit</PreBuildEvent>
-  </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+            <HintPath>../Vanilla/Assembly-CSharp.dll</HintPath>
+            <SpecificVersion>False</SpecificVersion>
+        </Reference>
+        <Reference Include="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+          <HintPath>..\Vanilla\mscorlib.dll</HintPath>
+            <SpecificVersion>False</SpecificVersion>
+        </Reference>
+        <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+            <HintPath>../Vanilla/PlayMaker.dll</HintPath>
+            <SpecificVersion>False</SpecificVersion>
+        </Reference>
+        <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+            <HintPath>../Vanilla/UnityEngine.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+            <HintPath>../Vanilla/UnityEngine.UI.dll</HintPath>
+        </Reference>
+    </ItemGroup>
 </Project>
