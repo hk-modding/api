@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Security.Authentication;
 using UnityEngine;
 
 namespace Modding
@@ -11,7 +12,10 @@ namespace Modding
     public class GithubVersionHelper
     {
         private static readonly WebClient WebClient = new WebClient();
-        
+
+        public const SslProtocols _Tls12 = (SslProtocols)0x00000C00;
+        public const SecurityProtocolType Tls12 = (SecurityProtocolType)_Tls12;
+
         private static GithubRelease FromJson(string json) => JsonUtility.FromJson<GithubRelease>(json);
 
         private readonly string _repositoryName;
@@ -23,6 +27,7 @@ namespace Modding
         public GithubVersionHelper(string repositoryName)
         {
             _repositoryName = repositoryName;
+            ServicePointManager.SecurityProtocol = Tls12;
         }
 
         /// <summary>
@@ -34,6 +39,8 @@ namespace Modding
             //Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
 
             return "0.0";
+
+            /*
             try
             {
                 //This needs to be added on every call
@@ -51,6 +58,7 @@ namespace Modding
                 Logger.LogError("Failed to fetch url with error: \n" +ex);
             }
             return string.Empty;
+            */
         }
         // ReSharper disable All
 #pragma warning disable 0649

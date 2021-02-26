@@ -143,7 +143,7 @@ namespace Modding
         /// </summary>
         public Mod()
         {
-            _globalSettingsFilename = Application.persistentDataPath + ModHooks.PathSeperator + GetType().Name + ".GlobalSettings.json";
+            _globalSettingsFilename = Application.persistentDataPath + ModHooks.PathSeperator + GetType().Name + ".GlobalSettings-" + Constants.GAME_VERSION + ".json";
             LoadGlobalSettings();
         }
 

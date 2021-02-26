@@ -20,14 +20,14 @@ namespace Modding
     {
         internal static bool IsInitialized;
 
-        private const int _modVersion = 39;
+        private const int _modVersion = 40;
 
         /// <summary>
         /// Contains the seperator for path's, useful for handling Mac vs Windows vs Linux
         /// </summary>
         public static char PathSeperator = SystemInfo.operatingSystem.Contains("Windows") ? '\\' : '/';
 
-        private static readonly string SettingsPath = Application.persistentDataPath + PathSeperator + "ModdingApi.GlobalSettings.json";
+        private static string SettingsPath;
         private static ModHooks _instance;
 
         private ModHooksGlobalSettings _globalSettings;
@@ -98,6 +98,7 @@ namespace Modding
 
         private ModHooks()
         {
+            SettingsPath = Application.persistentDataPath + PathSeperator + "ModdingApi.GlobalSettings-" + Constants.GAME_VERSION + ".json";
             Logger.Log("[API] - Adding GitHub SSL Cert to Allow for Checking of Mod Versions");
 
             SetupServicePointAuthorizor();
@@ -131,9 +132,10 @@ namespace Modding
             ApplicationQuitHook += SaveGlobalSettings;
 
             //Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
+            /*
             try
             {
-                GithubVersionHelper githubVersionHelper = new GithubVersionHelper("seanpr96/HollowKnight.Modding");
+                GithubVersionHelper githubVersionHelper = new GithubVersionHelper("seresharp/HollowKnight.Modding");
 
                 string currentGithubVersion = githubVersionHelper.GetVersion();
                 string[] temp = currentGithubVersion.Split('-');
@@ -148,6 +150,7 @@ namespace Modding
             {
                 Logger.LogError("[API] - Couldn't check for new version." + ex);
             }
+            */
 
             IsInitialized = true;
         }
@@ -1788,12 +1791,13 @@ namespace Modding
 
         /// <summary>
         /// Called whenever game tries to show cursor
+        /// TODO
         /// </summary>
         internal void OnCursor()
         {
             //Logger.LogFine("[API] - OnCursor Invoked"); // Too Spammy
 
-            Cursor.lockState = CursorLockMode.None;
+            Cursor.lockState = CursorLockMode.Confined;
             if (_CursorHook != null)
             {
                 _CursorHook.Invoke();
@@ -1805,6 +1809,9 @@ namespace Modding
                 return;
             }
             Cursor.visible = false;
+
+
+            
         }
 
 
