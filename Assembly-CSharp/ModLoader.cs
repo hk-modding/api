@@ -138,7 +138,7 @@ namespace Modding
                 {
                     foreach (Type type in Assembly.LoadFile(modPath).GetTypes())
                     {
-                        if (type.IsClass && type.IsSubclassOf(typeof(Mod)))
+                        if (type.IsClass && type.IsSubclassOf(typeof(Mod)) && !type.IsAbstract)
                         {
                             Logger.APILogger.LogDebug("Trying to instantiate mod: " + type);
                             if (type.GetConstructor(new Type[0])?.Invoke(new object[0]) is not Mod mod)
