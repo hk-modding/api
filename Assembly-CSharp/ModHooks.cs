@@ -132,7 +132,7 @@ namespace Modding
             ApplicationQuitHook += SaveGlobalSettings;
 
             //Wyza - Have to disable this.  Unity doesn't support TLS 1.2 and github removed TLS 1.0/1.1 support.  Grumble
-            /*
+            
             try
             {
                 GithubVersionHelper githubVersionHelper = new GithubVersionHelper("seresharp/HollowKnight.Modding");
@@ -150,7 +150,7 @@ namespace Modding
             {
                 Logger.LogError("[API] - Couldn't check for new version." + ex);
             }
-            */
+            
 
             IsInitialized = true;
         }
