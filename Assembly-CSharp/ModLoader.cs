@@ -42,8 +42,6 @@ namespace Modding
 
         private static ModVersionDraw _draw;
 
-        private static readonly Dictionary<string, string> ModVersionsCache = new();
-
         // Event subscription cache
         private static readonly Dictionary<string, EventInfo> ModHooksEvents =
             typeof(ModHooks).GetEvents().ToDictionary(e => e.Name);
@@ -590,14 +588,13 @@ namespace Modding
         private static void UpdateModText()
         {
             StringBuilder builder = new StringBuilder();
+            
             builder.AppendLine("Modding API: " + ModHooks.Instance.ModVersion);
+            
             foreach (string error in Errors)
             {
                 builder.AppendLine(error);
             }
-
-            // 56 you made me do this, I hope you're happy
-            Dictionary<string, List<IMod>> modsByNamespace = new ();
 
             foreach (IMod mod in LoadedMods)
             {
@@ -608,58 +605,11 @@ namespace Modding
                         continue;
                     }
 
-                    if (!ModVersionsCache.ContainsKey(mod.GetName()))
-                    {
-                        ModVersionsCache.Add(mod.GetName(), mod.GetVersion());
-                    }
-
-                    string ns = mod.GetType().Namespace;
-
-                    // ReSharper disable once AssignNullToNotNullAttribute
-                    if (!modsByNamespace.TryGetValue(ns, out List<IMod> nsMods))
-                    {
-                        nsMods = new List<IMod>();
-                        modsByNamespace.Add(ns, nsMods);
-                    }
-
-                    nsMods.Add(mod);
+                    builder.AppendLine($"{mod.GetName()} : {mod.GetVersion()}");
                 }
                 catch (Exception e)
                 {
-                    Logger.APILogger.LogError($"Failed to obtain mod namespace:\n{e}");
-                }
-            }
-
-            foreach (string ns in modsByNamespace.Keys)
-            {
-                try
-                {
-                    List<IMod> nsMods = modsByNamespace[ns];
-
-                    if (nsMods == null || nsMods.Count == 0)
-                    {
-                        Logger.APILogger.LogWarn("Namespace mod list empty, ignoring");
-                    }
-                    else if (nsMods.Count == 1)
-                    {
-                        builder.AppendLine($"{nsMods[0].GetName()} : {ModVersionsCache[nsMods[0].GetName()]}");
-                    }
-                    else
-                    {
-                        builder.Append($"{ns} : ");
-                        for (int i = 0; i < nsMods.Count; i++)
-                        {
-                            builder.Append(nsMods[i].GetName() + (i == nsMods.Count - 1 ? Environment.NewLine : ", "));
-                            if ((i + 1) % 4 == 0 && i < nsMods.Count - 1)
-                            {
-                                builder.Append(Environment.NewLine + "\t");
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.APILogger.LogError($"Failed to append mod name text:\n{e}");
+                    Logger.APILogger.LogError($"Failed to obtain mod name or version:\n{e}");
                 }
             }
 
