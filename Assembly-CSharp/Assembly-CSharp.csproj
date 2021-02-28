@@ -2,7 +2,7 @@
     <PropertyGroup>
         <RootNamespace>Modding</RootNamespace>
         <AssemblyName>Assembly-CSharp.mm</AssemblyName>
-        <TargetFramework>net4.0</TargetFramework>
+        <TargetFramework>net472</TargetFramework>
         <AssemblyTitle>Hollow Knight - Mod API Enabled</AssemblyTitle>
         <Product>Modding API</Product>
         <Copyright>Copyright © 2017</Copyright>
