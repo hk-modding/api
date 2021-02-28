@@ -590,8 +590,7 @@ namespace Modding
         private static void UpdateModText()
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine("Modding API: " + ModHooks.Instance.ModVersion +
-                               (ModHooks.Instance.IsCurrent ? "" : " - New Version Available!"));
+            builder.AppendLine("Modding API: " + ModHooks.Instance.ModVersion);
             foreach (string error in Errors)
             {
                 builder.AppendLine(error);
@@ -611,8 +610,7 @@ namespace Modding
 
                     if (!ModVersionsCache.ContainsKey(mod.GetName()))
                     {
-                        ModVersionsCache.Add(mod.GetName(),
-                            mod.GetVersion() + (mod.IsCurrent() ? string.Empty : " - New Version Available!"));
+                        ModVersionsCache.Add(mod.GetName(), mod.GetVersion());
                     }
 
                     string ns = mod.GetType().Namespace;

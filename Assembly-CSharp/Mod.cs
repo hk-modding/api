@@ -114,16 +114,6 @@ namespace Modding
             return "UNKNOWN";
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        ///     Denotes if the running version is the current version.  Set this with <see cref="T:Modding.GithubVersionHelper" />
-        /// </summary>
-        /// <returns>If the version is current or not.</returns>
-        public virtual bool IsCurrent()
-        {
-            return true;
-        }
-
         /// <summary>
         ///     Controls when this mod should load compared to other mods.  Defaults to ordered by name.
         /// </summary>

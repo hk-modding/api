@@ -34,12 +34,6 @@ namespace Modding
         string GetVersion();
 
         /// <summary>
-        ///     Denotes if the running version is the current version.
-        /// </summary>
-        /// <returns>If the version is current or not.</returns>
-        bool IsCurrent();
-
-        /// <summary>
         ///     Controls when this mod should load compared to other mods.  Defaults to ordered by name.
         /// </summary>
         /// <returns></returns>

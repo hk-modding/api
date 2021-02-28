@@ -32,12 +32,6 @@ namespace Modding
         private static ModHooks _instance;
 
         /// <summary>
-        ///     Denotes if the API is current
-        /// </summary>
-        // ReSharper disable once ConvertToConstant.Global
-        public readonly bool IsCurrent = true;
-
-        /// <summary>
         ///     Currently Loaded Mods
         /// </summary>
         public readonly List<string> LoadedMods = new();
