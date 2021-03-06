@@ -36,9 +36,6 @@
 
         <Copy SkipUnchangedFiles="true" SourceFiles="@(Files)" DestinationFolder="@(BuildDir)" />
 
-        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) $(SolutionDir)PrePatcher/Output/PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
-        <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)Assembly-CSharp-patched.dll" DestinationFiles="$(TargetDir)Assembly-CSharp.dll" />
-
         <Delete Condition="Exists('MONOMODDED_Assembly-CSharp.dll')" Files="MONOMODDED_Assembly-CSharp.dll" />
         <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.exe Assembly-CSharp.dll" />
 
@@ -76,18 +73,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ILRepack" Version="2.1.0-beta1">
-            <IncludeAssets>build;compile</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="MonoMod" Version="21.1.11.1">
-            <IncludeAssets>all</IncludeAssets>
-        </PackageReference>
-
-        <PackageReference Include="MonoMod.RuntimeDetour" Version="21.1.11.1">
+        <PackageReference Include="MonoMod" Version="21.3.1.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
         
-        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="21.1.11.1">
+        <PackageReference Include="MonoMod.Utils" Version="21.3.1.1">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="21.3.1.1">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+        
+        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="21.3.1.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
     </ItemGroup>
@@ -95,10 +93,6 @@
     <ItemGroup>
         <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
             <HintPath>../Vanilla/Assembly-CSharp.dll</HintPath>
-            <SpecificVersion>False</SpecificVersion>
-        </Reference>
-        <Reference Include="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <HintPath>..\Vanilla\mscorlib.dll</HintPath>
             <SpecificVersion>False</SpecificVersion>
         </Reference>
         <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
