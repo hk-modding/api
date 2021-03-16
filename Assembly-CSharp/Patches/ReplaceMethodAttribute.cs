@@ -29,7 +29,7 @@ namespace MonoMod
 {
     public static partial class MonoModRules
     {
-        private const BindingFlags FLAGS = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
+        private const BindingFlags AllBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
 
         /// <summary>
         /// Replace method call with alternate method call
@@ -42,7 +42,7 @@ namespace MonoMod
             MethodBase oldMethod = Type.GetType((string)attrib.ConstructorArguments[0].Value)?.GetMethod
             (
                 (string)attrib.ConstructorArguments[1].Value,
-                FLAGS,
+                AllBindingFlags,
                 null,
                 ((CustomAttributeArgument[])attrib.ConstructorArguments[2].Value)
                 .Select(t => Type.GetType((string)t.Value)).ToArray(),
@@ -55,7 +55,7 @@ namespace MonoMod
             MethodBase newMethod = Type.GetType((string)attrib.ConstructorArguments[3].Value)?.GetMethod
             (
                 (string)attrib.ConstructorArguments[4].Value,
-                FLAGS,
+                AllBindingFlags,
                 null,
                 ((CustomAttributeArgument[])attrib.ConstructorArguments[5].Value)
                 .Select(t => Type.GetType((string)t.Value)).ToArray(),
