@@ -39,37 +39,38 @@ namespace MonoMod
         [UsedImplicitly]
         public static void ReplaceMethod(MethodDefinition method, CustomAttribute attrib)
         {
-            MethodReference oldMethod = method.Module.ImportReference
+            MethodBase oldMethod = Type.GetType((string)attrib.ConstructorArguments[0].Value)?.GetMethod
             (
-                Type.GetType((string)attrib.ConstructorArguments[0].Value).GetMethod
-                (
-                    (string)attrib.ConstructorArguments[1].Value,
-                    FLAGS,
-                    null,
-                    ((CustomAttributeArgument[])attrib.ConstructorArguments[2].Value)
-                        .Select(t => Type.GetType((string)t.Value)).ToArray(),
-                    null
-                )
+                (string)attrib.ConstructorArguments[1].Value,
+                FLAGS,
+                null,
+                ((CustomAttributeArgument[])attrib.ConstructorArguments[2].Value)
+                .Select(t => Type.GetType((string)t.Value)).ToArray(),
+                null
             );
 
-            MethodReference newMethod = method.Module.ImportReference
-            (
-                Type.GetType((string)attrib.ConstructorArguments[3].Value).GetMethod
-                (
-                    (string)attrib.ConstructorArguments[4].Value,
-                    FLAGS,
-                    null,
-                    ((CustomAttributeArgument[])attrib.ConstructorArguments[5].Value)
-                        .Select(t => Type.GetType((string)t.Value)).ToArray(),
-                    null
-                )
-            );
+            if (oldMethod is null)
+                throw new InvalidOperationException("Couldn't find old method!");
 
-            ILCursor il = new ILCursor(new ILContext(method));
+            MethodBase newMethod = Type.GetType((string)attrib.ConstructorArguments[3].Value)?.GetMethod
+            (
+                (string)attrib.ConstructorArguments[4].Value,
+                FLAGS,
+                null,
+                ((CustomAttributeArgument[])attrib.ConstructorArguments[5].Value)
+                .Select(t => Type.GetType((string)t.Value)).ToArray(),
+                null
+            );
+            
+            if (newMethod is null)
+                throw new InvalidOperationException("Couldn't find new method!");
+
+            var il = new ILCursor(new ILContext(method));
+
             while (il.TryGotoNext(i => i.MatchCallOrCallvirt(oldMethod)))
             {
                 il.Remove();
-                il.Emit(newMethod.HasThis ? OpCodes.Callvirt : OpCodes.Call, newMethod);
+                il.Emit(newMethod.IsStatic ? OpCodes.Call : OpCodes.Callvirt, newMethod);
             }
         }
     }
