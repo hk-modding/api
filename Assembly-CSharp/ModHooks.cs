@@ -1084,7 +1084,7 @@ namespace Modding
                     try
                     {
                         T v = (T) toInvoke.Invoke(typeof(T), target, val);
-                        if (v.Equals(val) || gotValue)
+                        if (v == null || v.Equals(val) || gotValue)
                         {
                             continue;
                         }
@@ -1158,7 +1158,7 @@ namespace Modding
                 try
                 {
                     T v = (T) toInvoke.Invoke(typeof(T), target, varInternal);
-                    if (v.Equals(varInternal) || gotValue)
+                    if (v == null || v.Equals(varInternal) || gotValue)
                     {
                         continue;
                     }
