@@ -2,7 +2,7 @@
     <PropertyGroup>
         <RootNamespace>Modding</RootNamespace>
         <AssemblyName>Assembly-CSharp.mm</AssemblyName>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <AssemblyTitle>Hollow Knight - Mod API Enabled</AssemblyTitle>
         <Product>Modding API</Product>
         <Copyright>Copyright © 2017</Copyright>
@@ -41,11 +41,11 @@
         <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)Assembly-CSharp-patched.dll" DestinationFiles="$(TargetDir)Assembly-CSharp.dll" />
 
         <Delete Condition="Exists('MONOMODDED_Assembly-CSharp.dll')" Files="MONOMODDED_Assembly-CSharp.dll" />
-        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.exe Assembly-CSharp.dll" />
+        <Exec WorkingDirectory="@(BuildDir)" Command="MonoMod.dll Assembly-CSharp.dll" />
 
         <!-- Generate Hooks !-->
-        <Exec Condition="!Exists('$(TargetDir)MMHOOK_Assembly-CSharp.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.RuntimeDetour.HookGen.exe --private Assembly-CSharp.dll" />
-        <Exec Condition="!Exists('$(TargetDir)MMHOOK_Playmaker.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.RuntimeDetour.HookGen.exe --private PlayMaker.dll" />
+        <Exec Condition="!Exists('$(TargetDir)MMHOOK_Assembly-CSharp.dll')" WorkingDirectory="@(BuildDir)" Command="MonoMod.RuntimeDetour.HookGen.dll --private Assembly-CSharp.dll" />
+        <Exec Condition="!Exists('$(TargetDir)MMHOOK_Playmaker.dll')" WorkingDirectory="@(BuildDir)" Command="MonoMod.RuntimeDetour.HookGen.dll --private PlayMaker.dll" />
     </Target>
     
     <Target Name="Release" AfterTargets="PostBuild" Condition="'$(Configuration)' == 'Release'">
@@ -80,7 +80,7 @@
         <PackageReference Include="ILRepack" Version="2.1.0-beta1">
             <IncludeAssets>build;compile</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MonoMod" Version="21.1.11.1">
+        <PackageReference Include="MonoMod" Version="21.4.2.3">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
 
