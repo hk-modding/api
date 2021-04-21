@@ -697,7 +697,7 @@ namespace Modding
                     TypeDefinition parent = type.BaseType?.Resolve();
                     while (parent != null)
                     {
-                        if (parent.FullName == typeof(Mod).FullName)
+                        if (parent.FullName == typeof(Mod).FullName && !type.IsAbstract && type.IsClass)
                         {
                             return true;
                         }
