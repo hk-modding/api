@@ -93,6 +93,8 @@ namespace Modding
 
             // Called only once for performance
             string[] modFiles = Directory.GetFiles(path, "*.dll");
+            // Constructed only once for performance
+            List<AssemblyDefinition> asmDefs = new ();
             // List which mods have which other mods as dependencies
             List<ValueTuple<string, List<string>>> modDeps = new ();
             // List how deep into the dependency tree a mod is
@@ -103,17 +105,20 @@ namespace Modding
             foreach (string modPath in modFiles)
             {
                 // 'Register' the mods
-                using AssemblyDefinition asmDef = AssemblyDefinition.ReadAssembly(modPath);
-                modDeps.Add((asmDef.MainModule.Name.Replace(".dll", ""), new List<string>()));
+                AssemblyDefinition asmDef = AssemblyDefinition.ReadAssembly(modPath);
+                asmDefs.Add(asmDef);
+                modDeps.Add((Path.GetFileNameWithoutExtension(modPath), new List<string>()));
             }
-            foreach (string modPath in modFiles)
+
+            for (int i = 0; i < modFiles.Length; i++)
             {
                 // Put the mods' dependencies into the list
-                using AssemblyDefinition asmDef = AssemblyDefinition.ReadAssembly(modPath);
-                foreach (var item in asmDef.MainModule.AssemblyReferences)
+                foreach (var item in asmDefs[i].MainModule.AssemblyReferences)
                 {
                     if (modDeps.FirstOrDefault(x => x.Item1.Equals(item.Name)) != default)
-                        modDeps.FirstOrDefault(x => x.Item1.Equals(Path.GetFileNameWithoutExtension(modPath))).Item2.Add(item.Name);
+                    {
+                        modDeps.FirstOrDefault(x => x.Item1.Equals(Path.GetFileNameWithoutExtension(modFiles[i]))).Item2.Add(item.Name);
+                    }
                 }
             }
 
@@ -132,16 +137,15 @@ namespace Modding
                 {
                     var depths = new List<int>();
                     foreach (var item in pair.Item2)
+                    {
                         depths.Add(modDepth[item]);
+                    }
                     modDepth.Add(pair.Item1, depths.Max() + 1);
                 }
             }
-
-            foreach (string modPath in modFiles)
+            for (int i = 0; i < modFiles.Length; i++)
             {
-                using AssemblyDefinition asmDef = AssemblyDefinition.ReadAssembly(modPath);
-
-                int type = modDepth[asmDef.MainModule.Name.Replace(".dll", "")];
+                int type = modDepth[Path.GetFileNameWithoutExtension(modFiles[i])];
                 
                 if (!modTypes.TryGetValue(type, out List<string> typePaths))
                 {
@@ -149,10 +153,17 @@ namespace Modding
                     modTypes[type] = typePaths;
                 }
 
-                typePaths.Add(modPath);
+                typePaths.Add(modFiles[i]);
 
-                Logger.APILogger.Log($"{Path.GetFileNameWithoutExtension(modPath)} - {type}");
+                Logger.APILogger.Log($"{Path.GetFileNameWithoutExtension(modFiles[i])} - {type}");
             }
+
+            foreach (var asmDef in asmDefs)
+            {
+                // Cleanup asmDefs
+                asmDef.Dispose();
+            }
+            asmDefs.Clear();
 
             foreach (string modPath in modTypes.OrderBy(p => p.Key).SelectMany(p => p.Value))
             {
