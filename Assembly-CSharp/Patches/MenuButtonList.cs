@@ -26,6 +26,11 @@ namespace Modding.Patches
             }
         }
 
+        public void AddSelectableEnd(Selectable sel, int controlButtons)
+        {
+            AddSelectable(sel, entries.Length - controlButtons);
+        }
+
         public void AddSelectable(Selectable sel, int index)
         {
             if (sel == null || entries == null || index < 0 || index > entries.Length)

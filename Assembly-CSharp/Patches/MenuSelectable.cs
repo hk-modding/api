@@ -1,4 +1,4 @@
-﻿using Modding.Menu;
+﻿using System;
 using MonoMod;
 using UnityEngine.EventSystems;
 
@@ -10,22 +10,37 @@ namespace Modding.Patches
     [MonoModPatch("UnityEngine.UI.MenuSelectable")]
     public class MenuSelectable : UnityEngine.UI.MenuSelectable
     {
-        [MonoModIgnore]
-        internal CancelAction cancelAction;
+        public Action<MenuSelectable> customCancelAction { get; set; }
 
         public extern void orig_OnCancel(BaseEventData eventData);
 
         public void OnCancel(BaseEventData eventData)
         {
-            if (cancelAction == CancelAction.QuitModMenu)
+            if ((CancelAction)this.cancelAction == CancelAction.CustomCancelAction && this.customCancelAction != null)
             {
-                ForceDeselect();
-                FauxUIManager.Instance.UIquitModMenu();
-                PlayCancelSound();
+                this.ForceDeselect();
+                customCancelAction(this);
+                this.PlayCancelSound();
                 return;
             }
-
             orig_OnCancel(eventData);
+        }
+    }
+
+    public static class MenuSelectableExt
+    {
+        public static void SetDynamicMenuCancel(
+            this UnityEngine.UI.MenuSelectable ms,
+            Action preScreenSwapDelegate,
+            MenuScreen to
+        )
+        {
+            ms.cancelAction = (GlobalEnums.CancelAction)CancelAction.CustomCancelAction;
+            (ms as MenuSelectable).customCancelAction = (self) =>
+            {
+                var uim = (UIManager)global::UIManager.instance;
+                uim.StartMenuAnimationCoroutine(uim.GoToDynamicMenu(to, preScreenSwapDelegate));
+            };
         }
     }
 
@@ -46,6 +61,6 @@ namespace Modding.Patches
         ApplyVideoSettings,
         ApplyGameSettings,
         ApplyKeyboardSettings,
-        QuitModMenu
+        CustomCancelAction
     }
 }

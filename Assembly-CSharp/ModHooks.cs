@@ -4,7 +4,6 @@ using System.IO;
 using GlobalEnums;
 using HutongGames.PlayMaker;
 using JetBrains.Annotations;
-using Modding.Menu;
 using Modding.Patches;
 using MonoMod;
 using Newtonsoft.Json;
@@ -58,7 +57,6 @@ namespace Modding
 
         private ModHooks()
         {
-            ModManager _ = new ModManager();
             Logger.SetLogLevel(GlobalSettings.LoggingLevel);
             
             GameVersion gameVersion;
