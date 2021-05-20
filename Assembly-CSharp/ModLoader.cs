@@ -122,27 +122,42 @@ namespace Modding
                 }
             }
 
-            // Sort the mods by count of dependencies
-            modDeps.Sort((t1, t2) =>
+            for (int _ = 0; _ < 2; _++) // to solve below described problem
             {
-                return t1.Item2.Count - t2.Item2.Count;
-            });
-
-            foreach (var pair in modDeps)
-            {
-                // Calculate the depths of mods
-                if (pair.Item2.Count == 0)
-                    modDepth.Add(pair.Item1, 0);
-                else
+                foreach (ValueTuple<string, List<string>> pair in modDeps)
                 {
-                    var depths = new List<int>();
-                    foreach (var item in pair.Item2)
+                    // Calculate the depths of mods
+                    if (pair.Item2.Count == 0)
+                        modDepth.Add(pair.Item1, 0);
+                    else
                     {
-                        depths.Add(modDepth[item]);
+                        /*
+                         * To avoid edge cases where mod 2 only depends on mod 4, but mod 4 depends on both 1 and 3.
+                         * Example in the form of (mod, [deps]):
+                         * (1, []),
+                         * (2, [4]),
+                         * (3, [1]),
+                         * (4, [1, 3])
+                         *
+                         * Before, this would cause an error because 4 isn't in the dictionary yet.
+                         * And for the same reason the whole loop is done twice,
+                         * once to get all mods in the dictionary and once to get the real values.
+                         * This now also doesn't need the sorting before (turned out it didn't help)
+                         */
+                        List<int> depths = new ();
+                        foreach (string item in pair.Item2)
+                        {
+                            if (modDepth.ContainsKey(item))
+                                depths.Add(modDepth[item]);
+                        }
+                        if (depths.Count > 0)
+                            modDepth.Add(pair.Item1, depths.Max() + 1);
+                        else
+                            modDepth.Add(pair.Item1, 1); // it depends on something but the depth of it isn't determined yet
                     }
-                    modDepth.Add(pair.Item1, depths.Max() + 1);
                 }
             }
+
             for (int i = 0; i < modFiles.Length; i++)
             {
                 int type = modDepth[Path.GetFileNameWithoutExtension(modFiles[i])];
@@ -158,7 +173,7 @@ namespace Modding
                 Logger.APILogger.Log($"{Path.GetFileNameWithoutExtension(modFiles[i])} - {type}");
             }
 
-            foreach (var asmDef in asmDefs)
+            foreach (AssemblyDefinition asmDef in asmDefs)
             {
                 // Cleanup asmDefs
                 asmDef.Dispose();
