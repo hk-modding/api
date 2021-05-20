@@ -50,7 +50,7 @@ namespace Modding.Menu
             option.AddComponent<CanvasRenderer>();
             // RectTransform
             var optionRt = option.AddComponent<RectTransform>();
-            RectSize.FromParentRelLengths(new ParentRelLength(0f, 1f), style.height)
+            RelVector2.FromParentRelLengths(new RelLength(0f, 1f), style.height)
                 .GetBaseTransformData()
                 .Apply(optionRt);
             content.layout.ModifyNext(optionRt);
@@ -59,6 +59,7 @@ namespace Modding.Menu
             menuButton.buttonType = (MenuButton.MenuButtonType)Patch.MenuButton.MenuButtonType.CustomSubmit;
             menuButton.submitAction = config.submitAction;
             menuButton.cancelAction = (CancelAction)Patch.CancelAction.CustomCancelAction;
+            menuButton.proceed = config.proceed;
             ((Patch.MenuSelectable)(MenuSelectable)menuButton).customCancelAction = config.cancelAction;
             content.RegisterMenuItem(menuButton);
 
@@ -137,6 +138,29 @@ namespace Modding.Menu
             // Post Component Config
             menuButton.rightCursor = cursorRAnimator;
 
+            // FlashEffect object
+            var flash = new GameObject("FlashEffect");
+            GameObject.DontDestroyOnLoad(flash);
+            flash.transform.SetParent(label.transform, false);
+            // CanvasRenderer
+            flash.AddComponent<CanvasRenderer>();
+            // RectTransform
+            var flashRt = flash.AddComponent<RectTransform>();
+            flashRt.sizeDelta = new Vector2(0f, 0f);
+            flashRt.anchorMin = new Vector2(0f, 0f);
+            flashRt.anchorMax = new Vector2(1f, 1f);
+            flashRt.anchoredPosition = new Vector2(0f, 0f);
+            flashRt.pivot = new Vector2(0.5f, 0.5f);
+            // Image
+            flash.AddComponent<Image>();
+            // Animator
+            var flashAnimator = flash.AddComponent<Animator>();
+            flashAnimator.runtimeAnimatorController = MenuResources.MenuButtonFlashAnimator;
+            flashAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
+            flashAnimator.applyRootMotion = false;
+            // Post Component Config
+            menuButton.flashEffect = flashAnimator;
+
             obj = option;
             return content;
         }
@@ -158,6 +182,10 @@ namespace Modding.Menu
             /// </summary>
             public Action<Patch.MenuButton> submitAction;
             /// <summary>
+            /// Whether the button when activated proceeds to a new menu
+            /// </summary>
+            public bool proceed;
+            /// <summary>
             /// Action to happen when pressing the menu cancel key while selecting this item
             /// </summary>
             public Action<MenuSelectable> cancelAction;
@@ -177,14 +205,14 @@ namespace Modding.Menu
             /// </summary>
             public static readonly MenuButtonStyle vanillaStyle = new MenuButtonStyle
             {
-                height = new ParentRelLength(60f),
+                height = new RelLength(60f),
                 textSize = 45
             };
 
             /// <summary>
             /// The size of the menu button
             /// </summary>
-            public ParentRelLength height;
+            public RelLength height;
             /// <summary>
             /// The size of the text on the button
             /// </summary>

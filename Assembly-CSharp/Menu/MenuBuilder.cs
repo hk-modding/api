@@ -24,6 +24,10 @@ namespace Modding.Menu
         /// </summary>
         public event Action<MenuBuilder, ContentArea> BeforeAddContent;
         /// <summary>
+        /// An event that gets called before content is added in <c>AddControls</c>.
+        /// </summary>
+        public event Action<MenuBuilder, ContentArea> BeforeAddControls;
+        /// <summary>
         /// An event that gets called at the start of <c>Build</c>.
         /// </summary>
         public event Action<MenuBuilder> OnBuild;
@@ -98,7 +102,7 @@ namespace Modding.Menu
                 return this;
             }
             var ca = new ContentArea(this.screen.controls.gameObject, layout);
-            this.BeforeAddContent?.Invoke(this, ca);
+            this.BeforeAddControls?.Invoke(this, ca);
             action(ca);
             return this;
         }
@@ -111,6 +115,7 @@ namespace Modding.Menu
         {
             var itemNavList = this.menuObject.AddComponent<MenuItemNav>();
             this.BeforeAddContent += (self, c) => c.OnMenuItemAdd += itemNavList.content.Add;
+            this.BeforeAddControls += (self, c) => c.OnMenuItemAdd += itemNavList.controls.Add;
             this.OnBuild += self => itemNavList.RecalculateNavigation();
             return this;
         }
@@ -157,7 +162,7 @@ namespace Modding.Menu
             // RectTransform
             var fleurRt = fleur.AddComponent<RectTransform>();
             fleurRt.sizeDelta = new Vector2(1087f, 98f);
-            RectPosition.FromSiblingAnchor(
+            AnchoredPosition.FromSiblingAnchor(
                 new Vector2(0.5f, 0.5f),
                 titleRt,
                 new Vector2(0.5f, 0.5f),
@@ -280,9 +285,23 @@ namespace Modding.Menu
         public struct MenuTitleStyle
         {
             /// <summary>
+            /// Style preset of a standard menu title in the vanilla game
+            /// </summary>
+            public static readonly MenuTitleStyle vanillaStyle = new MenuTitleStyle
+            {
+                pos = new AnchoredPosition
+                {
+                    childAnchor = new Vector2(0.5f, 0.5f),
+                    parentAnchor = new Vector2(0.5f, 0.5f),
+                    offset = new Vector2(0f, 544f)
+                },
+                textSize = 75
+            };
+
+            /// <summary>
             /// The position of the title
             /// </summary>
-            public RectPosition pos;
+            public AnchoredPosition pos;
             /// <summary>
             /// The text size of the title
             /// </summary>

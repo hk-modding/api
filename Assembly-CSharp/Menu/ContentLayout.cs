@@ -23,11 +23,11 @@ namespace Modding.Menu
         /// <summary>
         /// The "size" of a cell in the grid
         /// </summary>
-        public Vector2 itemAdvance { get; init; }
+        public RelVector2 itemAdvance { get; init; }
         /// <summary>
         /// The starting position of the first cell
         /// </summary>
-        public RectPosition start { get; init; }
+        public AnchoredPosition start { get; init; }
         /// <summary>
         /// The maximum number of columns to allow
         /// </summary>
@@ -54,8 +54,8 @@ namespace Modding.Menu
             Vector2 start = new Vector2()
         ) => new RegularGridLayout
         {
-            itemAdvance = new Vector2(0, -itemHeight),
-            start = new RectPosition
+            itemAdvance = new RelVector2(new Vector2(0, -itemHeight)),
+            start = new AnchoredPosition
             {
                 childAnchor = new Vector2(0.5f, 1f),
                 parentAnchor = new Vector2(0.5f, 1f),
@@ -70,9 +70,7 @@ namespace Modding.Menu
         /// <param name="rt">The <c>RectTransform</c></param>
         public void ModifyNext(RectTransform rt)
         {
-            var transform = start;
-            transform.offset += itemAdvance * this.indexPos;
-            transform.Reposition(rt);
+            (start + itemAdvance * this.indexPos).Reposition(rt);
             this.index += 1;
         }
     }
@@ -82,13 +80,13 @@ namespace Modding.Menu
     /// </summary>
     public class EnumeratorLayout : ContentLayout
     {
-        private IEnumerator<RectPosition> generator;
+        private IEnumerator<AnchoredPosition> generator;
 
         /// <summary>
         /// Creates a layout from an <c>IEnumerable</c>
         /// </summary>
         /// <param name="src">The emumerable object</param>
-        public EnumeratorLayout(IEnumerable<RectPosition> src)
+        public EnumeratorLayout(IEnumerable<AnchoredPosition> src)
         {
             this.generator = src.GetEnumerator();
         }
@@ -97,7 +95,7 @@ namespace Modding.Menu
         /// Creates a layout from an <c>IEnumerator</c>
         /// </summary>
         /// <param name="generator">The enumerator</param>
-        public EnumeratorLayout(IEnumerator<RectPosition> generator)
+        public EnumeratorLayout(IEnumerator<AnchoredPosition> generator)
         {
             this.generator = generator;
         }
@@ -121,18 +119,18 @@ namespace Modding.Menu
         /// <summary>
         /// The position to place the object in
         /// </summary>
-        public RectPosition pos { get; set; }
+        public AnchoredPosition pos { get; set; }
 
         /// <summary>
         /// Creates a layout with the position anchoring the same spot on the child and parent together
         /// </summary>
-        public SingleContentLayout(Vector2 anchor) : this(new RectPosition(anchor, anchor)) { }
+        public SingleContentLayout(Vector2 anchor) : this(new AnchoredPosition(anchor, anchor)) { }
 
         /// <summary>
         /// Creates a layout from a <c>RectPosition</c>
         /// </summary>
         /// <param name="pos">The position</param>
-        public SingleContentLayout(RectPosition pos)
+        public SingleContentLayout(AnchoredPosition pos)
         {
             this.pos = pos;
         }

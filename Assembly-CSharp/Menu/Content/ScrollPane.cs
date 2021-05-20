@@ -17,7 +17,7 @@ namespace Modding.Menu
         public static ContentArea AddScrollPaneContent(
             this ContentArea content,
             ScrollbarConfig config,
-            ParentRelLength contentHeight,
+            RelLength contentHeight,
             ContentLayout layout,
             Action<ContentArea> action
         ) => content.AddScrollPaneContent(config, contentHeight, layout, action, out _, out _);
@@ -25,7 +25,7 @@ namespace Modding.Menu
         public static ContentArea AddScrollPaneContent(
             this ContentArea content,
             ScrollbarConfig config,
-            ParentRelLength contentHeight,
+            RelLength contentHeight,
             ContentLayout layout,
             Action<ContentArea> action,
             out GameObject scrollContent,
@@ -64,8 +64,8 @@ namespace Modding.Menu
             // RectTransform
             var scrollPaneRt = scrollPane.AddComponent<RectTransform>();
             RectTransformData.FromSizeAndPos(
-                new RectSize(new ParentRelLength(0f, 1f), contentHeight),
-                new RectPosition(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f))
+                new RelVector2(new RelLength(0f, 1f), contentHeight),
+                new AnchoredPosition(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f))
             ).Apply(scrollPaneRt);
             // CanvasRenderer
             scrollPane.AddComponent<CanvasRenderer>();
@@ -203,7 +203,7 @@ namespace Modding.Menu
         public struct ScrollbarConfig
         {
             public Navigation navigation;
-            public RectPosition position;
+            public AnchoredPosition position;
             public Action<MenuPreventDeselect> cancelAction;
         }
     }

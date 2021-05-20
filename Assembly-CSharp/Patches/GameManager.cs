@@ -65,6 +65,8 @@ namespace Modding.Patches
 
         #region SaveGame
 
+        internal ModSavegameData moddedData = new ModSavegameData();
+
         [MonoModIgnore]
         private GameCameras gameCams;
 
@@ -88,6 +90,23 @@ namespace Modding.Patches
 
         [MonoModIgnore]
         private extern void HideSaveIcon();
+
+        private static string ModdedSavePath(int slot) => Path.Combine(
+            Application.persistentDataPath,
+            $"user{slot}.modded.json"
+        );
+
+        private UIManager _uiInstance;
+
+        public UIManager ui
+        {
+            get
+            {
+                if (_uiInstance == null) _uiInstance = (UIManager)UIManager.instance;
+                return _uiInstance;
+            }
+            private set => _uiInstance = value;
+        }
 
         [MonoModReplace]
         public void SaveGame(int saveSlot, Action<bool> callback)
@@ -123,8 +142,34 @@ namespace Modding.Patches
                     try
                     {
                         SaveGameData obj = new SaveGameData(this.playerData, this.sceneData);
-                        
+
                         ModHooks.Instance.OnBeforeSaveGameSave(obj);
+                        ModHooks.Instance.OnSaveLocalSettings(this.moddedData);
+
+                        // save modded data
+                        try
+                        {
+                            var path = ModdedSavePath(saveSlot);
+                            string modded = JsonConvert.SerializeObject(
+                                this.moddedData,
+                                Formatting.Indented,
+                                new JsonSerializerSettings
+                                {
+                                    ContractResolver = ShouldSerializeContractResolver.Instance,
+                                    TypeNameHandling = TypeNameHandling.Auto,
+                                    Converters = JsonConverterTypes.ConverterTypes
+                                }
+                            );
+                            if (File.Exists(path + ".bak")) File.Delete(path + ".bak");
+                            if (File.Exists(path)) File.Move(path, path + ".bak");
+                            using FileStream fileStream = File.Create(path);
+                            using var writer = new StreamWriter(fileStream);
+                            writer.Write(modded);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.APILogger.LogError(e);
+                        }
 
                         string text = null;
 
@@ -140,15 +185,15 @@ namespace Modding.Patches
                         catch (Exception e)
                         {
                             Logger.LogError("Failed to serialize save using Json.NET, trying fallback.");
-                            
+
                             Logger.APILogger.LogError(e);
-                            
+
                             // If this dies, not much we can do about it.
                             text = JsonUtility.ToJson(obj);
                         }
-                        
+
                         bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
-                        
+
                         if (flag)
                         {
                             string graph = Encryption.Encrypt(text);
@@ -161,7 +206,7 @@ namespace Modding.Patches
                             (
                                 saveSlot,
                                 binary,
-                                delegate(bool didSave)
+                                delegate (bool didSave)
                                 {
                                     this.HideSaveIcon();
                                     callback(didSave);
@@ -174,7 +219,7 @@ namespace Modding.Patches
                             (
                                 saveSlot,
                                 Encoding.UTF8.GetBytes(text),
-                                delegate(bool didSave)
+                                delegate (bool didSave)
                                 {
                                     this.HideSaveIcon();
                                     if (callback != null)
@@ -223,8 +268,8 @@ namespace Modding.Patches
         public void SetupSceneRefs(bool refreshTilemapInfo)
         {
             orig_SetupSceneRefs(refreshTilemapInfo);
-            
-                        
+
+
             if (IsGameplayScene())
             {
                 GameObject go = GameCameras.instance.soulOrbFSM.gameObject.transform.Find("SoulOrb_fill").gameObject;
@@ -261,10 +306,41 @@ namespace Modding.Patches
                 return;
             }
 
+            try
+            {
+                var path = ModdedSavePath(saveSlot);
+                if (File.Exists(path))
+                {
+                    using FileStream fileStream = File.OpenRead(path);
+                    using var reader = new StreamReader(fileStream);
+                    string json = reader.ReadToEnd();
+                    this.moddedData = JsonConvert.DeserializeObject<ModSavegameData>(
+                        json,
+                        new JsonSerializerSettings()
+                        {
+                            ContractResolver = ShouldSerializeContractResolver.Instance,
+                            TypeNameHandling = TypeNameHandling.Auto,
+                            ObjectCreationHandling = ObjectCreationHandling.Replace,
+                            Converters = JsonConverterTypes.ConverterTypes
+                        }
+                    );
+                }
+                else
+                {
+                    this.moddedData = new ModSavegameData();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.APILogger.LogError(e);
+                this.moddedData = new ModSavegameData();
+            }
+            ModHooks.Instance.OnLoadLocalSettings(this.moddedData);
+
             Platform.Current.ReadSaveSlot
             (
                 saveSlot,
-                delegate(byte[] fileBytes)
+                delegate (byte[] fileBytes)
                 {
                     bool obj;
                     try
@@ -275,7 +351,7 @@ namespace Modding.Patches
                         {
                             BinaryFormatter binaryFormatter = new BinaryFormatter();
                             MemoryStream serializationStream = new MemoryStream(fileBytes);
-                            string encryptedString = (string) binaryFormatter.Deserialize(serializationStream);
+                            string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
                             json = Encryption.Decrypt(encryptedString);
                         }
                         else
@@ -284,7 +360,7 @@ namespace Modding.Patches
                         }
 
                         SaveGameData saveGameData;
-                        
+
                         try
                         {
                             saveGameData = JsonConvert.DeserializeObject<SaveGameData>(json, new JsonSerializerSettings()
@@ -297,10 +373,10 @@ namespace Modding.Patches
                         }
                         catch (Exception e)
                         {
-                             Logger.APILogger.LogError("Failed to read save using Json.NET (GameManager::LoadGame), falling back.");
-                             Logger.APILogger.LogError(e);
-                             
-                             saveGameData = JsonUtility.FromJson<SaveGameData>(json);
+                            Logger.APILogger.LogError("Failed to read save using Json.NET (GameManager::LoadGame), falling back.");
+                            Logger.APILogger.LogError(e);
+
+                            saveGameData = JsonUtility.FromJson<SaveGameData>(json);
                         }
 
                         global::PlayerData instance = saveGameData.playerData;
@@ -365,7 +441,7 @@ namespace Modding.Patches
             Platform.Current.ReadSaveSlot
             (
                 saveSlot,
-                delegate(byte[] fileBytes)
+                delegate (byte[] fileBytes)
                 {
                     if (fileBytes == null)
                     {
@@ -385,7 +461,7 @@ namespace Modding.Patches
                         {
                             BinaryFormatter binaryFormatter = new BinaryFormatter();
                             MemoryStream serializationStream = new MemoryStream(fileBytes);
-                            string encryptedString = (string) binaryFormatter.Deserialize(serializationStream);
+                            string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
                             json = Encryption.Decrypt(encryptedString);
                         }
                         else
@@ -403,15 +479,15 @@ namespace Modding.Patches
                                 ObjectCreationHandling = ObjectCreationHandling.Replace,
                                 Converters = JsonConverterTypes.ConverterTypes
                             });
-                        } 
+                        }
                         catch (Exception)
                         {
                             // Not a huge deal, this happens on saves with mod data which haven't been converted yet.
                             Logger.APILogger.LogWarn($"Failed to get save stats for slot {saveSlot} using Json.NET, falling back");
-                            
+
                             saveGameData = JsonUtility.FromJson<SaveGameData>(json);
                         }
-                        
+
                         global::PlayerData playerData = saveGameData.playerData;
                         SaveStats saveStats = new SaveStats
                         (

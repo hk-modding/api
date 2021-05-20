@@ -17,32 +17,21 @@ namespace Modding
 
         public void InitMenu()
         {
-            this.screen = new MenuBuilder(UIManager.instance.UICanvas.gameObject, "ModListMenu")
-                .CreateAutoMenuNav()
-                .CreateTitle(
-                    "Mods",
-                    new MenuTitleStyle
-                    {
-                        pos = new RectPosition
-                        {
-                            childAnchor = new Vector2(0.5f, 0.5f),
-                            parentAnchor = new Vector2(0.5f, 0.5f),
-                            offset = new Vector2(0f, 544f)
-                        },
-                        textSize = 75
-                    }
-                )
+            var builder = new MenuBuilder(UIManager.instance.UICanvas.gameObject, "ModListMenu");
+            this.screen = builder.screen;
+            builder.CreateAutoMenuNav()
+                .CreateTitle("Mods", MenuTitleStyle.vanillaStyle)
                 .CreateContentPane(RectTransformData.FromSizeAndPos(
-                    new RectSize(new Vector2(1920f, 903f)),
-                    new RectPosition(
+                    new RelVector2(new Vector2(1920f, 903f)),
+                    new AnchoredPosition(
                         new Vector2(0.5f, 0.5f),
                         new Vector2(0.5f, 0.5f),
                         new Vector2(0f, -60f)
                     )
                 ))
                 .CreateControlPane(RectTransformData.FromSizeAndPos(
-                    new RectSize(new Vector2(1920f, 259f)),
-                    new RectPosition(
+                    new RelVector2(new Vector2(1920f, 259f)),
+                    new AnchoredPosition(
                         new Vector2(0.5f, 0.5f),
                         new Vector2(0.5f, 0.5f),
                         new Vector2(0f, -502f)
@@ -55,14 +44,14 @@ namespace Modding
                         {
                             cancelAction = _ => this.ApplyChanges(),
                             navigation = new Navigation { mode = Navigation.Mode.Explicit },
-                            position = new RectPosition
+                            position = new AnchoredPosition
                             {
                                 childAnchor = new Vector2(0f, 1f),
                                 parentAnchor = new Vector2(1f, 1f),
                                 offset = new Vector2(-310f, 0f)
                             }
                         },
-                        new ParentRelLength(0f),
+                        new RelLength(0f),
                         RegularGridLayout.CreateVerticalLayout(105f),
                         c =>
                         {
@@ -98,12 +87,48 @@ namespace Modding
                                     );
                                     obj.GetComponent<MenuSetting>().RefreshValueFromGameSettings();
                                 }
+                                if (mod is IMenuMod immod)
+                                {
+                                    var menu = CreateModMenu(immod);
+                                    var rt = c.contentObject.GetComponent<RectTransform>();
+                                    rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
+                                    c.AddMenuButton(
+                                        $"{immod.GetName()}_Settings",
+                                        new MenuButtonConfig
+                                        {
+                                            style = MenuButtonStyle.vanillaStyle,
+                                            cancelAction = _ => this.ApplyChanges(),
+                                            label = $"{immod.GetName()} Settings",
+                                            submitAction = _ => ((Patch.UIManager)UIManager.instance)
+                                                .UIGoToDynamicMenu(menu),
+                                            proceed = true
+                                        }
+                                    );
+                                }
+                                else if (mod is ICustomMenuMod icmmod)
+                                {
+                                    var menu = icmmod.GetMenuScreen(this.screen);
+                                    var rt = c.contentObject.GetComponent<RectTransform>();
+                                    rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
+                                    c.AddMenuButton(
+                                        $"{icmmod.GetName()}_Settings",
+                                        new MenuButtonConfig
+                                        {
+                                            style = MenuButtonStyle.vanillaStyle,
+                                            cancelAction = _ => this.ApplyChanges(),
+                                            label = $"{icmmod.GetName()} Settings",
+                                            submitAction = _ => ((Patch.UIManager)UIManager.instance)
+                                                .UIGoToDynamicMenu(menu),
+                                            proceed = true
+                                        }
+                                    );
+                                }
                             }
                         }
                     )
                 )
                 .AddControls(
-                    new SingleContentLayout(new RectPosition(
+                    new SingleContentLayout(new AnchoredPosition(
                         new Vector2(0.5f, 0.5f),
                         new Vector2(0.5f, 0.5f),
                         new Vector2(0f, -64f)
@@ -115,6 +140,7 @@ namespace Modding
                             label = "Back",
                             cancelAction = _ => this.ApplyChanges(),
                             submitAction = _ => this.ApplyChanges(),
+                            proceed = true,
                             style = MenuButtonStyle.vanillaStyle
                         }
                     )
@@ -132,7 +158,8 @@ namespace Modding
                         {
                             cancelAction = self => UIManager.instance.UIGoToMainMenu(),
                             label = "Mods",
-                            submitAction = self => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen),
+                            submitAction = GoToModListMenu,
+                            proceed = true,
                             style = MenuButtonStyle.vanillaStyle
                         },
                         out modButton
@@ -166,6 +193,110 @@ namespace Modding
                 UIManager.instance.optionsMenuScreen,
                 Patch.MainMenuState.OPTIONS_MENU
             );
+        }
+
+        private MenuScreen CreateModMenu(IMenuMod mod)
+        {
+            var name = mod.GetName();
+            var entries = mod.GetMenuData();
+            GameObject backButton = null;
+            var builder = new MenuBuilder(UIManager.instance.UICanvas.gameObject, name)
+                .CreateTitle(name, MenuTitleStyle.vanillaStyle)
+                .CreateContentPane(RectTransformData.FromSizeAndPos(
+                    new RelVector2(new Vector2(1920f, 903f)),
+                    new AnchoredPosition(
+                        new Vector2(0.5f, 0.5f),
+                        new Vector2(0.5f, 0.5f),
+                        new Vector2(0f, -60f)
+                    )
+                ))
+                .CreateControlPane(RectTransformData.FromSizeAndPos(
+                    new RelVector2(new Vector2(1920f, 259f)),
+                    new AnchoredPosition(
+                        new Vector2(0.5f, 0.5f),
+                        new Vector2(0.5f, 0.5f),
+                        new Vector2(0f, -502f)
+                    )
+                ))
+                .CreateAutoMenuNav()
+                .AddControls(
+                    new SingleContentLayout(new AnchoredPosition(
+                        new Vector2(0.5f, 0.5f),
+                        new Vector2(0.5f, 0.5f),
+                        new Vector2(0f, -64f)
+                    )),
+                    c => c.AddMenuButton(
+                        "BackButton",
+                        new MenuButtonConfig
+                        {
+                            label = "Back",
+                            cancelAction = GoToModListMenu,
+                            submitAction = GoToModListMenu,
+                            proceed = true,
+                            style = MenuButtonStyle.vanillaStyle
+                        },
+                        out backButton
+                    )
+                );
+            if (entries.Count > 5)
+            {
+                builder.AddContent(null, c => c.AddScrollPaneContent(
+                    new ScrollbarConfig
+                    {
+                        cancelAction = _ => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen),
+                        navigation = new Navigation
+                        {
+                            mode = Navigation.Mode.Explicit,
+                            selectOnUp = backButton.GetComponent<MenuButton>(),
+                            selectOnDown = backButton.GetComponent<MenuButton>()
+                        },
+                        position = new AnchoredPosition
+                        {
+                            childAnchor = new Vector2(0f, 1f),
+                            parentAnchor = new Vector2(1f, 1f),
+                            offset = new Vector2(-310f, 0f)
+                        }
+                    },
+                    new RelLength(entries.Count * 105f),
+                    RegularGridLayout.CreateVerticalLayout(105f),
+                    c => AddModMenuContent(entries, c)
+                ));
+            }
+            else
+            {
+                builder.AddContent(
+                    RegularGridLayout.CreateVerticalLayout(105f),
+                    c => AddModMenuContent(entries, c)
+                );
+            }
+            return builder.Build();
+        }
+
+        private void GoToModListMenu(object _) => GoToModListMenu();
+        private void GoToModListMenu() => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen);
+
+        private void AddModMenuContent(List<IMenuMod.MenuEntry> entries, ContentArea c)
+        {
+            foreach (var entry in entries)
+            {
+                c.AddHorizontalOption(
+                    entry.name,
+                    new HorizontalOptionConfig
+                    {
+                        applySetting = (_, i) => entry.saver(i),
+                        refreshSetting = (s, _) => s.optionList.SetOptionTo(entry.loader()),
+                        cancelAction = GoToModListMenu,
+                        description = string.IsNullOrEmpty(entry.description) ? null : new DescriptionInfo
+                        {
+                            text = entry.description,
+                            style = DescriptionStyle.singleLineVanillaStyle
+                        },
+                        label = entry.name,
+                        options = entry.values,
+                        style = HorizontalOptionStyle.vanillaStyle
+                    }
+                );
+            }
         }
     }
 }

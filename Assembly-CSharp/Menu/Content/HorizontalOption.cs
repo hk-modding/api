@@ -180,8 +180,8 @@ namespace Modding.Menu
                 // RectTransform
                 var rt = description.AddComponent<RectTransform>();
                 RectTransformData.FromSizeAndPos(
-                    new RectSize(new ParentRelLength(0, 1), descStyle.height),
-                    new RectPosition(new Vector2(0, 1), new Vector2(0, 0), new Vector2(60, 0))
+                    new RelVector2(new RelLength(0, 1), descStyle.height),
+                    new AnchoredPosition(new Vector2(0, 0), new Vector2(0, 1), new Vector2(60, 0))
                 ).Apply(rt);
                 // Animator
                 var anim = description.AddComponent<Animator>();
@@ -251,10 +251,10 @@ namespace Modding.Menu
             /// </summary>
             public static readonly HorizontalOptionStyle vanillaStyle = new HorizontalOptionStyle
             {
-                size = new RectSize
+                size = new RelVector2
                 {
-                    parentRelSize = new Vector2(),
-                    sizeDelta = new Vector2(1000f, 60f)
+                    relative = new Vector2(),
+                    delta = new Vector2(1000f, 60f)
                 },
                 labelTextSize = 46,
                 valueTextSize = 46
@@ -263,7 +263,7 @@ namespace Modding.Menu
             /// <summary>
             /// The size of the main option
             /// </summary>
-            public RectSize size;
+            public RelVector2 size;
             /// <summary>
             /// The size of the text on the option label
             /// </summary>
@@ -300,7 +300,7 @@ namespace Modding.Menu
             public static readonly DescriptionStyle singleLineVanillaStyle = new DescriptionStyle
             {
                 textSize = 38,
-                height = new ParentRelLength(40),
+                height = new RelLength(40),
             };
             /// <summary>
             /// The size fo the text on the description
@@ -309,7 +309,7 @@ namespace Modding.Menu
             /// <summary>
             /// The height of the description text
             /// </summary>
-            public ParentRelLength height;
+            public RelLength height;
         }
     }
 }

@@ -17,6 +17,7 @@ namespace Modding.Menu
 
         public static RuntimeAnimatorController MenuTopFleurAnimator { get; private set; }
         public static RuntimeAnimatorController MenuCursorAnimator { get; private set; }
+        public static RuntimeAnimatorController MenuButtonFlashAnimator { get; private set; }
         public static AnimatorOverrideController TextHideShowAnimator { get; private set; }
 
         public static Sprite ScrollbarHandleSprite { get; private set; }
@@ -44,6 +45,9 @@ namespace Modding.Menu
                             break;
                         case "Menu Fleur":
                             MenuCursorAnimator = animator;
+                            break;
+                        case "Menu Flash Effect":
+                            MenuButtonFlashAnimator = animator;
                             break;
                     }
             }
