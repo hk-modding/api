@@ -122,8 +122,10 @@ namespace Modding
                 }
             }
 
-            for (int _ = 0; _ < 2; _++) // to solve below described problem
+            bool fillErr = true;
+            while (fillErr) // to solve below described problem
             {
+                fillErr = false;
                 foreach (ValueTuple<string, List<string>> pair in modDeps)
                 {
                     // Calculate the depths of mods
@@ -140,8 +142,8 @@ namespace Modding
                          * (4, [1, 3])
                          *
                          * Before, this would cause an error because 4 isn't in the dictionary yet.
-                         * And for the same reason the whole loop is done twice,
-                         * once to get all mods in the dictionary and once to get the real values.
+                         * And for the same reason the whole loop is done as many times as the dictionary couldn't be completed,
+                         * to get all mods in the dictionary and to get the real values.
                          * This now also doesn't need the sorting before (turned out it didn't help)
                          */
                         List<int> depths = new ();
@@ -149,11 +151,11 @@ namespace Modding
                         {
                             if (modDepth.ContainsKey(item))
                                 depths.Add(modDepth[item]);
+                            else
+                                fillErr = true;
                         }
                         if (depths.Count > 0)
                             modDepth.Add(pair.Item1, depths.Max() + 1);
-                        else
-                            modDepth.Add(pair.Item1, 1); // it depends on something but the depth of it isn't determined yet
                     }
                 }
             }
