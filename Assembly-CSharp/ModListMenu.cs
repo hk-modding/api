@@ -38,7 +38,7 @@ namespace Modding
                     )
                 ))
                 .AddContent(
-                    null,
+                    new NullContentLayout(),
                     c => c.AddScrollPaneContent(
                         new ScrollbarConfig
                         {
@@ -240,7 +240,7 @@ namespace Modding
                 );
             if (entries.Count > 5)
             {
-                builder.AddContent(null, c => c.AddScrollPaneContent(
+                builder.AddContent(new NullContentLayout(), c => c.AddScrollPaneContent(
                     new ScrollbarConfig
                     {
                         cancelAction = _ => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen),

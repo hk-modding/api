@@ -16,6 +16,15 @@ namespace Modding.Menu
     }
 
     /// <summary>
+    /// A layout that does absolutely nothing
+    /// </summary>
+    public struct NullContentLayout : ContentLayout
+    {
+        /// <inheritdoc/>
+        public void ModifyNext(RectTransform rt) { }
+    }
+
+    /// <summary>
     /// A layout to place items in a grid pattern
     /// </summary>
     public class RegularGridLayout : ContentLayout
@@ -23,15 +32,15 @@ namespace Modding.Menu
         /// <summary>
         /// The "size" of a cell in the grid
         /// </summary>
-        public RelVector2 itemAdvance { get; init; }
+        public RelVector2 itemAdvance { get; set; }
         /// <summary>
         /// The starting position of the first cell
         /// </summary>
-        public AnchoredPosition start { get; init; }
+        public AnchoredPosition start { get; set; }
         /// <summary>
         /// The maximum number of columns to allow
         /// </summary>
-        public int columns { get; init; }
+        public int columns { get; set; }
 
         /// <summary>
         /// The "index" of the next item to be placed
@@ -72,6 +81,36 @@ namespace Modding.Menu
         {
             (start + itemAdvance * this.indexPos).Reposition(rt);
             this.index += 1;
+        }
+
+        /// <summary>
+        /// Changes the column width of the layout, continuing where the layout left off.<br/>
+        /// This method should generally only be called at the end of a row,
+        /// because otherwise it may cause an overlap of the currently placed menu items
+        /// and the new menu items in the same row.<br/>
+        /// Internally this method resets the actual index count so a copy of index should be saved before calling
+        /// this method if needed.
+        /// </summary>
+        /// <param name="columns">The new number of columns.</param>
+        /// <param name="originalAnchor">The normalized anchor on the original "width" to place the new grid.</param>
+        /// <param name="newSize">The new size of the grid element, or null to not change</param>
+        /// <param name="newAnchor">The normalized anchor on the new "width" to place the anchor.</param>
+        public void ChangeColumns(
+            int columns,
+            float originalAnchor = 0.5f,
+            RelVector2? newSize = null,
+            float newAnchor = 0.5f
+        )
+        {
+            var size = newSize ?? this.itemAdvance;
+            var height = this.itemAdvance.y * this.indexPos.y;
+            var widthAdjust = this.itemAdvance.x * this.columns * originalAnchor - size.x * columns * newAnchor;
+            // figure out the width from the first item to the (newAnchor) of the new grid
+            var adjust = this.start.childAnchor.x * size.x + widthAdjust;
+            this.index = 0;
+            this.columns = columns;
+            this.start = this.start + new RelVector2(adjust, height);
+            this.itemAdvance = size;
         }
     }
 
