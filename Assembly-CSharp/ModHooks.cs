@@ -34,29 +34,29 @@ namespace Modding
         /// <summary>
         ///     Currently Loaded Mods
         /// </summary>
-        public readonly List<string> LoadedMods = new();
+        public static readonly List<string> LoadedMods = new();
 
         /// <summary>
         ///     Dictionary of mods and their version #s
         /// </summary>
-        public readonly Dictionary<string, string> LoadedModsWithVersions = new ();
+        public static readonly Dictionary<string, string> LoadedModsWithVersions = new ();
 
-        private Console _console;
+        private static Console _console;
 
-        private ModHooksGlobalSettings _globalSettings;
+        private static ModHooksGlobalSettings _globalSettings;
 
         /// <summary>
         ///     The Version of the Modding API
         /// </summary>
-        public string ModVersion;
+        public static string ModVersion;
 
         /// <summary>
         ///     Version of the Game
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public GameVersionData version;
+        public static GameVersionData version;
 
-        private ModHooks()
+        static ModHooks()
         {
             ModManager _ = new ModManager();
             Logger.SetLogLevel(GlobalSettings.LoggingLevel);
@@ -98,7 +98,7 @@ namespace Modding
             IsInitialized = true;
         }
 
-        internal ModHooksGlobalSettings GlobalSettings
+        internal static ModHooksGlobalSettings GlobalSettings
         {
             get
             {
@@ -132,7 +132,7 @@ namespace Modding
             }
         }
 
-        internal void LogConsole(string message)
+        internal static void LogConsole(string message)
         {
             try
             {
@@ -160,13 +160,13 @@ namespace Modding
         ///     Called whenever localization specific strings are requested
         /// </summary>
         /// <remarks>N/A</remarks>
-        public event LanguageGetHandler LanguageGetHook;
+        public static event LanguageGetHandler LanguageGetHook;
 
         /// <summary>
         ///     Called whenever localization specific strings are requested
         /// </summary>
         /// <remarks>N/A</remarks>
-        internal string LanguageGet(string key, string sheet)
+        internal static string LanguageGet(string key, string sheet)
         {
             string @internal = Patches.Language.GetInternal(key, sheet);
             string result = @internal;
@@ -204,12 +204,12 @@ namespace Modding
         /// <summary>
         ///     Called whenever game tries to show cursor
         /// </summary>
-        public event Action CursorHook;
+        public static event Action CursorHook;
 
         /// <summary>
         ///     Called whenever game tries to show cursor
         /// </summary>
-        internal void OnCursor()
+        internal static void OnCursor()
         {
             Cursor.lockState = CursorLockMode.None;
 
@@ -233,13 +233,13 @@ namespace Modding
         ///     Called whenever a new gameobject is created with a collider and playmaker2d
         /// </summary>
         /// <remarks>PlayMakerUnity2DProxy.Start</remarks>
-        public event Action<GameObject> ColliderCreateHook;
+        public static event Action<GameObject> ColliderCreateHook;
 
         /// <summary>
         ///     Called whenever a new gameobject is created with a collider and playmaker2d
         /// </summary>
         /// <remarks>PlayMakerUnity2DProxy.Start</remarks>
-        internal void OnColliderCreate(GameObject go)
+        internal static void OnColliderCreate(GameObject go)
         {
             Logger.APILogger.LogFine("OnColliderCreate Invoked");
 
@@ -267,12 +267,12 @@ namespace Modding
         /// <summary>
         ///     Called whenever game tries to create a new gameobject.  This happens often, care should be taken.
         /// </summary>
-        public event Func<GameObject, GameObject> ObjectPoolSpawnHook;
+        public static event Func<GameObject, GameObject> ObjectPoolSpawnHook;
 
         /// <summary>
         ///     Called whenever game tries to show cursor
         /// </summary>
-        internal GameObject OnObjectPoolSpawn(GameObject go)
+        internal static GameObject OnObjectPoolSpawn(GameObject go)
         {
             // No log because it's too spammy
 
@@ -302,13 +302,13 @@ namespace Modding
         ///     Called when the game is fully closed
         /// </summary>
         /// <remarks>GameManager.OnApplicationQuit</remarks>
-        public event Action ApplicationQuitHook;
+        public static event Action ApplicationQuitHook;
 
         /// <summary>
         ///     Called when the game is fully closed
         /// </summary>
         /// <remarks>GameManager.OnApplicationQuit</remarks>
-        internal void OnApplicationQuit()
+        internal static void OnApplicationQuit()
         {
             Logger.APILogger.LogFine("OnApplicationQuit Invoked");
 
@@ -335,7 +335,7 @@ namespace Modding
         /// <summary>
         ///     Save GlobalSettings to disk. (backs up the current global settings if it exists)
         /// </summary>
-        internal void SaveGlobalSettings()
+        internal static void SaveGlobalSettings()
         {
             Logger.APILogger.Log("Saving Global Settings");
             
@@ -379,7 +379,7 @@ namespace Modding
         /// <summary>
         ///     Loads global settings from disk (if they exist)
         /// </summary>
-        internal void LoadGlobalSettings()
+        internal static void LoadGlobalSettings()
         {
             Logger.APILogger.Log("Loading ModdingApi Global Settings.");
 
@@ -440,13 +440,13 @@ namespace Modding
             }
         }
 
-        public event HitInstanceHandler HitInstanceHook;
+        public static event HitInstanceHandler HitInstanceHook;
 
         /// <summary>
         ///     Called whenever a HitInstance is created. Overrides normal functionality
         /// </summary>
         /// <remarks>HutongGames.PlayMaker.Actions.TakeDamage</remarks>
-        internal HitInstance OnHitInstanceBeforeHit(Fsm owner, HitInstance hit)
+        internal static HitInstance OnHitInstanceBeforeHit(Fsm owner, HitInstance hit)
         {
             Logger.APILogger.LogFine("OnHitInstance Invoked");
 
@@ -477,9 +477,9 @@ namespace Modding
         ///     bounds of an area of the scene with these.
         /// </summary>
         /// <remarks>SceneManager.DrawBlackBorders</remarks>
-        public event Action<List<GameObject>> DrawBlackBordersHook;
+        public static event Action<List<GameObject>> DrawBlackBordersHook;
 
-        internal void OnDrawBlackBorders(List<GameObject> borders)
+        internal static void OnDrawBlackBorders(List<GameObject> borders)
         {
             Logger.APILogger.LogFine("OnDrawBlackBorders Invoked");
 
@@ -508,9 +508,9 @@ namespace Modding
         ///     will mark the enemy as already dead on load. Default behavior is to return the value inside "isAlreadyDead".
         /// </summary>
         /// <remarks>HealthManager.CheckPersistence</remarks>
-        public event OnEnableEnemyHandler OnEnableEnemyHook;
+        public static event OnEnableEnemyHandler OnEnableEnemyHook;
 
-        internal bool OnEnableEnemy(GameObject enemy, bool isAlreadyDead)
+        internal static bool OnEnableEnemy(GameObject enemy, bool isAlreadyDead)
         {
             Logger.APILogger.LogFine("OnEnableEnemy Invoked");
 
@@ -541,9 +541,9 @@ namespace Modding
         ///     check "eventAlreadyRecieved" to see if the event has been fired more than once.
         /// </summary>
         /// <remarks>EnemyDeathEffects.RecieveDeathEvent</remarks>
-        public event OnReceiveDeathEventHandler OnReceiveDeathEventHook;
+        public static event OnReceiveDeathEventHandler OnReceiveDeathEventHook;
 
-        internal void OnRecieveDeathEvent
+        internal static void OnRecieveDeathEvent
         (
             EnemyDeathEffects enemyDeathEffects,
             bool eventAlreadyRecieved,
@@ -585,9 +585,9 @@ namespace Modding
         ///     additional pre-formatted player data strings to look up values in playerData.
         /// </summary>
         /// <remarks>EnemyDeathEffects.OnRecordKillForJournal</remarks>
-        public event RecordKillForJournalHandler RecordKillForJournalHook;
+        public static event RecordKillForJournalHandler RecordKillForJournalHook;
 
-        internal void OnRecordKillForJournal
+        internal static void OnRecordKillForJournal
         (
             EnemyDeathEffects enemyDeathEffects,
             string playerDataName,
@@ -630,14 +630,14 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.SetBool</remarks>
         /// <see cref="SetBoolProxy" />
-        public event SetBoolProxy SetPlayerBoolHook;
+        public static event SetBoolProxy SetPlayerBoolHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetBool
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="val">Value to set</param>
-        internal void SetPlayerBool(string target, bool val)
+        internal static void SetPlayerBool(string target, bool val)
         {
             if (SetPlayerBoolHook != null)
             {
@@ -666,13 +666,13 @@ namespace Modding
         ///     Called when anything in the game tries to get a bool from player data
         /// </summary>
         /// <remarks>PlayerData.GetBool</remarks>
-        public event GetBoolProxy GetPlayerBoolHook;
+        public static event GetBoolProxy GetPlayerBoolHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetBool
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal bool GetPlayerBool(string target)
+        internal static bool GetPlayerBool(string target)
         {
             bool boolInternal = Patches.PlayerData.instance.GetBoolInternal(target);
             bool result = boolInternal;
@@ -711,14 +711,14 @@ namespace Modding
         ///     Called when anything in the game tries to set an int in player data
         /// </summary>
         /// <remarks>PlayerData.SetInt</remarks>
-        public event SetIntProxy SetPlayerIntHook;
+        public static event SetIntProxy SetPlayerIntHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetInt
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="val">Value to set</param>
-        internal void SetPlayerInt(string target, int val)
+        internal static void SetPlayerInt(string target, int val)
         {
             if (SetPlayerIntHook != null)
             {
@@ -746,13 +746,13 @@ namespace Modding
         ///     Called when anything in the game tries to get an int from player data
         /// </summary>
         /// <remarks>PlayerData.GetInt</remarks>
-        public event GetIntProxy GetPlayerIntHook;
+        public static event GetIntProxy GetPlayerIntHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetInt
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal int GetPlayerInt(string target)
+        internal static int GetPlayerInt(string target)
         {
             int intInternal = Patches.PlayerData.instance.GetIntInternal(target);
             int result = intInternal;
@@ -791,14 +791,14 @@ namespace Modding
         ///     Called when anything in the game tries to set a float in player data
         /// </summary>
         /// <remarks>PlayerData.SetFloat</remarks>
-        public event SetFloatProxy SetPlayerFloatHook;
+        public static event SetFloatProxy SetPlayerFloatHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetFloat
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="val">Value to set</param>
-        internal void SetPlayerFloat(string target, float val)
+        internal static void SetPlayerFloat(string target, float val)
         {
             if (SetPlayerFloatHook != null)
             {
@@ -826,13 +826,13 @@ namespace Modding
         ///     Called when anything in the game tries to get a float from player data
         /// </summary>
         /// <remarks>PlayerData.GetFloat</remarks>
-        public event GetFloatProxy GetPlayerFloatHook;
+        public static event GetFloatProxy GetPlayerFloatHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetFloat
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal float GetPlayerFloat(string target)
+        internal static float GetPlayerFloat(string target)
         {
             float floatInternal = Patches.PlayerData.instance.GetFloatInternal(target);
             float result = floatInternal;
@@ -873,14 +873,14 @@ namespace Modding
         ///     Called when anything in the game tries to set a string in player data
         /// </summary>
         /// <remarks>PlayerData.SetString</remarks>
-        public event SetStringProxy SetPlayerStringHook;
+        public static event SetStringProxy SetPlayerStringHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetString
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="val">Value to set</param>
-        internal void SetPlayerString(string target, string val)
+        internal static void SetPlayerString(string target, string val)
         {
             if (SetPlayerStringHook != null)
             {
@@ -908,13 +908,13 @@ namespace Modding
         ///     Called when anything in the game tries to get a string from player data
         /// </summary>
         /// <remarks>PlayerData.GetString</remarks>
-        public event GetStringProxy GetPlayerStringHook;
+        public static event GetStringProxy GetPlayerStringHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetString
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal string GetPlayerString(string target)
+        internal static string GetPlayerString(string target)
         {
             string stringInternal = Patches.PlayerData.instance.GetStringInternal(target);
             string result = stringInternal;
@@ -952,14 +952,14 @@ namespace Modding
         ///     Called when anything in the game tries to set a Vector3 in player data
         /// </summary>
         /// <remarks>PlayerData.SetVector3</remarks>
-        public event SetVector3Proxy SetPlayerVector3Hook;
+        public static event SetVector3Proxy SetPlayerVector3Hook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetVector3
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="val">Value to set</param>
-        internal void SetPlayerVector3(string target, Vector3 val)
+        internal static void SetPlayerVector3(string target, Vector3 val)
         {
             if (SetPlayerVector3Hook != null)
             {
@@ -987,13 +987,13 @@ namespace Modding
         ///     Called when anything in the game tries to get a Vector3 from player data
         /// </summary>
         /// <remarks>PlayerData.GetVector3</remarks>
-        public event GetVector3Proxy GetPlayerVector3Hook;
+        public static event GetVector3Proxy GetPlayerVector3Hook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetVector3
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal Vector3 GetPlayerVector3(string target)
+        internal static Vector3 GetPlayerVector3(string target)
         {
             Vector3 vecInternal = Patches.PlayerData.instance.GetVector3Internal(target);
             Vector3 result = vecInternal;
@@ -1033,14 +1033,14 @@ namespace Modding
         ///     Called when anything in the game tries to set a generic variable in player data
         /// </summary>
         /// <remarks>PlayerData.SetVariable</remarks>
-        public event SetVariableProxy SetPlayerVariableHook;
+        public static event SetVariableProxy SetPlayerVariableHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.SetVariable
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="val">Value to set</param>
-        internal void SetPlayerVariable<T>(string target, T val)
+        internal static void SetPlayerVariable<T>(string target, T val)
         {
             Type t = typeof(T);
 
@@ -1107,13 +1107,13 @@ namespace Modding
         /// </summary>
         /// <remarks>PlayerData.GetVariable</remarks>
         [PublicAPI]
-        public event GetVariableProxy GetPlayerVariableHook;
+        public static event GetVariableProxy GetPlayerVariableHook;
 
         /// <summary>
         ///     Called by the game in PlayerData.GetVariable
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal T GetPlayerVariable<T>(string target)
+        internal static T GetPlayerVariable<T>(string target)
         {
             Type t = typeof(T);
 
@@ -1178,12 +1178,12 @@ namespace Modding
         /// <summary>
         ///     Called whenever blue health is updated
         /// </summary>
-        public event Func<int> BlueHealthHook;
+        public static event Func<int> BlueHealthHook;
 
         /// <summary>
         ///     Called whenever blue health is updated
         /// </summary>
-        internal int OnBlueHealth()
+        internal static int OnBlueHealth()
         {
             Logger.APILogger.LogFine("OnBlueHealth Invoked");
 
@@ -1215,13 +1215,13 @@ namespace Modding
         ///     Called when health is taken from the player
         /// </summary>
         /// <remarks>HeroController.TakeHealth</remarks>
-        public event TakeHealthProxy TakeHealthHook;
+        public static event TakeHealthProxy TakeHealthHook;
 
         /// <summary>
         ///     Called when health is taken from the player
         /// </summary>
         /// <remarks>HeroController.TakeHealth</remarks>
-        internal int OnTakeHealth(int damage)
+        internal static int OnTakeHealth(int damage)
         {
             Logger.APILogger.LogFine("OnTakeHealth Invoked");
 
@@ -1251,13 +1251,13 @@ namespace Modding
         ///     Called when damage is dealt to the player
         /// </summary>
         /// <remarks>HeroController.TakeDamage</remarks>
-        public event TakeDamageProxy TakeDamageHook;
+        public static event TakeDamageProxy TakeDamageHook;
 
         /// <summary>
         ///     Called when damage is dealt to the player
         /// </summary>
         /// <remarks>HeroController.TakeDamage</remarks>
-        internal int OnTakeDamage(ref int hazardType, int damage)
+        internal static int OnTakeDamage(ref int hazardType, int damage)
         {
             Logger.APILogger.LogFine("OnTakeDamage Invoked");
 
@@ -1286,12 +1286,12 @@ namespace Modding
         /// <summary>
         ///     Called at the end of the take damage function
         /// </summary>
-        public event AfterTakeDamageHandler AfterTakeDamageHook;
+        public static event AfterTakeDamageHandler AfterTakeDamageHook;
 
         /// <summary>
         ///     Called at the end of the take damage function
         /// </summary>
-        internal int AfterTakeDamage(int hazardType, int damageAmount)
+        internal static int AfterTakeDamage(int hazardType, int damageAmount)
         {
             Logger.APILogger.LogFine("AfterTakeDamage Invoked");
 
@@ -1321,13 +1321,13 @@ namespace Modding
         ///     Called when the player dies
         /// </summary>
         /// <remarks>GameManager.PlayerDead</remarks>
-        public event Action BeforePlayerDeadHook;
+        public static event Action BeforePlayerDeadHook;
 
         /// <summary>
         ///     Called when the player dies (at the beginning of the method)
         /// </summary>
         /// <remarks>GameManager.PlayerDead</remarks>
-        internal void OnBeforePlayerDead()
+        internal static void OnBeforePlayerDead()
         {
             Logger.APILogger.LogFine("OnBeforePlayerDead Invoked");
 
@@ -1355,13 +1355,13 @@ namespace Modding
         ///     Called after the player dies
         /// </summary>
         /// <remarks>GameManager.PlayerDead</remarks>
-        public event Action AfterPlayerDeadHook;
+        public static event Action AfterPlayerDeadHook;
 
         /// <summary>
         ///     Called after the player dies (at the end of the method)
         /// </summary>
         /// <remarks>GameManager.PlayerDead</remarks>
-        internal void OnAfterPlayerDead()
+        internal static void OnAfterPlayerDead()
         {
             Logger.APILogger.LogFine("OnAfterPlayerDead Invoked");
 
@@ -1389,13 +1389,13 @@ namespace Modding
         ///     Called whenever the player attacks
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
-        public event Action<AttackDirection> AttackHook;
+        public static event Action<AttackDirection> AttackHook;
 
         /// <summary>
         ///     Called whenever the player attacks
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
-        internal void OnAttack(AttackDirection dir)
+        internal static void OnAttack(AttackDirection dir)
         {
             Logger.APILogger.LogFine("OnAttack Invoked");
 
@@ -1422,12 +1422,12 @@ namespace Modding
         /// <summary>
         ///     Called at the start of the DoAttack function
         /// </summary>
-        public event Action DoAttackHook;
+        public static event Action DoAttackHook;
 
         /// <summary>
         ///     Called at the start of the DoAttack function
         /// </summary>
-        internal void OnDoAttack()
+        internal static void OnDoAttack()
         {
             Logger.APILogger.LogFine("OnDoAttack Invoked");
 
@@ -1457,13 +1457,13 @@ namespace Modding
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
         [MonoModPublic]
-        public event Action<AttackDirection> AfterAttackHook;
+        public static event Action<AttackDirection> AfterAttackHook;
 
         /// <summary>
         ///     Called at the end of the attack function
         /// </summary>
         /// <remarks>HeroController.Attack</remarks>
-        internal void AfterAttack(AttackDirection dir)
+        internal static void AfterAttack(AttackDirection dir)
         {
             Logger.APILogger.LogFine("AfterAttack Invoked");
 
@@ -1490,12 +1490,12 @@ namespace Modding
         /// <summary>
         ///     Called whenever nail strikes something
         /// </summary>
-        public event SlashHitHandler SlashHitHook;
+        public static event SlashHitHandler SlashHitHook;
 
         /// <summary>
         ///     Called whenever nail strikes something
         /// </summary>
-        internal void OnSlashHit(Collider2D otherCollider, GameObject gameObject)
+        internal static void OnSlashHit(Collider2D otherCollider, GameObject gameObject)
         {
             Logger.APILogger.LogFine("OnSlashHit Invoked");
 
@@ -1528,13 +1528,13 @@ namespace Modding
         ///     Called after player values for charms have been set
         /// </summary>
         /// <remarks>HeroController.CharmUpdate</remarks>
-        public event CharmUpdateHandler CharmUpdateHook;
+        public static event CharmUpdateHandler CharmUpdateHook;
 
         /// <summary>
         ///     Called after player values for charms have been set
         /// </summary>
         /// <remarks>HeroController.CharmUpdate</remarks>
-        internal void OnCharmUpdate()
+        internal static void OnCharmUpdate()
         {
             Logger.APILogger.LogFine("OnCharmUpdate Invoked");
 
@@ -1562,13 +1562,13 @@ namespace Modding
         ///     Called whenever the hero updates
         /// </summary>
         /// <remarks>HeroController.Update</remarks>
-        public event Action HeroUpdateHook;
+        public static event Action HeroUpdateHook;
 
         /// <summary>
         ///     Called whenever the hero updates
         /// </summary>
         /// <remarks>HeroController.Update</remarks>
-        internal void OnHeroUpdate()
+        internal static void OnHeroUpdate()
         {
             //Logger.APILogger.LogFine("OnHeroUpdate Invoked");
 
@@ -1596,13 +1596,13 @@ namespace Modding
         ///     Called whenever the player heals
         /// </summary>
         /// <remarks>PlayerData.health</remarks>
-        public event Func<int, int> BeforeAddHealthHook;
+        public static event Func<int, int> BeforeAddHealthHook;
 
         /// <summary>
         ///     Called whenever the player heals
         /// </summary>
         /// <remarks>PlayerData.health</remarks>
-        internal int BeforeAddHealth(int amount)
+        internal static int BeforeAddHealth(int amount)
         {
             Logger.APILogger.LogFine("BeforeAddHealth Invoked");
 
@@ -1631,12 +1631,12 @@ namespace Modding
         /// <summary>
         ///     Called whenever focus cost is calculated
         /// </summary>
-        public event Func<float> FocusCostHook;
+        public static event Func<float> FocusCostHook;
 
         /// <summary>
         ///     Called whenever focus cost is calculated
         /// </summary>
-        internal float OnFocusCost()
+        internal static float OnFocusCost()
         {
             Logger.APILogger.LogFine("OnFocusCost Invoked");
 
@@ -1668,12 +1668,12 @@ namespace Modding
         ///     Called when Hero recovers Soul from hitting enemies
         ///     <returns>The amount of soul to recover</returns>
         /// </summary>
-        public event Func<int, int> SoulGainHook;
+        public static event Func<int, int> SoulGainHook;
 
         /// <summary>
         ///     Called when Hero recovers Soul from hitting enemies
         /// </summary>
-        internal int OnSoulGain(int num)
+        internal static int OnSoulGain(int num)
         {
             Logger.APILogger.LogFine("OnSoulGain Invoked");
 
@@ -1704,13 +1704,13 @@ namespace Modding
         ///     Called during dash function to change velocity
         /// </summary>
         /// <remarks>HeroController.Dash</remarks>
-        public event Func<Vector2, Vector2> DashVectorHook;
+        public static event Func<Vector2, Vector2> DashVectorHook;
 
         /// <summary>
         ///     Called during dash function to change velocity
         /// </summary>
         /// <remarks>HeroController.Dash</remarks>
-        internal Vector2 DashVelocityChange(Vector2 change)
+        internal static Vector2 DashVelocityChange(Vector2 change)
         {
             Logger.APILogger.LogFine("DashVelocityChange Invoked");
 
@@ -1740,13 +1740,13 @@ namespace Modding
         ///     Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality
         /// </summary>
         /// <remarks>HeroController.LookForQueueInput</remarks>
-        public event Func<bool> DashPressedHook;
+        public static event Func<bool> DashPressedHook;
 
         /// <summary>
         ///     Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality
         /// </summary>
         /// <remarks>HeroController.LookForQueueInput</remarks>
-        internal bool OnDashPressed()
+        internal static bool OnDashPressed()
         {
             Logger.APILogger.LogFine("OnDashPressed Invoked");
 
@@ -1783,13 +1783,13 @@ namespace Modding
         ///     Called directly after a save has been loaded
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        public event Action<int> SavegameLoadHook;
+        public static event Action<int> SavegameLoadHook;
 
         /// <summary>
         ///     Called directly after a save has been loaded
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        internal void OnSavegameLoad(int id)
+        internal static void OnSavegameLoad(int id)
         {
             Logger.APILogger.LogFine("OnSavegameLoad Invoked");
 
@@ -1817,13 +1817,13 @@ namespace Modding
         ///     Called directly after a save has been saved
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        public event Action<int> SavegameSaveHook;
+        public static event Action<int> SavegameSaveHook;
         
         /// <summary>
         ///     Called directly after a save has been saved
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        internal void OnSavegameSave(int id)
+        internal static void OnSavegameSave(int id)
         {
             Logger.APILogger.LogFine("OnSavegameSave Invoked");
 
@@ -1851,13 +1851,13 @@ namespace Modding
         ///     Called whenever a new game is started
         /// </summary>
         /// <remarks>GameManager.LoadFirstScene</remarks>
-        public event Action NewGameHook;
+        public static event Action NewGameHook;
 
         /// <summary>
         ///     Called whenever a new game is started
         /// </summary>
         /// <remarks>GameManager.LoadFirstScene</remarks>
-        internal void OnNewGame()
+        internal static void OnNewGame()
         {
             Logger.APILogger.LogFine("OnNewGame Invoked");
 
@@ -1885,13 +1885,13 @@ namespace Modding
         ///     Called before a save file is deleted
         /// </summary>
         /// <remarks>GameManager.ClearSaveFile</remarks>
-        public event Action<int> SavegameClearHook;
+        public static event Action<int> SavegameClearHook;
 
         /// <summary>
         ///     Called before a save file is deleted
         /// </summary>
         /// <remarks>GameManager.ClearSaveFile</remarks>
-        internal void OnSavegameClear(int id)
+        internal static void OnSavegameClear(int id)
         {
             Logger.APILogger.LogFine("OnSavegameClear Invoked");
 
@@ -1920,13 +1920,13 @@ namespace Modding
         ///     Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        public event Action<Patches.SaveGameData> AfterSavegameLoadHook;
+        public static event Action<Patches.SaveGameData> AfterSavegameLoadHook;
 
         /// <summary>
         ///     Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        internal void OnAfterSaveGameLoad(Patches.SaveGameData data)
+        internal static void OnAfterSaveGameLoad(Patches.SaveGameData data)
         {
             Logger.APILogger.LogFine("OnAfterSaveGameLoad Invoked");
 
@@ -1955,13 +1955,13 @@ namespace Modding
         ///     Called directly before save has been saved to allow for changes to the data before persisted.
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        public event Action<Patches.SaveGameData> BeforeSavegameSaveHook;
+        public static event Action<Patches.SaveGameData> BeforeSavegameSaveHook;
 
         /// <summary>
         ///     Called directly before save has been saved to allow for changes to the data before persisted.
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        internal void OnBeforeSaveGameSave(Patches.SaveGameData data)
+        internal static void OnBeforeSaveGameSave(Patches.SaveGameData data)
         {
             Logger.APILogger.LogFine("OnBeforeSaveGameSave Invoked");
             data.LoadedMods = LoadedModsWithVersions;
@@ -1990,12 +1990,12 @@ namespace Modding
         /// <summary>
         ///     Overrides the filename to load for a given slot.  Return null to use vanilla names.
         /// </summary>
-        public event Func<int, string> GetSaveFileNameHook;
+        public static event Func<int, string> GetSaveFileNameHook;
 
         /// <summary>
         ///     Overrides the filename to load for a given slot.  Return null to use vanilla names.
         /// </summary>
-        internal string GetSaveFileName(int saveSlot)
+        internal static string GetSaveFileName(int saveSlot)
         {
             Logger.APILogger.LogFine("GetSaveFileName Invoked");
 
@@ -2027,12 +2027,12 @@ namespace Modding
         /// <summary>
         ///     Called after a game has been cleared from a slot.
         /// </summary>
-        public event Action<int> AfterSaveGameClearHook;
+        public static event Action<int> AfterSaveGameClearHook;
 
         /// <summary>
         ///     Called after a game has been cleared from a slot.
         /// </summary>
-        internal void OnAfterSaveGameClear(int saveSlot)
+        internal static void OnAfterSaveGameClear(int saveSlot)
         {
             Logger.APILogger.LogFine("OnAfterSaveGameClear Invoked");
 
@@ -2064,13 +2064,13 @@ namespace Modding
         ///     Called after a new Scene has been loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        public event Action<string> SceneChanged;
+        public static event Action<string> SceneChanged;
 
         /// <summary>
         ///     Called after a new Scene has been loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        internal void OnSceneChanged(string targetScene)
+        internal static void OnSceneChanged(string targetScene)
         {
             Logger.APILogger.LogFine("OnSceneChanged Invoked");
 
@@ -2098,13 +2098,13 @@ namespace Modding
         ///     Called right before a scene gets loaded, can change which scene gets loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        public event Func<string, string> BeforeSceneLoadHook;
+        public static event Func<string, string> BeforeSceneLoadHook;
         
         /// <summary>
         ///     Called right before a scene gets loaded, can change which scene gets loaded
         /// </summary>
         /// <remarks>N/A</remarks>
-        internal string BeforeSceneLoad(string sceneName)
+        internal static string BeforeSceneLoad(string sceneName)
         {
             Logger.APILogger.LogFine("BeforeSceneLoad Invoked");
 
