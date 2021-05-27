@@ -37,10 +37,10 @@ namespace ExampleMod2
             Log("Initializing");
             
             //Here we are hooking into the AttackHook so we can modify the damage for the attack.
-            ModHooks.Instance.AttackHook += OnAttack;
+            ModHooks.AttackHook += OnAttack;
 
             //Here want to hook into the AfterAttackHook to do something at the end of the attack animation.
-            ModHooks.Instance.AfterAttackHook += OnAfterAttack;
+            ModHooks.AfterAttackHook += OnAfterAttack;
             Log("Initialized");
         }
 

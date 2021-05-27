@@ -65,7 +65,7 @@ namespace Modding.Patches
             gameObject.transform.localScale = new Vector2(40f + this.gm.sceneWidth, 20f);
             borders.Add(gameObject);
 
-            ModHooks.Instance.OnDrawBlackBorders(borders);
+            ModHooks.OnDrawBlackBorders(borders);
         }
 
         private extern void orig_Start();

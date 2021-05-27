@@ -26,7 +26,7 @@ namespace Modding.Patches
                 SpecialType = (SpecialTypes) this.SpecialType.Value,
                 IsExtraDamage = false
             };
-            hit = ModHooks.Instance.OnHitInstanceBeforeHit(this.Fsm, hit);
+            hit = ModHooks.OnHitInstanceBeforeHit(this.Fsm, hit);
             HitTaker.Hit(this.Target.Value, hit, 3);
             base.Finish();
         }

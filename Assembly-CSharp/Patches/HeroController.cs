@@ -52,7 +52,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public void Attack(AttackDirection attackDir)
         {
-            ModHooks.Instance.OnAttack(attackDir); //MOD API ADDED
+            ModHooks.OnAttack(attackDir); //MOD API ADDED
             if (Time.timeSinceLevelLoad - this.altAttackTime > this.ALT_ATTACK_RESET)
             {
                 this.cState.altAttack = false;
@@ -228,7 +228,7 @@ namespace Modding.Patches
             }
 
             this.altAttackTime = Time.timeSinceLevelLoad;
-            ModHooks.Instance.AfterAttack(attackDir); //MOD API - Added
+            ModHooks.AfterAttack(attackDir); //MOD API - Added
             if (!this.cState.attacking) return;       //MOD API - Added
             this.slashComponent.StartSlash();
             if (this.playerData.equippedCharm_38)
@@ -277,7 +277,7 @@ namespace Modding.Patches
             }
 
             int mpreserve = this.playerData.GetInt("MPReserve");
-            num = Modding.ModHooks.Instance.OnSoulGain(num);
+            num = Modding.ModHooks.OnSoulGain(num);
             this.playerData.AddMPCharge(num);
             GameCameras.instance.soulOrbFSM.SendEvent("MP GAIN");
             if (this.playerData.GetInt("MPReserve") != mpreserve)
@@ -416,7 +416,7 @@ namespace Modding.Patches
                     }
                 }
 
-                if (this.inputHandler.inputActions.dash.WasPressed && !ModHooks.Instance.OnDashPressed())
+                if (this.inputHandler.inputActions.dash.WasPressed && !ModHooks.OnDashPressed())
                 {
                     if (this.CanDash())
                     {
@@ -475,7 +475,7 @@ namespace Modding.Patches
                     && this.dashQueueSteps <= this.DASH_QUEUE_STEPS
                     && this.CanDash()
                     && this.dashQueuing
-                    && !ModHooks.Instance.OnDashPressed()
+                    && !ModHooks.OnDashPressed()
                     && this.CanDash())
                 {
                     this.HeroDash();
@@ -531,7 +531,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public void TakeDamage(GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
         {
-            damageAmount = ModHooks.Instance.OnTakeDamage(ref hazardType, damageAmount);
+            damageAmount = ModHooks.OnTakeDamage(ref hazardType, damageAmount);
             bool spawnDamageEffect = true;
             if (damageAmount > 0)
             {
@@ -651,7 +651,7 @@ namespace Modding.Patches
                         }
                     }
 
-                    damageAmount = ModHooks.Instance.AfterTakeDamage(hazardType, damageAmount);
+                    damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
                     if (this.playerData.GetBool("equippedCharm_5") && this.playerData.GetInt("blockerHits") > 0 && hazardType == 1 && this.cState.focusing && !flag)
                     {
                         this.proxyFSM.SendEvent("HeroCtrl-TookBlockerHit");
@@ -817,14 +817,14 @@ namespace Modding.Patches
         public void StartMPDrain(float time)
         {
             orig_StartMPDrain(time);
-            focusMP_amount *= ModHooks.Instance.OnFocusCost();
+            focusMP_amount *= ModHooks.OnFocusCost();
         }
 
         private void orig_Update() { }
 
         private void Update()
         {
-            ModHooks.Instance.OnHeroUpdate();
+            ModHooks.OnHeroUpdate();
             orig_Update();
         }
 
@@ -904,7 +904,7 @@ namespace Modding.Patches
             }
 
             Vector2 vector = OrigDashVector();
-            vector = ModHooks.Instance.DashVelocityChange(vector);
+            vector = ModHooks.DashVelocityChange(vector);
 
             rb2d.velocity = vector;
             dash_timer += Time.deltaTime;
@@ -919,7 +919,7 @@ namespace Modding.Patches
         public void CharmUpdate()
         {
             orig_CharmUpdate();
-            ModHooks.Instance.OnCharmUpdate();
+            ModHooks.OnCharmUpdate();
             playerData.UpdateBlueHealth();
         }
 
@@ -930,7 +930,7 @@ namespace Modding.Patches
 
         public void DoAttack()
         {
-            ModHooks.Instance.OnDoAttack();
+            ModHooks.OnDoAttack();
             orig_DoAttack();
         }
     }

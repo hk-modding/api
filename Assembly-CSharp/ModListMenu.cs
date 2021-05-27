@@ -13,7 +13,7 @@ namespace Modding
 
         private Dictionary<ITogglableMod, bool> changedMods = new Dictionary<ITogglableMod, bool>();
 
-        private Dictionary<string, bool> modEnabledSettings = ModHooks.Instance.GlobalSettings.ModEnabledSettings;
+        private Dictionary<string, bool> modEnabledSettings = ModHooks.GlobalSettings.ModEnabledSettings;
 
         public void InitMenu()
         {

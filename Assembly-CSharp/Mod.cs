@@ -157,9 +157,9 @@ namespace Modding
 
         private void HookSaveMethods()
         {
-            ModHooks.Instance.ApplicationQuitHook += SaveGlobalSettings;
-            ModHooks.Instance.SaveLocalSettings += SaveLocalSettings;
-            ModHooks.Instance.LoadLocalSettings += LoadLocalSettings;
+            ModHooks.ApplicationQuitHook += SaveGlobalSettings;
+            ModHooks.SaveLocalSettings += SaveLocalSettings;
+            ModHooks.LoadLocalSettings += LoadLocalSettings;
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += SceneChanged;
         }
 

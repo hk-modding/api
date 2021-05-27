@@ -38,9 +38,9 @@ namespace ExampleMod3
             Log("Initializing");
             
             //Here want to hook into the AfterAttackHook to do something at the end of the attack animation.
-            ModHooks.Instance.AttackHook += OnAttack;
-            ModHooks.Instance.AfterAttackHook += OnAfterAttack;
-            ModHooks.Instance.ApplicationQuitHook += ApplicationQuitHook;
+            ModHooks.AttackHook += OnAttack;
+            ModHooks.AfterAttackHook += OnAfterAttack;
+            ModHooks.ApplicationQuitHook += ApplicationQuitHook;
             Log("Initialized");
         }
 
