@@ -5,19 +5,19 @@ using Modding.Menu.Config;
 namespace Modding.Menu
 {
     /// <summary>
-    /// Helper class for creating single object wrappers 
+    /// A helper class for creating single object wrappers.
     /// </summary>
     public static class WrapperContent
     {
         /// <summary>
-        /// Creates a wrapper on the content area.
+        /// Creates a single item wrapper.
         /// </summary>
         /// <remarks>
         /// This wrapper will have no size so all parent relative sizes will break.
         /// </remarks>
-        /// <param name="content">The <c>ContentArea</c> to put the wrapper in</param>
-        /// <param name="name">The name of the wrapper object</param>
-        /// <param name="action">The action that will get called to add the inner object</param>
+        /// <param name="content">The <c>ContentArea</c> to put the wrapper in.</param>
+        /// <param name="name">The name of the wrapper game object.</param>
+        /// <param name="action">The action that will get called to add the inner object.</param>
         /// <returns></returns>
         public static ContentArea AddWrappedItem(
             this ContentArea content,
@@ -26,25 +26,25 @@ namespace Modding.Menu
         ) => content.AddWrappedItem(name, action, out _);
 
         /// <summary>
-        /// Creates a wrapper on the content area.
+        /// Creates a single item wrapper.
         /// </summary>
         /// <remarks>
         /// This wrapper will have no size so all parent relative sizes will break.
         /// </remarks>
-        /// <param name="content">The <c>ContentArea</c> to put the wrapper in</param>
-        /// <param name="name">The name of the wrapper object</param>
-        /// <param name="action">The action that will get called to add the inner object</param>
-        /// <param name="obj">The newly created wrapper object</param>
+        /// <param name="content">The <c>ContentArea</c> to put the wrapper in.</param>
+        /// <param name="name">The name of the wrapper game object.</param>
+        /// <param name="action">The action that will get called to add the inner object.</param>
+        /// <param name="wrapper">The newly created wrapper.</param>
         /// <returns></returns>
         public static ContentArea AddWrappedItem(
             this ContentArea content,
             string name,
             Action<ContentArea> action,
-            out GameObject obj
+            out GameObject wrapper
         )
         {
             // Wrapper
-            var wrapper = new GameObject(name);
+            wrapper = new GameObject(name);
             GameObject.DontDestroyOnLoad(wrapper);
             wrapper.transform.SetParent(content.contentObject.transform, false);
             // RectTransform
@@ -59,7 +59,6 @@ namespace Modding.Menu
 
             action(new ContentArea(wrapper, new SingleContentLayout(new Vector2(0.5f, 0.5f))).CopyEvents(content));
 
-            obj = wrapper;
             return content;
         }
     }

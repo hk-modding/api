@@ -61,7 +61,7 @@ namespace Modding
                                 {
                                     var rt = c.contentObject.GetComponent<RectTransform>();
                                     rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
-                                    GameObject obj;
+                                    MenuOptionHorizontal opt;
                                     c.AddHorizontalOption(
                                         itmod.GetName(),
                                         new HorizontalOptionConfig
@@ -83,9 +83,9 @@ namespace Modding
                                                 style = DescriptionStyle.singleLineVanillaStyle
                                             }
                                         },
-                                        out obj
+                                        out opt
                                     );
-                                    obj.GetComponent<MenuSetting>().RefreshValueFromGameSettings();
+                                    opt.menuSetting.RefreshValueFromGameSettings();
                                 }
                                 if (mod is IMenuMod immod)
                                 {
@@ -148,25 +148,27 @@ namespace Modding
                 .Build();
 
             var optScreen = UIManager.instance.optionsMenuScreen;
-            GameObject modButton = null;
+            var mbl = (Modding.Patches.MenuButtonList)optScreen.gameObject.GetComponent<MenuButtonList>();
             new ContentArea(optScreen.content.gameObject, new SingleContentLayout(new Vector2(0.5f, 0.5f)))
                 .AddWrappedItem(
                     "ModMenuButtonWrapper",
-                    c => c.AddMenuButton(
-                        "ModMenuButton",
-                        new MenuButtonConfig
-                        {
-                            cancelAction = self => UIManager.instance.UIGoToMainMenu(),
-                            label = "Mods",
-                            submitAction = GoToModListMenu,
-                            proceed = true,
-                            style = MenuButtonStyle.vanillaStyle
-                        },
-                        out modButton
-                    )
+                    c =>
+                    {
+                        c.AddMenuButton(
+                            "ModMenuButton",
+                            new MenuButtonConfig
+                            {
+                                cancelAction = self => UIManager.instance.UIGoToMainMenu(),
+                                label = "Mods",
+                                submitAction = GoToModListMenu,
+                                proceed = true,
+                                style = MenuButtonStyle.vanillaStyle
+                            },
+                            out var modButton
+                        );
+                        mbl.AddSelectableEnd(modButton, 1);
+                    }
                 );
-            var mbl = (Modding.Patches.MenuButtonList)optScreen.gameObject.GetComponent<MenuButtonList>();
-            mbl.AddSelectableEnd(modButton.GetComponent<MenuButton>(), 1);
             mbl.RecalculateNavigation();
         }
 
@@ -199,7 +201,7 @@ namespace Modding
         {
             var name = mod.GetName();
             var entries = mod.GetMenuData();
-            GameObject backButton = null;
+            MenuButton backButton = null;
             var builder = new MenuBuilder(UIManager.instance.UICanvas.gameObject, name)
                 .CreateTitle(name, MenuTitleStyle.vanillaStyle)
                 .CreateContentPane(RectTransformData.FromSizeAndPos(
@@ -247,8 +249,8 @@ namespace Modding
                         navigation = new Navigation
                         {
                             mode = Navigation.Mode.Explicit,
-                            selectOnUp = backButton.GetComponent<MenuButton>(),
-                            selectOnDown = backButton.GetComponent<MenuButton>()
+                            selectOnUp = backButton,
+                            selectOnDown = backButton
                         },
                         position = new AnchoredPosition
                         {

@@ -8,16 +8,16 @@ using Patch = Modding.Patches;
 namespace Modding.Menu
 {
     /// <summary>
-    /// Helper class for creating horizontal menu options
+    /// A helper class for creating horizontal menu options.
     /// </summary>
     public static class HorizontalOptionContent
     {
         /// <summary>
-        /// Creates a horizontal option on the content area
+        /// Creates a horizontal option.
         /// </summary>
-        /// <param name="content">The <c>ContentArea</c> to put the option in</param>
-        /// <param name="name">The name of the option object</param>
-        /// <param name="config">The item configuration</param>
+        /// <param name="content">The <c>ContentArea</c> to put the option in.</param>
+        /// <param name="name">The name of the option game object.</param>
+        /// <param name="config">The configuration options for the horizontal option.</param>
         /// <returns></returns>
         public static ContentArea AddHorizontalOption(
             this ContentArea content,
@@ -26,18 +26,18 @@ namespace Modding.Menu
         ) => content.AddHorizontalOption(name, config, out _);
 
         /// <summary>
-        /// Creates a horizontal option on the content areaa
+        /// Creates a horizontal option.
         /// </summary>
-        /// <param name="content">The <c>ContentArea</c> to put the option in</param>
-        /// <param name="name">The name of the option object</param>
-        /// <param name="config">The item configuration</param>
-        /// <param name="obj">The newly created object</param>
+        /// <param name="content">The <c>ContentArea</c> to put the option in.</param>
+        /// <param name="name">The name of the option game object.</param>
+        /// <param name="config">The configuration options for the horizontal option.</param>
+        /// <param name="horizontalOption">The <c>MenuOptionHorizontal</c> component on the created horizontal option.</param>
         /// <returns></returns>
         public static ContentArea AddHorizontalOption(
             this ContentArea content,
             string name,
             HorizontalOptionConfig config,
-            out GameObject obj
+            out MenuOptionHorizontal horizontalOption
         )
         {
             var style = config.style ?? HorizontalOptionStyle.vanillaStyle;
@@ -199,7 +199,7 @@ namespace Modding.Menu
                 menuOptionHorizontal.descriptionText = anim;
             }
 
-            obj = option;
+            horizontalOption = menuOptionHorizontal;
             return content;
         }
     }
@@ -207,47 +207,47 @@ namespace Modding.Menu
     namespace Config
     {
         /// <summary>
-        /// Horizontal menu item configuration
+        /// Configuration options for creating a horizontal option.
         /// </summary>
         public struct HorizontalOptionConfig
         {
             /// <summary>
-            /// The list of options to display
+            /// The list of options to display.
             /// </summary>
             public string[] options;
             /// <summary>
-            /// The displayed name of the option
+            /// The displayed name of the option.
             /// </summary>
             public string label;
             /// <summary>
-            /// Action to happen when the menu setting is changed
+            /// The action to run when the menu setting is changed.
             /// </summary>
             public Patch.MenuSetting.ApplySetting applySetting;
             /// <summary>
-            /// Action to happen when loading the saved setting
+            /// The action to run when loading the saved setting.
             /// </summary>
             public Patch.MenuSetting.RefreshSetting refreshSetting;
             /// <summary>
-            /// Action to happen when pressing the menu cancel key while selecting this item
+            /// The action to run when pressing the menu cancel key while selecting this item.
             /// </summary>
             public Action<MenuSelectable> cancelAction;
             /// <summary>
-            /// The styling of the menu option
+            /// The styling of the menu option.
             /// </summary>
             public HorizontalOptionStyle? style;
             /// <summary>
-            /// The description of the option that gets displayed underneath
+            /// The description of the option that gets displayed underneath.
             /// </summary>
             public DescriptionInfo? description;
         }
 
         /// <summary>
-        /// Styling of a horizontal option
+        /// The styling options for a horizontal option.
         /// </summary>
         public struct HorizontalOptionStyle
         {
             /// <summary>
-            /// Style preset of a horizontal option in the vanilla game
+            /// The style preset of a horizontal option in the vanilla game.
             /// </summary>
             public static readonly HorizontalOptionStyle vanillaStyle = new HorizontalOptionStyle
             {
@@ -261,41 +261,41 @@ namespace Modding.Menu
             };
 
             /// <summary>
-            /// The size of the main option
+            /// The size of the main option.
             /// </summary>
             public RelVector2 size;
             /// <summary>
-            /// The size of the text on the option label
+            /// The size of the text on the option label.
             /// </summary>
             public int labelTextSize;
             /// <summary>
-            /// The size of the text on the option value
+            /// The size of the text on the option value.
             /// </summary>
             public int valueTextSize;
         }
 
         /// <summary>
-        /// Configuration of an option's description text
+        /// Configuration options for a horizontal option's description text.
         /// </summary>
         public struct DescriptionInfo
         {
             /// <summary>
-            /// The text of the description
+            /// The text of the description.
             /// </summary>
             public string text;
             /// <summary>
-            /// The styling of the description text
+            /// The styling of the description text.
             /// </summary>
             public DescriptionStyle? style;
         }
 
         /// <summary>
-        /// Styling of an option's description text
+        /// The styling options of a horizontal option's description text
         /// </summary>
         public struct DescriptionStyle
         {
             /// <summary>
-            /// Style preset of a single line description in the vanilla game
+            /// The style preset of a single line description in the vanilla game.
             /// </summary>
             public static readonly DescriptionStyle singleLineVanillaStyle = new DescriptionStyle
             {
@@ -303,11 +303,11 @@ namespace Modding.Menu
                 height = new RelLength(40),
             };
             /// <summary>
-            /// The size fo the text on the description
+            /// The size of the text on the description.
             /// </summary>
             public int textSize;
             /// <summary>
-            /// The height of the description text
+            /// The height of the description text.
             /// </summary>
             public RelLength height;
         }

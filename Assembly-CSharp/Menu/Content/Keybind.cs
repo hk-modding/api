@@ -9,17 +9,17 @@ using InControl;
 namespace Modding.Menu
 {
     /// <summary>
-    /// Helper class for creating keybind entries
+    /// A helper class for creating keybind mapping buttons.
     /// </summary>
     public static class KeybindContent
     {
         /// <summary>
-        /// Creates a keybind menu item on the content areaa
+        /// Creates a keybind menu item.
         /// </summary>
-        /// <param name="content">The <c>ContentArea</c> to put the option in</param>
-        /// <param name="name">The name of the keybind object</param>
-        /// <param name="action">The <c>PlayerAction</c> to associate with this keybind</param>
-        /// <param name="config">The keybind configuration</param>
+        /// <param name="content">The <c>ContentArea</c> to put the keybind item in.</param>
+        /// <param name="name">The name of the keybind game object.</param>
+        /// <param name="action">The <c>PlayerAction</c> to associate with this keybind.</param>
+        /// <param name="config">The configuration options for the keybind item.</param>
         /// <returns></returns>
         public static ContentArea AddKeybind(
             this ContentArea content,
@@ -29,20 +29,20 @@ namespace Modding.Menu
         ) => content.AddKeybind(name, action, config, out _);
 
         /// <summary>
-        /// Creates a keybind menu item on the content areaa
+        /// Creates a keybind menu item.
         /// </summary>
-        /// <param name="content">The <c>ContentArea</c> to put the option in</param>
-        /// <param name="name">The name of the keybind object</param>
-        /// <param name="action">The <c>PlayerAction</c> to associate with this keybind</param>
-        /// <param name="config">The keybind configuration</param>
-        /// <param name="obj">The newly created object</param>
+        /// <param name="content">The <c>ContentArea</c> to put the keybind item in.</param>
+        /// <param name="name">The name of the keybind game object.</param>
+        /// <param name="action">The <c>PlayerAction</c> to associate with this keybind.</param>
+        /// <param name="config">The configuration options for the keybind item.</param>
+        /// <param name="mappableKey">The <c>MappablKey</c> component on the created keybind item.</param>
         /// <returns></returns>
         public static ContentArea AddKeybind(
             this ContentArea content,
             string name,
             PlayerAction action,
             KeybindConfig config,
-            out GameObject obj
+            out MappableKey mappableKey
         )
         {
             var style = config.style ?? KeybindStyle.vanillaStyle;
@@ -57,16 +57,16 @@ namespace Modding.Menu
             new RelVector2(new Vector2(650f, 100f)).GetBaseTransformData().Apply(keybindRt);
             content.layout.ModifyNext(keybindRt);
             // MappableKey
-            var mappableKey = (Patch.MappableKey)keybind.AddComponent<MappableKey>();
-            mappableKey.InitCustomActions(action.Owner, action);
-            var mkbutton = (Patch.MenuSelectable)(MenuSelectable)mappableKey;
+            var mapKey = (Patch.MappableKey)keybind.AddComponent<MappableKey>();
+            mapKey.InitCustomActions(action.Owner, action);
+            var mkbutton = (Patch.MenuSelectable)(MenuSelectable)mapKey;
             mkbutton.cancelAction = (CancelAction)Patch.CancelAction.CustomCancelAction;
             mkbutton.customCancelAction = _ =>
             {
-                mappableKey.AbortRebind();
-                config.cancelAction?.Invoke(mappableKey);
+                mapKey.AbortRebind();
+                config.cancelAction?.Invoke(mapKey);
             };
-            content.RegisterMenuItem(mappableKey);
+            content.RegisterMenuItem(mapKey);
 
             // Text object
             var text = new GameObject("Text");
@@ -114,7 +114,7 @@ namespace Modding.Menu
             // Image
             cursorL.AddComponent<Image>();
             // Post Component Config
-            mappableKey.leftCursor = cursorLAnimator;
+            mapKey.leftCursor = cursorLAnimator;
 
             // RightCursor object
             var cursorR = new GameObject("CursorRight");
@@ -138,7 +138,7 @@ namespace Modding.Menu
             // Image
             cursorR.AddComponent<Image>();
             // Post Component Config
-            mappableKey.rightCursor = cursorRAnimator;
+            mapKey.rightCursor = cursorRAnimator;
 
             // Keymap object
             var keymap = new GameObject("Keymap");
@@ -156,7 +156,7 @@ namespace Modding.Menu
             // Image
             var keymapImg = keymap.AddComponent<Image>();
             keymapImg.preserveAspect = true;
-            mappableKey.keymapSprite = keymapImg;
+            mapKey.keymapSprite = keymapImg;
 
             // Keymap Text object
             var keymapText = new GameObject("Text");
@@ -174,13 +174,13 @@ namespace Modding.Menu
             // Text
             var keymapTextText = keymapText.AddComponent<Text>();
             keymapTextText.font = MenuResources.Perpetua;
-            mappableKey.keymapText = keymapTextText;
+            mapKey.keymapText = keymapTextText;
             // FixVerticalAlign
             keymapText.AddComponent<FixVerticalAlign>().labelFixType = FixVerticalAlign.LabelFixType.KeyMap;
 
-            mappableKey.GetBinding();
-            mappableKey.ShowCurrentBinding();
-            obj = keybind;
+            mapKey.GetBinding();
+            mapKey.ShowCurrentBinding();
+            mappableKey = mapKey;
             return content;
         }
     }
@@ -188,7 +188,7 @@ namespace Modding.Menu
     namespace Config
     {
         /// <summary>
-        /// Keybind menu item configuration
+        /// Configuration options for creating a menu keybind option.
         /// </summary>
         public struct KeybindConfig
         {
@@ -201,25 +201,25 @@ namespace Modding.Menu
             /// </summary>
             public KeybindStyle? style;
             /// <summary>
-            /// Action to happen when pressing the menu cancel key while selecting this item
+            /// The action to run when pressing the menu cancel key while selecting this item.
             /// </summary>
             public Action<MappableKey> cancelAction;
         }
 
         /// <summary>
-        /// Styling of a keybind menu item
+        /// The styling options of a keybind menu item.
         /// </summary>
         public struct KeybindStyle
         {
             /// <summary>
-            /// Style preset of a keybind in the vanilla game
+            /// The style preset of a keybind in the vanilla game.
             /// </summary>
             public static readonly KeybindStyle vanillaStyle = new KeybindStyle
             {
                 labelTextSize = 37
             };
             /// <summary>
-            /// Text size of the label text
+            /// The text size of the label text.
             /// </summary>
             public int labelTextSize;
         }

@@ -8,16 +8,16 @@ using Patch = Modding.Patches;
 namespace Modding.Menu
 {
     /// <summary>
-    /// Helper class for creating menu buttons
+    /// A helper class for creating menu buttons.
     /// </summary>
     public static class MenuButtonContent
     {
         /// <summary>
-        /// Creates a menu button on the content area
+        /// Creates a menu button.
         /// </summary>
-        /// <param name="content">The <c>ContentArea</c> to put the button in</param>
-        /// <param name="name">The name of the button object</param>
-        /// <param name="config">The item configuration</param>
+        /// <param name="content">The <c>ContentArea</c> to put the button in.</param>
+        /// <param name="name">The name of the button game object.</param>
+        /// <param name="config">The configuration options for the menu button.</param>
         /// <returns></returns>
         public static ContentArea AddMenuButton(
             this ContentArea content,
@@ -26,18 +26,18 @@ namespace Modding.Menu
         ) => content.AddMenuButton(name, config, out _);
 
         /// <summary>
-        /// Creates a menu button on the content area
+        /// Creates a menu button.
         /// </summary>
-        /// <param name="content">The <c>ContentArea</c> to put the button in</param>
-        /// <param name="name">The name of the button object</param>
-        /// <param name="config">The item configuration</param>
-        /// <param name="obj">The newly created object</param>
+        /// <param name="content">The <c>ContentArea</c> to put the button in.</param>
+        /// <param name="name">The name of the button game object.</param>
+        /// <param name="config">The configuration options for the menu button.</param>
+        /// <param name="button">The <c>MenuButton</c> component on the created menu button.</param>
         /// <returns></returns>
         public static ContentArea AddMenuButton(
             this ContentArea content,
             string name,
             MenuButtonConfig config,
-            out GameObject obj
+            out MenuButton button
         )
         {
             var style = config.style ?? MenuButtonStyle.vanillaStyle;
@@ -50,7 +50,7 @@ namespace Modding.Menu
             option.AddComponent<CanvasRenderer>();
             // RectTransform
             var optionRt = option.AddComponent<RectTransform>();
-            RelVector2.FromParentRelLengths(new RelLength(0f, 1f), style.height)
+            new RelVector2(new RelLength(0f, 1f), style.height)
                 .GetBaseTransformData()
                 .Apply(optionRt);
             content.layout.ModifyNext(optionRt);
@@ -161,7 +161,7 @@ namespace Modding.Menu
             // Post Component Config
             menuButton.flashEffect = flashAnimator;
 
-            obj = option;
+            button = menuButton;
             return content;
         }
     }
@@ -169,39 +169,39 @@ namespace Modding.Menu
     namespace Config
     {
         /// <summary>
-        /// Menu button configuration
+        /// Configuration options for creating a menu button.
         /// </summary>
         public struct MenuButtonConfig
         {
             /// <summary>
-            /// The text on the button
+            /// The text to render on the button.
             /// </summary>
             public string label;
             /// <summary>
-            /// The action to run when the button is pressed
+            /// The action to run when the button is pressed.
             /// </summary>
             public Action<Patch.MenuButton> submitAction;
             /// <summary>
-            /// Whether the button when activated proceeds to a new menu
+            /// Whether the button when activated proceeds to a new menu.
             /// </summary>
             public bool proceed;
             /// <summary>
-            /// Action to happen when pressing the menu cancel key while selecting this item
+            /// The action to run when pressing the menu cancel key while selecting this item.
             /// </summary>
             public Action<MenuSelectable> cancelAction;
             /// <summary>
-            /// The styling of the menu button
+            /// The styling of the menu button.
             /// </summary>
             public MenuButtonStyle? style;
         }
 
         /// <summary>
-        /// Styling of a menu button
+        /// The styling options for a menu button.
         /// </summary>
         public struct MenuButtonStyle
         {
             /// <summary>
-            /// Style preset of a menu button in the vanilla game
+            /// The style preset of a menu button in the vanilla game.
             /// </summary>
             public static readonly MenuButtonStyle vanillaStyle = new MenuButtonStyle
             {
@@ -210,11 +210,11 @@ namespace Modding.Menu
             };
 
             /// <summary>
-            /// The size of the menu button
+            /// The size of the menu button.
             /// </summary>
             public RelLength height;
             /// <summary>
-            /// The size of the text on the button
+            /// The size of the text on the button.
             /// </summary>
             public int textSize;
         }

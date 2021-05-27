@@ -4,19 +4,19 @@ using UnityEngine;
 namespace Modding.Menu
 {
     /// <summary>
-    /// An interface to place successive <c>RectTransform</c>s
+    /// An interface to place successive <c>RectTransform</c>s.
     /// </summary>
     public interface ContentLayout
     {
         /// <summary>
-        /// Modifies the passed in <c>RectTransform</c>.
+        /// Modifies a <c>RectTransform</c>.
         /// </summary>
-        /// <param name="rt">The <c>RectTransform</c></param>
+        /// <param name="rt">The <c>RectTransform</c> to modify.</param>
         public void ModifyNext(RectTransform rt);
     }
 
     /// <summary>
-    /// A layout that does absolutely nothing
+    /// A layout that does absolutely nothing.
     /// </summary>
     public struct NullContentLayout : ContentLayout
     {
@@ -25,38 +25,38 @@ namespace Modding.Menu
     }
 
     /// <summary>
-    /// A layout to place items in a grid pattern
+    /// A layout to place items in a grid pattern.
     /// </summary>
     public class RegularGridLayout : ContentLayout
     {
         /// <summary>
-        /// The "size" of a cell in the grid
+        /// The "size" of a cell in the grid.
         /// </summary>
         public RelVector2 itemAdvance { get; set; }
         /// <summary>
-        /// The starting position of the first cell
+        /// The starting position of the first cell.
         /// </summary>
         public AnchoredPosition start { get; set; }
         /// <summary>
-        /// The maximum number of columns to allow
+        /// The maximum number of columns to allow.
         /// </summary>
         public int columns { get; set; }
 
         /// <summary>
-        /// The "index" of the next item to be placed
+        /// The "index" of the next item to be placed.
         /// </summary>
         public int index { get; set; } = 0;
 
         /// <summary>
-        /// The position in grid cells of the next item
+        /// The position in grid cells of the next item.
         /// </summary>
         public Vector2Int indexPos { get => new Vector2Int(index % columns, index / columns); }
 
         /// <summary>
         /// Creates a single column, top down vertical layout.
         /// </summary>
-        /// <param name="itemHeight">The height of each item</param>
-        /// <param name="start">The starting position</param>
+        /// <param name="itemHeight">The height of each item.</param>
+        /// <param name="start">The starting position.</param>
         /// <returns></returns>
         public static RegularGridLayout CreateVerticalLayout(
             float itemHeight,
@@ -74,9 +74,9 @@ namespace Modding.Menu
         };
 
         /// <summary>
-        /// Modifies the passed in <c>RectTransform</c> to be placed in the next spot in the grid
+        /// Modifies a <c>RectTransform</c> to place it in the next spot in the grid.
         /// </summary>
-        /// <param name="rt">The <c>RectTransform</c></param>
+        /// <param name="rt">The <c>RectTransform</c> to modify.</param>
         public void ModifyNext(RectTransform rt)
         {
             (start + itemAdvance * this.indexPos).Reposition(rt);
@@ -93,7 +93,7 @@ namespace Modding.Menu
         /// </summary>
         /// <param name="columns">The new number of columns.</param>
         /// <param name="originalAnchor">The normalized anchor on the original "width" to place the new grid.</param>
-        /// <param name="newSize">The new size of the grid element, or null to not change</param>
+        /// <param name="newSize">The new size of the grid element, or null to not change.</param>
         /// <param name="newAnchor">The normalized anchor on the new "width" to place the anchor.</param>
         public void ChangeColumns(
             int columns,
@@ -115,68 +115,69 @@ namespace Modding.Menu
     }
 
     /// <summary>
-    /// A layout based on an enumerator to get successive <c>RectPosition</c>s
+    /// A layout based on an enumerator to get successive <c>RectPosition</c>s.
     /// </summary>
     public class EnumeratorLayout : ContentLayout
     {
         private IEnumerator<AnchoredPosition> generator;
 
         /// <summary>
-        /// Creates a layout from an <c>IEnumerable</c>
+        /// Creates a layout from an <c>IEnumerable</c>.
         /// </summary>
-        /// <param name="src">The emumerable object</param>
+        /// <param name="src">The emumerable object.</param>
         public EnumeratorLayout(IEnumerable<AnchoredPosition> src)
         {
             this.generator = src.GetEnumerator();
         }
 
         /// <summary>
-        /// Creates a layout from an <c>IEnumerator</c>
+        /// Creates a layout from an <c>IEnumerator</c>.
         /// </summary>
-        /// <param name="generator">The enumerator</param>
+        /// <param name="generator">The enumerator.</param>
         public EnumeratorLayout(IEnumerator<AnchoredPosition> generator)
         {
             this.generator = generator;
         }
 
         /// <summary>
-        /// Modifies the passed in <c>RectTransform</c> based on the next item of the enumerator.
+        /// Modifies a <c>RectTransform</c> to place it based on the next item of the enumerator.
         /// </summary>
-        /// <param name="rt">The passed in <c>RectTransform</c></param>
+        /// <param name="rt">The <c>RectTransform</c> to modify.</param>
         public void ModifyNext(RectTransform rt)
         {
-            generator.Current.Reposition(rt);
-            generator.MoveNext();
+            if (generator.MoveNext()) generator.Current.Reposition(rt);
         }
     }
 
     /// <summary>
-    /// A layout that places every object in the same position
+    /// A layout that places every object in the same position.
     /// </summary>
     public class SingleContentLayout : ContentLayout
     {
         /// <summary>
-        /// The position to place the object in
+        /// The position to place the object in.
         /// </summary>
         public AnchoredPosition pos { get; set; }
 
         /// <summary>
-        /// Creates a layout with the position anchoring the same spot on the child and parent together
+        /// Creates a layout with the position anchoring the same spot on the child and parent together.
         /// </summary>
+        /// <param name="anchor">The point to anchor the child to the parent.</param>
         public SingleContentLayout(Vector2 anchor) : this(new AnchoredPosition(anchor, anchor)) { }
 
         /// <summary>
-        /// Creates a layout from a <c>RectPosition</c>
+        /// Creates a layout from a <c>RectPosition</c>.
         /// </summary>
-        /// <param name="pos">The position</param>
+        /// <param name="pos">The position to place the objects in.</param>
         public SingleContentLayout(AnchoredPosition pos)
         {
             this.pos = pos;
         }
 
         /// <summary>
-        /// Places the passed in <c>RectTransform</c> based on <c>pos</c>
+        /// Modifies a <c>RectTransform</c> to place it in the specified location.
         /// </summary>
+        /// <param name="rt">The <c>RectTransform</c> to modify.</param>
         public void ModifyNext(RectTransform rt)
         {
             pos.Reposition(rt);

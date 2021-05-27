@@ -6,25 +6,25 @@ using UnityEngine.UI;
 namespace Modding.Menu
 {
     /// <summary>
-    /// Component to automatically calculate menu item navigation
+    /// A component to automatically calculate menu item navigation.
     /// </summary>
     public class MenuItemNav : MonoBehaviour
     {
         /// <summary>
-        /// The currently selected menu item
+        /// The currently selected menu item.
         /// </summary>
         public MenuSelectable selected { get; private set; }
         /// <summary>
-        /// The list of menu items in the content pane
+        /// The list of menu items in the content pane.
         /// </summary>
         public List<MenuSelectable> content { get; set; } = new List<MenuSelectable>();
         /// <summary>
-        /// The list of menu items in the control pane
+        /// The list of menu items in the control pane.
         /// </summary>
         public List<MenuSelectable> controls { get; set; } = new List<MenuSelectable>();
 
         /// <summary>
-        /// Calculates the <c>Navigation</c>s of all of the menu items
+        /// Calculates the <c>Navigation</c>s of all of the menu items.
         /// </summary>
         public void RecalculateNavigation()
         {

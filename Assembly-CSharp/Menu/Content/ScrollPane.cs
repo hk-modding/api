@@ -4,16 +4,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using Modding.Menu.Config;
 
-// ReSharper disable CS1591
-#pragma warning disable 1591
-
 namespace Modding.Menu
 {
     /// <summary>
-    /// Helper class for creating scrollbars and their associated content panes
+    /// A helper class for creating scrollbars and their associated content panes.
     /// </summary>
     public static class ScrollPaneContent
     {
+        /// <summary>
+        /// Creates a scrollable window.<br/>
+        /// The scrolling content will be the same width as the parent.
+        /// </summary>
+        /// <param name="content">The <c>ContentArea</c> to put the scrollable window in.</param>
+        /// <param name="config">The configuration options for the scrollbar.</param>
+        /// <param name="contentHeight">The height of the scroll window.</param>
+        /// <param name="layout">The layout to apply to the added content.</param>
+        /// <param name="action">The action that will get called to add the content.</param>
+        /// <returns></returns>
         public static ContentArea AddScrollPaneContent(
             this ContentArea content,
             ScrollbarConfig config,
@@ -22,6 +29,18 @@ namespace Modding.Menu
             Action<ContentArea> action
         ) => content.AddScrollPaneContent(config, contentHeight, layout, action, out _, out _);
 
+        /// <summary>
+        /// Creates a scrollable window.<br/>
+        /// The scrolling content will be the same width as the parent.
+        /// </summary>
+        /// <param name="content">The <c>ContentArea</c> to put the scrollable window in.</param>
+        /// <param name="config">The configuration options for the scrollbar.</param>
+        /// <param name="contentHeight">The height of the scroll window.</param>
+        /// <param name="layout">The layout to apply to the added content.</param>
+        /// <param name="action">The action that will get called to add the content.</param>
+        /// <param name="scrollContent">The created scrollable window game object.</param>
+        /// <param name="scroll">The <c>Scrollbar</c> component on the created scrollbar.</param>
+        /// <returns></returns>
         public static ContentArea AddScrollPaneContent(
             this ContentArea content,
             ScrollbarConfig config,
@@ -33,9 +52,7 @@ namespace Modding.Menu
         )
         {
             // Scrollbar
-            GameObject scrollbarObj;
-            content.AddScrollbar(config, out scrollbarObj);
-            var scrollbar = scrollbarObj.GetComponent<Scrollbar>();
+            content.AddScrollbar(config, out scroll);
 
             // ScrollMask
             var scrollMask = new GameObject("ScrollMask");
@@ -72,7 +89,7 @@ namespace Modding.Menu
 
             action(new ContentArea(scrollPane, layout).CopyEvents(content));
 
-            scrollbar.onValueChanged = CreateScrollEvent(f =>
+            scroll.onValueChanged = CreateScrollEvent(f =>
             {
                 scrollPaneRt.anchoredPosition = new Vector2(
                     0f,
@@ -83,15 +100,21 @@ namespace Modding.Menu
                 );
             });
 
-            scroll = scrollbar;
             scrollContent = scrollMask;
             return content;
         }
 
+        /// <summary>
+        /// Creates a scrollbar.
+        /// </summary>
+        /// <param name="content">The <c>ContentArea</c> to put the scrollbar in.</param>
+        /// <param name="config">The configuration options for the scrollbar.</param>
+        /// <param name="scroll">The <c>Scrollbar</c> component on the created scrollbar.</param>
+        /// <returns></returns>
         public static ContentArea AddScrollbar(
             this ContentArea content,
             ScrollbarConfig config,
-            out GameObject obj
+            out Scrollbar scroll
         )
         {
             // Scrollbar
@@ -186,7 +209,7 @@ namespace Modding.Menu
             var backgroundImage = background.AddComponent<Image>();
             backgroundImage.sprite = MenuResources.ScrollbarBackgroundSprite;
 
-            obj = scrollbar;
+            scroll = scrollbarComp;
             return content;
         }
 
@@ -197,13 +220,25 @@ namespace Modding.Menu
             return ret;
         }
     }
-    
+
     namespace Config
     {
+        /// <summary>
+        /// Configuration options for creating a scrollbar.
+        /// </summary>
         public struct ScrollbarConfig
         {
+            /// <summary>
+            /// The menu navigation to apply to the scrollbar.
+            /// </summary>
             public Navigation navigation;
+            /// <summary>
+            /// The anchored poisition to place the scrollbar.
+            /// </summary>
             public AnchoredPosition position;
+            /// <summary>
+            /// The action to run when pressing the menu cancel key while selecting this item.
+            /// </summary>
             public Action<MenuPreventDeselect> cancelAction;
         }
     }

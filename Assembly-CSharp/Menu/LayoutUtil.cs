@@ -4,37 +4,37 @@ namespace Modding.Menu
 {
     // unironically one of the most useful pieces of code I have ever written
     /// <summary>
-    /// A struct to define anchored positioning relative to a parent
+    /// A struct to define anchored positioning relative to a parent.
     /// </summary>
     public struct AnchoredPosition
     {
         /// <summary>
-        /// The normalized anchoring point on the parent rectangle that will get anchored to the child.<br/>
+        /// The normalized anchoring point on the parent rectangle that will get anchored to the child.
         /// </summary>
         /// <remarks>
-        /// The lower left corner is (0, 0) and the upper right corner is (1, 1)
+        /// The lower left corner is (0, 0) and the upper right corner is (1, 1).
         /// </remarks>
         public Vector2 parentAnchor;
 
         /// <summary>
-        /// The normalized anchoring point on this rectangle that will get anchored to the parent.<br/>
+        /// The normalized anchoring point on this rectangle that will get anchored to the parent.
         /// </summary>
         /// <remarks>
-        /// The lower left corner is (0, 0) and the upper right corner is (1, 1)
+        /// The lower left corner is (0, 0) and the upper right corner is (1, 1).
         /// </remarks>
         public Vector2 childAnchor;
 
         /// <summary>
-        /// The offset in pixels of the <c>childAnchor</c> from the <c>parentAnchor</c>
+        /// The offset in pixels of the <c>childAnchor</c> from the <c>parentAnchor</c>.
         /// </summary>
         public Vector2 offset;
 
         /// <summary>
-        /// Creates a new <c>RectPosition</c>
+        /// Creates a new <c>RectPosition</c>.
         /// </summary>
-        /// <param name="parentAnchor">The parent anchor</param>
-        /// <param name="childAnchor">The child anchor</param>
-        /// <param name="offset">The offset from the parent anchor to the child anchor</param>
+        /// <param name="parentAnchor">The normalized point on the parent to anchor the child on.</param>
+        /// <param name="childAnchor">The normalized point on the child to anchor to the parent.</param>
+        /// <param name="offset">The offset from the parent anchor to the child anchor.</param>
         public AnchoredPosition(Vector2 parentAnchor, Vector2 childAnchor, Vector2 offset = new Vector2())
         {
             this.parentAnchor = parentAnchor;
@@ -43,15 +43,15 @@ namespace Modding.Menu
         }
 
         /// <summary>
-        /// Translate a <c>RectTransform</c> based on the fields in this struct
+        /// Translate a <c>RectTransform</c> based on the fields in this struct.
         /// </summary>
-        /// <param name="rt">The <c>RectTransform</c> to modify</param>
+        /// <param name="rt">The <c>RectTransform</c> to modify.</param>
         public void Reposition(RectTransform rt) => this.GetRepositioned(rt).Apply(rt);
 
         /// <summary>
-        /// Get a translated <c>RectTransformData</c> based on the fields in this struct
+        /// Get a translated <c>RectTransformData</c> based on the fields in this struct.
         /// </summary>
-        /// <param name="rt">The <c>RectTransformData</c> to translate</param>
+        /// <param name="rt">The <c>RectTransformData</c> to translate.</param>
         /// <returns></returns>
         public RectTransformData GetRepositioned(RectTransformData rt)
         {
@@ -64,12 +64,12 @@ namespace Modding.Menu
         }
 
         /// <summary>
-        /// Creates a <c>RectPosition</c> from an anchor on a sibling rect
+        /// Creates a <c>RectPosition</c> from an anchor on a sibling rectangle.
         /// </summary>
-        /// <param name="selfAnchor">The anchor on this rect</param>
-        /// <param name="sibling">The sibling rect</param>
-        /// <param name="siblingAnchor">The anchor on the sibling</param>
-        /// <param name="offset">The offset in pixels of the <c>selfAnchor</c> from the <c>siblingAnchor</c></param>
+        /// <param name="selfAnchor">The normalized point on a rect to anchor to the sibling.</param>
+        /// <param name="sibling">The sibling rectangle to anchor to.</param>
+        /// <param name="siblingAnchor">The normalized point on the sibling to anchor to.</param>
+        /// <param name="offset">The offset in pixels of the <c>selfAnchor</c> to the sibling anchor point.</param>
         /// <returns></returns>
         public static AnchoredPosition FromSiblingAnchor(
             Vector2 selfAnchor,
@@ -85,8 +85,8 @@ namespace Modding.Menu
         /// <summary>
         /// Gets a normalized point on the parent from a normalized point on the child.
         /// </summary>
-        /// <param name="child">The child rect</param>
-        /// <param name="childPoint">A normalized point on <c>child</c></param>
+        /// <param name="child">The child rectangle.</param>
+        /// <param name="childPoint">A normalized point on the child.</param>
         /// <returns></returns>
         public static Vector2 ParentPointFromChild(
             RectTransformData child,
@@ -94,7 +94,7 @@ namespace Modding.Menu
         ) => child.anchorMin + (child.anchorMax - child.anchorMin) * childPoint;
 
         /// <summary>
-        /// Translates an anchored position by a relative vector
+        /// Translates an anchored position by a relative vector.
         /// </summary>
         public static AnchoredPosition operator +(AnchoredPosition lhs, RelVector2 rhs) => new AnchoredPosition(
             lhs.parentAnchor + rhs.relative,
@@ -102,13 +102,13 @@ namespace Modding.Menu
             lhs.offset + rhs.delta
         );
         /// <summary>
-        /// Translates an anchored position by a relative vector
+        /// Translates an anchored position by a relative vector.
         /// </summary>
         public static AnchoredPosition operator +(RelVector2 lhs, AnchoredPosition rhs) => rhs + lhs;
     }
 
     /// <summary>
-    /// A struct to define size relative to a parent
+    /// A struct to define size relative to a parent.
     /// </summary>
     public struct RelVector2
     {
@@ -122,7 +122,7 @@ namespace Modding.Menu
         public Vector2 relative;
 
         /// <summary>
-        /// The x component of this vector
+        /// The x component of this vector.
         /// </summary>
         public RelLength x
         {
@@ -135,7 +135,7 @@ namespace Modding.Menu
         }
 
         /// <summary>
-        /// The y component of this vector
+        /// The y component of this vector.
         /// </summary>
         public RelLength y
         {
@@ -148,10 +148,10 @@ namespace Modding.Menu
         }
 
         /// <summary>
-        /// Creates a <c>RectSize</c> from two parent relative lengths.
+        /// Creates a <c>RectSize</c> from two parent-relative lengths.
         /// </summary>
-        /// <param name="x">The length on the <c>x</c> axis</param>
-        /// <param name="y">The length on the <c>y</c> axis</param>
+        /// <param name="x">The length on the <c>x</c> axis.</param>
+        /// <param name="y">The length on the <c>y</c> axis.</param>
         /// <returns></returns>
         public RelVector2(RelLength x, RelLength y)
         {
@@ -160,10 +160,10 @@ namespace Modding.Menu
         }
 
         /// <summary>
-        /// Creates a <c>RectSize</c> from a size delta and a normalized parent-relative size
+        /// Creates a <c>RectSize</c> from a size delta and a normalized parent-relative size.
         /// </summary>
-        /// <param name="sizeDelta">The size delta in pixels</param>
-        /// <param name="parentRelSize">The normalized parent-relative size</param>
+        /// <param name="sizeDelta">The size delta in pixels.</param>
+        /// <param name="parentRelSize">The normalized parent-relative size.</param>
         public RelVector2(Vector2 sizeDelta, Vector2 parentRelSize)
         {
             this.delta = sizeDelta;
@@ -171,9 +171,9 @@ namespace Modding.Menu
         }
 
         /// <summary>
-        /// Creates a <c>RectSize</c> from an absolute size in pixels
+        /// Creates a <c>RectSize</c> from an absolute size in pixels.
         /// </summary>
-        /// <param name="size">The size in pixels</param>
+        /// <param name="size">The size in pixels.</param>
         public RelVector2(Vector2 size) : this(size, new Vector2()) { }
 
 
@@ -186,18 +186,6 @@ namespace Modding.Menu
             sizeDelta = delta,
             anchorMin = new Vector2(),
             anchorMax = relative
-        };
-
-        /// <summary>
-        /// Combines two parent relative lengths into a <c>RectSize</c>
-        /// </summary>
-        /// <param name="x">The length on the <c>x</c> axis</param>
-        /// <param name="y">The length on the <c>y</c> axis</param>
-        /// <returns></returns>
-        public static RelVector2 FromParentRelLengths(RelLength x, RelLength y) => new RelVector2
-        {
-            delta = new Vector2(x.delta, y.delta),
-            relative = new Vector2(x.relative, y.relative)
         };
 
         /// <summary>  
@@ -249,24 +237,24 @@ namespace Modding.Menu
     }
 
     /// <summary>
-    /// A struct to define a scalar length relative to a parent
+    /// A struct to define a scalar length relative to a parent.
     /// </summary>
     public struct RelLength
     {
         /// <summary>
-        /// The length in pixels to increase the parent-relative length
+        /// The length in pixels to increase the parent-relative length.
         /// </summary>
         public float delta;
         /// <summary>
-        /// The normalized parent-relative length
+        /// The normalized parent-relative length.
         /// </summary>
         public float relative;
 
         /// <summary>
-        /// Creates a new <c>ParentRelLength</c> from a length delta and a normalized parent-relative length
+        /// Creates a new <c>ParentRelLength</c> from a length delta and a normalized parent-relative length.
         /// </summary>
-        /// <param name="lengthDelta">The length delta</param>
-        /// <param name="parentRelLength">The normalized parent-relative length</param>
+        /// <param name="lengthDelta">The pixels to be added to the size from the scaled parent-relative length.</param>
+        /// <param name="parentRelLength">The normalized parent-relative length.</param>
         public RelLength(float lengthDelta, float parentRelLength)
         {
             this.delta = lengthDelta;
@@ -274,9 +262,9 @@ namespace Modding.Menu
         }
 
         /// <summary>
-        /// Creates a new absolute <c>ParentRelLength</c> from a length in pixels
+        /// Creates a new absolute <c>ParentRelLength</c> from a length in pixels.
         /// </summary>
-        /// <param name="length">The length in pixels</param>
+        /// <param name="length">The length in pixels.</param>
         public RelLength(float length) : this(length, 0f) { }
 
         /// <summary>
@@ -321,44 +309,44 @@ namespace Modding.Menu
     }
 
     /// <summary>
-    /// A struct to represent the data in a <c>RectTransform</c>
+    /// A struct to represent the data in a <c>RectTransform</c>.
     /// </summary>
     public struct RectTransformData
     {
         /// <summary>
-        /// See <c>RectTransform.sizeDelta</c>
+        /// See <c>RectTransform.sizeDelta</c> in the unity docs.
         /// </summary>
         public Vector2 sizeDelta;
         /// <summary>
-        /// See <c>RectTransform.anchorMin</c>
+        /// See <c>RectTransform.anchorMin</c> in the unity docs.
         /// </summary>
         public Vector2 anchorMin;
         /// <summary>
-        /// See <c>RectTransform.anchorMax</c>
+        /// See <c>RectTransform.anchorMax</c> in the unity docs.
         /// </summary>
         public Vector2 anchorMax;
         /// <summary>
-        /// See <c>RectTransform.anchoredPosition</c>
+        /// See <c>RectTransform.anchoredPosition</c> in the unity docs.
         /// </summary>
         public Vector2 anchoredPosition;
         /// <summary>
-        /// See <c>RectTransform.pivot</c>
+        /// See <c>RectTransform.pivot</c> in the unity docs.
         /// </summary>
         public Vector2 pivot;
 
         /// <summary>
-        /// Get the data from an existing <c>RectTransform</c>.
+        /// Creates a <c>RectTransformData</c> from an existing <c>RectTransform</c>.
         /// </summary>
-        /// <param name="rt">The <c>RectTransform</c></param>
+        /// <param name="rt">The source <c>RectTransform</c>.</param>
         /// <returns></returns>
-        public static RectTransformData FromRectTransform(RectTransform rt) => new RectTransformData
+        public RectTransformData(RectTransform rt)
         {
-            sizeDelta = rt.sizeDelta,
-            anchorMin = rt.anchorMin,
-            anchorMax = rt.anchorMax,
-            anchoredPosition = rt.anchoredPosition,
-            pivot = rt.pivot
-        };
+            this.sizeDelta = rt.sizeDelta;
+            this.anchorMin = rt.anchorMin;
+            this.anchorMax = rt.anchorMax;
+            this.anchoredPosition = rt.anchoredPosition;
+            this.pivot = rt.pivot;
+        }
 
         /// <summary>
         /// Create a <c>RectTransformData</c> from a <c>RectSize</c> and <c>RectPosition</c>.
@@ -372,9 +360,9 @@ namespace Modding.Menu
         ) => pos.GetRepositioned(size.GetBaseTransformData());
 
         /// <summary>
-        /// Apply the data to an existing <c>RectTransform</c>
+        /// Apply the data to an existing <c>RectTransform</c>.
         /// </summary>
-        /// <param name="rt">The <c>RectTransform</c></param>
+        /// <param name="rt">The <c>RectTransform</c> to apply the data to.</param>
         public void Apply(RectTransform rt)
         {
             rt.sizeDelta = this.sizeDelta;
@@ -386,8 +374,8 @@ namespace Modding.Menu
 
         // Is this a good idea? I think it probably is
         /// <summary>
-        /// Convenience conversion to get the data from a <c>RectTransform</c>
+        /// Convenience conversion to get the data from a <c>RectTransform</c>.
         /// </summary>
-        public static implicit operator RectTransformData(RectTransform r) => FromRectTransform(r);
+        public static implicit operator RectTransformData(RectTransform r) => new RectTransformData(r);
     }
 }

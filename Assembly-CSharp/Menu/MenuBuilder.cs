@@ -6,16 +6,16 @@ using Modding.Menu.Config;
 namespace Modding.Menu
 {
     /// <summary>
-    /// Builder style interface for creating in-game menus
+    /// A builder style class for creating in-game menus.
     /// </summary>
     public class MenuBuilder
     {
         /// <summary>
-        /// The root game object of the menu
+        /// The root game object of the menu.
         /// </summary>
         public GameObject menuObject { get; set; }
         /// <summary>
-        /// The <c>MenuScreen</c> component on <c>menuObject</c>
+        /// The <c>MenuScreen</c> component on <c>menuObject</c>.
         /// </summary>
         public MenuScreen screen { get; set; }
 
@@ -92,8 +92,8 @@ namespace Modding.Menu
         /// Adds "content" to the control pane in a certain layout. <br/>
         /// If <c>CreateControlPane</c> has not been called yet, this method will immeddiately return.
         /// </summary>
-        /// <param name="layout">The layout of the added content</param>
-        /// <param name="action">The action that will get called to add the content</param>
+        /// <param name="layout">The layout to apply to the added content.</param>
+        /// <param name="action">The action that will get called to add the content.</param>
         /// <returns></returns>
         public MenuBuilder AddControls(ContentLayout layout, Action<ContentArea> action)
         {
@@ -123,8 +123,8 @@ namespace Modding.Menu
         /// <summary>
         /// Adds a title and top fleur to the menu.
         /// </summary>
-        /// <param name="title">The title</param>
-        /// <param name="style">The styling of the title</param>
+        /// <param name="title">The title to render on the menu.</param>
+        /// <param name="style">The styling of the title.</param>
         /// <returns></returns>
         public MenuBuilder CreateTitle(string title, MenuTitleStyle style)
         {
@@ -183,7 +183,7 @@ namespace Modding.Menu
         /// <summary>
         /// Creates the content canvas group to hold the majority of items in the menu.
         /// </summary>
-        /// <param name="style">The rect describing the layout of the content pane</param>
+        /// <param name="style">The rect describing the size and position of the content pane.</param>
         /// <returns></returns>
         public MenuBuilder CreateContentPane(RectTransformData style)
         {
@@ -205,7 +205,7 @@ namespace Modding.Menu
         /// <summary>
         /// Creates the control canvas group to hold the buttons at the bottom of the menu.
         /// </summary>
-        /// <param name="style">The rect describing the layout of the control pane</param>
+        /// <param name="style">The rect describing the size and position of the control pane.</param>
         /// <returns></returns>
         public MenuBuilder CreateControlPane(RectTransformData style)
         {
@@ -236,20 +236,20 @@ namespace Modding.Menu
         public event Action<MenuSelectable> OnMenuItemAdd;
 
         /// <summary>
-        /// The root content pane
+        /// The game object to place the new content in.
         /// </summary>
         public GameObject contentObject { get; protected set; }
 
         /// <summary>
-        /// The layout of the content being added
+        /// The layout to apply to the content being added.
         /// </summary>
         public ContentLayout layout { get; set; }
 
         /// <summary>
-        /// Creates a new <c>ContentArea</c>
+        /// Creates a new <c>ContentArea</c>.
         /// </summary>
-        /// <param name="obj">The content pane to place the added items on</param>
-        /// <param name="layout">The layout of the added items</param>
+        /// <param name="obj">The object to place the added content in.</param>
+        /// <param name="layout">The layout to applly to the content being added.</param>
         public ContentArea(GameObject obj, ContentLayout layout)
         {
             this.contentObject = obj;
@@ -257,9 +257,9 @@ namespace Modding.Menu
         }
 
         /// <summary>
-        /// Copy the events of another <c>ContentArea</c> to this one
+        /// Overwrite the events in this <c>ContentArea</c> with the events in another one.
         /// </summary>
-        /// <param name="src">The source <c>ContentArea</c></param>
+        /// <param name="src">The source of the events to copy.</param>
         /// <returns></returns>
         public ContentArea CopyEvents(ContentArea src)
         {
@@ -270,22 +270,19 @@ namespace Modding.Menu
         /// <summary>
         /// Registers a <c>MenuSelectable</c> to be added. Calls the <c>OnMenuItemAdd</c> event.
         /// </summary>
-        /// <param name="sel">The menu item to add</param>
-        public void RegisterMenuItem(MenuSelectable sel)
-        {
-            this.OnMenuItemAdd?.Invoke(sel);
-        }
+        /// <param name="sel">The menu item to add.</param>
+        public void RegisterMenuItem(MenuSelectable sel) => this.OnMenuItemAdd?.Invoke(sel);
     }
 
     namespace Config
     {
         /// <summary>
-        /// Styling of the menu title
+        /// The styling options for the menu title.
         /// </summary>
         public struct MenuTitleStyle
         {
             /// <summary>
-            /// Style preset of a standard menu title in the vanilla game
+            /// The style preset of a standard menu title in the vanilla game.
             /// </summary>
             public static readonly MenuTitleStyle vanillaStyle = new MenuTitleStyle
             {
@@ -299,11 +296,11 @@ namespace Modding.Menu
             };
 
             /// <summary>
-            /// The position of the title
+            /// The position of the title.
             /// </summary>
             public AnchoredPosition pos;
             /// <summary>
-            /// The text size of the title
+            /// The text size of the title.
             /// </summary>
             public int textSize;
         }
