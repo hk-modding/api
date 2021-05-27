@@ -320,7 +320,7 @@ namespace Modding
                 yield return PreloadScenes(coroutineHolder, toPreload, preloadedObjects);
             }
             
-            ModHooks.Instance.LoadGlobalSettings();
+            ModHooks.LoadGlobalSettings();
 
             foreach (IMod mod in orderedMods)
             {
@@ -340,10 +340,10 @@ namespace Modding
             SubscribeEvents(null, true);
 
             // Clean out the ModEnabledSettings for any mods that don't exist.
-            LoadedMods.RemoveAll(mod => !ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()));
+            LoadedMods.RemoveAll(mod => !ModHooks.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()));
 
             // Get previously disabled mods and disable them.
-            foreach ((string modName, bool _) in ModHooks.Instance.GlobalSettings.ModEnabledSettings.Where(x => !x.Value))
+            foreach ((string modName, bool _) in ModHooks.GlobalSettings.ModEnabledSettings.Where(x => !x.Value))
             {
                 IMod mod = LoadedMods.FirstOrDefault(x => x.GetName() == modName);
                 
@@ -365,7 +365,10 @@ namespace Modding
 
             Loaded = true;
 
-            ModHooks.Instance.SaveGlobalSettings();
+            ModHooks.SaveGlobalSettings();
+            
+            ModListMenu menu = new ModListMenu();
+            menu.InitMenu();
 
             Object.Destroy(coroutineHolder.gameObject);
         }
@@ -549,7 +552,7 @@ namespace Modding
 
             foreach (string sceneName in toPreload.Keys)
             {
-                int batchCount = Math.Min(ModHooks.Instance.GlobalSettings.PreloadBatchSize, maxKeys);
+                int batchCount = Math.Min(ModHooks.GlobalSettings.PreloadBatchSize, maxKeys);
 
                 batch.Add(PreloadScene(sceneName));
 
@@ -589,7 +592,7 @@ namespace Modding
         {
             StringBuilder builder = new StringBuilder();
             
-            builder.AppendLine("Modding API: " + ModHooks.Instance.ModVersion);
+            builder.AppendLine("Modding API: " + ModHooks.ModVersion);
             
             foreach (string error in Errors)
             {
@@ -600,7 +603,7 @@ namespace Modding
             {
                 try
                 {
-                    if (!ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()])
+                    if (!ModHooks.GlobalSettings.ModEnabledSettings[mod.GetName()])
                     {
                         continue;
                     }
@@ -619,26 +622,26 @@ namespace Modding
         internal static void LoadMod(IMod mod, bool updateModText, bool changeSettings = true,
             Dictionary<string, Dictionary<string, GameObject>> preloadedObjects = null)
         {
-            if (changeSettings || !ModHooks.Instance.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()))
+            if (changeSettings || !ModHooks.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()))
             {
-                ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = true;
+                ModHooks.GlobalSettings.ModEnabledSettings[mod.GetName()] = true;
             }
 
             mod.Initialize(preloadedObjects);
             SubscribeEvents(mod, true);
 
-            if (!ModHooks.Instance.LoadedModsWithVersions.ContainsKey(mod.GetType().Name))
+            if (!ModHooks.LoadedModsWithVersions.ContainsKey(mod.GetType().Name))
             {
-                ModHooks.Instance.LoadedModsWithVersions.Add(mod.GetType().Name, mod.GetVersion());
+                ModHooks.LoadedModsWithVersions.Add(mod.GetType().Name, mod.GetVersion());
             }
             else
             {
-                ModHooks.Instance.LoadedModsWithVersions[mod.GetType().Name] = mod.GetVersion();
+                ModHooks.LoadedModsWithVersions[mod.GetType().Name] = mod.GetVersion();
             }
 
-            if (ModHooks.Instance.LoadedMods.All(x => x != mod.GetType().Name))
+            if (ModHooks.LoadedMods.All(x => x != mod.GetType().Name))
             {
-                ModHooks.Instance.LoadedMods.Add(mod.GetType().Name);
+                ModHooks.LoadedMods.Add(mod.GetType().Name);
             }
 
             if (updateModText)
@@ -651,9 +654,9 @@ namespace Modding
         {
             try
             {
-                ModHooks.Instance.GlobalSettings.ModEnabledSettings[mod.GetName()] = false;
-                ModHooks.Instance.LoadedModsWithVersions.Remove(mod.GetType().Name);
-                ModHooks.Instance.LoadedMods.Remove(mod.GetType().Name);
+                ModHooks.GlobalSettings.ModEnabledSettings[mod.GetName()] = false;
+                ModHooks.LoadedModsWithVersions.Remove(mod.GetType().Name);
+                ModHooks.LoadedMods.Remove(mod.GetType().Name);
 
                 SubscribeEvents(mod, false);
                 mod.Unload();
@@ -810,11 +813,11 @@ namespace Modding
                 {
                     if (subscribe)
                     {
-                        e.AddEventHandler(ModHooks.Instance, del);
+                        e.AddEventHandler(null, del);
                     }
                     else
                     {
-                        e.RemoveEventHandler(ModHooks.Instance, del);
+                        e.RemoveEventHandler(null, del);
                     }
                 }
                 catch (Exception exception)

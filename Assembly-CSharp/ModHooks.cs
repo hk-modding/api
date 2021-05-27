@@ -4,7 +4,6 @@ using System.IO;
 using GlobalEnums;
 using HutongGames.PlayMaker;
 using JetBrains.Annotations;
-using Modding.Menu;
 using Modding.Patches;
 using MonoMod;
 using Newtonsoft.Json;
@@ -24,7 +23,7 @@ namespace Modding
     public class ModHooks
     {
         private const int _modVersion = 60;
-        
+
         internal static bool IsInitialized;
 
         private static readonly string SettingsPath = Path.Combine(Application.persistentDataPath, "ModdingApi.GlobalSettings.json");
@@ -39,7 +38,7 @@ namespace Modding
         /// <summary>
         ///     Dictionary of mods and their version #s
         /// </summary>
-        public static readonly Dictionary<string, string> LoadedModsWithVersions = new ();
+        public static readonly Dictionary<string, string> LoadedModsWithVersions = new();
 
         private static Console _console;
 
@@ -58,9 +57,8 @@ namespace Modding
 
         static ModHooks()
         {
-            ModManager _ = new ModManager();
             Logger.SetLogLevel(GlobalSettings.LoggingLevel);
-            
+
             GameVersion gameVersion;
             try
             {
@@ -87,7 +85,7 @@ namespace Modding
             ModVersion = version.GetGameVersionString() + "-" + _modVersion;
 
             ApplicationQuitHook += SaveGlobalSettings;
-            
+
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 Logger.APILogger.Log($"Couldn't resolve assembly {args.Name}, with sender {sender}");
@@ -118,6 +116,7 @@ namespace Modding
         /// <summary>
         ///     Current instance of Modhooks.
         /// </summary>
+        [Obsolete("All members of ModHooks are now static, use the type name instead.")]
         public static ModHooks Instance
         {
             get
@@ -338,7 +337,7 @@ namespace Modding
         internal static void SaveGlobalSettings()
         {
             Logger.APILogger.Log("Saving Global Settings");
-            
+
             if (File.Exists(SettingsPath + ".bak"))
             {
                 File.Delete(SettingsPath + ".bak");
@@ -350,9 +349,9 @@ namespace Modding
             }
 
             using FileStream fileStream = File.Create(SettingsPath);
-            
+
             using StreamWriter writer = new StreamWriter(fileStream);
-            
+
             try
             {
                 string json = JsonConvert.SerializeObject(GlobalSettings, Formatting.Indented, new JsonSerializerSettings
@@ -361,7 +360,7 @@ namespace Modding
                     TypeNameHandling = TypeNameHandling.Auto,
                     Converters = JsonConverterTypes.ConverterTypes
                 });
-                        
+
                 writer.Write(json);
 
             }
@@ -369,9 +368,9 @@ namespace Modding
             {
                 Logger.APILogger.LogError("Failed to save global settings using Json.NET.");
                 Logger.APILogger.LogError(e);
-                        
+
                 string json = JsonUtility.ToJson(GlobalSettings, true);
-                        
+
                 writer.Write(json);
             }
         }
@@ -390,7 +389,7 @@ namespace Modding
                     LoggingLevel = LogLevel.Info,
                     ModEnabledSettings = new Dictionary<string, bool>()
                 };
-                
+
                 return;
             }
 
@@ -398,7 +397,7 @@ namespace Modding
             {
                 using FileStream fileStream = File.OpenRead(SettingsPath);
                 using StreamReader reader = new StreamReader(fileStream);
-                
+
                 string json = reader.ReadToEnd();
 
                 try
@@ -434,7 +433,7 @@ namespace Modding
 
                 _globalSettings = new ModHooksGlobalSettings
                 {
-                    LoggingLevel = LogLevel.Info, 
+                    LoggingLevel = LogLevel.Info,
                     ModEnabledSettings = new Dictionary<string, bool>()
                 };
             }
@@ -556,7 +555,7 @@ namespace Modding
             Logger.APILogger.LogFine("OnRecieveDeathEvent Invoked");
 
             if (OnReceiveDeathEventHook == null) return;
-            
+
             Delegate[] invocationList = OnReceiveDeathEventHook.GetInvocationList();
 
             foreach (OnReceiveDeathEventHandler toInvoke in invocationList)
@@ -1046,31 +1045,31 @@ namespace Modding
 
             if (t == typeof(bool))
             {
-                SetPlayerBool(target, (bool) (object) val);
+                SetPlayerBool(target, (bool)(object)val);
                 return;
             }
 
             if (t == typeof(int))
             {
-                SetPlayerInt(target, (int) (object) val);
+                SetPlayerInt(target, (int)(object)val);
                 return;
             }
 
             if (t == typeof(float))
             {
-                SetPlayerFloat(target, (float) (object) val);
+                SetPlayerFloat(target, (float)(object)val);
                 return;
             }
 
             if (t == typeof(string))
             {
-                SetPlayerString(target, (string) (object) val);
+                SetPlayerString(target, (string)(object)val);
                 return;
             }
 
             if (t == typeof(Vector3))
             {
-                SetPlayerVector3(target, (Vector3) (object) val);
+                SetPlayerVector3(target, (Vector3)(object)val);
                 return;
             }
 
@@ -1083,7 +1082,7 @@ namespace Modding
                 {
                     try
                     {
-                        T v = (T) toInvoke.Invoke(typeof(T), target, val);
+                        T v = (T)toInvoke.Invoke(typeof(T), target, val);
                         if (v == null || v.Equals(val) || gotValue)
                         {
                             continue;
@@ -1119,27 +1118,27 @@ namespace Modding
 
             if (t == typeof(bool))
             {
-                return (T) (object) GetPlayerBool(target);
+                return (T)(object)GetPlayerBool(target);
             }
 
             if (t == typeof(int))
             {
-                return (T) (object) GetPlayerInt(target);
+                return (T)(object)GetPlayerInt(target);
             }
 
             if (t == typeof(float))
             {
-                return (T) (object) GetPlayerFloat(target);
+                return (T)(object)GetPlayerFloat(target);
             }
 
             if (t == typeof(string))
             {
-                return (T) (object) GetPlayerString(target);
+                return (T)(object)GetPlayerString(target);
             }
 
             if (t == typeof(Vector3))
             {
-                return (T) (object) GetPlayerVector3(target);
+                return (T)(object)GetPlayerVector3(target);
             }
 
             T varInternal = Patches.PlayerData.instance.GetVariableInternal<T>(target);
@@ -1157,7 +1156,7 @@ namespace Modding
             {
                 try
                 {
-                    T v = (T) toInvoke.Invoke(typeof(T), target, varInternal);
+                    T v = (T)toInvoke.Invoke(typeof(T), target, varInternal);
                     if (v == null || v.Equals(varInternal) || gotValue)
                     {
                         continue;
@@ -1818,7 +1817,7 @@ namespace Modding
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
         public static event Action<int> SavegameSaveHook;
-        
+
         /// <summary>
         ///     Called directly after a save has been saved
         /// </summary>
@@ -1920,13 +1919,13 @@ namespace Modding
         ///     Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        public static event Action<Patches.SaveGameData> AfterSavegameLoadHook;
+        public static event Action<SaveGameData> AfterSavegameLoadHook;
 
         /// <summary>
         ///     Called directly after a save has been loaded.  Allows for accessing SaveGame instance.
         /// </summary>
         /// <remarks>GameManager.LoadGame</remarks>
-        internal static void OnAfterSaveGameLoad(Patches.SaveGameData data)
+        internal static void OnAfterSaveGameLoad(SaveGameData data)
         {
             Logger.APILogger.LogFine("OnAfterSaveGameLoad Invoked");
 
@@ -1937,7 +1936,7 @@ namespace Modding
 
             Delegate[] invocationList = AfterSavegameLoadHook.GetInvocationList();
 
-            foreach (Action<Patches.SaveGameData> toInvoke in invocationList)
+            foreach (Action<SaveGameData> toInvoke in invocationList)
             {
                 try
                 {
@@ -1955,16 +1954,15 @@ namespace Modding
         ///     Called directly before save has been saved to allow for changes to the data before persisted.
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        public static event Action<Patches.SaveGameData> BeforeSavegameSaveHook;
+        public static event Action<SaveGameData> BeforeSavegameSaveHook;
 
         /// <summary>
         ///     Called directly before save has been saved to allow for changes to the data before persisted.
         /// </summary>
         /// <remarks>GameManager.SaveGame</remarks>
-        internal static void OnBeforeSaveGameSave(Patches.SaveGameData data)
+        internal static void OnBeforeSaveGameSave(SaveGameData data)
         {
             Logger.APILogger.LogFine("OnBeforeSaveGameSave Invoked");
-            data.LoadedMods = LoadedModsWithVersions;
 
             if (BeforeSavegameSaveHook == null)
             {
@@ -1973,7 +1971,7 @@ namespace Modding
 
             Delegate[] invocationList = BeforeSavegameSaveHook.GetInvocationList();
 
-            foreach (Action<Patches.SaveGameData> toInvoke in invocationList)
+            foreach (Action<SaveGameData> toInvoke in invocationList)
             {
                 try
                 {
@@ -2058,6 +2056,17 @@ namespace Modding
 
         #endregion
 
+        internal static event Action<ModSavegameData> SaveLocalSettings;
+        internal static event Action<ModSavegameData> LoadLocalSettings;
+
+        internal static void OnSaveLocalSettings(ModSavegameData data)
+        {
+            data.LoadedMods = LoadedModsWithVersions;
+            SaveLocalSettings?.Invoke(data);
+        }
+        internal static void OnLoadLocalSettings(ModSavegameData data) => LoadLocalSettings?.Invoke(data);
+
+
         #region SceneHandling
 
         /// <summary>
@@ -2099,7 +2108,7 @@ namespace Modding
         /// </summary>
         /// <remarks>N/A</remarks>
         public static event Func<string, string> BeforeSceneLoadHook;
-        
+
         /// <summary>
         ///     Called right before a scene gets loaded, can change which scene gets loaded
         /// </summary>

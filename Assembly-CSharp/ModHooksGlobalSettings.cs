@@ -9,8 +9,7 @@ namespace Modding
     ///     Class to hold GlobalSettings for the Modding API
     /// </summary>
     [PublicAPI]
-    [Serializable]
-    public class ModHooksGlobalSettings : ModSettings
+    public class ModHooksGlobalSettings
     {
         /// <summary>
         ///     Lists the known mods that are currently installed and whether or not they've been enabled or disabled via the Mod

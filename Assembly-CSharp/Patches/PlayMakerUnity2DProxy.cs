@@ -22,7 +22,7 @@ namespace Modding.Patches
                 return;
             }
 
-            ModHooks.Instance.OnColliderCreate(gameObject);
+            ModHooks.OnColliderCreate(gameObject);
             RefreshImplementation();
         }
     }

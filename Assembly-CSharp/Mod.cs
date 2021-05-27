@@ -6,6 +6,9 @@ using Modding.Patches;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using MonoMod.Utils;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 
 // ReSharper disable file UnusedMember.Global
 
@@ -21,25 +24,12 @@ namespace Modding
     {
         private readonly string _globalSettingsPath;
 
-        /// <summary>
-        /// Gets or sets the save settings of this Mod
-        /// </summary>
-        public virtual ModSettings SaveSettings
-        {
-            get => null;
-            // ReSharper disable once ValueParameterNotUsed overriden by super class
-            set { }
-        }
-
-        /// <summary>
-        /// Gets or sets the global settings of this Mod
-        /// </summary>
-        public virtual ModSettings GlobalSettings
-        {
-            get => null;
-            // ReSharper disable once ValueParameterNotUsed overriden by super class
-            set { }
-        }
+        private readonly Type globalSettingsType = null;
+        private readonly FastReflectionDelegate onLoadGlobalSettings;
+        private readonly FastReflectionDelegate onSaveGlobalSettings;
+        private readonly Type saveSettingsType = null;
+        private readonly FastReflectionDelegate onLoadSaveSettings;
+        private readonly FastReflectionDelegate onSaveSaveSettings;
 
         /// <summary>
         ///     The Mods Name
@@ -61,6 +51,43 @@ namespace Modding
             if (string.IsNullOrEmpty(name))
             {
                 name = GetType().Name;
+            }
+
+            if (this.GetType().GetInterfaces().Where(
+                x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(GlobalSettings<>)
+            ).FirstOrDefault() is Type globalType)
+            {
+                this.globalSettingsType = globalType.GetGenericArguments()[0];
+                foreach (var mi in globalType.GetMethods())
+                {
+                    switch (mi.Name)
+                    {
+                        case nameof(GlobalSettings<object>.OnLoadGlobal):
+                            this.onLoadGlobalSettings = mi.GetFastDelegate();
+                            break;
+                        case nameof(GlobalSettings<object>.OnSaveGlobal):
+                            this.onSaveGlobalSettings = mi.GetFastDelegate();
+                            break;
+                    }
+                }
+            }
+            if (this.GetType().GetInterfaces().Where(
+                x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(LocalSettings<>)
+            ).FirstOrDefault() is Type saveType)
+            {
+                this.saveSettingsType = saveType.GetGenericArguments()[0];
+                foreach (var mi in saveType.GetMethods())
+                {
+                    switch (mi.Name)
+                    {
+                        case nameof(LocalSettings<object>.OnLoadLocal):
+                            this.onLoadSaveSettings = mi.GetFastDelegate();
+                            break;
+                        case nameof(LocalSettings<object>.OnSaveLocal):
+                            this.onSaveSaveSettings = mi.GetFastDelegate();
+                            break;
+                    }
+                }
             }
 
             Name = name;
@@ -130,9 +157,9 @@ namespace Modding
 
         private void HookSaveMethods()
         {
-            ModHooks.Instance.BeforeSavegameSaveHook += SaveSaveSettings;
-            ModHooks.Instance.AfterSavegameLoadHook += LoadSaveSettings;
-            ModHooks.Instance.ApplicationQuitHook += SaveGlobalSettings;
+            ModHooks.ApplicationQuitHook += SaveGlobalSettings;
+            ModHooks.SaveLocalSettings += SaveLocalSettings;
+            ModHooks.LoadLocalSettings += LoadLocalSettings;
             UnityEngine.SceneManagement.SceneManager.activeSceneChanged += SceneChanged;
         }
 
@@ -140,41 +167,29 @@ namespace Modding
         {
             if (arg1.name != Constants.MENU_SCENE) return;
 
-            Type type = SaveSettings?.GetType();
-
-            if (type == null)
-                return;
-
-            SaveSettings = (ModSettings) Activator.CreateInstance(type);
+            if (this.saveSettingsType is Type saveType)
+            {
+                this.onLoadSaveSettings(this, Activator.CreateInstance(saveType));
+            }
         }
 
         private void LoadGlobalSettings()
         {
-            if (!File.Exists(_globalSettingsPath))
-                return;
-            
-            Log("Loading Global Settings");
-
-            using FileStream fileStream = File.OpenRead(_globalSettingsPath);
-
-            using var reader = new StreamReader(fileStream);
-            
-            string json = reader.ReadToEnd();
-
             try
             {
-                Type settingsType = GlobalSettings?.GetType();
-
-                if (settingsType == null)
-                    return;
-
-                ModSettings settings;
-
-                try
+                // test to see if we can load global settings from this mod
+                if (this.globalSettingsType is Type saveType)
                 {
-                    settings = JsonConvert.DeserializeObject(
+                    if (!File.Exists(_globalSettingsPath))
+                        return;
+                    Log("Loading Global Settings");
+                    using FileStream fileStream = File.OpenRead(_globalSettingsPath);
+                    using var reader = new StreamReader(fileStream);
+                    string json = reader.ReadToEnd();
+
+                    var obj = JsonConvert.DeserializeObject(
                         json,
-                        settingsType,
+                        saveType,
                         new JsonSerializerSettings
                         {
                             ContractResolver = ShouldSerializeContractResolver.Instance,
@@ -182,23 +197,9 @@ namespace Modding
                             ObjectCreationHandling = ObjectCreationHandling.Replace,
                             Converters = JsonConverterTypes.ConverterTypes
                         }
-                    ) as ModSettings;
+                    );
+                    this.onLoadGlobalSettings(this, obj);
                 }
-                catch (Exception e)
-                {
-                    LogError("Failed to load settings using Json.Net, falling back.");
-                    LogError(e);
-
-                    settings = JsonUtility.FromJson(json, settingsType) as ModSettings;
-                }
-
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                if (settings is ISerializationCallbackReceiver receiver)
-                {
-                    receiver.OnAfterDeserialize();
-                }
-
-                GlobalSettings = settings;
             }
             catch (Exception e)
             {
@@ -211,56 +212,32 @@ namespace Modding
         /// </summary>
         protected void SaveGlobalSettings()
         {
-            ModSettings settings = GlobalSettings;
-
-            if (settings is null)
-                return;
-
-            Log("Saving Global Settings");
-
-            if (File.Exists(_globalSettingsPath + ".bak"))
-            {
-                File.Delete(_globalSettingsPath + ".bak");
-            }
-
-            if (File.Exists(_globalSettingsPath))
-            {
-                File.Move(_globalSettingsPath, _globalSettingsPath + ".bak");
-            }
-
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (settings is ISerializationCallbackReceiver receiver)
-            {
-                try
-                {
-                    receiver.OnBeforeSerialize();
-                }
-                catch (Exception e)
-                {
-                    LogError(e);
-                }
-            }
-
-            using FileStream fileStream = File.Create(_globalSettingsPath);
-
-            using var writer = new StreamWriter(fileStream);
-
             try
             {
-                writer.Write
-                (
-                    JsonConvert.SerializeObject
-                    (
-                        settings,
-                        Formatting.Indented,
-                        new JsonSerializerSettings
-                        {
-                            ContractResolver = ShouldSerializeContractResolver.Instance,
-                            TypeNameHandling = TypeNameHandling.Auto,
-                            Converters = JsonConverterTypes.ConverterTypes
-                        }
-                    )
-                );
+                if (this.globalSettingsType is Type saveType)
+                {
+                    Log("Saving Global Settings");
+                    var obj = this.onSaveGlobalSettings(this);
+                    if (obj is null)
+                        return;
+                    if (File.Exists(_globalSettingsPath + ".bak")) File.Delete(_globalSettingsPath + ".bak");
+                    if (File.Exists(_globalSettingsPath)) File.Move(_globalSettingsPath, _globalSettingsPath + ".bak");
+                    using FileStream fileStream = File.Create(_globalSettingsPath);
+                    using var writer = new StreamWriter(fileStream);
+                    writer.Write(
+                        JsonConvert.SerializeObject
+                        (
+                            obj,
+                            Formatting.Indented,
+                            new JsonSerializerSettings
+                            {
+                                ContractResolver = ShouldSerializeContractResolver.Instance,
+                                TypeNameHandling = TypeNameHandling.Auto,
+                                Converters = JsonConverterTypes.ConverterTypes
+                            }
+                        )
+                    );
+                }
             }
             catch (Exception e)
             {
@@ -268,41 +245,31 @@ namespace Modding
             }
         }
 
-        private void LoadSaveSettings(Patches.SaveGameData data)
+        private void LoadLocalSettings(ModSavegameData data)
         {
             try
             {
-                string name = GetType().Name;
-
-                if (data?.PolymorphicModData == null || !data.PolymorphicModData.TryGetValue(name, out string settings))
-                    return;
-
-                if (SaveSettings == null)
-                    return;
-
-                if (string.IsNullOrEmpty(settings))
-                    return;
-
-                var saveSettings = (ModSettings) JsonConvert.DeserializeObject
-                (
-                    settings,
-                    SaveSettings.GetType(),
-                    new JsonSerializerSettings
+                if (this.saveSettingsType is Type saveType)
+                {
+                    if (data.modData.TryGetValue(this.GetName(), out var obj))
                     {
-                        ContractResolver = ShouldSerializeContractResolver.Instance,
-                        TypeNameHandling = TypeNameHandling.Auto,
-                        ObjectCreationHandling = ObjectCreationHandling.Replace,
-                        Converters = JsonConverterTypes.ConverterTypes
+                        this.onLoadSaveSettings(
+                            this,
+                            obj.ToObject(
+                                saveType,
+                                JsonSerializer.Create(
+                                    new JsonSerializerSettings
+                                    {
+                                        ContractResolver = ShouldSerializeContractResolver.Instance,
+                                        TypeNameHandling = TypeNameHandling.Auto,
+                                        ObjectCreationHandling = ObjectCreationHandling.Replace,
+                                        Converters = JsonConverterTypes.ConverterTypes
+                                    }
+                                )
+                            )
+                        );
                     }
-                );
-
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                if (saveSettings is ISerializationCallbackReceiver receiver)
-                    receiver.OnAfterDeserialize();
-
-                Log("Loaded mod settings from save.");
-
-                SaveSettings = saveSettings;
+                }
             }
             catch (Exception e)
             {
@@ -310,57 +277,41 @@ namespace Modding
             }
         }
 
-        private void SaveSaveSettings(Patches.SaveGameData data)
+        private void SaveLocalSettings(ModSavegameData data)
         {
-            ModSettings saveSettings;
-
             try
             {
-                saveSettings = SaveSettings;
+                if (this.saveSettingsType is Type saveType)
+                {
+                    var settings = this.onSaveSaveSettings(this);
+                    switch (settings)
+                    {
+                        // No point in serializing nothing.
+                        case null:
+                            return;
+                        // ReSharper disable once SuspiciousTypeConversion.Global
+                        case ISerializationCallbackReceiver receiver:
+                            receiver.OnBeforeSerialize();
+                            break;
+                    }
+                    data.modData[this.GetName()] = JToken.FromObject(
+                        settings,
+                        JsonSerializer.Create(
+                            new JsonSerializerSettings
+                            {
+                                ContractResolver = ShouldSerializeContractResolver.Instance,
+                                TypeNameHandling = TypeNameHandling.Auto,
+                                Converters = JsonConverterTypes.ConverterTypes
+                            }
+                        )
+                    );
+                }
+
             }
             catch (Exception e)
             {
                 LogError(e);
-
-                return;
             }
-
-            switch (saveSettings)
-            {
-                // No point in serializing nothing.
-                case null:
-                    return;
-
-                // ReSharper disable once SuspiciousTypeConversion.Global
-                case ISerializationCallbackReceiver receiver:
-                    receiver.OnBeforeSerialize();
-                    break;
-            }
-
-            string name = GetType().Name;
-
-            Log("Adding settings to save file");
-
-            data.PolymorphicModData ??= new Dictionary<string, string>();
-
-            /*
-             * This looks kinda dumb because it kinda is.
-             *
-             * We do this so if a mod using settings is uninstalled, settings are preseved anyways.
-             * Keeping the raw settings isn't viable as we don't have a type with all the fields to load into.
-             */
-            data.PolymorphicModData[name] = JsonConvert.SerializeObject
-            (
-                saveSettings,
-                saveSettings.GetType(),
-                Formatting.Indented,
-                new JsonSerializerSettings
-                {
-                    ContractResolver = ShouldSerializeContractResolver.Instance,
-                    TypeNameHandling = TypeNameHandling.Auto,
-                    Converters = JsonConverterTypes.ConverterTypes
-                }
-            );
         }
     }
 }

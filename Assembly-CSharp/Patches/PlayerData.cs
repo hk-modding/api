@@ -83,25 +83,25 @@ namespace Modding.Patches
         [MonoModReplace]
         public void SetBool(string boolName, bool value)
         {
-            ModHooks.Instance.SetPlayerBool(boolName, value);
+            ModHooks.SetPlayerBool(boolName, value);
         }
 
         [MonoModReplace]
         public bool GetBool(string boolName)
         {
-            return ModHooks.Instance.GetPlayerBool(boolName);
+            return ModHooks.GetPlayerBool(boolName);
         }
 
         [MonoModReplace]
         public int GetInt(string intName)
         {
-            return ModHooks.Instance.GetPlayerInt(intName);
+            return ModHooks.GetPlayerInt(intName);
         }
 
         [MonoModReplace]
         public void SetInt(string intName, int value)
         {
-            ModHooks.Instance.SetPlayerInt(intName, value);
+            ModHooks.SetPlayerInt(intName, value);
         }
 
         [MonoModReplace]
@@ -109,7 +109,7 @@ namespace Modding.Patches
         {
             if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
             {
-                ModHooks.Instance.SetPlayerInt(intName, this.GetIntInternal(intName) + 1);
+                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) + 1);
                 return;
             }
 
@@ -121,7 +121,7 @@ namespace Modding.Patches
         {
             if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
             {
-                ModHooks.Instance.SetPlayerInt(intName, this.GetIntInternal(intName) - 1);
+                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) - 1);
             }
         }
 
@@ -130,7 +130,7 @@ namespace Modding.Patches
         {
             if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
             {
-                ModHooks.Instance.SetPlayerInt(intName, this.GetIntInternal(intName) + amount);
+                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) + amount);
                 return;
             }
 
@@ -140,56 +140,56 @@ namespace Modding.Patches
         [MonoModReplace]
         public float GetFloat(string floatName)
         {
-            return ModHooks.Instance.GetPlayerFloat(floatName);
+            return ModHooks.GetPlayerFloat(floatName);
         }
 
         [MonoModReplace]
         public void SetFloat(string floatName, float value)
         {
-            ModHooks.Instance.SetPlayerFloat(floatName, value);
+            ModHooks.SetPlayerFloat(floatName, value);
         }
 
         [MonoModReplace]
         public string GetString(string stringName)
         {
-            return ModHooks.Instance.GetPlayerString(stringName);
+            return ModHooks.GetPlayerString(stringName);
         }
 
         [MonoModReplace]
         public void SetString(string stringName, string value)
         {
-            ModHooks.Instance.SetPlayerString(stringName, value);
+            ModHooks.SetPlayerString(stringName, value);
         }
 
         [MonoModReplace]
         public Vector3 GetVector3(string vector3Name)
         {
-            return ModHooks.Instance.GetPlayerVector3(vector3Name);
+            return ModHooks.GetPlayerVector3(vector3Name);
         }
 
         [MonoModReplace]
         public void SetVector3(string vector3Name, Vector3 value)
         {
-            ModHooks.Instance.SetPlayerVector3(vector3Name, value);
+            ModHooks.SetPlayerVector3(vector3Name, value);
         }
 
         [MonoModReplace]
         public T GetVariable<T>(string varName)
         {
-            return ModHooks.Instance.GetPlayerVariable<T>(varName);
+            return ModHooks.GetPlayerVariable<T>(varName);
         }
 
         [MonoModReplace]
         public void SetVariable<T>(string varName, T value)
         {
-            ModHooks.Instance.SetPlayerVariable<T>(varName, value);
+            ModHooks.SetPlayerVariable<T>(varName, value);
         }
 
         public extern void orig_TakeHealth(int amount);
 
         public void TakeHealth(int amount)
         {
-            amount = ModHooks.Instance.OnTakeHealth(amount);
+            amount = ModHooks.OnTakeHealth(amount);
             orig_TakeHealth(amount);
         }
 
@@ -198,14 +198,14 @@ namespace Modding.Patches
         public void UpdateBlueHealth()
         {
             orig_UpdateBlueHealth();
-            healthBlue += ModHooks.Instance.OnBlueHealth();
+            healthBlue += ModHooks.OnBlueHealth();
         }
 
         public extern void orig_AddHealth(int amount);
 
         public void AddHealth(int amount)
         {
-            amount = ModHooks.Instance.BeforeAddHealth(amount);
+            amount = ModHooks.BeforeAddHealth(amount);
             orig_AddHealth(amount);
         }
     }

@@ -31,7 +31,7 @@ namespace Modding.Patches
 
             if (!isMenuScene)
             {
-                ModHooks.Instance.OnCursor();
+                ModHooks.OnCursor();
                 return;
             }
 

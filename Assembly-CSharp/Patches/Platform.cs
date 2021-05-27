@@ -15,7 +15,7 @@ namespace Modding.Patches
         {
             string text = slotIndex == 0 ? "user.dat" : $"user{slotIndex}.dat";
 
-            string modhook = ModHooks.Instance.GetSaveFileName(slotIndex);
+            string modhook = ModHooks.GetSaveFileName(slotIndex);
 
             text = string.IsNullOrEmpty(modhook) ? text : modhook;
 

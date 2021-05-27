@@ -190,7 +190,7 @@ namespace Modding
             {
                 if (ModHooks.IsInitialized)
                 {
-                    ModHooks.Instance.LogConsole(text);
+                    ModHooks.LogConsole(text);
                 }
 
                 Writer.Write(text);
