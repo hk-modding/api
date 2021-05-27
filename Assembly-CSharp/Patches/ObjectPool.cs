@@ -23,7 +23,7 @@ namespace Modding.Patches
             try
             {
                 GameObject obj = orig_Spawn(prefab, parent, position, rotation);
-                return ModHooks.Instance.OnObjectPoolSpawn(obj);
+                return ModHooks.OnObjectPoolSpawn(obj);
             }
             catch (NullReferenceException) when (!ModLoader.Preloaded)
             {

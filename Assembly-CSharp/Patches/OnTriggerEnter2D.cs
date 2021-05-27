@@ -13,7 +13,7 @@ namespace Modding.Patches
 
         private void OnTriggerEnter2D(Collider2D otherCollider)
         {
-            ModHooks.Instance.OnSlashHit(otherCollider, gameObject);
+            ModHooks.OnSlashHit(otherCollider, gameObject);
             orig_OnTriggerEnter2D(otherCollider);
         }
     }

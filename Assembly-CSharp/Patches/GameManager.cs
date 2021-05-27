@@ -22,25 +22,25 @@ namespace Modding.Patches
         public void OnApplicationQuit()
         {
             orig_OnApplicationQuit();
-            ModHooks.Instance.OnApplicationQuit();
+            ModHooks.OnApplicationQuit();
         }
 
         public extern void orig_LoadScene(string destScene);
 
         public void LoadScene(string destScene)
         {
-            destScene = ModHooks.Instance.BeforeSceneLoad(destScene);
+            destScene = ModHooks.BeforeSceneLoad(destScene);
 
             orig_LoadScene(destScene);
 
-            ModHooks.Instance.OnSceneChanged(destScene);
+            ModHooks.OnSceneChanged(destScene);
         }
 
         public extern void orig_BeginSceneTransition(GameManager.SceneLoadInfo info);
 
         public void BeginSceneTransition(GameManager.SceneLoadInfo info)
         {
-            info.SceneName = ModHooks.Instance.BeforeSceneLoad(info.SceneName);
+            info.SceneName = ModHooks.BeforeSceneLoad(info.SceneName);
 
             orig_BeginSceneTransition(info);
         }
@@ -49,18 +49,18 @@ namespace Modding.Patches
 
         public void ClearSaveFile(int saveSlot, Action<bool> callback)
         {
-            ModHooks.Instance.OnSavegameClear(saveSlot);
+            ModHooks.OnSavegameClear(saveSlot);
             orig_ClearSaveFile(saveSlot, callback);
-            ModHooks.Instance.OnAfterSaveGameClear(saveSlot);
+            ModHooks.OnAfterSaveGameClear(saveSlot);
         }
 
         public extern IEnumerator orig_PlayerDead(float waitTime);
 
         public IEnumerator PlayerDead(float waitTime)
         {
-            ModHooks.Instance.OnBeforePlayerDead();
+            ModHooks.OnBeforePlayerDead();
             yield return orig_PlayerDead(waitTime);
-            ModHooks.Instance.OnAfterPlayerDead();
+            ModHooks.OnAfterPlayerDead();
         }
 
         #region SaveGame
@@ -143,8 +143,8 @@ namespace Modding.Patches
                     {
                         SaveGameData obj = new SaveGameData(this.playerData, this.sceneData);
 
-                        ModHooks.Instance.OnBeforeSaveGameSave(obj);
-                        ModHooks.Instance.OnSaveLocalSettings(this.moddedData);
+                        ModHooks.OnBeforeSaveGameSave(obj);
+                        ModHooks.OnSaveLocalSettings(this.moddedData);
 
                         // save modded data
                         try
@@ -240,7 +240,7 @@ namespace Modding.Patches
                         }
                     }
 
-                    ModHooks.Instance.OnSavegameSave(saveSlot);
+                    ModHooks.OnSavegameSave(saveSlot);
                 }
                 else
                 {
@@ -335,7 +335,7 @@ namespace Modding.Patches
                 Logger.APILogger.LogError(e);
                 this.moddedData = new ModSavegameData();
             }
-            ModHooks.Instance.OnLoadLocalSettings(this.moddedData);
+            ModHooks.OnLoadLocalSettings(this.moddedData);
 
             Platform.Current.ReadSaveSlot
             (
@@ -384,11 +384,11 @@ namespace Modding.Patches
                         global::PlayerData.instance = instance;
                         this.playerData = instance;
                         SceneData.instance = instance2;
-                        ModHooks.Instance.OnAfterSaveGameLoad(saveGameData);
+                        ModHooks.OnAfterSaveGameLoad(saveGameData);
                         this.sceneData = instance2;
                         this.profileID = saveSlot;
                         this.inputHandler.RefreshPlayerData();
-                        ModHooks.Instance.OnSavegameLoad(saveSlot);
+                        ModHooks.OnSavegameLoad(saveSlot);
                         obj = true;
                     }
                     catch (Exception ex)
@@ -550,7 +550,7 @@ namespace Modding.Patches
         public IEnumerator LoadSceneAdditive(string destScene)
         {
             Debug.Log("Loading " + destScene);
-            destScene = ModHooks.Instance.BeforeSceneLoad(destScene);
+            destScene = ModHooks.BeforeSceneLoad(destScene);
             this.tilemapDirty = true;
             this.startedOnThisScene = false;
             this.nextSceneName = destScene;
@@ -570,7 +570,7 @@ namespace Modding.Patches
             loadop.allowSceneActivation = true;
             yield return loadop;
             yield return UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(exitingScene);
-            ModHooks.Instance.OnSceneChanged(destScene);
+            ModHooks.OnSceneChanged(destScene);
             this.RefreshTilemapInfo(destScene);
             if (this.IsUnloadAssetsRequired(exitingScene, destScene))
             {
@@ -597,7 +597,7 @@ namespace Modding.Patches
             yield return new WaitForEndOfFrame();
             this.OnWillActivateFirstLevel();
             this.LoadScene("Tutorial_01");
-            ModHooks.Instance.OnNewGame();
+            ModHooks.OnNewGame();
             yield break;
         }
 
@@ -610,7 +610,7 @@ namespace Modding.Patches
         public void OnWillActivateFirstLevel()
         {
             orig_OnWillActivateFirstLevel();
-            ModHooks.Instance.OnNewGame();
+            ModHooks.OnNewGame();
         }
 
         #endregion
