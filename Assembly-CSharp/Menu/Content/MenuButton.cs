@@ -40,7 +40,7 @@ namespace Modding.Menu
             out MenuButton button
         )
         {
-            var style = config.style ?? MenuButtonStyle.vanillaStyle;
+            var style = config.Style ?? MenuButtonStyle.VanillaStyle;
 
             // Option object
             var option = new GameObject($"{name}");
@@ -50,17 +50,17 @@ namespace Modding.Menu
             option.AddComponent<CanvasRenderer>();
             // RectTransform
             var optionRt = option.AddComponent<RectTransform>();
-            new RelVector2(new RelLength(0f, 1f), style.height)
+            new RelVector2(new RelLength(0f, 1f), style.Height)
                 .GetBaseTransformData()
                 .Apply(optionRt);
             content.layout.ModifyNext(optionRt);
             // MenuButton
             var menuButton = (Patch.MenuButton)option.AddComponent<MenuButton>();
             menuButton.buttonType = (MenuButton.MenuButtonType)Patch.MenuButton.MenuButtonType.CustomSubmit;
-            menuButton.submitAction = config.submitAction;
+            menuButton.submitAction = config.SubmitAction;
             menuButton.cancelAction = (CancelAction)Patch.CancelAction.CustomCancelAction;
-            menuButton.proceed = config.proceed;
-            ((Patch.MenuSelectable)(MenuSelectable)menuButton).customCancelAction = config.cancelAction;
+            menuButton.proceed = config.Proceed;
+            ((Patch.MenuSelectable)(MenuSelectable)menuButton).customCancelAction = config.CancelAction;
             content.RegisterMenuItem(menuButton);
 
             // Label object
@@ -79,10 +79,10 @@ namespace Modding.Menu
             // Text
             var labelText = label.AddComponent<Text>();
             labelText.font = MenuResources.TrajanBold;
-            labelText.fontSize = style.textSize;
-            labelText.resizeTextMaxSize = style.textSize;
+            labelText.fontSize = style.TextSize;
+            labelText.resizeTextMaxSize = style.TextSize;
             labelText.alignment = TextAnchor.MiddleCenter;
-            labelText.text = config.label;
+            labelText.text = config.Label;
             labelText.supportRichText = true;
             // FixVerticalAlign
             label.AddComponent<FixVerticalAlign>();
@@ -176,23 +176,23 @@ namespace Modding.Menu
             /// <summary>
             /// The text to render on the button.
             /// </summary>
-            public string label;
+            public string Label;
             /// <summary>
             /// The action to run when the button is pressed.
             /// </summary>
-            public Action<Patch.MenuButton> submitAction;
+            public Action<Patch.MenuButton> SubmitAction;
             /// <summary>
             /// Whether the button when activated proceeds to a new menu.
             /// </summary>
-            public bool proceed;
+            public bool Proceed;
             /// <summary>
             /// The action to run when pressing the menu cancel key while selecting this item.
             /// </summary>
-            public Action<MenuSelectable> cancelAction;
+            public Action<MenuSelectable> CancelAction;
             /// <summary>
             /// The styling of the menu button.
             /// </summary>
-            public MenuButtonStyle? style;
+            public MenuButtonStyle? Style;
         }
 
         /// <summary>
@@ -203,20 +203,20 @@ namespace Modding.Menu
             /// <summary>
             /// The style preset of a menu button in the vanilla game.
             /// </summary>
-            public static readonly MenuButtonStyle vanillaStyle = new MenuButtonStyle
+            public static readonly MenuButtonStyle VanillaStyle = new MenuButtonStyle
             {
-                height = new RelLength(60f),
-                textSize = 45
+                Height = new RelLength(60f),
+                TextSize = 45
             };
 
             /// <summary>
             /// The size of the menu button.
             /// </summary>
-            public RelLength height;
+            public RelLength Height;
             /// <summary>
             /// The size of the text on the button.
             /// </summary>
-            public int textSize;
+            public int TextSize;
         }
     }
 }

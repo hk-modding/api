@@ -45,7 +45,7 @@ namespace Modding.Menu
             out MappableKey mappableKey
         )
         {
-            var style = config.style ?? KeybindStyle.vanillaStyle;
+            var style = config.Style ?? KeybindStyle.VanillaStyle;
             // Keybind object
             var keybind = new GameObject($"{name}");
             GameObject.DontDestroyOnLoad(keybind);
@@ -64,7 +64,7 @@ namespace Modding.Menu
             mkbutton.customCancelAction = _ =>
             {
                 mapKey.AbortRebind();
-                config.cancelAction?.Invoke(mapKey);
+                config.CancelAction?.Invoke(mapKey);
             };
             content.RegisterMenuItem(mapKey);
 
@@ -84,10 +84,10 @@ namespace Modding.Menu
             // Text
             var labelText = text.AddComponent<Text>();
             labelText.font = MenuResources.TrajanBold;
-            labelText.fontSize = style.labelTextSize;
-            labelText.resizeTextMaxSize = style.labelTextSize;
+            labelText.fontSize = style.LabelTextSize;
+            labelText.resizeTextMaxSize = style.LabelTextSize;
             labelText.alignment = TextAnchor.MiddleLeft;
-            labelText.text = config.label;
+            labelText.text = config.Label;
             labelText.supportRichText = true;
             // FixVerticalAlign
             text.AddComponent<FixVerticalAlign>();
@@ -195,15 +195,15 @@ namespace Modding.Menu
             /// <summary>
             /// The displayed text for the name of the keybind.
             /// </summary>
-            public string label;
+            public string Label;
             /// <summary>
             /// The style of the keybind.
             /// </summary>
-            public KeybindStyle? style;
+            public KeybindStyle? Style;
             /// <summary>
             /// The action to run when pressing the menu cancel key while selecting this item.
             /// </summary>
-            public Action<MappableKey> cancelAction;
+            public Action<MappableKey> CancelAction;
         }
 
         /// <summary>
@@ -214,14 +214,14 @@ namespace Modding.Menu
             /// <summary>
             /// The style preset of a keybind in the vanilla game.
             /// </summary>
-            public static readonly KeybindStyle vanillaStyle = new KeybindStyle
+            public static readonly KeybindStyle VanillaStyle = new KeybindStyle
             {
-                labelTextSize = 37
+                LabelTextSize = 37
             };
             /// <summary>
             /// The text size of the label text.
             /// </summary>
-            public int labelTextSize;
+            public int LabelTextSize;
         }
     }
 }

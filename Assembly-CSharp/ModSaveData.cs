@@ -7,7 +7,7 @@ namespace Modding
     /// An interface that signifies that the mod will save data into a save file.
     /// </summary>
     /// <typeparam name="S">The type representing the settings.</typeparam>
-    public interface LocalSettings<S>
+    public interface ILocalSettings<S>
     {
         /// <summary>
         /// Called when the mod just loaded the save data.
@@ -25,7 +25,7 @@ namespace Modding
     /// An interface that signifies that the mod will save global data.
     /// </summary>
     /// <typeparam name="S">The type representing the settings.</typeparam>
-    public interface GlobalSettings<S>
+    public interface IGlobalSettings<S>
     {
         /// <summary>
         /// Called when the mod just loaded the global settings.
@@ -41,7 +41,7 @@ namespace Modding
 
     internal class ModSavegameData
     {
-        public Dictionary<string, string> LoadedMods;
+        public Dictionary<string, string> loadedMods;
         public Dictionary<string, JToken> modData = new Dictionary<string, JToken>();
     }
 }

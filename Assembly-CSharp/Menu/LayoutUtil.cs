@@ -14,7 +14,7 @@ namespace Modding.Menu
         /// <remarks>
         /// The lower left corner is (0, 0) and the upper right corner is (1, 1).
         /// </remarks>
-        public Vector2 parentAnchor;
+        public Vector2 ParentAnchor;
 
         /// <summary>
         /// The normalized anchoring point on this rectangle that will get anchored to the parent.
@@ -22,12 +22,12 @@ namespace Modding.Menu
         /// <remarks>
         /// The lower left corner is (0, 0) and the upper right corner is (1, 1).
         /// </remarks>
-        public Vector2 childAnchor;
+        public Vector2 ChildAnchor;
 
         /// <summary>
         /// The offset in pixels of the <c>childAnchor</c> from the <c>parentAnchor</c>.
         /// </summary>
-        public Vector2 offset;
+        public Vector2 Offset;
 
         /// <summary>
         /// Creates a new <c>RectPosition</c>.
@@ -37,9 +37,9 @@ namespace Modding.Menu
         /// <param name="offset">The offset from the parent anchor to the child anchor.</param>
         public AnchoredPosition(Vector2 parentAnchor, Vector2 childAnchor, Vector2 offset = new Vector2())
         {
-            this.parentAnchor = parentAnchor;
-            this.childAnchor = childAnchor;
-            this.offset = offset;
+            this.ParentAnchor = parentAnchor;
+            this.ChildAnchor = childAnchor;
+            this.Offset = offset;
         }
 
         /// <summary>
@@ -55,11 +55,11 @@ namespace Modding.Menu
         /// <returns></returns>
         public RectTransformData GetRepositioned(RectTransformData rt)
         {
-            var del = this.parentAnchor - ParentPointFromChild(rt, childAnchor);
-            rt.pivot = this.childAnchor;
+            var del = this.ParentAnchor - ParentPointFromChild(rt, ChildAnchor);
+            rt.pivot = this.ChildAnchor;
             rt.anchorMin += del;
             rt.anchorMax += del;
-            rt.anchoredPosition = offset;
+            rt.anchoredPosition = Offset;
             return rt;
         }
 
@@ -97,9 +97,9 @@ namespace Modding.Menu
         /// Translates an anchored position by a relative vector.
         /// </summary>
         public static AnchoredPosition operator +(AnchoredPosition lhs, RelVector2 rhs) => new AnchoredPosition(
-            lhs.parentAnchor + rhs.relative,
-            lhs.childAnchor,
-            lhs.offset + rhs.delta
+            lhs.ParentAnchor + rhs.Relative,
+            lhs.ChildAnchor,
+            lhs.Offset + rhs.Delta
         );
         /// <summary>
         /// Translates an anchored position by a relative vector.
@@ -115,22 +115,22 @@ namespace Modding.Menu
         /// <summary>
         /// The size in pixels to increase the parent-relative size of the rect.
         /// </summary>
-        public Vector2 delta;
+        public Vector2 Delta;
         /// <summary>
         /// The normalized parent-relative size of the rect.
         /// </summary>
-        public Vector2 relative;
+        public Vector2 Relative;
 
         /// <summary>
         /// The x component of this vector.
         /// </summary>
         public RelLength x
         {
-            get => new RelLength(delta.x, relative.x);
+            get => new RelLength(Delta.x, Relative.x);
             set
             {
-                delta.x = value.delta;
-                relative.x = value.relative;
+                Delta.x = value.Delta;
+                Relative.x = value.Relative;
             }
         }
 
@@ -139,11 +139,11 @@ namespace Modding.Menu
         /// </summary>
         public RelLength y
         {
-            get => new RelLength(delta.y, relative.y);
+            get => new RelLength(Delta.y, Relative.y);
             set
             {
-                delta.y = value.delta;
-                relative.y = value.relative;
+                Delta.y = value.Delta;
+                Relative.y = value.Relative;
             }
         }
 
@@ -155,8 +155,8 @@ namespace Modding.Menu
         /// <returns></returns>
         public RelVector2(RelLength x, RelLength y)
         {
-            this.delta = new Vector2(x.delta, y.delta);
-            this.relative = new Vector2(x.relative, y.relative);
+            this.Delta = new Vector2(x.Delta, y.Delta);
+            this.Relative = new Vector2(x.Relative, y.Relative);
         }
 
         /// <summary>
@@ -166,8 +166,8 @@ namespace Modding.Menu
         /// <param name="parentRelSize">The normalized parent-relative size.</param>
         public RelVector2(Vector2 sizeDelta, Vector2 parentRelSize)
         {
-            this.delta = sizeDelta;
-            this.relative = parentRelSize;
+            this.Delta = sizeDelta;
+            this.Relative = parentRelSize;
         }
 
         /// <summary>
@@ -183,38 +183,38 @@ namespace Modding.Menu
         /// <returns></returns>
         public RectTransformData GetBaseTransformData() => new RectTransformData
         {
-            sizeDelta = delta,
+            sizeDelta = Delta,
             anchorMin = new Vector2(),
-            anchorMax = relative
+            anchorMax = Relative
         };
 
         /// <summary>  
         /// Negates each element in a <c>RelVector2</c>.
         /// </summary>
         public static RelVector2 operator -(RelVector2 self) => new RelVector2(
-            -self.delta,
-            -self.relative
+            -self.Delta,
+            -self.Relative
         );
         /// <summary>
         /// Adds two <c>RelVector2</c>s together.
         /// </summary>
         public static RelVector2 operator +(RelVector2 lhs, RelVector2 rhs) => new RelVector2(
-            lhs.delta + rhs.delta,
-            lhs.relative + rhs.relative
+            lhs.Delta + rhs.Delta,
+            lhs.Relative + rhs.Relative
         );
         /// <summary>
         /// Subtracts one <c>RelVector2</c> from another.
         /// </summary>
         public static RelVector2 operator -(RelVector2 lhs, RelVector2 rhs) => new RelVector2(
-            lhs.delta - rhs.delta,
-            lhs.relative - rhs.relative
+            lhs.Delta - rhs.Delta,
+            lhs.Relative - rhs.Relative
         );
         /// <summary>
         /// Scales both dimensions of a <c>RelVector2</c> up by a constant factor.
         /// </summary>
         public static RelVector2 operator *(RelVector2 lhs, float rhs) => new RelVector2(
-            lhs.delta * rhs,
-            lhs.relative * rhs
+            lhs.Delta * rhs,
+            lhs.Relative * rhs
         );
         /// <summary>
         /// Scales both dimensions of a <c>RelVector2</c> up by a constant factor.
@@ -224,15 +224,15 @@ namespace Modding.Menu
         /// Scales both dimensions of a <c>RelVector2</c> up by the respective factor in a <c>Vector2</c>.
         /// </summary>
         public static RelVector2 operator *(RelVector2 lhs, Vector2 rhs) => new RelVector2(
-            lhs.delta * rhs,
-            lhs.relative * rhs
+            lhs.Delta * rhs,
+            lhs.Relative * rhs
         );
         /// <summary>
         /// Scales both dimensions of a <c>RelVector2</c> down by a constant factor.
         /// </summary>
         public static RelVector2 operator /(RelVector2 lhs, float rhs) => new RelVector2(
-            lhs.delta / rhs,
-            lhs.relative / rhs
+            lhs.Delta / rhs,
+            lhs.Relative / rhs
         );
     }
 
@@ -244,11 +244,11 @@ namespace Modding.Menu
         /// <summary>
         /// The length in pixels to increase the parent-relative length.
         /// </summary>
-        public float delta;
+        public float Delta;
         /// <summary>
         /// The normalized parent-relative length.
         /// </summary>
-        public float relative;
+        public float Relative;
 
         /// <summary>
         /// Creates a new <c>ParentRelLength</c> from a length delta and a normalized parent-relative length.
@@ -257,8 +257,8 @@ namespace Modding.Menu
         /// <param name="parentRelLength">The normalized parent-relative length.</param>
         public RelLength(float lengthDelta, float parentRelLength)
         {
-            this.delta = lengthDelta;
-            this.relative = parentRelLength;
+            this.Delta = lengthDelta;
+            this.Relative = parentRelLength;
         }
 
         /// <summary>
@@ -271,29 +271,29 @@ namespace Modding.Menu
         /// Negates the <c>RelLenght</c>.
         /// </summary>
         public static RelLength operator -(RelLength self) => new RelLength(
-            -self.delta,
-            -self.relative
+            -self.Delta,
+            -self.Relative
         );
         /// <summary>
         /// Adds two <c>RelLength</c>s together.
         /// </summary>
         public static RelLength operator +(RelLength lhs, RelLength rhs) => new RelLength(
-            lhs.delta + rhs.delta,
-            lhs.relative + rhs.relative
+            lhs.Delta + rhs.Delta,
+            lhs.Relative + rhs.Relative
         );
         /// <summary>
         /// Subtracts one <c>RelVector2</c> from another.
         /// </summary>
         public static RelLength operator -(RelLength lhs, RelLength rhs) => new RelLength(
-            lhs.delta - rhs.delta,
-            lhs.relative - rhs.relative
+            lhs.Delta - rhs.Delta,
+            lhs.Relative - rhs.Relative
         );
         /// <summary>
         /// Scales both dimensions of a <c>RelVector2</c> up by a constant factor.
         /// </summary>
         public static RelLength operator *(RelLength lhs, float rhs) => new RelLength(
-            lhs.delta * rhs,
-            lhs.relative * rhs
+            lhs.Delta * rhs,
+            lhs.Relative * rhs
         );
         /// <summary>
         /// Scales both dimensions of a <c>RelVector2</c> up by a constant factor.
@@ -303,11 +303,12 @@ namespace Modding.Menu
         /// Scales both dimensions of a <c>RelVector2</c> down by a constant factor.
         /// </summary>
         public static RelLength operator /(RelLength lhs, float rhs) => new RelLength(
-            lhs.delta / rhs,
-            lhs.relative / rhs
+            lhs.Delta / rhs,
+            lhs.Relative / rhs
         );
     }
 
+    // I want the names of these fields to mirror Unity's `RectTransform` fields.
     /// <summary>
     /// A struct to represent the data in a <c>RectTransform</c>.
     /// </summary>

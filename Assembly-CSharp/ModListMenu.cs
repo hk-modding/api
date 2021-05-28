@@ -18,7 +18,7 @@ namespace Modding
         public void InitMenu()
         {
             var builder = new MenuBuilder(UIManager.instance.UICanvas.gameObject, "ModListMenu");
-            this.screen = builder.screen;
+            this.screen = builder.Screen;
             builder.CreateAutoMenuNav()
                 .CreateTitle("Mods", MenuTitleStyle.vanillaStyle)
                 .CreateContentPane(RectTransformData.FromSizeAndPos(
@@ -42,13 +42,13 @@ namespace Modding
                     c => c.AddScrollPaneContent(
                         new ScrollbarConfig
                         {
-                            cancelAction = _ => this.ApplyChanges(),
-                            navigation = new Navigation { mode = Navigation.Mode.Explicit },
-                            position = new AnchoredPosition
+                            CancelAction = _ => this.ApplyChanges(),
+                            Navigation = new Navigation { mode = Navigation.Mode.Explicit },
+                            Position = new AnchoredPosition
                             {
-                                childAnchor = new Vector2(0f, 1f),
-                                parentAnchor = new Vector2(1f, 1f),
-                                offset = new Vector2(-310f, 0f)
+                                ChildAnchor = new Vector2(0f, 1f),
+                                ParentAnchor = new Vector2(1f, 1f),
+                                Offset = new Vector2(-310f, 0f)
                             }
                         },
                         new RelLength(0f),
@@ -66,21 +66,21 @@ namespace Modding
                                         itmod.GetName(),
                                         new HorizontalOptionConfig
                                         {
-                                            applySetting = (self, ind) =>
+                                            ApplySetting = (self, ind) =>
                                             {
                                                 changedMods[itmod] = ind == 1;
                                             },
-                                            cancelAction = _ => this.ApplyChanges(),
-                                            label = itmod.GetName(),
-                                            options = new string[] { "Off", "On" },
-                                            refreshSetting = (self, apply) => self.optionList.SetOptionTo(
+                                            CancelAction = _ => this.ApplyChanges(),
+                                            Label = itmod.GetName(),
+                                            Options = new string[] { "Off", "On" },
+                                            RefreshSetting = (self, apply) => self.optionList.SetOptionTo(
                                                 this.modEnabledSettings[itmod.GetName()] ? 1 : 0
                                             ),
-                                            style = HorizontalOptionStyle.vanillaStyle,
-                                            description = new DescriptionInfo
+                                            Style = HorizontalOptionStyle.VanillaStyle,
+                                            Description = new DescriptionInfo
                                             {
-                                                text = $"Version {mod.GetVersion()}",
-                                                style = DescriptionStyle.singleLineVanillaStyle
+                                                Text = $"Version {mod.GetVersion()}",
+                                                Style = DescriptionStyle.SingleLineVanillaStyle
                                             }
                                         },
                                         out opt
@@ -96,12 +96,12 @@ namespace Modding
                                         $"{immod.GetName()}_Settings",
                                         new MenuButtonConfig
                                         {
-                                            style = MenuButtonStyle.vanillaStyle,
-                                            cancelAction = _ => this.ApplyChanges(),
-                                            label = $"{immod.GetName()} Settings",
-                                            submitAction = _ => ((Patch.UIManager)UIManager.instance)
+                                            Style = MenuButtonStyle.VanillaStyle,
+                                            CancelAction = _ => this.ApplyChanges(),
+                                            Label = $"{immod.GetName()} Settings",
+                                            SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
                                                 .UIGoToDynamicMenu(menu),
-                                            proceed = true
+                                            Proceed = true
                                         }
                                     );
                                 }
@@ -114,12 +114,12 @@ namespace Modding
                                         $"{icmmod.GetName()}_Settings",
                                         new MenuButtonConfig
                                         {
-                                            style = MenuButtonStyle.vanillaStyle,
-                                            cancelAction = _ => this.ApplyChanges(),
-                                            label = $"{icmmod.GetName()} Settings",
-                                            submitAction = _ => ((Patch.UIManager)UIManager.instance)
+                                            Style = MenuButtonStyle.VanillaStyle,
+                                            CancelAction = _ => this.ApplyChanges(),
+                                            Label = $"{icmmod.GetName()} Settings",
+                                            SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
                                                 .UIGoToDynamicMenu(menu),
-                                            proceed = true
+                                            Proceed = true
                                         }
                                     );
                                 }
@@ -137,11 +137,11 @@ namespace Modding
                         "BackButton",
                         new MenuButtonConfig
                         {
-                            label = "Back",
-                            cancelAction = _ => this.ApplyChanges(),
-                            submitAction = _ => this.ApplyChanges(),
-                            proceed = true,
-                            style = MenuButtonStyle.vanillaStyle
+                            Label = "Back",
+                            CancelAction = _ => this.ApplyChanges(),
+                            SubmitAction = _ => this.ApplyChanges(),
+                            Proceed = true,
+                            Style = MenuButtonStyle.VanillaStyle
                         }
                     )
                 )
@@ -158,11 +158,11 @@ namespace Modding
                             "ModMenuButton",
                             new MenuButtonConfig
                             {
-                                cancelAction = self => UIManager.instance.UIGoToMainMenu(),
-                                label = "Mods",
-                                submitAction = GoToModListMenu,
-                                proceed = true,
-                                style = MenuButtonStyle.vanillaStyle
+                                CancelAction = self => UIManager.instance.UIGoToMainMenu(),
+                                Label = "Mods",
+                                SubmitAction = GoToModListMenu,
+                                Proceed = true,
+                                Style = MenuButtonStyle.VanillaStyle
                             },
                             out var modButton
                         );
@@ -231,11 +231,11 @@ namespace Modding
                         "BackButton",
                         new MenuButtonConfig
                         {
-                            label = "Back",
-                            cancelAction = GoToModListMenu,
-                            submitAction = GoToModListMenu,
-                            proceed = true,
-                            style = MenuButtonStyle.vanillaStyle
+                            Label = "Back",
+                            CancelAction = GoToModListMenu,
+                            SubmitAction = GoToModListMenu,
+                            Proceed = true,
+                            Style = MenuButtonStyle.VanillaStyle
                         },
                         out backButton
                     )
@@ -245,18 +245,18 @@ namespace Modding
                 builder.AddContent(new NullContentLayout(), c => c.AddScrollPaneContent(
                     new ScrollbarConfig
                     {
-                        cancelAction = _ => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen),
-                        navigation = new Navigation
+                        CancelAction = _ => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen),
+                        Navigation = new Navigation
                         {
                             mode = Navigation.Mode.Explicit,
                             selectOnUp = backButton,
                             selectOnDown = backButton
                         },
-                        position = new AnchoredPosition
+                        Position = new AnchoredPosition
                         {
-                            childAnchor = new Vector2(0f, 1f),
-                            parentAnchor = new Vector2(1f, 1f),
-                            offset = new Vector2(-310f, 0f)
+                            ChildAnchor = new Vector2(0f, 1f),
+                            ParentAnchor = new Vector2(1f, 1f),
+                            Offset = new Vector2(-310f, 0f)
                         }
                     },
                     new RelLength(entries.Count * 105f),
@@ -285,17 +285,17 @@ namespace Modding
                     entry.name,
                     new HorizontalOptionConfig
                     {
-                        applySetting = (_, i) => entry.saver(i),
-                        refreshSetting = (s, _) => s.optionList.SetOptionTo(entry.loader()),
-                        cancelAction = GoToModListMenu,
-                        description = string.IsNullOrEmpty(entry.description) ? null : new DescriptionInfo
+                        ApplySetting = (_, i) => entry.saver(i),
+                        RefreshSetting = (s, _) => s.optionList.SetOptionTo(entry.loader()),
+                        CancelAction = GoToModListMenu,
+                        Description = string.IsNullOrEmpty(entry.description) ? null : new DescriptionInfo
                         {
-                            text = entry.description,
-                            style = DescriptionStyle.singleLineVanillaStyle
+                            Text = entry.description,
+                            Style = DescriptionStyle.SingleLineVanillaStyle
                         },
-                        label = entry.name,
-                        options = entry.values,
-                        style = HorizontalOptionStyle.vanillaStyle
+                        Label = entry.name,
+                        Options = entry.values,
+                        Style = HorizontalOptionStyle.VanillaStyle
                     }
                 );
             }
