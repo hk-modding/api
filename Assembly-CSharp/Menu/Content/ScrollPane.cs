@@ -124,19 +124,19 @@ namespace Modding.Menu
             // RectTransform
             var scrollbarRt = scrollbar.AddComponent<RectTransform>();
             scrollbarRt.sizeDelta = new Vector2(38f, 906f);
-            config.position.Reposition(scrollbarRt);
+            config.Position.Reposition(scrollbarRt);
             // CanvasRenderer
             scrollbar.AddComponent<CanvasRenderer>();
             // Scrollbar
             var scrollbarComp = scrollbar.AddComponent<Scrollbar>();
             scrollbarComp.direction = Scrollbar.Direction.TopToBottom;
             scrollbarComp.numberOfSteps = 0;
-            scrollbarComp.navigation = config.navigation;
+            scrollbarComp.navigation = config.Navigation;
             scrollbarComp.size = 0.1f;
             // MenuPreventDeselect
             var scrollbarMpd = scrollbar.AddComponent<MenuPreventDeselect>();
             scrollbarMpd.cancelAction = (CancelAction)Modding.Patches.CancelAction.CustomCancelAction;
-            ((Modding.Patches.MenuPreventDeselect)scrollbarMpd).customCancelAction = config.cancelAction;
+            ((Modding.Patches.MenuPreventDeselect)scrollbarMpd).customCancelAction = config.CancelAction;
 
             // Sliding Area
             var slidingArea = new GameObject("Sliding Area");
@@ -231,15 +231,15 @@ namespace Modding.Menu
             /// <summary>
             /// The menu navigation to apply to the scrollbar.
             /// </summary>
-            public Navigation navigation;
+            public Navigation Navigation;
             /// <summary>
             /// The anchored poisition to place the scrollbar.
             /// </summary>
-            public AnchoredPosition position;
+            public AnchoredPosition Position;
             /// <summary>
             /// The action to run when pressing the menu cancel key while selecting this item.
             /// </summary>
-            public Action<MenuPreventDeselect> cancelAction;
+            public Action<MenuPreventDeselect> CancelAction;
         }
     }
 }

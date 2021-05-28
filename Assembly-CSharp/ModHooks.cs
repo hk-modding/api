@@ -2061,7 +2061,7 @@ namespace Modding
 
         internal static void OnSaveLocalSettings(ModSavegameData data)
         {
-            data.LoadedMods = LoadedModsWithVersions;
+            data.loadedMods = LoadedModsWithVersions;
             SaveLocalSettings?.Invoke(data);
         }
         internal static void OnLoadLocalSettings(ModSavegameData data) => LoadLocalSettings?.Invoke(data);

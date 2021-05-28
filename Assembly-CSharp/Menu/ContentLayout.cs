@@ -32,25 +32,38 @@ namespace Modding.Menu
         /// <summary>
         /// The "size" of a cell in the grid.
         /// </summary>
-        public RelVector2 itemAdvance { get; set; }
+        public RelVector2 ItemAdvance { get; set; }
         /// <summary>
         /// The starting position of the first cell.
         /// </summary>
-        public AnchoredPosition start { get; set; }
+        public AnchoredPosition Start { get; set; }
         /// <summary>
         /// The maximum number of columns to allow.
         /// </summary>
-        public int columns { get; set; }
+        public int Columns { get; set; }
 
         /// <summary>
         /// The "index" of the next item to be placed.
         /// </summary>
-        public int index { get; set; } = 0;
+        public int Index { get; set; } = 0;
 
         /// <summary>
         /// The position in grid cells of the next item.
         /// </summary>
-        public Vector2Int indexPos { get => new Vector2Int(index % columns, index / columns); }
+        public Vector2Int IndexPos { get => new Vector2Int(Index % Columns, Index / Columns); }
+
+        /// <summary>
+        /// Creates a new regular grid layout.
+        /// </summary>
+        /// <param name="start">The starting position of the first item in the grid.</param>
+        /// <param name="itemAdvance">The "size" of a cell in the grid.</param>
+        /// <param name="columns">The maximum number of columns to allow.</param>
+        public RegularGridLayout(AnchoredPosition start, RelVector2 itemAdvance, int columns)
+        {
+            this.Start = start;
+            this.ItemAdvance = itemAdvance;
+            this.Columns = columns;
+        }
 
         /// <summary>
         /// Creates a single column, top down vertical layout.
@@ -61,17 +74,16 @@ namespace Modding.Menu
         public static RegularGridLayout CreateVerticalLayout(
             float itemHeight,
             Vector2 start = new Vector2()
-        ) => new RegularGridLayout
-        {
-            itemAdvance = new RelVector2(new Vector2(0, -itemHeight)),
-            start = new AnchoredPosition
+        ) => new RegularGridLayout(
+            new AnchoredPosition
             {
-                childAnchor = new Vector2(0.5f, 1f),
-                parentAnchor = new Vector2(0.5f, 1f),
-                offset = start
+                ChildAnchor = new Vector2(0.5f, 1f),
+                ParentAnchor = new Vector2(0.5f, 1f),
+                Offset = start
             },
-            columns = 1
-        };
+            new RelVector2(new Vector2(0, -itemHeight)),
+            1
+        );
 
         /// <summary>
         /// Modifies a <c>RectTransform</c> to place it in the next spot in the grid.
@@ -79,8 +91,8 @@ namespace Modding.Menu
         /// <param name="rt">The <c>RectTransform</c> to modify.</param>
         public void ModifyNext(RectTransform rt)
         {
-            (start + itemAdvance * this.indexPos).Reposition(rt);
-            this.index += 1;
+            (Start + ItemAdvance * this.IndexPos).Reposition(rt);
+            this.Index += 1;
         }
 
         /// <summary>
@@ -102,15 +114,15 @@ namespace Modding.Menu
             float newAnchor = 0.5f
         )
         {
-            var size = newSize ?? this.itemAdvance;
-            var height = this.itemAdvance.y * this.indexPos.y;
-            var widthAdjust = this.itemAdvance.x * this.columns * originalAnchor - size.x * columns * newAnchor;
+            var size = newSize ?? this.ItemAdvance;
+            var height = this.ItemAdvance.y * this.IndexPos.y;
+            var widthAdjust = this.ItemAdvance.x * this.Columns * originalAnchor - size.x * columns * newAnchor;
             // figure out the width from the first item to the (newAnchor) of the new grid
-            var adjust = this.start.childAnchor.x * size.x + widthAdjust;
-            this.index = 0;
-            this.columns = columns;
-            this.start = this.start + new RelVector2(adjust, height);
-            this.itemAdvance = size;
+            var adjust = this.Start.ChildAnchor.x * size.x + widthAdjust;
+            this.Index = 0;
+            this.Columns = columns;
+            this.Start = this.Start + new RelVector2(adjust, height);
+            this.ItemAdvance = size;
         }
     }
 
@@ -157,7 +169,7 @@ namespace Modding.Menu
         /// <summary>
         /// The position to place the object in.
         /// </summary>
-        public AnchoredPosition pos { get; set; }
+        public AnchoredPosition Position { get; set; }
 
         /// <summary>
         /// Creates a layout with the position anchoring the same spot on the child and parent together.
@@ -171,7 +183,7 @@ namespace Modding.Menu
         /// <param name="pos">The position to place the objects in.</param>
         public SingleContentLayout(AnchoredPosition pos)
         {
-            this.pos = pos;
+            this.Position = pos;
         }
 
         /// <summary>
@@ -180,7 +192,7 @@ namespace Modding.Menu
         /// <param name="rt">The <c>RectTransform</c> to modify.</param>
         public void ModifyNext(RectTransform rt)
         {
-            pos.Reposition(rt);
+            Position.Reposition(rt);
         }
     }
 }

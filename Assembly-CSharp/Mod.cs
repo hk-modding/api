@@ -54,7 +54,7 @@ namespace Modding
             }
 
             if (this.GetType().GetInterfaces().Where(
-                x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(GlobalSettings<>)
+                x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IGlobalSettings<>)
             ).FirstOrDefault() is Type globalType)
             {
                 this.globalSettingsType = globalType.GetGenericArguments()[0];
@@ -62,17 +62,17 @@ namespace Modding
                 {
                     switch (mi.Name)
                     {
-                        case nameof(GlobalSettings<object>.OnLoadGlobal):
+                        case nameof(IGlobalSettings<object>.OnLoadGlobal):
                             this.onLoadGlobalSettings = mi.GetFastDelegate();
                             break;
-                        case nameof(GlobalSettings<object>.OnSaveGlobal):
+                        case nameof(IGlobalSettings<object>.OnSaveGlobal):
                             this.onSaveGlobalSettings = mi.GetFastDelegate();
                             break;
                     }
                 }
             }
             if (this.GetType().GetInterfaces().Where(
-                x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(LocalSettings<>)
+                x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ILocalSettings<>)
             ).FirstOrDefault() is Type saveType)
             {
                 this.saveSettingsType = saveType.GetGenericArguments()[0];
@@ -80,10 +80,10 @@ namespace Modding
                 {
                     switch (mi.Name)
                     {
-                        case nameof(LocalSettings<object>.OnLoadLocal):
+                        case nameof(ILocalSettings<object>.OnLoadLocal):
                             this.onLoadSaveSettings = mi.GetFastDelegate();
                             break;
-                        case nameof(LocalSettings<object>.OnSaveLocal):
+                        case nameof(ILocalSettings<object>.OnSaveLocal):
                             this.onSaveSaveSettings = mi.GetFastDelegate();
                             break;
                     }

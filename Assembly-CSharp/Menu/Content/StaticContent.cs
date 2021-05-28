@@ -72,9 +72,9 @@ namespace Modding.Menu
         {
             content.AddStaticPanel(name, size, out var go);
             text = go.AddComponent<Text>();
-            text.text = config.text;
-            text.fontSize = config.size;
-            text.font = config.font switch
+            text.text = config.Text;
+            text.fontSize = config.Size;
+            text.font = config.Font switch
             {
                 TextPanelConfig.TextFont.TrajanRegular => MenuResources.TrajanRegular,
                 TextPanelConfig.TextFont.TrajanBold => MenuResources.TrajanBold,
@@ -82,7 +82,7 @@ namespace Modding.Menu
                 _ => MenuResources.TrajanRegular
             };
             text.supportRichText = true;
-            text.alignment = config.anchor;
+            text.alignment = config.Anchor;
 
             return content;
         }
@@ -138,19 +138,19 @@ namespace Modding.Menu
             /// <summary>
             /// The text to render.
             /// </summary>
-            public string text;
+            public string Text;
             /// <summary>
             /// The font size of the text.
             /// </summary>
-            public int size;
+            public int Size;
             /// <summary>
             /// The font to render.
             /// </summary>
-            public TextFont font;
+            public TextFont Font;
             /// <summary>
             /// The position where the text should be anchored to.
             /// </summary>
-            public TextAnchor anchor;
+            public TextAnchor Anchor;
 
             /// <summary>
             /// The three main fonts that Hollow Knight uses in the menus.

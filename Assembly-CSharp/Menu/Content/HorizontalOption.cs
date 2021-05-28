@@ -40,7 +40,7 @@ namespace Modding.Menu
             out MenuOptionHorizontal horizontalOption
         )
         {
-            var style = config.style ?? HorizontalOptionStyle.vanillaStyle;
+            var style = config.Style ?? HorizontalOptionStyle.VanillaStyle;
 
             // Option object
             var option = new GameObject($"{name}");
@@ -50,20 +50,20 @@ namespace Modding.Menu
             option.AddComponent<CanvasRenderer>();
             // RectTransform
             var optionRt = option.AddComponent<RectTransform>();
-            style.size.GetBaseTransformData().Apply(optionRt);
+            style.Size.GetBaseTransformData().Apply(optionRt);
             content.layout.ModifyNext(optionRt);
             // MenuOptionHorizontal
             var menuOptionHorizontal = option.AddComponent<MenuOptionHorizontal>();
-            menuOptionHorizontal.optionList = config.options;
+            menuOptionHorizontal.optionList = config.Options;
             menuOptionHorizontal.applySettingOn = MenuOptionHorizontal.ApplyOnType.Scroll;
             menuOptionHorizontal.cancelAction = (CancelAction)Patch.CancelAction.CustomCancelAction;
-            ((Patch.MenuSelectable)(MenuSelectable)menuOptionHorizontal).customCancelAction = config.cancelAction;
+            ((Patch.MenuSelectable)(MenuSelectable)menuOptionHorizontal).customCancelAction = config.CancelAction;
             content.RegisterMenuItem(menuOptionHorizontal);
             // MenuSetting
             var menuSetting = (Patch.MenuSetting)option.AddComponent<MenuSetting>();
             menuSetting.settingType = (MenuSetting.MenuSettingType)Patch.MenuSetting.MenuSettingType.CustomSetting;
-            menuSetting.customApplySetting = config.applySetting;
-            menuSetting.customRefreshSetting = config.refreshSetting;
+            menuSetting.customApplySetting = config.ApplySetting;
+            menuSetting.customRefreshSetting = config.RefreshSetting;
             menuSetting.optionList = menuOptionHorizontal;
             // Post Component Config
             menuOptionHorizontal.menuSetting = menuSetting;
@@ -85,10 +85,10 @@ namespace Modding.Menu
             // Text
             var labelText = label.AddComponent<Text>();
             labelText.font = MenuResources.TrajanBold;
-            labelText.fontSize = style.labelTextSize;
-            labelText.resizeTextMaxSize = style.labelTextSize;
+            labelText.fontSize = style.LabelTextSize;
+            labelText.resizeTextMaxSize = style.LabelTextSize;
             labelText.alignment = TextAnchor.MiddleLeft;
-            labelText.text = config.label;
+            labelText.text = config.Label;
             labelText.supportRichText = true;
             // FixVerticalAlign
             label.AddComponent<FixVerticalAlign>();
@@ -109,10 +109,10 @@ namespace Modding.Menu
             // Text
             var optionTextText = optionText.AddComponent<Text>();
             optionTextText.font = MenuResources.TrajanRegular;
-            optionTextText.fontSize = style.valueTextSize;
-            optionTextText.resizeTextMaxSize = style.valueTextSize;
+            optionTextText.fontSize = style.ValueTextSize;
+            optionTextText.resizeTextMaxSize = style.ValueTextSize;
             optionTextText.alignment = TextAnchor.MiddleRight;
-            optionTextText.text = config.label;
+            optionTextText.text = config.Label;
             optionTextText.supportRichText = true;
             // FixVerticalAlign
             optionText.AddComponent<FixVerticalAlign>();
@@ -168,9 +168,9 @@ namespace Modding.Menu
             menuOptionHorizontal.rightCursor = cursorRAnimator;
 
             // Description
-            if (config.description is DescriptionInfo descInfo)
+            if (config.Description is DescriptionInfo descInfo)
             {
-                var descStyle = descInfo.style ?? DescriptionStyle.singleLineVanillaStyle;
+                var descStyle = descInfo.Style ?? DescriptionStyle.SingleLineVanillaStyle;
 
                 var description = new GameObject("Description");
                 GameObject.DontDestroyOnLoad(description);
@@ -180,7 +180,7 @@ namespace Modding.Menu
                 // RectTransform
                 var rt = description.AddComponent<RectTransform>();
                 RectTransformData.FromSizeAndPos(
-                    new RelVector2(new RelLength(0, 1), descStyle.height),
+                    new RelVector2(new RelLength(0, 1), descStyle.Height),
                     new AnchoredPosition(new Vector2(0, 0), new Vector2(0, 1), new Vector2(60, 0))
                 ).Apply(rt);
                 // Animator
@@ -190,10 +190,10 @@ namespace Modding.Menu
                 // Text
                 var descText = description.AddComponent<Text>();
                 descText.font = MenuResources.Perpetua;
-                descText.fontSize = descStyle.textSize;
-                descText.resizeTextMaxSize = descStyle.textSize;
+                descText.fontSize = descStyle.TextSize;
+                descText.resizeTextMaxSize = descStyle.TextSize;
                 descText.alignment = TextAnchor.UpperLeft;
-                descText.text = descInfo.text;
+                descText.text = descInfo.Text;
                 descText.supportRichText = true;
                 // Post Component Config
                 menuOptionHorizontal.descriptionText = anim;
@@ -214,31 +214,31 @@ namespace Modding.Menu
             /// <summary>
             /// The list of options to display.
             /// </summary>
-            public string[] options;
+            public string[] Options;
             /// <summary>
             /// The displayed name of the option.
             /// </summary>
-            public string label;
+            public string Label;
             /// <summary>
             /// The action to run when the menu setting is changed.
             /// </summary>
-            public Patch.MenuSetting.ApplySetting applySetting;
+            public Patch.MenuSetting.ApplySetting ApplySetting;
             /// <summary>
             /// The action to run when loading the saved setting.
             /// </summary>
-            public Patch.MenuSetting.RefreshSetting refreshSetting;
+            public Patch.MenuSetting.RefreshSetting RefreshSetting;
             /// <summary>
             /// The action to run when pressing the menu cancel key while selecting this item.
             /// </summary>
-            public Action<MenuSelectable> cancelAction;
+            public Action<MenuSelectable> CancelAction;
             /// <summary>
             /// The styling of the menu option.
             /// </summary>
-            public HorizontalOptionStyle? style;
+            public HorizontalOptionStyle? Style;
             /// <summary>
             /// The description of the option that gets displayed underneath.
             /// </summary>
-            public DescriptionInfo? description;
+            public DescriptionInfo? Description;
         }
 
         /// <summary>
@@ -249,29 +249,29 @@ namespace Modding.Menu
             /// <summary>
             /// The style preset of a horizontal option in the vanilla game.
             /// </summary>
-            public static readonly HorizontalOptionStyle vanillaStyle = new HorizontalOptionStyle
+            public static readonly HorizontalOptionStyle VanillaStyle = new HorizontalOptionStyle
             {
-                size = new RelVector2
+                Size = new RelVector2
                 {
-                    relative = new Vector2(),
-                    delta = new Vector2(1000f, 60f)
+                    Relative = new Vector2(),
+                    Delta = new Vector2(1000f, 60f)
                 },
-                labelTextSize = 46,
-                valueTextSize = 46
+                LabelTextSize = 46,
+                ValueTextSize = 46
             };
 
             /// <summary>
             /// The size of the main option.
             /// </summary>
-            public RelVector2 size;
+            public RelVector2 Size;
             /// <summary>
             /// The size of the text on the option label.
             /// </summary>
-            public int labelTextSize;
+            public int LabelTextSize;
             /// <summary>
             /// The size of the text on the option value.
             /// </summary>
-            public int valueTextSize;
+            public int ValueTextSize;
         }
 
         /// <summary>
@@ -282,11 +282,11 @@ namespace Modding.Menu
             /// <summary>
             /// The text of the description.
             /// </summary>
-            public string text;
+            public string Text;
             /// <summary>
             /// The styling of the description text.
             /// </summary>
-            public DescriptionStyle? style;
+            public DescriptionStyle? Style;
         }
 
         /// <summary>
@@ -297,19 +297,19 @@ namespace Modding.Menu
             /// <summary>
             /// The style preset of a single line description in the vanilla game.
             /// </summary>
-            public static readonly DescriptionStyle singleLineVanillaStyle = new DescriptionStyle
+            public static readonly DescriptionStyle SingleLineVanillaStyle = new DescriptionStyle
             {
-                textSize = 38,
-                height = new RelLength(40),
+                TextSize = 38,
+                Height = new RelLength(40),
             };
             /// <summary>
             /// The size of the text on the description.
             /// </summary>
-            public int textSize;
+            public int TextSize;
             /// <summary>
             /// The height of the description text.
             /// </summary>
-            public RelLength height;
+            public RelLength Height;
         }
     }
 }

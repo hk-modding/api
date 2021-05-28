@@ -13,22 +13,22 @@ namespace Modding.Menu
         /// <summary>
         /// The currently selected menu item.
         /// </summary>
-        public MenuSelectable selected { get; private set; }
+        public MenuSelectable Selected { get; private set; }
         /// <summary>
         /// The list of menu items in the content pane.
         /// </summary>
-        public List<MenuSelectable> content { get; set; } = new List<MenuSelectable>();
+        public List<MenuSelectable> Content { get; set; } = new List<MenuSelectable>();
         /// <summary>
         /// The list of menu items in the control pane.
         /// </summary>
-        public List<MenuSelectable> controls { get; set; } = new List<MenuSelectable>();
+        public List<MenuSelectable> Controls { get; set; } = new List<MenuSelectable>();
 
         /// <summary>
         /// Calculates the <c>Navigation</c>s of all of the menu items.
         /// </summary>
         public void RecalculateNavigation()
         {
-            for (var i = 0; i < content.Count + controls.Count; i++)
+            for (var i = 0; i < Content.Count + Controls.Count; i++)
             {
                 var last = this.GetSelJoint(i - 1);
                 var sel = this.GetSelJoint(i);
@@ -39,7 +39,7 @@ namespace Modding.Menu
                 nav.selectOnUp = last;
                 nav.selectOnDown = next;
                 sel.navigation = nav;
-                sel.OnSelected += self => this.selected = self;
+                sel.OnSelected += self => this.Selected = self;
             }
         }
 
@@ -49,8 +49,8 @@ namespace Modding.Menu
         /// <returns></returns>
         public MenuSelectable FirstItem()
         {
-            if (this.content.Count > 0) return this.content[0];
-            else if (this.controls.Count > 0) return this.controls[0];
+            if (this.Content.Count > 0) return this.Content[0];
+            else if (this.Controls.Count > 0) return this.Controls[0];
             else return null;
         }
 
@@ -59,18 +59,18 @@ namespace Modding.Menu
         {
             if (index == -1)
             {
-                return controls.Count == 0 ? content[content.Count - 1] : controls[controls.Count - 1];
+                return Controls.Count == 0 ? Content[Content.Count - 1] : Controls[Controls.Count - 1];
             }
-            if (index < content.Count)
+            if (index < Content.Count)
             {
-                return content[index];
+                return Content[index];
             }
-            index -= content.Count;
-            if (index < controls.Count)
+            index -= Content.Count;
+            if (index < Controls.Count)
             {
-                return controls[index];
+                return Controls[index];
             }
-            return content.Count == 0 ? controls[0] : content[0];
+            return Content.Count == 0 ? Controls[0] : Content[0];
         }
 
         private void OnEnable()
@@ -80,9 +80,9 @@ namespace Modding.Menu
 
         private void Select()
         {
-            if (this.selected != null)
+            if (this.Selected != null)
             {
-                this.StartCoroutine(this.SelectDelayed(this.selected));
+                this.StartCoroutine(this.SelectDelayed(this.Selected));
             }
             else
             {
