@@ -47,6 +47,19 @@
         <Exec Condition="!Exists('$(TargetDir)MMHOOK_Assembly-CSharp.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.RuntimeDetour.HookGen.exe --private Assembly-CSharp.dll" />
         <Exec Condition="!Exists('$(TargetDir)MMHOOK_Playmaker.dll')" WorkingDirectory="@(BuildDir)" Command="$(Mono) MonoMod.RuntimeDetour.HookGen.exe --private PlayMaker.dll" />
     </Target>
+
+    <Target Name="SetupExamples" AfterTargets="PostBuildEvent" Condition="'$(SetupExamples)' == 'true'">
+        <RemoveDir Directories="$(SolutionDir)/Examples/HollowKnightManaged/" />
+        <MakeDir Directories="$(SolutionDir)/Examples/HollowKnightManaged/" />
+        <!-- Copy the vanilla files. -->
+        <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)/Examples/HollowKnightManaged/" />
+        <!-- Copy the API and the documentation -->
+        <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(SolutionDir)/Examples/HollowKnightManaged/Assembly-CSharp.dll" />
+        <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(SolutionDir)/Examples/HollowKnightManaged/Assembly-CSharp.xml" />
+        
+        <!-- Copy the dependencies for the API and hooks for mods -->
+        <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(SolutionDir)/Examples/HollowKnightManaged/" />
+    </Target>
     
     <Target Name="Release" AfterTargets="PostBuild" Condition="'$(Configuration)' == 'Release'">
         <!-- Cleanup -->
