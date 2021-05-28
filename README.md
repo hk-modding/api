@@ -11,16 +11,17 @@ Building the API is fairly straightforward.
 
 1. Clone this!
 2. Go to one of the directories listed below and copy it's contents to the `Vanilla` folder in this repository. (Create the Vanilla folder if it does not exist.)
-  * Windows: `%HollowKnightGameInstallPath%/hollow_knight_Data/Managed/`
-  * Linux: `~/.steam/steam/steamapps/common/Hollow Knight/hollow_knight_Data/Managed/`
-  * Mac: `~/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/hollow_knight_Data/Managed/`
+    * Windows: `%HollowKnightGameInstallPath%/hollow_knight_Data/Managed/`
+    * Linux: `~/.steam/steam/steamapps/common/Hollow Knight/hollow_knight_Data/Managed/`
+    * Mac: `~/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/hollow_knight_Data/Managed/`
 3. Open the solution in Visual Studio or Rider (You can also just use msbuild/xbuild)
 4. Set the build configuration to Debug.
-5. The patched assembly should be in `RepoPath/OutputFinal/hollow_knight_Data/Managed/` (There is also a zip file in `RepoPath/ModdingAPI.zip` ready to upload to Google Drive)
+5. The patched assembly should be in `RepoPath/OutputFinal/` (There is also a zip file in `RepoPath/ModdingAPI.zip` ready to upload to Google Drive)
 6. Copy `Assembly-CSharp.dll` to `%HollowKnightGameInstallPath%/hollow_knight_Data/Managed/`
-To use msbuild:
+
+To use the `dotnet` cli:
 1. Navigate to the root of the project
-2. Run `msbuild -p:Configuration=Debug /restore`
+2. Run `dotnet build -p:Configuration=Debug`
 
 Contributors
 =======

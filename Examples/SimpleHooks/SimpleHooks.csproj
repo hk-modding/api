@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net472</TargetFramework>
+        <AssemblyTitle>SimpleHooks</AssemblyTitle>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <DebugType>portable</DebugType>
+        <Copyright>Copyright © 2021</Copyright>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
+        <LangVersion>latest</LangVersion>
+        <!--
+            Update this to be the `Managed` folder of your Hollow Knight install in real mods,
+            or to point to the nescessary assemblies referenced by this mod.
+        -->
+        <HollowKnightRefs>../HollowKnightManaged/</HollowKnightRefs>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>$(HollowKnightRefs)/Assembly-CSharp.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+</Project>
