@@ -61,7 +61,7 @@
         <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(SolutionDir)/Examples/HollowKnightManaged/" />
     </Target>
     
-    <Target Name="Release" AfterTargets="PostBuild" Condition="'$(Configuration)' == 'Release'">
+    <Target Name="OutputFinal" AfterTargets="PostBuild">
         <!-- Cleanup -->
         <RemoveDir Directories="$(OutputDir)" />
 
@@ -75,7 +75,9 @@
         
         <!-- Copy the dependencies for the API and hooks for mods -->
         <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutputDir)" />
+    </Target>
 
+    <Target Name="ReleaseZip" AfterTargets="OutputFinal" Condition="'$(Configuration)' == 'Release'">
         <!-- Zip for distribution -->
         <ZipDirectory SourceDirectory="$(OutputDir)" DestinationFile="$(SolutionDir)ModdingAPI.zip" />
     </Target>
