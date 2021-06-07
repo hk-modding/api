@@ -10,9 +10,11 @@ namespace ExampleMods
     {
         public static CustomSaveData LoadedInstance { get; set; }
 
-        // The global settings for this mod. The settings load will only occur once
-        // so a static field should be used to prevent loss of data
-        public static CustomGlobalSaveData GlobalSaveData { get; set; }
+        // The global settings for this mod. The settings load will only occur once.
+        // so a static field should be used to prevent loss of data.
+        // If this mod has not been loaded yet, `OnLoadGlobal` will never be called,
+        // so a default value must be provided.
+        public static CustomGlobalSaveData GlobalSaveData { get; set; } = new CustomGlobalSaveData();
         // Implement the GlobalSettings interface.
         // This method gets called when the mod loader loads the global settings.
         public void OnLoadGlobal(CustomGlobalSaveData s) => CustomSaveData.GlobalSaveData = s;
@@ -20,7 +22,9 @@ namespace ExampleMods
         public CustomGlobalSaveData OnSaveGlobal() => CustomSaveData.GlobalSaveData;
 
         // The save data specific to a certain savefile. This setting will be loaded each time a save is opened.
-        public CustomLocalSaveData LocalSaveData { get; set; }
+        // If this mod has not been loaded yet on a save, `OnLoadLocal` will never be called,
+        // so a default value must be provided.
+        public CustomLocalSaveData LocalSaveData { get; set; } = new CustomLocalSaveData();
         // Implement the LocalSettings interface.
         // This method gets called when a save is loaded.
         public void OnLoadLocal(CustomLocalSaveData s) => this.LocalSaveData = s;
