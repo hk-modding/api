@@ -1,0 +1,32 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      with:
+        repository: HollowKnight-Modding/Vanilla-CI-Refs
+        ssh-key: ${{ secrets.VANILLA_DEPLOY_KEY }}
+    - name: Copy vanilla files
+      run: cp ./Vanilla-CI-Refs/*.dll ./HollowKnight.Modding/Vanilla/
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 4.7.2
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -p:Configuration=Release
+    - name: Upload Binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: ModdingApi
+        path: ./OutputFinal/
