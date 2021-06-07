@@ -2,9 +2,9 @@ name: .NET
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, ci ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, ci ]
 
 jobs:
   build:
@@ -15,16 +15,16 @@ jobs:
       with:
         repository: HollowKnight-Modding/Vanilla-CI-Refs
         ssh-key: ${{ secrets.VANILLA_DEPLOY_KEY }}
-    - name: Copy vanilla files
-      run: cp ./Vanilla-CI-Refs/*.dll ./HollowKnight.Modding/Vanilla/
+        ref: master
+        path: Vanilla
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 4.7.2
+    - name: Setup ms-build
+      run: sudo apt-get install -y nuget mono-devel mono-xbuild
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build -p:Configuration=Release
+      run: dotnet build
     - name: Upload Binary
       uses: actions/upload-artifact@v2
       with:

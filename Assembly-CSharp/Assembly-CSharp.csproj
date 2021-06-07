@@ -106,6 +106,10 @@
         <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="21.1.11.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
