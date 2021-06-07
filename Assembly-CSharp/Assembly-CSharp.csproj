@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <OutputDir>$(SolutionDir)OutputFinal</OutputDir>
+        <OutputDir>$(SolutionDir)/OutputFinal</OutputDir>
         <Mono Condition="$(OS) == WINDOWS_NT" />
         <Mono Condition="$(OS) != WINDOWS_NT">mono</Mono>
     </PropertyGroup>
@@ -63,10 +63,10 @@
     
     <Target Name="OutputFinal" AfterTargets="PostBuild">
         <!-- Cleanup -->
-        <RemoveDir Directories="$(OutputDir)" />
+        <RemoveDir Directories="$(OutputDir)/" />
 
         <!-- Make the output directory -->
-        <MakeDir Directories="$(OutputDir)" />
+        <MakeDir Directories="$(OutputDir)/" />
 
         <!-- Copy the API, the documentation, and the README. -->
         <Copy SourceFiles="$(SolutionDir)/README.ModdingApi.md" DestinationFiles="$(OutputDir)/README.md" />
@@ -79,7 +79,7 @@
 
     <Target Name="ReleaseZip" AfterTargets="OutputFinal" Condition="'$(Configuration)' == 'Release'">
         <!-- Zip for distribution -->
-        <ZipDirectory SourceDirectory="$(OutputDir)" DestinationFile="$(SolutionDir)ModdingAPI.zip" />
+        <ZipDirectory SourceDirectory="$(OutputDir)/" DestinationFile="$(SolutionDir)/ModdingAPI.zip" />
     </Target>
     
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
