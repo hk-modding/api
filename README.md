@@ -15,7 +15,7 @@ Building the API is fairly straightforward.
     * Linux: `~/.steam/steam/steamapps/common/Hollow Knight/hollow_knight_Data/Managed/`
     * Mac: `~/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/hollow_knight_Data/Managed/`
 3. Open the solution in Visual Studio or Rider (You can also just use msbuild/xbuild)
-4. Set the build configuration to Debug.
+4. Set the build configuration to Release.
 5. The patched assembly should be in `RepoPath/OutputFinal/` (There is also a zip file in `RepoPath/ModdingAPI.zip` ready to upload to Google Drive)
 6. Copy `Assembly-CSharp.dll` to `%HollowKnightGameInstallPath%/hollow_knight_Data/Managed/`
 
