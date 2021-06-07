@@ -65,7 +65,7 @@ namespace Modding.Patches
 
         #region SaveGame
 
-        internal ModSavegameData moddedData = new ModSavegameData();
+        private ModSavegameData moddedData;
 
         [MonoModIgnore]
         private GameCameras gameCams;
@@ -144,6 +144,9 @@ namespace Modding.Patches
                         SaveGameData obj = new SaveGameData(this.playerData, this.sceneData);
 
                         ModHooks.OnBeforeSaveGameSave(obj);
+                        if(this.moddedData == null) {
+                            this.moddedData = new ModSavegameData();
+                        }
                         ModHooks.OnSaveLocalSettings(this.moddedData);
 
                         // save modded data
@@ -324,6 +327,11 @@ namespace Modding.Patches
                             Converters = JsonConverterTypes.ConverterTypes
                         }
                     );
+                    if (this.moddedData == null)
+                    {
+                        Logger.APILogger.LogError($"Loaded mod savegame data deserialized to null: {json}");
+                        this.moddedData = new ModSavegameData();
+                    }
                 }
                 else
                 {
