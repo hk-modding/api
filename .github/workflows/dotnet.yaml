@@ -24,7 +24,9 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build
+      run: |
+        dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
+        dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
     - name: Upload Binary
       uses: actions/upload-artifact@v2
       with:

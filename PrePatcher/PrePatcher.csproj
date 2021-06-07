@@ -19,12 +19,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <TargetDirFiles Include="$(TargetDir)/*.*" />
+        <TargetDirFiles Include="$(TargetDir)\**" />
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <MakeDir Directories="$(ProjectDir)Output" />
-        <Copy SourceFiles="@(TargetDirFiles)" DestinationFolder="$(ProjectDir)Output/" />
+        <Copy SourceFiles="@(TargetDirFiles)" DestinationFolder="$(ProjectDir)Output" />
     </Target>
 
     <ItemGroup>
