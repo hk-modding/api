@@ -37,7 +37,7 @@
 
         <Copy SkipUnchangedFiles="true" SourceFiles="@(Files)" DestinationFolder="@(BuildDir)" />
 
-        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) $(SolutionDir)/PrePatcher/Output/PrePatcher.exe Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
+        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(SolutionDir)/PrePatcher/Output/PrePatcher.exe&quot; Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
         <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)Assembly-CSharp-patched.dll" DestinationFiles="$(TargetDir)Assembly-CSharp.dll" />
 
         <Delete Condition="Exists('MONOMODDED_Assembly-CSharp.dll')" Files="MONOMODDED_Assembly-CSharp.dll" />
@@ -95,15 +95,15 @@
         <PackageReference Include="ILRepack" Version="2.1.0-beta1">
             <IncludeAssets>build;compile</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MonoMod" Version="21.1.11.1">
+        <PackageReference Include="MonoMod" Version="21.4.29.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
 
-        <PackageReference Include="MonoMod.RuntimeDetour" Version="21.1.11.1">
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="21.4.29.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
         
-        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="21.1.11.1">
+        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="21.4.29.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
     </ItemGroup>
