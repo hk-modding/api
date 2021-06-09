@@ -121,7 +121,7 @@ namespace Modding.Menu
             var adjust = Start.ChildAnchor.x * size.x + widthAdjust;
             Index = 0;
             Columns = columns;
-            Start = Start + new RelVector2(adjust, height);
+            Start += new RelVector2(adjust, height);
             ItemAdvance = size;
         }
     }
