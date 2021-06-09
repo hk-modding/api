@@ -61,31 +61,30 @@ namespace Modding
                                 {
                                     var rt = c.contentObject.GetComponent<RectTransform>();
                                     rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
-                                    MenuOptionHorizontal opt;
-                                    c.AddHorizontalOption(
-                                        itmod.GetName(),
-                                        new HorizontalOptionConfig
-                                        {
-                                            ApplySetting = (self, ind) =>
-                                            {
-                                                changedMods[itmod] = ind == 1;
-                                            },
-                                            CancelAction = _ => ApplyChanges(),
-                                            Label = itmod.GetName(),
-                                            Options = new string[] { "Off", "On" },
-                                            RefreshSetting = (self, apply) => self.optionList.SetOptionTo(
-                                                modEnabledSettings[itmod.GetName()] ? 1 : 0
-                                            ),
-                                            Style = HorizontalOptionStyle.VanillaStyle,
-                                            Description = new DescriptionInfo
-                                            {
-                                                Text = $"Version {mod.GetVersion()}",
-                                                Style = DescriptionStyle.SingleLineVanillaStyle
-                                            }
-                                        },
-                                        out opt
-                                    );
-                                    opt.menuSetting.RefreshValueFromGameSettings();
+									c.AddHorizontalOption(
+										itmod.GetName(),
+										new HorizontalOptionConfig
+										{
+											ApplySetting = (self, ind) =>
+											{
+												changedMods[itmod] = ind == 1;
+											},
+											CancelAction = _ => ApplyChanges(),
+											Label = itmod.GetName(),
+											Options = new string[] { "Off", "On" },
+											RefreshSetting = (self, apply) => self.optionList.SetOptionTo(
+												modEnabledSettings[itmod.GetName()] ? 1 : 0
+											),
+											Style = HorizontalOptionStyle.VanillaStyle,
+											Description = new DescriptionInfo
+											{
+												Text = $"Version {mod.GetVersion()}",
+												Style = DescriptionStyle.SingleLineVanillaStyle
+											}
+										},
+										out MenuOptionHorizontal opt
+									);
+									opt.menuSetting.RefreshValueFromGameSettings();
                                 }
                                 if (mod is IMenuMod immod)
                                 {
