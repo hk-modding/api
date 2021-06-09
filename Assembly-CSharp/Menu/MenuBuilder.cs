@@ -175,7 +175,7 @@ namespace Modding.Menu
             fleurAnimator.applyRootMotion = false;
             Screen.topFleur = fleurAnimator;
             // Image
-            var image = fleur.AddComponent<Image>();
+            fleur.AddComponent<Image>();
 
             return this;
         }
