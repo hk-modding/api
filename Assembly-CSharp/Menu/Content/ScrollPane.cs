@@ -25,7 +25,7 @@ namespace Modding.Menu
             this ContentArea content,
             ScrollbarConfig config,
             RelLength contentHeight,
-            ContentLayout layout,
+            IContentLayout layout,
             Action<ContentArea> action
         ) => content.AddScrollPaneContent(config, contentHeight, layout, action, out _, out _);
 
@@ -45,7 +45,7 @@ namespace Modding.Menu
             this ContentArea content,
             ScrollbarConfig config,
             RelLength contentHeight,
-            ContentLayout layout,
+            IContentLayout layout,
             Action<ContentArea> action,
             out GameObject scrollContent,
             out Scrollbar scroll

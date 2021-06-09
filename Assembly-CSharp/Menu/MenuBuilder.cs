@@ -76,7 +76,7 @@ namespace Modding.Menu
         /// <param name="layout">The layout of the added content</param>
         /// <param name="action">The action that will get called to add the content</param>
         /// <returns></returns>
-        public MenuBuilder AddContent(ContentLayout layout, Action<ContentArea> action)
+        public MenuBuilder AddContent(IContentLayout layout, Action<ContentArea> action)
         {
             if (Screen.content == null)
             {
@@ -95,7 +95,7 @@ namespace Modding.Menu
         /// <param name="layout">The layout to apply to the added content.</param>
         /// <param name="action">The action that will get called to add the content.</param>
         /// <returns></returns>
-        public MenuBuilder AddControls(ContentLayout layout, Action<ContentArea> action)
+        public MenuBuilder AddControls(IContentLayout layout, Action<ContentArea> action)
         {
             if (Screen.controls == null)
             {
@@ -243,14 +243,14 @@ namespace Modding.Menu
         /// <summary>
         /// The layout to apply to the content being added.
         /// </summary>
-        public ContentLayout layout { get; set; }
+        public IContentLayout layout { get; set; }
 
         /// <summary>
         /// Creates a new <c>ContentArea</c>.
         /// </summary>
         /// <param name="obj">The object to place the added content in.</param>
         /// <param name="layout">The layout to applly to the content being added.</param>
-        public ContentArea(GameObject obj, ContentLayout layout)
+        public ContentArea(GameObject obj, IContentLayout layout)
         {
             contentObject = obj;
             this.layout = layout;
