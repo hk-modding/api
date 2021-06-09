@@ -76,7 +76,7 @@ namespace Modding.Patches
             }
             catch
             {
-                return default(T);
+                return default;
             }
         }
 
