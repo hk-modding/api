@@ -11,12 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/checkout@v2
-      with:
-        repository: HollowKnight-Modding/Vanilla-CI-Refs
-        ssh-key: ${{ secrets.VANILLA_DEPLOY_KEY }}
-        ref: master
-        path: Vanilla
+    - name: Setup Vanilla
+      run: |
+        wget https://files.catbox.moe/jeu7gx.zip -O Vanilla.zip
+        unzip Vanilla.zip
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
     - name: Setup ms-build
