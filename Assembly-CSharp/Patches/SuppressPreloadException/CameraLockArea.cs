@@ -33,28 +33,28 @@ namespace Modding.Patches
 
         private IEnumerator Start()
         {
-            this.gcams = SuppressPreloadException.GameCameras.instance;
-            if (this.gcams == null)
+            gcams = SuppressPreloadException.GameCameras.instance;
+            if (gcams == null)
                 yield break;
-            this.cameraCtrl = this.gcams.cameraController;
-            this.camTarget = this.gcams.cameraTarget;
-            Scene scene = this.gameObject.scene;
-            if (this.cameraCtrl == null)
+            cameraCtrl = gcams.cameraController;
+            camTarget = gcams.cameraTarget;
+            Scene scene = gameObject.scene;
+            if (cameraCtrl == null)
                 yield break;
-            while (this.cameraCtrl.tilemap == null || this.cameraCtrl.tilemap.gameObject.scene != scene)
+            while (cameraCtrl.tilemap == null || cameraCtrl.tilemap.gameObject.scene != scene)
             {
                 yield return null;
             }
-            if (!this.ValidateBounds())
+            if (!ValidateBounds())
             {
-                Debug.LogError("Camera bounds are unspecified for " + this.name + ", please specify lock area bounds for this Camera Lock Area.");
+                Debug.LogError("Camera bounds are unspecified for " + name + ", please specify lock area bounds for this Camera Lock Area.");
             }
-            if (this.box2d != null)
+            if (box2d != null)
             {
-                this.leftSideX = this.box2d.bounds.min.x;
-                this.rightSideX = this.box2d.bounds.max.x;
-                this.botSideY = this.box2d.bounds.min.y;
-                this.topSideY = this.box2d.bounds.max.y;
+                leftSideX = box2d.bounds.min.x;
+                rightSideX = box2d.bounds.max.x;
+                botSideY = box2d.bounds.min.y;
+                topSideY = box2d.bounds.max.y;
             }
             yield break;
         }

@@ -23,17 +23,17 @@ namespace Modding.Patches
         [MonoModReplace]
         private void Update()
         {
-            if (this.controlEnabled)
+            if (controlEnabled)
             {
-                this.UpdateAnimation();
+                UpdateAnimation();
             }
-            else if (this.cState.facingRight)
+            else if (cState.facingRight)
             {
-                this.wasFacingRight = true;
+                wasFacingRight = true;
             }
             else
             {
-                this.wasFacingRight = false;
+                wasFacingRight = false;
             }
         }
     }

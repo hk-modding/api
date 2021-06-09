@@ -53,187 +53,187 @@ namespace Modding.Patches
         public void Attack(AttackDirection attackDir)
         {
             ModHooks.OnAttack(attackDir); //MOD API ADDED
-            if (Time.timeSinceLevelLoad - this.altAttackTime > this.ALT_ATTACK_RESET)
+            if (Time.timeSinceLevelLoad - altAttackTime > ALT_ATTACK_RESET)
             {
-                this.cState.altAttack = false;
+                cState.altAttack = false;
             }
 
-            this.cState.attacking = true;
-            if (this.playerData.equippedCharm_32)
+            cState.attacking = true;
+            if (playerData.equippedCharm_32)
             {
-                this.attackDuration = this.ATTACK_DURATION_CH;
+                attackDuration = ATTACK_DURATION_CH;
             }
             else
             {
-                this.attackDuration = this.ATTACK_DURATION;
+                attackDuration = ATTACK_DURATION;
             }
 
-            if (this.cState.wallSliding)
+            if (cState.wallSliding)
             {
-                this.wallSlashing = true;
-                this.slashComponent = this.wallSlash;
-                this.slashFsm = this.wallSlashFsm;
+                wallSlashing = true;
+                slashComponent = wallSlash;
+                slashFsm = wallSlashFsm;
             }
             else
             {
-                this.wallSlashing = false;
+                wallSlashing = false;
                 if (attackDir == AttackDirection.normal)
                 {
-                    if (!this.cState.altAttack)
+                    if (!cState.altAttack)
                     {
-                        this.slashComponent = this.normalSlash;
-                        this.slashFsm = this.normalSlashFsm;
-                        this.cState.altAttack = true;
+                        slashComponent = normalSlash;
+                        slashFsm = normalSlashFsm;
+                        cState.altAttack = true;
                     }
                     else
                     {
-                        this.slashComponent = this.alternateSlash;
-                        this.slashFsm = this.alternateSlashFsm;
-                        this.cState.altAttack = false;
+                        slashComponent = alternateSlash;
+                        slashFsm = alternateSlashFsm;
+                        cState.altAttack = false;
                     }
 
-                    if (this.playerData.equippedCharm_35)
+                    if (playerData.equippedCharm_35)
                     {
-                        if ((this.playerData.health == this.playerData.maxHealth && !this.playerData.equippedCharm_27) || (this.joniBeam && this.playerData.equippedCharm_27))
+                        if ((playerData.health == playerData.maxHealth && !playerData.equippedCharm_27) || (joniBeam && playerData.equippedCharm_27))
                         {
-                            if (this.transform.localScale.x < 0f)
+                            if (transform.localScale.x < 0f)
                             {
-                                this.grubberFlyBeam = this.grubberFlyBeamPrefabR.Spawn(this.transform.position);
+                                grubberFlyBeam = grubberFlyBeamPrefabR.Spawn(transform.position);
                             }
                             else
                             {
-                                this.grubberFlyBeam = this.grubberFlyBeamPrefabL.Spawn(this.transform.position);
+                                grubberFlyBeam = grubberFlyBeamPrefabL.Spawn(transform.position);
                             }
 
-                            if (this.playerData.equippedCharm_13)
+                            if (playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.MANTIS_CHARM_SCALE);
+                                Extensions.SetScaleY(grubberFlyBeam.transform, MANTIS_CHARM_SCALE);
                             }
                             else
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, 1f);
+                                Extensions.SetScaleY(grubberFlyBeam.transform, 1f);
                             }
                         }
 
-                        if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
+                        if (playerData.health == 1 && playerData.equippedCharm_6 && playerData.healthBlue < 1)
                         {
-                            if (this.transform.localScale.x < 0f)
+                            if (transform.localScale.x < 0f)
                             {
-                                this.grubberFlyBeam = this.grubberFlyBeamPrefabR_fury.Spawn(this.transform.position);
+                                grubberFlyBeam = grubberFlyBeamPrefabR_fury.Spawn(transform.position);
                             }
                             else
                             {
-                                this.grubberFlyBeam = this.grubberFlyBeamPrefabL_fury.Spawn(this.transform.position);
+                                grubberFlyBeam = grubberFlyBeamPrefabL_fury.Spawn(transform.position);
                             }
 
-                            if (this.playerData.equippedCharm_13)
+                            if (playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.MANTIS_CHARM_SCALE);
+                                Extensions.SetScaleY(grubberFlyBeam.transform, MANTIS_CHARM_SCALE);
                             }
                             else
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, 1f);
+                                Extensions.SetScaleY(grubberFlyBeam.transform, 1f);
                             }
                         }
                     }
                 }
                 else if (attackDir == AttackDirection.upward)
                 {
-                    this.slashComponent = this.upSlash;
-                    this.slashFsm = this.upSlashFsm;
-                    this.cState.upAttacking = true;
-                    if (this.playerData.equippedCharm_35)
+                    slashComponent = upSlash;
+                    slashFsm = upSlashFsm;
+                    cState.upAttacking = true;
+                    if (playerData.equippedCharm_35)
                     {
-                        if ((this.playerData.health == this.playerData.maxHealth && !this.playerData.equippedCharm_27) || (this.joniBeam && this.playerData.equippedCharm_27))
+                        if ((playerData.health == playerData.maxHealth && !playerData.equippedCharm_27) || (joniBeam && playerData.equippedCharm_27))
                         {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabU.Spawn(this.transform.position);
-                            Extensions.SetScaleY(this.grubberFlyBeam.transform, this.transform.localScale.x);
-                            this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 270f);
-                            if (this.playerData.equippedCharm_13)
+                            grubberFlyBeam = grubberFlyBeamPrefabU.Spawn(transform.position);
+                            Extensions.SetScaleY(grubberFlyBeam.transform, transform.localScale.x);
+                            grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 270f);
+                            if (playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
+                                Extensions.SetScaleY(grubberFlyBeam.transform, grubberFlyBeam.transform.localScale.y * MANTIS_CHARM_SCALE);
                             }
                         }
 
-                        if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
+                        if (playerData.health == 1 && playerData.equippedCharm_6 && playerData.healthBlue < 1)
                         {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabU_fury.Spawn(this.transform.position);
-                            Extensions.SetScaleY(this.grubberFlyBeam.transform, this.transform.localScale.x);
-                            this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 270f);
-                            if (this.playerData.equippedCharm_13)
+                            grubberFlyBeam = grubberFlyBeamPrefabU_fury.Spawn(transform.position);
+                            Extensions.SetScaleY(grubberFlyBeam.transform, transform.localScale.x);
+                            grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 270f);
+                            if (playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
+                                Extensions.SetScaleY(grubberFlyBeam.transform, grubberFlyBeam.transform.localScale.y * MANTIS_CHARM_SCALE);
                             }
                         }
                     }
                 }
                 else if (attackDir == AttackDirection.downward)
                 {
-                    this.slashComponent = this.downSlash;
-                    this.slashFsm = this.downSlashFsm;
-                    this.cState.downAttacking = true;
-                    if (this.playerData.equippedCharm_35)
+                    slashComponent = downSlash;
+                    slashFsm = downSlashFsm;
+                    cState.downAttacking = true;
+                    if (playerData.equippedCharm_35)
                     {
-                        if ((this.playerData.health == this.playerData.maxHealth && !this.playerData.equippedCharm_27) || (this.joniBeam && this.playerData.equippedCharm_27))
+                        if ((playerData.health == playerData.maxHealth && !playerData.equippedCharm_27) || (joniBeam && playerData.equippedCharm_27))
                         {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabD.Spawn(this.transform.position);
-                            Extensions.SetScaleY(this.grubberFlyBeam.transform, this.transform.localScale.x);
-                            this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
-                            if (this.playerData.equippedCharm_13)
+                            grubberFlyBeam = grubberFlyBeamPrefabD.Spawn(transform.position);
+                            Extensions.SetScaleY(grubberFlyBeam.transform, transform.localScale.x);
+                            grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
+                            if (playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
+                                Extensions.SetScaleY(grubberFlyBeam.transform, grubberFlyBeam.transform.localScale.y * MANTIS_CHARM_SCALE);
                             }
                         }
 
-                        if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
+                        if (playerData.health == 1 && playerData.equippedCharm_6 && playerData.healthBlue < 1)
                         {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabD_fury.Spawn(this.transform.position);
-                            Extensions.SetScaleY(this.grubberFlyBeam.transform, this.transform.localScale.x);
-                            this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
-                            if (this.playerData.equippedCharm_13)
+                            grubberFlyBeam = grubberFlyBeamPrefabD_fury.Spawn(transform.position);
+                            Extensions.SetScaleY(grubberFlyBeam.transform, transform.localScale.x);
+                            grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
+                            if (playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
+                                Extensions.SetScaleY(grubberFlyBeam.transform, grubberFlyBeam.transform.localScale.y * MANTIS_CHARM_SCALE);
                             }
                         }
                     }
                 }
             }
 
-            if (this.cState.wallSliding)
+            if (cState.wallSliding)
             {
-                if (this.cState.facingRight)
+                if (cState.facingRight)
                 {
-                    this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 180f;
+                    slashFsm.FsmVariables.GetFsmFloat("direction").Value = 180f;
                 }
                 else
                 {
-                    this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 0f;
+                    slashFsm.FsmVariables.GetFsmFloat("direction").Value = 0f;
                 }
             }
-            else if (attackDir == AttackDirection.normal && this.cState.facingRight)
+            else if (attackDir == AttackDirection.normal && cState.facingRight)
             {
-                this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 0f;
+                slashFsm.FsmVariables.GetFsmFloat("direction").Value = 0f;
             }
-            else if (attackDir == AttackDirection.normal && !this.cState.facingRight)
+            else if (attackDir == AttackDirection.normal && !cState.facingRight)
             {
-                this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 180f;
+                slashFsm.FsmVariables.GetFsmFloat("direction").Value = 180f;
             }
             else if (attackDir == AttackDirection.upward)
             {
-                this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 90f;
+                slashFsm.FsmVariables.GetFsmFloat("direction").Value = 90f;
             }
             else if (attackDir == AttackDirection.downward)
             {
-                this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 270f;
+                slashFsm.FsmVariables.GetFsmFloat("direction").Value = 270f;
             }
 
-            this.altAttackTime = Time.timeSinceLevelLoad;
+            altAttackTime = Time.timeSinceLevelLoad;
             ModHooks.AfterAttack(attackDir); //MOD API - Added
-            if (!this.cState.attacking) return;       //MOD API - Added
-            this.slashComponent.StartSlash();
-            if (this.playerData.equippedCharm_38)
+            if (!cState.attacking) return;       //MOD API - Added
+            slashComponent.StartSlash();
+            if (playerData.equippedCharm_38)
             {
-                this.fsm_orbitShield.SendEvent("SLASH");
+                fsm_orbitShield.SendEvent("SLASH");
             }
         }
 
@@ -247,17 +247,17 @@ namespace Modding.Patches
         [MonoModReplace]
         public void SoulGain()
         {
-            int mpcharge = this.playerData.GetInt("MPCharge");
+            int mpcharge = playerData.GetInt("MPCharge");
             int num;
-            if (mpcharge < this.playerData.GetInt("maxMP"))
+            if (mpcharge < playerData.GetInt("maxMP"))
             {
                 num = 11;
-                if (this.playerData.GetBool("equippedCharm_20"))
+                if (playerData.GetBool("equippedCharm_20"))
                 {
                     num += 3;
                 }
 
-                if (this.playerData.GetBool("equippedCharm_21"))
+                if (playerData.GetBool("equippedCharm_21"))
                 {
                     num += 8;
                 }
@@ -265,24 +265,24 @@ namespace Modding.Patches
             else
             {
                 num = 6;
-                if (this.playerData.GetBool("equippedCharm_20"))
+                if (playerData.GetBool("equippedCharm_20"))
                 {
                     num += 2;
                 }
 
-                if (this.playerData.GetBool("equippedCharm_21"))
+                if (playerData.GetBool("equippedCharm_21"))
                 {
                     num += 6;
                 }
             }
 
-            int mpreserve = this.playerData.GetInt("MPReserve");
+            int mpreserve = playerData.GetInt("MPReserve");
             num = Modding.ModHooks.OnSoulGain(num);
-            this.playerData.AddMPCharge(num);
+            playerData.AddMPCharge(num);
             GameCameras.instance.soulOrbFSM.SendEvent("MP GAIN");
-            if (this.playerData.GetInt("MPReserve") != mpreserve)
+            if (playerData.GetInt("MPReserve") != mpreserve)
             {
-                this.gm.soulVessel_fsm.SendEvent("MP RESERVE UP");
+                gm.soulVessel_fsm.SendEvent("MP RESERVE UP");
             }
         }
 
@@ -384,106 +384,106 @@ namespace Modding.Patches
         [MonoModReplace]
         private void LookForQueueInput()
         {
-            if (this.acceptingInput && !this.gm.isPaused && this.isGameplayScene)
+            if (acceptingInput && !gm.isPaused && isGameplayScene)
             {
-                if (this.inputHandler.inputActions.jump.WasPressed)
+                if (inputHandler.inputActions.jump.WasPressed)
                 {
-                    if (this.CanWallJump())
+                    if (CanWallJump())
                     {
-                        this.DoWallJump();
+                        DoWallJump();
                     }
-                    else if (this.CanJump())
+                    else if (CanJump())
                     {
-                        this.HeroJump();
+                        HeroJump();
                     }
-                    else if (this.CanDoubleJump())
+                    else if (CanDoubleJump())
                     {
-                        this.DoDoubleJump();
+                        DoDoubleJump();
                     }
-                    else if (this.CanInfiniteAirJump())
+                    else if (CanInfiniteAirJump())
                     {
-                        this.CancelJump();
-                        this.audioCtrl.PlaySound(HeroSounds.JUMP);
-                        this.ResetLook();
-                        this.cState.jumping = true;
+                        CancelJump();
+                        audioCtrl.PlaySound(HeroSounds.JUMP);
+                        ResetLook();
+                        cState.jumping = true;
                     }
                     else
                     {
-                        this.jumpQueueSteps = 0;
-                        this.jumpQueuing = true;
-                        this.doubleJumpQueueSteps = 0;
-                        this.doubleJumpQueuing = true;
+                        jumpQueueSteps = 0;
+                        jumpQueuing = true;
+                        doubleJumpQueueSteps = 0;
+                        doubleJumpQueuing = true;
                     }
                 }
 
-                if (this.inputHandler.inputActions.dash.WasPressed && !ModHooks.OnDashPressed())
+                if (inputHandler.inputActions.dash.WasPressed && !ModHooks.OnDashPressed())
                 {
-                    if (this.CanDash())
+                    if (CanDash())
                     {
-                        this.HeroDash();
+                        HeroDash();
                     }
                     else
                     {
-                        this.dashQueueSteps = 0;
-                        this.dashQueuing = true;
+                        dashQueueSteps = 0;
+                        dashQueuing = true;
                     }
                 }
 
-                if (this.inputHandler.inputActions.attack.WasPressed)
+                if (inputHandler.inputActions.attack.WasPressed)
                 {
-                    if (this.CanAttack())
+                    if (CanAttack())
                     {
-                        this.DoAttack();
+                        DoAttack();
                     }
                     else
                     {
-                        this.attackQueueSteps = 0;
-                        this.attackQueuing = true;
+                        attackQueueSteps = 0;
+                        attackQueuing = true;
                     }
                 }
 
-                if (this.inputHandler.inputActions.jump.IsPressed)
+                if (inputHandler.inputActions.jump.IsPressed)
                 {
-                    if (this.jumpQueueSteps <= this.JUMP_QUEUE_STEPS && this.CanJump() && this.jumpQueuing)
+                    if (jumpQueueSteps <= JUMP_QUEUE_STEPS && CanJump() && jumpQueuing)
                     {
-                        this.HeroJump();
+                        HeroJump();
                     }
-                    else if (this.doubleJumpQueueSteps <= this.DOUBLE_JUMP_QUEUE_STEPS && this.CanDoubleJump() && this.doubleJumpQueuing)
+                    else if (doubleJumpQueueSteps <= DOUBLE_JUMP_QUEUE_STEPS && CanDoubleJump() && doubleJumpQueuing)
                     {
-                        if (this.cState.onGround)
+                        if (cState.onGround)
                         {
-                            this.HeroJump();
+                            HeroJump();
                         }
                         else
                         {
-                            this.DoDoubleJump();
+                            DoDoubleJump();
                         }
                     }
 
-                    if (this.CanSwim())
+                    if (CanSwim())
                     {
-                        if (this.hero_state != ActorStates.airborne)
+                        if (hero_state != ActorStates.airborne)
                         {
-                            this.SetState(ActorStates.airborne);
+                            SetState(ActorStates.airborne);
                         }
 
-                        this.cState.swimming = true;
+                        cState.swimming = true;
                     }
                 }
 
-                if (this.inputHandler.inputActions.dash.IsPressed
-                    && this.dashQueueSteps <= this.DASH_QUEUE_STEPS
-                    && this.CanDash()
-                    && this.dashQueuing
+                if (inputHandler.inputActions.dash.IsPressed
+                    && dashQueueSteps <= DASH_QUEUE_STEPS
+                    && CanDash()
+                    && dashQueuing
                     && !ModHooks.OnDashPressed()
-                    && this.CanDash())
+                    && CanDash())
                 {
-                    this.HeroDash();
+                    HeroDash();
                 }
 
-                if (this.inputHandler.inputActions.attack.IsPressed && this.attackQueueSteps <= this.ATTACK_QUEUE_STEPS && this.CanAttack() && this.attackQueuing)
+                if (inputHandler.inputActions.attack.IsPressed && attackQueueSteps <= ATTACK_QUEUE_STEPS && CanAttack() && attackQueuing)
                 {
-                    this.DoAttack();
+                    DoAttack();
                 }
             }
         }
@@ -551,19 +551,19 @@ namespace Modding.Patches
                     }
                 }
 
-                if (this.CanTakeDamage())
+                if (CanTakeDamage())
                 {
-                    if (this.damageMode == DamageMode.HAZARD_ONLY && hazardType == 1)
+                    if (damageMode == DamageMode.HAZARD_ONLY && hazardType == 1)
                     {
                         return;
                     }
 
-                    if (this.cState.shadowDashing && hazardType == 1)
+                    if (cState.shadowDashing && hazardType == 1)
                     {
                         return;
                     }
 
-                    if (this.parryInvulnTimer > 0f && hazardType == 1)
+                    if (parryInvulnTimer > 0f && hazardType == 1)
                     {
                         return;
                     }
@@ -575,14 +575,14 @@ namespace Modding.Patches
                     }
 
                     bool flag = false;
-                    if (this.carefreeShieldEquipped && hazardType == 1)
+                    if (carefreeShieldEquipped && hazardType == 1)
                     {
-                        if (this.hitsSinceShielded > 7)
+                        if (hitsSinceShielded > 7)
                         {
-                            this.hitsSinceShielded = 7;
+                            hitsSinceShielded = 7;
                         }
 
-                        switch (this.hitsSinceShielded)
+                        switch (hitsSinceShielded)
                         {
                             case 1:
                                 if ((float) UnityEngine.Random.Range(1, 100) <= 10f)
@@ -640,115 +640,115 @@ namespace Modding.Patches
 
                         if (flag)
                         {
-                            this.hitsSinceShielded = 0;
-                            this.carefreeShield.SetActive(true);
+                            hitsSinceShielded = 0;
+                            carefreeShield.SetActive(true);
                             damageAmount = 0;
                             spawnDamageEffect = false;
                         }
                         else
                         {
-                            this.hitsSinceShielded++;
+                            hitsSinceShielded++;
                         }
                     }
 
                     damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
-                    if (this.playerData.GetBool("equippedCharm_5") && this.playerData.GetInt("blockerHits") > 0 && hazardType == 1 && this.cState.focusing && !flag)
+                    if (playerData.GetBool("equippedCharm_5") && playerData.GetInt("blockerHits") > 0 && hazardType == 1 && cState.focusing && !flag)
                     {
-                        this.proxyFSM.SendEvent("HeroCtrl-TookBlockerHit");
-                        this.audioSource.PlayOneShot(this.blockerImpact, 1f);
+                        proxyFSM.SendEvent("HeroCtrl-TookBlockerHit");
+                        audioSource.PlayOneShot(blockerImpact, 1f);
                         spawnDamageEffect = false;
                         damageAmount = 0;
                     }
                     else
                     {
-                        this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
+                        proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
                     }
 
-                    this.CancelAttack();
-                    if (this.cState.wallSliding)
+                    CancelAttack();
+                    if (cState.wallSliding)
                     {
-                        this.cState.wallSliding = false;
-                        this.wallSlideVibrationPlayer.Stop();
+                        cState.wallSliding = false;
+                        wallSlideVibrationPlayer.Stop();
                     }
 
-                    if (this.cState.touchingWall)
+                    if (cState.touchingWall)
                     {
-                        this.cState.touchingWall = false;
+                        cState.touchingWall = false;
                     }
 
-                    if (this.cState.recoilingLeft || this.cState.recoilingRight)
+                    if (cState.recoilingLeft || cState.recoilingRight)
                     {
-                        this.CancelRecoilHorizontal();
+                        CancelRecoilHorizontal();
                     }
 
-                    if (this.cState.bouncing)
+                    if (cState.bouncing)
                     {
-                        this.CancelBounce();
-                        this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
+                        CancelBounce();
+                        rb2d.velocity = new Vector2(rb2d.velocity.x, 0f);
                     }
 
-                    if (this.cState.shroomBouncing)
+                    if (cState.shroomBouncing)
                     {
-                        this.CancelBounce();
-                        this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
+                        CancelBounce();
+                        rb2d.velocity = new Vector2(rb2d.velocity.x, 0f);
                     }
 
                     if (!flag)
                     {
-                        this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
+                        audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
                     }
 
-                    if (!this.takeNoDamage && !this.playerData.GetBool("invinciTest"))
+                    if (!takeNoDamage && !playerData.GetBool("invinciTest"))
                     {
-                        if (this.playerData.GetBool("overcharmed"))
+                        if (playerData.GetBool("overcharmed"))
                         {
-                            this.playerData.TakeHealth(damageAmount * 2);
+                            playerData.TakeHealth(damageAmount * 2);
                         }
                         else
                         {
-                            this.playerData.TakeHealth(damageAmount);
+                            playerData.TakeHealth(damageAmount);
                         }
                     }
 
-                    if (this.playerData.GetBool("equippedCharm_3") && damageAmount > 0)
+                    if (playerData.GetBool("equippedCharm_3") && damageAmount > 0)
                     {
-                        if (this.playerData.GetBool("equippedCharm_35"))
+                        if (playerData.GetBool("equippedCharm_35"))
                         {
-                            this.AddMPCharge(this.GRUB_SOUL_MP_COMBO);
+                            AddMPCharge(GRUB_SOUL_MP_COMBO);
                         }
                         else
                         {
-                            this.AddMPCharge(this.GRUB_SOUL_MP);
+                            AddMPCharge(GRUB_SOUL_MP);
                         }
                     }
 
-                    if (this.joniBeam && damageAmount > 0)
+                    if (joniBeam && damageAmount > 0)
                     {
-                        this.joniBeam = false;
+                        joniBeam = false;
                     }
 
-                    if (this.cState.nailCharging || this.nailChargeTimer != 0f)
+                    if (cState.nailCharging || nailChargeTimer != 0f)
                     {
-                        this.cState.nailCharging = false;
-                        this.nailChargeTimer = 0f;
+                        cState.nailCharging = false;
+                        nailChargeTimer = 0f;
                     }
 
-                    if (damageAmount > 0 && this.OnTakenDamage != null)
+                    if (damageAmount > 0 && OnTakenDamage != null)
                     {
-                        this.OnTakenDamage();
+                        OnTakenDamage();
                     }
 
-                    if (this.playerData.GetInt("health") == 0)
+                    if (playerData.GetInt("health") == 0)
                     {
-                        base.StartCoroutine(this.Die());
+                        base.StartCoroutine(Die());
                     }
                     else if (hazardType == 2)
                     {
-                        base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, (!(go != null)) ? 0f : go.transform.rotation.z));
+                        base.StartCoroutine(DieFromHazard(HazardType.SPIKES, (!(go != null)) ? 0f : go.transform.rotation.z));
                     }
                     else if (hazardType == 3)
                     {
-                        base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
+                        base.StartCoroutine(DieFromHazard(HazardType.ACID, 0f));
                     }
                     else if (hazardType == 4)
                     {
@@ -756,44 +756,44 @@ namespace Modding.Patches
                     }
                     else if (hazardType == 5)
                     {
-                        base.StartCoroutine(this.DieFromHazard(HazardType.PIT, 0f));
+                        base.StartCoroutine(DieFromHazard(HazardType.PIT, 0f));
                     }
                     else
                     {
-                        base.StartCoroutine(this.StartRecoil(damageSide, spawnDamageEffect, damageAmount));
+                        base.StartCoroutine(StartRecoil(damageSide, spawnDamageEffect, damageAmount));
                     }
                 }
-                else if (this.cState.invulnerable && !this.cState.hazardDeath && !this.playerData.GetBool("isInvincible"))
+                else if (cState.invulnerable && !cState.hazardDeath && !playerData.GetBool("isInvincible"))
                 {
                     if (hazardType == 2)
                     {
-                        if (!this.takeNoDamage)
+                        if (!takeNoDamage)
                         {
-                            this.playerData.TakeHealth(damageAmount);
+                            playerData.TakeHealth(damageAmount);
                         }
 
-                        this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-                        if (this.playerData.GetInt("health") == 0)
+                        proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
+                        if (playerData.GetInt("health") == 0)
                         {
-                            base.StartCoroutine(this.Die());
+                            base.StartCoroutine(Die());
                         }
                         else
                         {
-                            this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
-                            base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, (!(go != null)) ? 0f : go.transform.rotation.z));
+                            audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
+                            base.StartCoroutine(DieFromHazard(HazardType.SPIKES, (!(go != null)) ? 0f : go.transform.rotation.z));
                         }
                     }
                     else if (hazardType == 3)
                     {
-                        this.playerData.TakeHealth(damageAmount);
-                        this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-                        if (this.playerData.GetInt("health") == 0)
+                        playerData.TakeHealth(damageAmount);
+                        proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
+                        if (playerData.GetInt("health") == 0)
                         {
-                            base.StartCoroutine(this.Die());
+                            base.StartCoroutine(Die());
                         }
                         else
                         {
-                            base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
+                            base.StartCoroutine(DieFromHazard(HazardType.ACID, 0f));
                         }
                     }
                     else if (hazardType == 4)
@@ -849,27 +849,27 @@ namespace Modding.Patches
             Vector2 origVector;
 
             float velocity;
-            if (this.playerData.equippedCharm_16 && this.cState.shadowDashing)
+            if (playerData.equippedCharm_16 && cState.shadowDashing)
             {
-                velocity = this.DASH_SPEED_SHARP;
+                velocity = DASH_SPEED_SHARP;
             }
             else
             {
-                velocity = this.DASH_SPEED;
+                velocity = DASH_SPEED;
             }
 
-            if (this.dashingDown)
+            if (dashingDown)
             {
                 origVector = new Vector2(0f, -velocity);
             }
-            else if (this.cState.facingRight)
+            else if (cState.facingRight)
             {
-                if (this.CheckForBump(CollisionSide.right))
+                if (CheckForBump(CollisionSide.right))
                 {
                     origVector = new Vector2
                     (
                         velocity,
-                        (!this.cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY
+                        (!cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY
                     );
                 }
                 else
@@ -877,12 +877,12 @@ namespace Modding.Patches
                     origVector = new Vector2(velocity, 0f);
                 }
             }
-            else if (this.CheckForBump(CollisionSide.left))
+            else if (CheckForBump(CollisionSide.left))
             {
                 origVector = new Vector2
                 (
                     -velocity,
-                    (!this.cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY
+                    (!cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY
                 );
             }
             else

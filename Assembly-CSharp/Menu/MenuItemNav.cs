@@ -30,16 +30,16 @@ namespace Modding.Menu
         {
             for (var i = 0; i < Content.Count + Controls.Count; i++)
             {
-                var last = this.GetSelJoint(i - 1);
-                var sel = this.GetSelJoint(i);
-                var next = this.GetSelJoint(i + 1);
+                var last = GetSelJoint(i - 1);
+                var sel = GetSelJoint(i);
+                var next = GetSelJoint(i + 1);
 
                 var nav = sel.navigation;
                 nav.mode = Navigation.Mode.Explicit;
                 nav.selectOnUp = last;
                 nav.selectOnDown = next;
                 sel.navigation = nav;
-                sel.OnSelected += self => this.Selected = self;
+                sel.OnSelected += self => Selected = self;
             }
         }
 
@@ -49,8 +49,8 @@ namespace Modding.Menu
         /// <returns></returns>
         public MenuSelectable FirstItem()
         {
-            if (this.Content.Count > 0) return this.Content[0];
-            else if (this.Controls.Count > 0) return this.Controls[0];
+            if (Content.Count > 0) return Content[0];
+            else if (Controls.Count > 0) return Controls[0];
             else return null;
         }
 
@@ -75,19 +75,19 @@ namespace Modding.Menu
 
         private void OnEnable()
         {
-            this.Select();
+            Select();
         }
 
         private void Select()
         {
-            if (this.Selected != null)
+            if (Selected != null)
             {
-                this.StartCoroutine(this.SelectDelayed(this.Selected));
+                StartCoroutine(SelectDelayed(Selected));
             }
             else
             {
-                var top = this.FirstItem();
-                if (top != null) this.StartCoroutine(this.SelectDelayed(top));
+                var top = FirstItem();
+                if (top != null) StartCoroutine(SelectDelayed(top));
             }
         }
 

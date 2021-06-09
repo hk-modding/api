@@ -67,7 +67,7 @@ namespace Modding.Patches
             startup = null;
             if (scm == null)
             {
-                this.enableGrade = false;
+                enableGrade = false;
             }
             else
             {

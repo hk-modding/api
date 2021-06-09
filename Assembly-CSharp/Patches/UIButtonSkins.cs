@@ -26,23 +26,23 @@ namespace Modding.Patches
         public extern void orig_SetupRefs();
 
         private HashSet<MappableKey> customKeys = new HashSet<MappableKey>();
-        public void AddMappableKey(MappableKey b) => this.customKeys.Add(b);
-        public void RemoveMappableKey(MappableKey b) => this.customKeys.Remove(b);
+        public void AddMappableKey(MappableKey b) => customKeys.Add(b);
+        public void RemoveMappableKey(MappableKey b) => customKeys.Remove(b);
 
         private HashSet<MappableControllerButton> customButtons = new HashSet<MappableControllerButton>();
-        public void AddMappableControllerButton(MappableControllerButton b) => this.customButtons.Add(b);
-        public void RemoveMappableControllerButton(MappableControllerButton b) => this.customButtons.Remove(b);
+        public void AddMappableControllerButton(MappableControllerButton b) => customButtons.Add(b);
+        public void RemoveMappableControllerButton(MappableControllerButton b) => customButtons.Remove(b);
 
         [MonoModReplace]
-        public ButtonSkin GetKeyboardSkinFor(PlayerAction action) => this.GetButtonSkinFor(
+        public ButtonSkin GetKeyboardSkinFor(PlayerAction action) => GetButtonSkinFor(
             action.GetKeyOrMouseBinding().ToString()
         );
         [MonoModReplace]
-        public ButtonSkin GetControllerButtonSkinFor(PlayerAction action) => this.GetButtonSkinFor(
+        public ButtonSkin GetControllerButtonSkinFor(PlayerAction action) => GetButtonSkinFor(
             action.GetControllerButtonBinding()
         );
         [MonoModReplace]
-        public ButtonSkin GetButtonSkinFor(PlayerAction action) => this.ih.lastActiveController switch
+        public ButtonSkin GetButtonSkinFor(PlayerAction action) => ih.lastActiveController switch
         {
             BindingSourceType.None | BindingSourceType.KeyBindingSource | BindingSourceType.MouseBindingSource
                 => GetKeyboardSkinFor(action),
@@ -52,7 +52,7 @@ namespace Modding.Patches
 
         public void RefreshKeyMappings()
         {
-            if (this.customKeys != null) foreach (var k in this.customKeys)
+            if (customKeys != null) foreach (var k in customKeys)
                 {
                     if (k == null) continue;
                     k.GetBinding();
@@ -62,7 +62,7 @@ namespace Modding.Patches
         }
         public IEnumerator ShowCurrentKeyboardMappings()
         {
-            if (this.customKeys != null) foreach (var k in this.customKeys)
+            if (customKeys != null) foreach (var k in customKeys)
                 {
                     if (k == null) continue;
                     k.GetBinding();
@@ -75,7 +75,7 @@ namespace Modding.Patches
         }
         public void RefreshButtonMappings()
         {
-            if (this.customButtons != null) foreach (var k in this.customButtons)
+            if (customButtons != null) foreach (var k in customButtons)
                 {
                     if (k == null) continue;
                     k.ShowCurrentBinding();
@@ -84,7 +84,7 @@ namespace Modding.Patches
         }
         public IEnumerator ShowCurrentButtonMappings()
         {
-            if (this.customButtons != null) foreach (var k in this.customButtons)
+            if (customButtons != null) foreach (var k in customButtons)
                 {
                     if (k == null) continue;
                     k.ShowCurrentBinding();
@@ -97,8 +97,8 @@ namespace Modding.Patches
 
         private void SetupRefs()
         {
-            this.customKeys = new HashSet<MappableKey>();
-            this.customButtons = new HashSet<MappableControllerButton>();
+            customKeys = new HashSet<MappableKey>();
+            customButtons = new HashSet<MappableControllerButton>();
             orig_SetupRefs();
         }
     }

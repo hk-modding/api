@@ -14,20 +14,20 @@ namespace Modding.Patches
             HitInstance hit = new HitInstance
             {
                 Source = base.Owner,
-                AttackType = (AttackTypes) this.AttackType.Value,
-                CircleDirection = this.CircleDirection.Value,
-                DamageDealt = this.DamageDealt.Value,
-                Direction = this.Direction.Value,
-                IgnoreInvulnerable = this.IgnoreInvulnerable.Value,
-                MagnitudeMultiplier = this.MagnitudeMultiplier.Value,
-                MoveAngle = this.MoveAngle.Value,
-                MoveDirection = this.MoveDirection.Value,
-                Multiplier = ((!this.Multiplier.IsNone) ? this.Multiplier.Value : 1f),
-                SpecialType = (SpecialTypes) this.SpecialType.Value,
+                AttackType = (AttackTypes) AttackType.Value,
+                CircleDirection = CircleDirection.Value,
+                DamageDealt = DamageDealt.Value,
+                Direction = Direction.Value,
+                IgnoreInvulnerable = IgnoreInvulnerable.Value,
+                MagnitudeMultiplier = MagnitudeMultiplier.Value,
+                MoveAngle = MoveAngle.Value,
+                MoveDirection = MoveDirection.Value,
+                Multiplier = ((!Multiplier.IsNone) ? Multiplier.Value : 1f),
+                SpecialType = (SpecialTypes) SpecialType.Value,
                 IsExtraDamage = false
             };
-            hit = ModHooks.OnHitInstanceBeforeHit(this.Fsm, hit);
-            HitTaker.Hit(this.Target.Value, hit, 3);
+            hit = ModHooks.OnHitInstanceBeforeHit(Fsm, hit);
+            HitTaker.Hit(Target.Value, hit, 3);
             base.Finish();
         }
     }

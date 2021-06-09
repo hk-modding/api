@@ -53,38 +53,38 @@ namespace Modding
                 name = GetType().Name;
             }
 
-            if (this.GetType().GetInterfaces().Where(
+            if (GetType().GetInterfaces().Where(
                 x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IGlobalSettings<>)
             ).FirstOrDefault() is Type globalType)
             {
-                this.globalSettingsType = globalType.GetGenericArguments()[0];
+                globalSettingsType = globalType.GetGenericArguments()[0];
                 foreach (var mi in globalType.GetMethods())
                 {
                     switch (mi.Name)
                     {
                         case nameof(IGlobalSettings<object>.OnLoadGlobal):
-                            this.onLoadGlobalSettings = mi.GetFastDelegate();
+                            onLoadGlobalSettings = mi.GetFastDelegate();
                             break;
                         case nameof(IGlobalSettings<object>.OnSaveGlobal):
-                            this.onSaveGlobalSettings = mi.GetFastDelegate();
+                            onSaveGlobalSettings = mi.GetFastDelegate();
                             break;
                     }
                 }
             }
-            if (this.GetType().GetInterfaces().Where(
+            if (GetType().GetInterfaces().Where(
                 x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ILocalSettings<>)
             ).FirstOrDefault() is Type saveType)
             {
-                this.saveSettingsType = saveType.GetGenericArguments()[0];
+                saveSettingsType = saveType.GetGenericArguments()[0];
                 foreach (var mi in saveType.GetMethods())
                 {
                     switch (mi.Name)
                     {
                         case nameof(ILocalSettings<object>.OnLoadLocal):
-                            this.onLoadSaveSettings = mi.GetFastDelegate();
+                            onLoadSaveSettings = mi.GetFastDelegate();
                             break;
                         case nameof(ILocalSettings<object>.OnSaveLocal):
-                            this.onSaveSaveSettings = mi.GetFastDelegate();
+                            onSaveSaveSettings = mi.GetFastDelegate();
                             break;
                     }
                 }
@@ -167,9 +167,9 @@ namespace Modding
         {
             if (arg1.name != Constants.MENU_SCENE) return;
 
-            if (this.saveSettingsType is Type saveType)
+            if (saveSettingsType is Type saveType)
             {
-                this.onLoadSaveSettings(this, Activator.CreateInstance(saveType));
+                onLoadSaveSettings(this, Activator.CreateInstance(saveType));
             }
         }
 
@@ -178,7 +178,7 @@ namespace Modding
             try
             {
                 // test to see if we can load global settings from this mod
-                if (this.globalSettingsType is Type saveType)
+                if (globalSettingsType is Type saveType)
                 {
                     if (!File.Exists(_globalSettingsPath))
                         return;
@@ -198,7 +198,7 @@ namespace Modding
                             Converters = JsonConverterTypes.ConverterTypes
                         }
                     );
-                    this.onLoadGlobalSettings(this, obj);
+                    onLoadGlobalSettings(this, obj);
                 }
             }
             catch (Exception e)
@@ -214,10 +214,10 @@ namespace Modding
         {
             try
             {
-                if (this.globalSettingsType is Type saveType)
+                if (globalSettingsType is Type saveType)
                 {
                     Log("Saving Global Settings");
-                    var obj = this.onSaveGlobalSettings(this);
+                    var obj = onSaveGlobalSettings(this);
                     if (obj is null)
                         return;
                     if (File.Exists(_globalSettingsPath + ".bak")) File.Delete(_globalSettingsPath + ".bak");
@@ -249,11 +249,11 @@ namespace Modding
         {
             try
             {
-                if (this.saveSettingsType is Type saveType)
+                if (saveSettingsType is Type saveType)
                 {
-                    if (data.modData.TryGetValue(this.GetName(), out var obj))
+                    if (data.modData.TryGetValue(GetName(), out var obj))
                     {
-                        this.onLoadSaveSettings(
+                        onLoadSaveSettings(
                             this,
                             obj.ToObject(
                                 saveType,
@@ -281,9 +281,9 @@ namespace Modding
         {
             try
             {
-                if (this.saveSettingsType is Type saveType)
+                if (saveSettingsType is Type saveType)
                 {
-                    var settings = this.onSaveSaveSettings(this);
+                    var settings = onSaveSaveSettings(this);
                     switch (settings)
                     {
                         // No point in serializing nothing.
@@ -294,7 +294,7 @@ namespace Modding
                             receiver.OnBeforeSerialize();
                             break;
                     }
-                    data.modData[this.GetName()] = JToken.FromObject(
+                    data.modData[GetName()] = JToken.FromObject(
                         settings,
                         JsonSerializer.Create(
                             new JsonSerializerSettings

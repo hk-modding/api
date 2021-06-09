@@ -39,7 +39,7 @@ namespace Modding.Patches
 
         private new void OnDestroy()
         {
-            if (this.uibs != null) this.uibs.RemoveMappableKey(this);
+            if (uibs != null) uibs.RemoveMappableKey(this);
             base.OnDestroy();
         }
 
@@ -49,10 +49,10 @@ namespace Modding.Patches
 
         public void GetBinding()
         {
-            this.SetupRefs();
-            if (this.actionSet != null)
+            SetupRefs();
+            if (actionSet != null)
             {
-                this.currentBinding = this.playerAction.GetKeyOrMouseBinding();
+                currentBinding = playerAction.GetKeyOrMouseBinding();
             }
             else
             {
@@ -62,9 +62,9 @@ namespace Modding.Patches
 
         private void SetupBindingListenOptions()
         {
-            if (this.actionSet != null)
+            if (actionSet != null)
             {
-                this.actionSet.ListenOptions = new BindingListenOptions
+                actionSet.ListenOptions = new BindingListenOptions
                 {
                     IncludeControllers = false,
                     IncludeNonStandardControls = false,
@@ -73,9 +73,9 @@ namespace Modding.Patches
                     IncludeModifiersAsFirstClassKeys = true,
                     IncludeUnknownControllers = false,
                     MaxAllowedBindingsPerType = 1,
-                    OnBindingFound = this.OnBindingFound,
-                    OnBindingAdded = this.OnBindingAdded,
-                    OnBindingRejected = this.OnBindingRejected,
+                    OnBindingFound = OnBindingFound,
+                    OnBindingAdded = OnBindingAdded,
+                    OnBindingRejected = OnBindingRejected,
                     UnsetDuplicateBindingsOnSet = true
                 };
             }
@@ -87,16 +87,16 @@ namespace Modding.Patches
 
         private void SetupRefs()
         {
-            if (this.actionSet != null)
+            if (actionSet != null)
             {
-                this.gm = GameManager.instance;
-                this.ui = this.gm.ui;
-                this.uibs = (UIButtonSkins)this.ui.uiButtonSkins;
-                this.ih = this.gm.inputHandler;
-                this.gs = this.gm.gameSettings;
+                gm = GameManager.instance;
+                ui = gm.ui;
+                uibs = (UIButtonSkins)ui.uiButtonSkins;
+                ih = gm.inputHandler;
+                gs = gm.gameSettings;
                 base.HookUpAudioPlayer();
-                this.SetupUnmappableKeys();
-                this.uibs.AddMappableKey(this);
+                SetupUnmappableKeys();
+                uibs.AddMappableKey(this);
             }
             else
             {
@@ -111,12 +111,12 @@ namespace Modding.Patches
         [MonoModReplace]
         public void AbortRebind()
         {
-            if(this.isListening)
+            if(isListening)
             {
                 // show the unbound key message
-                this.ShowCurrentBinding();
+                ShowCurrentBinding();
                 base.interactable = true;
-                this.isListening = false;
+                isListening = false;
             }
         }
     }

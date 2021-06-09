@@ -16,14 +16,14 @@ namespace Modding.Patches
         public extern void orig_OnSubmit(BaseEventData eventData);
         public void OnSubmit(BaseEventData eventData)
         {
-            if (this.buttonType == (UnityEngine.UI.MenuButton.MenuButtonType)MenuButtonType.CustomSubmit)
+            if (buttonType == (UnityEngine.UI.MenuButton.MenuButtonType)MenuButtonType.CustomSubmit)
             {
-                if (this.flashEffect)
+                if (flashEffect)
                 {
-                    this.flashEffect.ResetTrigger("Flash");
-                    this.flashEffect.SetTrigger("Flash");
+                    flashEffect.ResetTrigger("Flash");
+                    flashEffect.SetTrigger("Flash");
                 }
-                if (this.proceed) this.ForceDeselect();
+                if (proceed) ForceDeselect();
                 submitAction?.Invoke(this);
             }
             orig_OnSubmit(eventData);

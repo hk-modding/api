@@ -32,25 +32,25 @@ namespace Modding.Patches
 
         private IEnumerator Start()
         {
-            this.controllerImage.sprite = this.GetControllerSpriteForPlatform(this.platform);
+            controllerImage.sprite = GetControllerSpriteForPlatform(platform);
             AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Menu_Title");
             loadOperation.allowSceneActivation = false;
-            bool showLanguageSelect = !this.CheckIsLanguageSet();
+            bool showLanguageSelect = !CheckIsLanguageSet();
             if (showLanguageSelect && Platform.Current.ShowLanguageSelect)
             {
-                yield return base.StartCoroutine(this.ShowLanguageSelect());
-                while (!this.confirmedLanguage)
+                yield return base.StartCoroutine(ShowLanguageSelect());
+                while (!confirmedLanguage)
                 {
                     yield return null;
                 }
 
-                yield return base.StartCoroutine(this.LanguageSettingDone());
+                yield return base.StartCoroutine(LanguageSettingDone());
             }
 
-            this.startManagerAnimator.SetBool("WillShowControllerNotice", false);
-            this.startManagerAnimator.SetBool("WillShowQuote", true);
+            startManagerAnimator.SetBool("WillShowControllerNotice", false);
+            startManagerAnimator.SetBool("WillShowQuote", true);
 
-            StandaloneLoadingSpinner loadSpinner = UnityEngine.Object.Instantiate<StandaloneLoadingSpinner>(this.loadSpinnerPrefab);
+            StandaloneLoadingSpinner loadSpinner = UnityEngine.Object.Instantiate<StandaloneLoadingSpinner>(loadSpinnerPrefab);
             loadSpinner.Setup(null);
             loadOperation.allowSceneActivation = true;
             yield return loadOperation;

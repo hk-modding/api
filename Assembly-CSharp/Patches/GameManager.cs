@@ -113,26 +113,26 @@ namespace Modding.Patches
         {
             if (saveSlot >= 0)
             {
-                this.SaveLevelState();
-                if (!this.gameConfig.disableSaveGame)
+                SaveLevelState();
+                if (!gameConfig.disableSaveGame)
                 {
-                    this.ShowSaveIcon();
-                    if (this.achievementHandler != null)
+                    ShowSaveIcon();
+                    if (achievementHandler != null)
                     {
-                        this.achievementHandler.FlushRecordsToDisk();
+                        achievementHandler.FlushRecordsToDisk();
                     }
                     else
                     {
                         Debug.LogError("Error saving achievements (PlayerAchievements is null)");
                     }
 
-                    if (this.playerData != null)
+                    if (playerData != null)
                     {
-                        this.playerData.playTime += this.sessionPlayTimer;
-                        this.ResetGameTimer();
-                        this.playerData.version = Constants.GAME_VERSION;
-                        this.playerData.profileID = saveSlot;
-                        this.playerData.CountGameCompletion();
+                        playerData.playTime += sessionPlayTimer;
+                        ResetGameTimer();
+                        playerData.version = Constants.GAME_VERSION;
+                        playerData.profileID = saveSlot;
+                        playerData.CountGameCompletion();
                     }
                     else
                     {
@@ -141,20 +141,20 @@ namespace Modding.Patches
 
                     try
                     {
-                        SaveGameData obj = new SaveGameData(this.playerData, this.sceneData);
+                        SaveGameData obj = new SaveGameData(playerData, sceneData);
 
                         ModHooks.OnBeforeSaveGameSave(obj);
-                        if(this.moddedData == null) {
-                            this.moddedData = new ModSavegameData();
+                        if(moddedData == null) {
+                            moddedData = new ModSavegameData();
                         }
-                        ModHooks.OnSaveLocalSettings(this.moddedData);
+                        ModHooks.OnSaveLocalSettings(moddedData);
 
                         // save modded data
                         try
                         {
                             var path = ModdedSavePath(saveSlot);
                             string modded = JsonConvert.SerializeObject(
-                                this.moddedData,
+                                moddedData,
                                 Formatting.Indented,
                                 new JsonSerializerSettings
                                 {
@@ -195,7 +195,7 @@ namespace Modding.Patches
                             text = JsonUtility.ToJson(obj);
                         }
 
-                        bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
+                        bool flag = gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
 
                         if (flag)
                         {
@@ -211,7 +211,7 @@ namespace Modding.Patches
                                 binary,
                                 delegate (bool didSave)
                                 {
-                                    this.HideSaveIcon();
+                                    HideSaveIcon();
                                     callback(didSave);
                                 }
                             );
@@ -224,7 +224,7 @@ namespace Modding.Patches
                                 Encoding.UTF8.GetBytes(text),
                                 delegate (bool didSave)
                                 {
-                                    this.HideSaveIcon();
+                                    HideSaveIcon();
                                     if (callback != null)
                                     {
                                         callback(didSave);
@@ -236,7 +236,7 @@ namespace Modding.Patches
                     catch (Exception arg)
                     {
                         Debug.LogError("GM Save - There was an error saving the game: " + arg);
-                        this.HideSaveIcon();
+                        HideSaveIcon();
                         if (callback != null)
                         {
                             CoreLoop.InvokeNext(delegate { callback(false); });
@@ -317,7 +317,7 @@ namespace Modding.Patches
                     using FileStream fileStream = File.OpenRead(path);
                     using var reader = new StreamReader(fileStream);
                     string json = reader.ReadToEnd();
-                    this.moddedData = JsonConvert.DeserializeObject<ModSavegameData>(
+                    moddedData = JsonConvert.DeserializeObject<ModSavegameData>(
                         json,
                         new JsonSerializerSettings()
                         {
@@ -327,23 +327,23 @@ namespace Modding.Patches
                             Converters = JsonConverterTypes.ConverterTypes
                         }
                     );
-                    if (this.moddedData == null)
+                    if (moddedData == null)
                     {
                         Logger.APILogger.LogError($"Loaded mod savegame data deserialized to null: {json}");
-                        this.moddedData = new ModSavegameData();
+                        moddedData = new ModSavegameData();
                     }
                 }
                 else
                 {
-                    this.moddedData = new ModSavegameData();
+                    moddedData = new ModSavegameData();
                 }
             }
             catch (Exception e)
             {
                 Logger.APILogger.LogError(e);
-                this.moddedData = new ModSavegameData();
+                moddedData = new ModSavegameData();
             }
-            ModHooks.OnLoadLocalSettings(this.moddedData);
+            ModHooks.OnLoadLocalSettings(moddedData);
 
             Platform.Current.ReadSaveSlot
             (
@@ -353,7 +353,7 @@ namespace Modding.Patches
                     bool obj;
                     try
                     {
-                        bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
+                        bool flag = gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
                         string json;
                         if (flag)
                         {
@@ -390,12 +390,12 @@ namespace Modding.Patches
                         global::PlayerData instance = saveGameData.playerData;
                         SceneData instance2 = saveGameData.sceneData;
                         global::PlayerData.instance = instance;
-                        this.playerData = instance;
+                        playerData = instance;
                         SceneData.instance = instance2;
                         ModHooks.OnAfterSaveGameLoad(saveGameData);
-                        this.sceneData = instance2;
-                        this.profileID = saveSlot;
-                        this.inputHandler.RefreshPlayerData();
+                        sceneData = instance2;
+                        profileID = saveSlot;
+                        inputHandler.RefreshPlayerData();
                         ModHooks.OnSavegameLoad(saveSlot);
                         obj = true;
                     }
@@ -463,7 +463,7 @@ namespace Modding.Patches
 
                     try
                     {
-                        bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
+                        bool flag = gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
                         string json;
                         if (flag)
                         {
@@ -559,18 +559,18 @@ namespace Modding.Patches
         {
             Debug.Log("Loading " + destScene);
             destScene = ModHooks.BeforeSceneLoad(destScene);
-            this.tilemapDirty = true;
-            this.startedOnThisScene = false;
-            this.nextSceneName = destScene;
-            this.waitForManualLevelStart = true;
-            if (this.DestroyPersonalPools != null)
+            tilemapDirty = true;
+            startedOnThisScene = false;
+            nextSceneName = destScene;
+            waitForManualLevelStart = true;
+            if (DestroyPersonalPools != null)
             {
-                this.DestroyPersonalPools();
+                DestroyPersonalPools();
             }
 
-            if (this.UnloadingLevel != null)
+            if (UnloadingLevel != null)
             {
-                this.UnloadingLevel();
+                UnloadingLevel();
             }
 
             string exitingScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
@@ -579,18 +579,18 @@ namespace Modding.Patches
             yield return loadop;
             yield return UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(exitingScene);
             ModHooks.OnSceneChanged(destScene);
-            this.RefreshTilemapInfo(destScene);
-            if (this.IsUnloadAssetsRequired(exitingScene, destScene))
+            RefreshTilemapInfo(destScene);
+            if (IsUnloadAssetsRequired(exitingScene, destScene))
             {
                 Debug.LogFormat(this, "Unloading assets due to zone transition", new object[0]);
                 yield return Resources.UnloadUnusedAssets();
             }
 
             GCManager.Collect();
-            this.SetupSceneRefs(true);
-            this.BeginScene();
-            this.OnNextLevelReady();
-            this.waitForManualLevelStart = false;
+            SetupSceneRefs(true);
+            BeginScene();
+            OnNextLevelReady();
+            waitForManualLevelStart = false;
             Debug.Log("Done Loading " + destScene);
             yield break;
         }
@@ -603,8 +603,8 @@ namespace Modding.Patches
         public IEnumerator LoadFirstScene()
         {
             yield return new WaitForEndOfFrame();
-            this.OnWillActivateFirstLevel();
-            this.LoadScene("Tutorial_01");
+            OnWillActivateFirstLevel();
+            LoadScene("Tutorial_01");
             ModHooks.OnNewGame();
             yield break;
         }

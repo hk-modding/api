@@ -37,16 +37,16 @@ namespace Modding.Menu
         /// <param name="offset">The offset from the parent anchor to the child anchor.</param>
         public AnchoredPosition(Vector2 parentAnchor, Vector2 childAnchor, Vector2 offset = new Vector2())
         {
-            this.ParentAnchor = parentAnchor;
-            this.ChildAnchor = childAnchor;
-            this.Offset = offset;
+            ParentAnchor = parentAnchor;
+            ChildAnchor = childAnchor;
+            Offset = offset;
         }
 
         /// <summary>
         /// Translate a <c>RectTransform</c> based on the fields in this struct.
         /// </summary>
         /// <param name="rt">The <c>RectTransform</c> to modify.</param>
-        public void Reposition(RectTransform rt) => this.GetRepositioned(rt).Apply(rt);
+        public void Reposition(RectTransform rt) => GetRepositioned(rt).Apply(rt);
 
         /// <summary>
         /// Get a translated <c>RectTransformData</c> based on the fields in this struct.
@@ -55,8 +55,8 @@ namespace Modding.Menu
         /// <returns></returns>
         public RectTransformData GetRepositioned(RectTransformData rt)
         {
-            var del = this.ParentAnchor - ParentPointFromChild(rt, ChildAnchor);
-            rt.pivot = this.ChildAnchor;
+            var del = ParentAnchor - ParentPointFromChild(rt, ChildAnchor);
+            rt.pivot = ChildAnchor;
             rt.anchorMin += del;
             rt.anchorMax += del;
             rt.anchoredPosition = Offset;
@@ -155,8 +155,8 @@ namespace Modding.Menu
         /// <returns></returns>
         public RelVector2(RelLength x, RelLength y)
         {
-            this.Delta = new Vector2(x.Delta, y.Delta);
-            this.Relative = new Vector2(x.Relative, y.Relative);
+            Delta = new Vector2(x.Delta, y.Delta);
+            Relative = new Vector2(x.Relative, y.Relative);
         }
 
         /// <summary>
@@ -166,8 +166,8 @@ namespace Modding.Menu
         /// <param name="parentRelSize">The normalized parent-relative size.</param>
         public RelVector2(Vector2 sizeDelta, Vector2 parentRelSize)
         {
-            this.Delta = sizeDelta;
-            this.Relative = parentRelSize;
+            Delta = sizeDelta;
+            Relative = parentRelSize;
         }
 
         /// <summary>
@@ -257,8 +257,8 @@ namespace Modding.Menu
         /// <param name="parentRelLength">The normalized parent-relative length.</param>
         public RelLength(float lengthDelta, float parentRelLength)
         {
-            this.Delta = lengthDelta;
-            this.Relative = parentRelLength;
+            Delta = lengthDelta;
+            Relative = parentRelLength;
         }
 
         /// <summary>
@@ -342,11 +342,11 @@ namespace Modding.Menu
         /// <returns></returns>
         public RectTransformData(RectTransform rt)
         {
-            this.sizeDelta = rt.sizeDelta;
-            this.anchorMin = rt.anchorMin;
-            this.anchorMax = rt.anchorMax;
-            this.anchoredPosition = rt.anchoredPosition;
-            this.pivot = rt.pivot;
+            sizeDelta = rt.sizeDelta;
+            anchorMin = rt.anchorMin;
+            anchorMax = rt.anchorMax;
+            anchoredPosition = rt.anchoredPosition;
+            pivot = rt.pivot;
         }
 
         /// <summary>
@@ -366,11 +366,11 @@ namespace Modding.Menu
         /// <param name="rt">The <c>RectTransform</c> to apply the data to.</param>
         public void Apply(RectTransform rt)
         {
-            rt.sizeDelta = this.sizeDelta;
-            rt.anchorMin = this.anchorMin;
-            rt.anchorMax = this.anchorMax;
-            rt.anchoredPosition = this.anchoredPosition;
-            rt.pivot = this.pivot;
+            rt.sizeDelta = sizeDelta;
+            rt.anchorMin = anchorMin;
+            rt.anchorMax = anchorMax;
+            rt.anchoredPosition = anchoredPosition;
+            rt.pivot = pivot;
         }
 
         // Is this a good idea? I think it probably is

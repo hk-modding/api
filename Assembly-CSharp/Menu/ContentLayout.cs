@@ -60,9 +60,9 @@ namespace Modding.Menu
         /// <param name="columns">The maximum number of columns to allow.</param>
         public RegularGridLayout(AnchoredPosition start, RelVector2 itemAdvance, int columns)
         {
-            this.Start = start;
-            this.ItemAdvance = itemAdvance;
-            this.Columns = columns;
+            Start = start;
+            ItemAdvance = itemAdvance;
+            Columns = columns;
         }
 
         /// <summary>
@@ -91,8 +91,8 @@ namespace Modding.Menu
         /// <param name="rt">The <c>RectTransform</c> to modify.</param>
         public void ModifyNext(RectTransform rt)
         {
-            (Start + ItemAdvance * this.IndexPos).Reposition(rt);
-            this.Index += 1;
+            (Start + ItemAdvance * IndexPos).Reposition(rt);
+            Index += 1;
         }
 
         /// <summary>
@@ -114,15 +114,15 @@ namespace Modding.Menu
             float newAnchor = 0.5f
         )
         {
-            var size = newSize ?? this.ItemAdvance;
-            var height = this.ItemAdvance.y * this.IndexPos.y;
-            var widthAdjust = this.ItemAdvance.x * this.Columns * originalAnchor - size.x * columns * newAnchor;
+            var size = newSize ?? ItemAdvance;
+            var height = ItemAdvance.y * IndexPos.y;
+            var widthAdjust = ItemAdvance.x * Columns * originalAnchor - size.x * columns * newAnchor;
             // figure out the width from the first item to the (newAnchor) of the new grid
-            var adjust = this.Start.ChildAnchor.x * size.x + widthAdjust;
-            this.Index = 0;
-            this.Columns = columns;
-            this.Start = this.Start + new RelVector2(adjust, height);
-            this.ItemAdvance = size;
+            var adjust = Start.ChildAnchor.x * size.x + widthAdjust;
+            Index = 0;
+            Columns = columns;
+            Start = Start + new RelVector2(adjust, height);
+            ItemAdvance = size;
         }
     }
 
@@ -139,7 +139,7 @@ namespace Modding.Menu
         /// <param name="src">The emumerable object.</param>
         public EnumeratorLayout(IEnumerable<AnchoredPosition> src)
         {
-            this.generator = src.GetEnumerator();
+            generator = src.GetEnumerator();
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Modding.Menu
         /// <param name="pos">The position to place the objects in.</param>
         public SingleContentLayout(AnchoredPosition pos)
         {
-            this.Position = pos;
+            Position = pos;
         }
 
         /// <summary>

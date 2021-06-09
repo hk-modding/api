@@ -16,11 +16,11 @@ namespace Modding.Patches
 
         public void OnCancel(BaseEventData eventData)
         {
-            if ((CancelAction)this.cancelAction == CancelAction.CustomCancelAction && this.customCancelAction != null)
+            if ((CancelAction)cancelAction == CancelAction.CustomCancelAction && customCancelAction != null)
             {
-                this.ForceDeselect();
+                ForceDeselect();
                 customCancelAction(this);
-                this.PlayCancelSound();
+                PlayCancelSound();
                 return;
             }
             orig_OnCancel(eventData);

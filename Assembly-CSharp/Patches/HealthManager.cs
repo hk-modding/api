@@ -19,7 +19,7 @@ namespace Modding.Patches
             yield return null;
             //We insert the hook here because I think some enemys' FSMs need 1 frame to mark the "isDead" bool for things that it thinks should be dead.
             isDead = ModHooks.OnEnableEnemy( gameObject, isDead );
-            if( this.isDead )
+            if( isDead )
             {
                 base.gameObject.SetActive( false );
             }

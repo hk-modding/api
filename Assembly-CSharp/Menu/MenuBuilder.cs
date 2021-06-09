@@ -39,16 +39,16 @@ namespace Modding.Menu
         /// <param name="name">The name of the root menu</param>
         public MenuBuilder(GameObject canvas, string name)
         {
-            this.MenuObject = new GameObject(name);
-            GameObject.DontDestroyOnLoad(this.MenuObject);
-            this.MenuObject.transform.SetParent(canvas.transform, false);
-            this.MenuObject.SetActive(false);
+            MenuObject = new GameObject(name);
+            GameObject.DontDestroyOnLoad(MenuObject);
+            MenuObject.transform.SetParent(canvas.transform, false);
+            MenuObject.SetActive(false);
             // MenuScreen
-            this.Screen = this.MenuObject.AddComponent<MenuScreen>();
+            Screen = MenuObject.AddComponent<MenuScreen>();
             // CanvasRenderer
-            this.MenuObject.AddComponent<CanvasRenderer>();
+            MenuObject.AddComponent<CanvasRenderer>();
             // RectTransform
-            var rt = this.MenuObject.AddComponent<RectTransform>();
+            var rt = MenuObject.AddComponent<RectTransform>();
             rt.sizeDelta = new Vector2(0f, 463f);
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.anchorMin = new Vector2(0f, 0f);
@@ -56,7 +56,7 @@ namespace Modding.Menu
             rt.anchoredPosition = new Vector2(0f, 0f);
             rt.localScale = new Vector3(0.7f, 0.7f, 1f);
             // CanvasGroup
-            this.MenuObject.AddComponent<CanvasGroup>();
+            MenuObject.AddComponent<CanvasGroup>();
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace Modding.Menu
         /// <returns></returns>
         public MenuScreen Build()
         {
-            this.OnBuild?.Invoke(this);
-            return this.Screen;
+            OnBuild?.Invoke(this);
+            return Screen;
         }
 
         /// <summary>
@@ -78,12 +78,12 @@ namespace Modding.Menu
         /// <returns></returns>
         public MenuBuilder AddContent(ContentLayout layout, Action<ContentArea> action)
         {
-            if (this.Screen.content == null)
+            if (Screen.content == null)
             {
                 return this;
             }
-            var ca = new ContentArea(this.Screen.content.gameObject, layout);
-            this.BeforeAddContent?.Invoke(this, ca);
+            var ca = new ContentArea(Screen.content.gameObject, layout);
+            BeforeAddContent?.Invoke(this, ca);
             action(ca);
             return this;
         }
@@ -97,12 +97,12 @@ namespace Modding.Menu
         /// <returns></returns>
         public MenuBuilder AddControls(ContentLayout layout, Action<ContentArea> action)
         {
-            if (this.Screen.controls == null)
+            if (Screen.controls == null)
             {
                 return this;
             }
-            var ca = new ContentArea(this.Screen.controls.gameObject, layout);
-            this.BeforeAddControls?.Invoke(this, ca);
+            var ca = new ContentArea(Screen.controls.gameObject, layout);
+            BeforeAddControls?.Invoke(this, ca);
             action(ca);
             return this;
         }
@@ -113,10 +113,10 @@ namespace Modding.Menu
         /// <returns></returns>
         public MenuBuilder CreateAutoMenuNav()
         {
-            var itemNavList = this.MenuObject.AddComponent<MenuItemNav>();
-            this.BeforeAddContent += (self, c) => c.OnMenuItemAdd += itemNavList.Content.Add;
-            this.BeforeAddControls += (self, c) => c.OnMenuItemAdd += itemNavList.Controls.Add;
-            this.OnBuild += self => itemNavList.RecalculateNavigation();
+            var itemNavList = MenuObject.AddComponent<MenuItemNav>();
+            BeforeAddContent += (self, c) => c.OnMenuItemAdd += itemNavList.Content.Add;
+            BeforeAddControls += (self, c) => c.OnMenuItemAdd += itemNavList.Controls.Add;
+            OnBuild += self => itemNavList.RecalculateNavigation();
             return this;
         }
 
@@ -141,7 +141,7 @@ namespace Modding.Menu
             titleRt.anchorMax = new Vector2(1f, 0.5f);
             style.pos.Reposition(titleRt);
             // CanvasGroup
-            this.Screen.title = titleObj.AddComponent<CanvasGroup>();
+            Screen.title = titleObj.AddComponent<CanvasGroup>();
             // ZeroAlphaOnStart
             titleObj.AddComponent<ZeroAlphaOnStart>();
             // Text
@@ -173,7 +173,7 @@ namespace Modding.Menu
             fleurAnimator.runtimeAnimatorController = MenuResources.MenuTopFleurAnimator;
             fleurAnimator.updateMode = AnimatorUpdateMode.UnscaledTime;
             fleurAnimator.applyRootMotion = false;
-            this.Screen.topFleur = fleurAnimator;
+            Screen.topFleur = fleurAnimator;
             // Image
             var image = fleur.AddComponent<Image>();
 
@@ -189,11 +189,11 @@ namespace Modding.Menu
         {
             var content = new GameObject("Content");
             GameObject.DontDestroyOnLoad(content);
-            content.transform.SetParent(this.MenuObject.transform, false);
+            content.transform.SetParent(MenuObject.transform, false);
             // RectTransform
             style.Apply(content.AddComponent<RectTransform>());
             // CanvasGroup
-            this.Screen.content = content.AddComponent<CanvasGroup>();
+            Screen.content = content.AddComponent<CanvasGroup>();
             // Canvas Renderer
             content.AddComponent<CanvasRenderer>();
             // ZeroAlphaOnStart
@@ -211,11 +211,11 @@ namespace Modding.Menu
         {
             var control = new GameObject("Control");
             GameObject.DontDestroyOnLoad(control);
-            control.transform.SetParent(this.MenuObject.transform, false);
+            control.transform.SetParent(MenuObject.transform, false);
             // RectTransform
             style.Apply(control.AddComponent<RectTransform>());
             // CanvasGroup
-            this.Screen.controls = control.AddComponent<CanvasGroup>();
+            Screen.controls = control.AddComponent<CanvasGroup>();
             // Canvas Renderer
             control.AddComponent<CanvasRenderer>();
             // ZeroAlphaOnStart
@@ -252,7 +252,7 @@ namespace Modding.Menu
         /// <param name="layout">The layout to applly to the content being added.</param>
         public ContentArea(GameObject obj, ContentLayout layout)
         {
-            this.contentObject = obj;
+            contentObject = obj;
             this.layout = layout;
         }
 
@@ -263,7 +263,7 @@ namespace Modding.Menu
         /// <returns></returns>
         public ContentArea CopyEvents(ContentArea src)
         {
-            this.OnMenuItemAdd = src.OnMenuItemAdd;
+            OnMenuItemAdd = src.OnMenuItemAdd;
             return this;
         }
 
@@ -271,7 +271,7 @@ namespace Modding.Menu
         /// Registers a <c>MenuSelectable</c> to be added. Calls the <c>OnMenuItemAdd</c> event.
         /// </summary>
         /// <param name="sel">The menu item to add.</param>
-        public void RegisterMenuItem(MenuSelectable sel) => this.OnMenuItemAdd?.Invoke(sel);
+        public void RegisterMenuItem(MenuSelectable sel) => OnMenuItemAdd?.Invoke(sel);
     }
 
     namespace Config

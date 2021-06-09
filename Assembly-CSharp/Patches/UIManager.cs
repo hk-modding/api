@@ -43,13 +43,13 @@ namespace Modding.Patches
 
         public IEnumerator HideCurrentMenu()
         {
-            if (((MainMenuState)this.menuState) == MainMenuState.DYNAMIC_MENU)
+            if (((MainMenuState)menuState) == MainMenuState.DYNAMIC_MENU)
             {
-                return this.HideMenu(this.currentDynamicMenu);
+                return HideMenu(currentDynamicMenu);
             }
             else
             {
-                return this.orig_HideCurrentMenu();
+                return orig_HideCurrentMenu();
             }
         }
 
@@ -60,31 +60,31 @@ namespace Modding.Patches
 
         public void UIGoToDynamicMenu(MenuScreen menu, System.Action preLeaveAction = null)
         {
-            this.StartMenuAnimationCoroutine(this.GoToDynamicMenu(menu, preLeaveAction));
+            StartMenuAnimationCoroutine(GoToDynamicMenu(menu, preLeaveAction));
         }
 
         public IEnumerator GoToDynamicMenu(MenuScreen menu, System.Action preLeaveAction = null)
         {
-            this.ih.StopUIInput();
+            ih.StopUIInput();
             if (preLeaveAction != null) preLeaveAction();
-            yield return this.HideCurrentMenu();
-            yield return this.ShowMenu(menu);
-            this.currentDynamicMenu = menu;
-            this.SetMenuState(MainMenuState.DYNAMIC_MENU);
-            this.ih.StartUIInput();
+            yield return HideCurrentMenu();
+            yield return ShowMenu(menu);
+            currentDynamicMenu = menu;
+            SetMenuState(MainMenuState.DYNAMIC_MENU);
+            ih.StartUIInput();
             yield break;
         }
 
         public void UILeaveDynamicMenu(MenuScreen to, MainMenuState state) {
-            this.StartMenuAnimationCoroutine(this.LeaveDynamicMenu(to, state));
+            StartMenuAnimationCoroutine(LeaveDynamicMenu(to, state));
         }
 
         public IEnumerator LeaveDynamicMenu(MenuScreen to, MainMenuState state) {
-            this.ih.StopUIInput();
-            yield return this.HideCurrentMenu();
-            yield return this.ShowMenu(to);
-            this.SetMenuState(state);
-            this.ih.StartUIInput();
+            ih.StopUIInput();
+            yield return HideCurrentMenu();
+            yield return ShowMenu(to);
+            SetMenuState(state);
+            ih.StartUIInput();
             yield break;
         }
     }

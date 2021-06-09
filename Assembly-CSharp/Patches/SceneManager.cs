@@ -28,12 +28,12 @@ namespace Modding.Patches
         //Added checks for null and an attempt to fix any missing references
         private void Update()
         {
-            if (this.gameplayScene)
+            if (gameplayScene)
             {
-                if (!this.heroInfoSent && this.heroCtrl != null && (this.heroCtrl.heroLight == null || this.heroCtrl.heroLight.material == null))
+                if (!heroInfoSent && heroCtrl != null && (heroCtrl.heroLight == null || heroCtrl.heroLight.material == null))
                 {
-                    this.heroCtrl.SetDarkness(this.darknessLevel);
-                    this.heroInfoSent = true;
+                    heroCtrl.SetDarkness(darknessLevel);
+                    heroInfoSent = true;
                 }
             }
 
@@ -45,24 +45,24 @@ namespace Modding.Patches
         private void DrawBlackBorders()
         {
             List<GameObject> borders = new List<GameObject>();
-            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(this.borderPrefab);
-            gameObject.transform.SetPosition2D(this.gm.sceneWidth + 10f, this.gm.sceneHeight / 2f);
-            gameObject.transform.localScale = new Vector2(20f, this.gm.sceneHeight + 40f);
+            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(borderPrefab);
+            gameObject.transform.SetPosition2D(gm.sceneWidth + 10f, gm.sceneHeight / 2f);
+            gameObject.transform.localScale = new Vector2(20f, gm.sceneHeight + 40f);
             borders.Add(gameObject);
 
-            gameObject = UnityEngine.Object.Instantiate<GameObject>(this.borderPrefab);
-            gameObject.transform.SetPosition2D(-10f, this.gm.sceneHeight / 2f);
-            gameObject.transform.localScale = new Vector2(20f, this.gm.sceneHeight + 40f);
+            gameObject = UnityEngine.Object.Instantiate<GameObject>(borderPrefab);
+            gameObject.transform.SetPosition2D(-10f, gm.sceneHeight / 2f);
+            gameObject.transform.localScale = new Vector2(20f, gm.sceneHeight + 40f);
             borders.Add(gameObject);
 
-            gameObject = UnityEngine.Object.Instantiate<GameObject>(this.borderPrefab);
-            gameObject.transform.SetPosition2D(this.gm.sceneWidth / 2f, this.gm.sceneHeight + 10f);
-            gameObject.transform.localScale = new Vector2(40f + this.gm.sceneWidth, 20f);
+            gameObject = UnityEngine.Object.Instantiate<GameObject>(borderPrefab);
+            gameObject.transform.SetPosition2D(gm.sceneWidth / 2f, gm.sceneHeight + 10f);
+            gameObject.transform.localScale = new Vector2(40f + gm.sceneWidth, 20f);
             borders.Add(gameObject);
 
-            gameObject = UnityEngine.Object.Instantiate<GameObject>(this.borderPrefab);
-            gameObject.transform.SetPosition2D(this.gm.sceneWidth / 2f, -10f);
-            gameObject.transform.localScale = new Vector2(40f + this.gm.sceneWidth, 20f);
+            gameObject = UnityEngine.Object.Instantiate<GameObject>(borderPrefab);
+            gameObject.transform.SetPosition2D(gm.sceneWidth / 2f, -10f);
+            gameObject.transform.localScale = new Vector2(40f + gm.sceneWidth, 20f);
             borders.Add(gameObject);
 
             ModHooks.OnDrawBlackBorders(borders);

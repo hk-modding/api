@@ -29,9 +29,9 @@ namespace Modding.Patches
 
         private void RecordKillForJournal()
         {
-            string boolName = "killed" + this.playerDataName;
-            string intName = "kills" + this.playerDataName;
-            string boolName2 = "newData" + this.playerDataName;
+            string boolName = "killed" + playerDataName;
+            string intName = "kills" + playerDataName;
+            string boolName2 = "newData" + playerDataName;
             
             ModHooks.OnRecordKillForJournal(this, playerDataName, boolName, intName, boolName2);
             

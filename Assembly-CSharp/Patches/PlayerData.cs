@@ -109,7 +109,7 @@ namespace Modding.Patches
         {
             if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
             {
-                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) + 1);
+                ModHooks.SetPlayerInt(intName, GetIntInternal(intName) + 1);
                 return;
             }
 
@@ -121,7 +121,7 @@ namespace Modding.Patches
         {
             if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
             {
-                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) - 1);
+                ModHooks.SetPlayerInt(intName, GetIntInternal(intName) - 1);
             }
         }
 
@@ -130,7 +130,7 @@ namespace Modding.Patches
         {
             if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
             {
-                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) + amount);
+                ModHooks.SetPlayerInt(intName, GetIntInternal(intName) + amount);
                 return;
             }
 

@@ -18,7 +18,7 @@ namespace Modding
         public void InitMenu()
         {
             var builder = new MenuBuilder(UIManager.instance.UICanvas.gameObject, "ModListMenu");
-            this.screen = builder.Screen;
+            screen = builder.Screen;
             builder.CreateAutoMenuNav()
                 .CreateTitle("Mods", MenuTitleStyle.vanillaStyle)
                 .CreateContentPane(RectTransformData.FromSizeAndPos(
@@ -42,7 +42,7 @@ namespace Modding
                     c => c.AddScrollPaneContent(
                         new ScrollbarConfig
                         {
-                            CancelAction = _ => this.ApplyChanges(),
+                            CancelAction = _ => ApplyChanges(),
                             Navigation = new Navigation { mode = Navigation.Mode.Explicit },
                             Position = new AnchoredPosition
                             {
@@ -70,11 +70,11 @@ namespace Modding
                                             {
                                                 changedMods[itmod] = ind == 1;
                                             },
-                                            CancelAction = _ => this.ApplyChanges(),
+                                            CancelAction = _ => ApplyChanges(),
                                             Label = itmod.GetName(),
                                             Options = new string[] { "Off", "On" },
                                             RefreshSetting = (self, apply) => self.optionList.SetOptionTo(
-                                                this.modEnabledSettings[itmod.GetName()] ? 1 : 0
+                                                modEnabledSettings[itmod.GetName()] ? 1 : 0
                                             ),
                                             Style = HorizontalOptionStyle.VanillaStyle,
                                             Description = new DescriptionInfo
@@ -97,7 +97,7 @@ namespace Modding
                                         new MenuButtonConfig
                                         {
                                             Style = MenuButtonStyle.VanillaStyle,
-                                            CancelAction = _ => this.ApplyChanges(),
+                                            CancelAction = _ => ApplyChanges(),
                                             Label = $"{immod.GetName()} Settings",
                                             SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
                                                 .UIGoToDynamicMenu(menu),
@@ -107,7 +107,7 @@ namespace Modding
                                 }
                                 else if (mod is ICustomMenuMod icmmod)
                                 {
-                                    var menu = icmmod.GetMenuScreen(this.screen);
+                                    var menu = icmmod.GetMenuScreen(screen);
                                     var rt = c.contentObject.GetComponent<RectTransform>();
                                     rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
                                     c.AddMenuButton(
@@ -115,7 +115,7 @@ namespace Modding
                                         new MenuButtonConfig
                                         {
                                             Style = MenuButtonStyle.VanillaStyle,
-                                            CancelAction = _ => this.ApplyChanges(),
+                                            CancelAction = _ => ApplyChanges(),
                                             Label = $"{icmmod.GetName()} Settings",
                                             SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
                                                 .UIGoToDynamicMenu(menu),
@@ -138,8 +138,8 @@ namespace Modding
                         new MenuButtonConfig
                         {
                             Label = "Back",
-                            CancelAction = _ => this.ApplyChanges(),
-                            SubmitAction = _ => this.ApplyChanges(),
+                            CancelAction = _ => ApplyChanges(),
+                            SubmitAction = _ => ApplyChanges(),
                             Proceed = true,
                             Style = MenuButtonStyle.VanillaStyle
                         }
@@ -177,9 +177,9 @@ namespace Modding
             foreach (var (mod, enabled) in changedMods)
             {
                 var name = mod.GetName();
-                if (this.modEnabledSettings[name] != enabled)
+                if (modEnabledSettings[name] != enabled)
                 {
-                    this.modEnabledSettings[name] = enabled;
+                    modEnabledSettings[name] = enabled;
                     if (enabled)
                     {
                         ModLoader.LoadMod(mod, true);
@@ -245,7 +245,7 @@ namespace Modding
                 builder.AddContent(new NullContentLayout(), c => c.AddScrollPaneContent(
                     new ScrollbarConfig
                     {
-                        CancelAction = _ => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen),
+                        CancelAction = _ => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(screen),
                         Navigation = new Navigation
                         {
                             mode = Navigation.Mode.Explicit,
@@ -275,7 +275,7 @@ namespace Modding
         }
 
         private void GoToModListMenu(object _) => GoToModListMenu();
-        private void GoToModListMenu() => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen);
+        private void GoToModListMenu() => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(screen);
 
         private void AddModMenuContent(List<IMenuMod.MenuEntry> entries, ContentArea c)
         {

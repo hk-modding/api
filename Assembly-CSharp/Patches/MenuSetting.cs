@@ -20,11 +20,11 @@ namespace Modding.Patches
         public void UpdateSetting(int settingIndex)
         {
             if (
-                (MenuSettingType)this.settingType == MenuSettingType.CustomSetting &&
-                this.customApplySetting != null
+                (MenuSettingType)settingType == MenuSettingType.CustomSetting &&
+                customApplySetting != null
             )
             {
-                this.customApplySetting?.Invoke(this, settingIndex);
+                customApplySetting?.Invoke(this, settingIndex);
             }
             else
             {
@@ -35,11 +35,11 @@ namespace Modding.Patches
         public void RefreshValueFromGameSettings(bool alsoApplySetting = false)
         {
             if (
-                (MenuSettingType)this.settingType == MenuSettingType.CustomSetting &&
-                this.customRefreshSetting != null
+                (MenuSettingType)settingType == MenuSettingType.CustomSetting &&
+                customRefreshSetting != null
             )
             {
-                this.customRefreshSetting?.Invoke(this, alsoApplySetting);
+                customRefreshSetting?.Invoke(this, alsoApplySetting);
             }
             else
             {
