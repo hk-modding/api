@@ -45,13 +45,13 @@ namespace Modding.Menu
             // Option object
             var option = new GameObject($"{name}");
             GameObject.DontDestroyOnLoad(option);
-            option.transform.SetParent(content.contentObject.transform, false);
+            option.transform.SetParent(content.ContentObject.transform, false);
             // CanvasRenderer
             option.AddComponent<CanvasRenderer>();
             // RectTransform
             var optionRt = option.AddComponent<RectTransform>();
             style.Size.GetBaseTransformData().Apply(optionRt);
-            content.layout.ModifyNext(optionRt);
+            content.Layout.ModifyNext(optionRt);
             // MenuOptionHorizontal
             var menuOptionHorizontal = option.AddComponent<MenuOptionHorizontal>();
             menuOptionHorizontal.optionList = config.Options;

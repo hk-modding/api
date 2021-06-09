@@ -59,9 +59,8 @@ namespace Modding
                             {
                                 if (mod is ITogglableMod itmod)
                                 {
-                                    var rt = c.contentObject.GetComponent<RectTransform>();
+                                    var rt = c.ContentObject.GetComponent<RectTransform>();
                                     rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
-                                    MenuOptionHorizontal opt;
                                     c.AddHorizontalOption(
                                         itmod.GetName(),
                                         new HorizontalOptionConfig
@@ -83,14 +82,14 @@ namespace Modding
                                                 Style = DescriptionStyle.SingleLineVanillaStyle
                                             }
                                         },
-                                        out opt
+                                        out var opt
                                     );
                                     opt.menuSetting.RefreshValueFromGameSettings();
                                 }
                                 if (mod is IMenuMod immod)
                                 {
                                     var menu = CreateModMenu(immod);
-                                    var rt = c.contentObject.GetComponent<RectTransform>();
+                                    var rt = c.ContentObject.GetComponent<RectTransform>();
                                     rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
                                     c.AddMenuButton(
                                         $"{immod.GetName()}_Settings",
@@ -108,7 +107,7 @@ namespace Modding
                                 else if (mod is ICustomMenuMod icmmod)
                                 {
                                     var menu = icmmod.GetMenuScreen(this.screen);
-                                    var rt = c.contentObject.GetComponent<RectTransform>();
+                                    var rt = c.ContentObject.GetComponent<RectTransform>();
                                     rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
                                     c.AddMenuButton(
                                         $"{icmmod.GetName()}_Settings",

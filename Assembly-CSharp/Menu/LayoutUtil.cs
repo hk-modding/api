@@ -55,11 +55,11 @@ namespace Modding.Menu
         /// <returns></returns>
         public RectTransformData GetRepositioned(RectTransformData rt)
         {
-            var del = this.ParentAnchor - ParentPointFromChild(rt, ChildAnchor);
+            var del = this.ParentAnchor - ParentPointFromChild(rt, this.ChildAnchor);
             rt.pivot = this.ChildAnchor;
             rt.anchorMin += del;
             rt.anchorMax += del;
-            rt.anchoredPosition = Offset;
+            rt.anchoredPosition = this.Offset;
             return rt;
         }
 
@@ -129,8 +129,8 @@ namespace Modding.Menu
             get => new RelLength(Delta.x, Relative.x);
             set
             {
-                Delta.x = value.Delta;
-                Relative.x = value.Relative;
+                this.Delta.x = value.Delta;
+                this.Relative.x = value.Relative;
             }
         }
 
@@ -142,8 +142,8 @@ namespace Modding.Menu
             get => new RelLength(Delta.y, Relative.y);
             set
             {
-                Delta.y = value.Delta;
-                Relative.y = value.Relative;
+                this.Delta.y = value.Delta;
+                this.Relative.y = value.Relative;
             }
         }
 

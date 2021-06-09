@@ -76,7 +76,7 @@ namespace Modding.Menu
         /// <param name="layout">The layout of the added content</param>
         /// <param name="action">The action that will get called to add the content</param>
         /// <returns></returns>
-        public MenuBuilder AddContent(ContentLayout layout, Action<ContentArea> action)
+        public MenuBuilder AddContent(IContentLayout layout, Action<ContentArea> action)
         {
             if (this.Screen.content == null)
             {
@@ -95,7 +95,7 @@ namespace Modding.Menu
         /// <param name="layout">The layout to apply to the added content.</param>
         /// <param name="action">The action that will get called to add the content.</param>
         /// <returns></returns>
-        public MenuBuilder AddControls(ContentLayout layout, Action<ContentArea> action)
+        public MenuBuilder AddControls(IContentLayout layout, Action<ContentArea> action)
         {
             if (this.Screen.controls == null)
             {
@@ -131,7 +131,7 @@ namespace Modding.Menu
             // Title
             var titleObj = new GameObject("Title");
             GameObject.DontDestroyOnLoad(titleObj);
-            titleObj.transform.SetParent(MenuObject.transform, false);
+            titleObj.transform.SetParent(this.MenuObject.transform, false);
             // CanvasRenderer
             titleObj.AddComponent<CanvasRenderer>();
             // RectTransform
@@ -139,7 +139,7 @@ namespace Modding.Menu
             titleRt.sizeDelta = new Vector2(0f, 107f);
             titleRt.anchorMin = new Vector2(0f, 0.5f);
             titleRt.anchorMax = new Vector2(1f, 0.5f);
-            style.pos.Reposition(titleRt);
+            style.Pos.Reposition(titleRt);
             // CanvasGroup
             this.Screen.title = titleObj.AddComponent<CanvasGroup>();
             // ZeroAlphaOnStart
@@ -147,8 +147,8 @@ namespace Modding.Menu
             // Text
             var titleText = titleObj.AddComponent<Text>();
             titleText.font = MenuResources.TrajanBold;
-            titleText.fontSize = style.textSize;
-            titleText.resizeTextMaxSize = style.textSize;
+            titleText.fontSize = style.TextSize;
+            titleText.resizeTextMaxSize = style.TextSize;
             titleText.alignment = TextAnchor.MiddleCenter;
             titleText.text = title;
             titleText.supportRichText = true;
@@ -156,7 +156,7 @@ namespace Modding.Menu
             // TopFleur
             var fleur = new GameObject("TopFleur");
             GameObject.DontDestroyOnLoad(fleur);
-            fleur.transform.SetParent(MenuObject.transform, false);
+            fleur.transform.SetParent(this.MenuObject.transform, false);
             // CanvasRenderer
             fleur.AddComponent<CanvasRenderer>();
             // RectTransform
@@ -238,22 +238,22 @@ namespace Modding.Menu
         /// <summary>
         /// The game object to place the new content in.
         /// </summary>
-        public GameObject contentObject { get; protected set; }
+        public GameObject ContentObject { get; protected set; }
 
         /// <summary>
         /// The layout to apply to the content being added.
         /// </summary>
-        public ContentLayout layout { get; set; }
+        public IContentLayout Layout { get; set; }
 
         /// <summary>
         /// Creates a new <c>ContentArea</c>.
         /// </summary>
         /// <param name="obj">The object to place the added content in.</param>
         /// <param name="layout">The layout to applly to the content being added.</param>
-        public ContentArea(GameObject obj, ContentLayout layout)
+        public ContentArea(GameObject obj, IContentLayout layout)
         {
-            this.contentObject = obj;
-            this.layout = layout;
+            this.ContentObject = obj;
+            this.Layout = layout;
         }
 
         /// <summary>
@@ -286,23 +286,23 @@ namespace Modding.Menu
             /// </summary>
             public static readonly MenuTitleStyle vanillaStyle = new MenuTitleStyle
             {
-                pos = new AnchoredPosition
+                Pos = new AnchoredPosition
                 {
                     ChildAnchor = new Vector2(0.5f, 0.5f),
                     ParentAnchor = new Vector2(0.5f, 0.5f),
                     Offset = new Vector2(0f, 544f)
                 },
-                textSize = 75
+                TextSize = 75
             };
 
             /// <summary>
             /// The position of the title.
             /// </summary>
-            public AnchoredPosition pos;
+            public AnchoredPosition Pos;
             /// <summary>
             /// The text size of the title.
             /// </summary>
-            public int textSize;
+            public int TextSize;
         }
     }
 }

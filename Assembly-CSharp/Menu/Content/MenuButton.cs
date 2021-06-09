@@ -45,7 +45,7 @@ namespace Modding.Menu
             // Option object
             var option = new GameObject($"{name}");
             GameObject.DontDestroyOnLoad(option);
-            option.transform.SetParent(content.contentObject.transform, false);
+            option.transform.SetParent(content.ContentObject.transform, false);
             // CanvasRenderer
             option.AddComponent<CanvasRenderer>();
             // RectTransform
@@ -53,7 +53,7 @@ namespace Modding.Menu
             new RelVector2(new RelLength(0f, 1f), style.Height)
                 .GetBaseTransformData()
                 .Apply(optionRt);
-            content.layout.ModifyNext(optionRt);
+            content.Layout.ModifyNext(optionRt);
             // MenuButton
             var menuButton = (Patch.MenuButton)option.AddComponent<MenuButton>();
             menuButton.buttonType = (MenuButton.MenuButtonType)Patch.MenuButton.MenuButtonType.CustomSubmit;

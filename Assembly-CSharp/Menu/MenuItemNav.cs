@@ -28,7 +28,7 @@ namespace Modding.Menu
         /// </summary>
         public void RecalculateNavigation()
         {
-            for (var i = 0; i < Content.Count + Controls.Count; i++)
+            for (var i = 0; i < this.Content.Count + this.Controls.Count; i++)
             {
                 var last = this.GetSelJoint(i - 1);
                 var sel = this.GetSelJoint(i);
@@ -59,18 +59,20 @@ namespace Modding.Menu
         {
             if (index == -1)
             {
-                return Controls.Count == 0 ? Content[Content.Count - 1] : Controls[Controls.Count - 1];
+                return this.Controls.Count == 0 ?
+                    this.Content[this.Content.Count - 1] :
+                    this.Controls[this.Controls.Count - 1];
             }
-            if (index < Content.Count)
+            if (index < this.Content.Count)
             {
-                return Content[index];
+                return this.Content[index];
             }
-            index -= Content.Count;
-            if (index < Controls.Count)
+            index -= this.Content.Count;
+            if (index < this.Controls.Count)
             {
-                return Controls[index];
+                return this.Controls[index];
             }
-            return Content.Count == 0 ? Controls[0] : Content[0];
+            return this.Content.Count == 0 ? this.Controls[0] : this.Content[0];
         }
 
         private void OnEnable()

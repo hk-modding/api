@@ -49,13 +49,13 @@ namespace Modding.Menu
             // Keybind object
             var keybind = new GameObject($"{name}");
             GameObject.DontDestroyOnLoad(keybind);
-            keybind.transform.SetParent(content.contentObject.transform, false);
+            keybind.transform.SetParent(content.ContentObject.transform, false);
             // CanvasRenderer
             keybind.AddComponent<CanvasRenderer>();
             // RectTransform
             var keybindRt = keybind.AddComponent<RectTransform>();
             new RelVector2(new Vector2(650f, 100f)).GetBaseTransformData().Apply(keybindRt);
-            content.layout.ModifyNext(keybindRt);
+            content.Layout.ModifyNext(keybindRt);
             // MappableKey
             var mapKey = (Patch.MappableKey)keybind.AddComponent<MappableKey>();
             mapKey.InitCustomActions(action.Owner, action);

@@ -26,11 +26,11 @@ namespace Modding.Menu
         {
             var go = new GameObject(name);
             GameObject.DontDestroyOnLoad(go);
-            go.transform.SetParent(content.contentObject.transform, false);
+            go.transform.SetParent(content.ContentObject.transform, false);
             // RectTransform
             var rt = go.AddComponent<RectTransform>();
             size.GetBaseTransformData().Apply(rt);
-            content.layout.ModifyNext(rt);
+            content.Layout.ModifyNext(rt);
             // CanvasRenderer
             go.AddComponent<CanvasRenderer>();
 

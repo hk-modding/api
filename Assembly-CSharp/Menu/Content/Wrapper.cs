@@ -46,14 +46,14 @@ namespace Modding.Menu
             // Wrapper
             wrapper = new GameObject(name);
             GameObject.DontDestroyOnLoad(wrapper);
-            wrapper.transform.SetParent(content.contentObject.transform, false);
+            wrapper.transform.SetParent(content.ContentObject.transform, false);
             // RectTransform
             var wrapperRt = wrapper.AddComponent<RectTransform>();
             wrapperRt.sizeDelta = new Vector2(0f, 0f);
             wrapperRt.pivot = new Vector2(0.5f, 0.5f);
             wrapperRt.anchorMin = new Vector2(0.5f, 0.5f);
             wrapperRt.anchorMax = new Vector2(0.5f, 0.5f);
-            content.layout.ModifyNext(wrapperRt);
+            content.Layout.ModifyNext(wrapperRt);
             // CanvasRenderer
             wrapper.AddComponent<CanvasRenderer>();
 

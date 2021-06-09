@@ -25,7 +25,7 @@ namespace Modding.Menu
             this ContentArea content,
             ScrollbarConfig config,
             RelLength contentHeight,
-            ContentLayout layout,
+            IContentLayout layout,
             Action<ContentArea> action
         ) => content.AddScrollPaneContent(config, contentHeight, layout, action, out _, out _);
 
@@ -45,7 +45,7 @@ namespace Modding.Menu
             this ContentArea content,
             ScrollbarConfig config,
             RelLength contentHeight,
-            ContentLayout layout,
+            IContentLayout layout,
             Action<ContentArea> action,
             out GameObject scrollContent,
             out Scrollbar scroll
@@ -57,7 +57,7 @@ namespace Modding.Menu
             // ScrollMask
             var scrollMask = new GameObject("ScrollMask");
             GameObject.DontDestroyOnLoad(scrollMask);
-            scrollMask.transform.SetParent(content.contentObject.transform, false);
+            scrollMask.transform.SetParent(content.ContentObject.transform, false);
             // RectTransform
             var scrollMaskRt = scrollMask.AddComponent<RectTransform>();
             scrollMaskRt.sizeDelta = new Vector2(0f, 0f);
@@ -120,7 +120,7 @@ namespace Modding.Menu
             // Scrollbar
             var scrollbar = new GameObject("Scrollbar");
             GameObject.DontDestroyOnLoad(scrollbar);
-            scrollbar.transform.SetParent(content.contentObject.transform, false);
+            scrollbar.transform.SetParent(content.ContentObject.transform, false);
             // RectTransform
             var scrollbarRt = scrollbar.AddComponent<RectTransform>();
             scrollbarRt.sizeDelta = new Vector2(38f, 906f);

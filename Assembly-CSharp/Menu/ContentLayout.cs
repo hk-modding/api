@@ -6,7 +6,7 @@ namespace Modding.Menu
     /// <summary>
     /// An interface to place successive <c>RectTransform</c>s.
     /// </summary>
-    public interface ContentLayout
+    public interface IContentLayout
     {
         /// <summary>
         /// Modifies a <c>RectTransform</c>.
@@ -18,7 +18,7 @@ namespace Modding.Menu
     /// <summary>
     /// A layout that does absolutely nothing.
     /// </summary>
-    public struct NullContentLayout : ContentLayout
+    public struct NullContentLayout : IContentLayout
     {
         /// <inheritdoc/>
         public void ModifyNext(RectTransform rt) { }
@@ -27,7 +27,7 @@ namespace Modding.Menu
     /// <summary>
     /// A layout to place items in a grid pattern.
     /// </summary>
-    public class RegularGridLayout : ContentLayout
+    public class RegularGridLayout : IContentLayout
     {
         /// <summary>
         /// The "size" of a cell in the grid.
@@ -91,7 +91,7 @@ namespace Modding.Menu
         /// <param name="rt">The <c>RectTransform</c> to modify.</param>
         public void ModifyNext(RectTransform rt)
         {
-            (Start + ItemAdvance * this.IndexPos).Reposition(rt);
+            (this.Start + this.ItemAdvance * this.IndexPos).Reposition(rt);
             this.Index += 1;
         }
 
@@ -121,7 +121,7 @@ namespace Modding.Menu
             var adjust = this.Start.ChildAnchor.x * size.x + widthAdjust;
             this.Index = 0;
             this.Columns = columns;
-            this.Start = this.Start + new RelVector2(adjust, height);
+            this.Start += new RelVector2(adjust, height);
             this.ItemAdvance = size;
         }
     }
@@ -129,7 +129,7 @@ namespace Modding.Menu
     /// <summary>
     /// A layout based on an enumerator to get successive <c>RectPosition</c>s.
     /// </summary>
-    public class EnumeratorLayout : ContentLayout
+    public class EnumeratorLayout : IContentLayout
     {
         private IEnumerator<AnchoredPosition> generator;
 
@@ -164,7 +164,7 @@ namespace Modding.Menu
     /// <summary>
     /// A layout that places every object in the same position.
     /// </summary>
-    public class SingleContentLayout : ContentLayout
+    public class SingleContentLayout : IContentLayout
     {
         /// <summary>
         /// The position to place the object in.
@@ -192,7 +192,7 @@ namespace Modding.Menu
         /// <param name="rt">The <c>RectTransform</c> to modify.</param>
         public void ModifyNext(RectTransform rt)
         {
-            Position.Reposition(rt);
+            this.Position.Reposition(rt);
         }
     }
 }
