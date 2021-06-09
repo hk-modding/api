@@ -225,11 +225,8 @@ namespace Modding.Patches
                                 delegate (bool didSave)
                                 {
                                     HideSaveIcon();
-                                    if (callback != null)
-                                    {
-                                        callback(didSave);
-                                    }
-                                }
+									callback?.Invoke(didSave);
+								}
                             );
                         }
                     }
@@ -413,11 +410,8 @@ namespace Modding.Patches
                         obj = false;
                     }
 
-                    if (callback != null)
-                    {
-                        callback(obj);
-                    }
-                }
+					callback?.Invoke(obj);
+				}
             );
         }
 
@@ -563,17 +557,11 @@ namespace Modding.Patches
             startedOnThisScene = false;
             nextSceneName = destScene;
             waitForManualLevelStart = true;
-            if (DestroyPersonalPools != null)
-            {
-                DestroyPersonalPools();
-            }
+			DestroyPersonalPools?.Invoke();
 
-            if (UnloadingLevel != null)
-            {
-                UnloadingLevel();
-            }
+			UnloadingLevel?.Invoke();
 
-            string exitingScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+			string exitingScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
             AsyncOperation loadop = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(destScene, LoadSceneMode.Additive);
             loadop.allowSceneActivation = true;
             yield return loadop;

@@ -66,8 +66,8 @@ namespace Modding.Patches
         public IEnumerator GoToDynamicMenu(MenuScreen menu, System.Action preLeaveAction = null)
         {
             ih.StopUIInput();
-            if (preLeaveAction != null) preLeaveAction();
-            yield return HideCurrentMenu();
+			preLeaveAction?.Invoke();
+			yield return HideCurrentMenu();
             yield return ShowMenu(menu);
             currentDynamicMenu = menu;
             SetMenuState(MainMenuState.DYNAMIC_MENU);
