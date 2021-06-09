@@ -45,7 +45,7 @@ namespace Modding.Patches
                 newEntries[i] = entries[i];
             }
 
-            Entry newEntry = new Entry();
+            Entry newEntry = new();
             ReflectionHelper.SetAttr(newEntry, "selectable", sel);
 
             newEntries[index] = newEntry;

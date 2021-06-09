@@ -11,7 +11,7 @@ namespace Modding
     {
         private MenuScreen screen;
 
-        private Dictionary<ITogglableMod, bool> changedMods = new Dictionary<ITogglableMod, bool>();
+        private Dictionary<ITogglableMod, bool> changedMods = new();
 
         private Dictionary<string, bool> modEnabledSettings = ModHooks.GlobalSettings.ModEnabledSettings;
 

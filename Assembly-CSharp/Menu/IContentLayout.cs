@@ -50,7 +50,7 @@ namespace Modding.Menu
         /// <summary>
         /// The position in grid cells of the next item.
         /// </summary>
-        public Vector2Int IndexPos { get => new Vector2Int(Index % Columns, Index / Columns); }
+        public Vector2Int IndexPos { get => new(Index % Columns, Index / Columns); }
 
         /// <summary>
         /// Creates a new regular grid layout.
@@ -74,7 +74,7 @@ namespace Modding.Menu
         public static RegularGridLayout CreateVerticalLayout(
             float itemHeight,
             Vector2 start = new Vector2()
-        ) => new RegularGridLayout(
+        ) => new(
             new AnchoredPosition
             {
                 ChildAnchor = new Vector2(0.5f, 1f),

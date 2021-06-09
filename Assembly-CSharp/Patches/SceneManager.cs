@@ -44,7 +44,7 @@ namespace Modding.Patches
         [MonoModReplace]
         private void DrawBlackBorders()
         {
-            List<GameObject> borders = new List<GameObject>();
+            List<GameObject> borders = new();
             GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(borderPrefab);
             gameObject.transform.SetPosition2D(gm.sceneWidth + 10f, gm.sceneHeight / 2f);
             gameObject.transform.localScale = new Vector2(20f, gm.sceneHeight + 40f);

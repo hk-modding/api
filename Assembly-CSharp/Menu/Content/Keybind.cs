@@ -214,8 +214,8 @@ namespace Modding.Menu
             /// <summary>
             /// The style preset of a keybind in the vanilla game.
             /// </summary>
-            public static readonly KeybindStyle VanillaStyle = new KeybindStyle
-            {
+            public static readonly KeybindStyle VanillaStyle = new()
+			{
                 LabelTextSize = 37
             };
             /// <summary>

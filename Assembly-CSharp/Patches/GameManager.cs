@@ -141,7 +141,7 @@ namespace Modding.Patches
 
                     try
                     {
-                        SaveGameData obj = new SaveGameData(playerData, sceneData);
+                        SaveGameData obj = new(playerData, sceneData);
 
                         ModHooks.OnBeforeSaveGameSave(obj);
                         if(moddedData == null) {
@@ -200,8 +200,8 @@ namespace Modding.Patches
                         if (flag)
                         {
                             string graph = Encryption.Encrypt(text);
-                            BinaryFormatter binaryFormatter = new BinaryFormatter();
-                            MemoryStream memoryStream = new MemoryStream();
+                            BinaryFormatter binaryFormatter = new();
+                            MemoryStream memoryStream = new();
                             binaryFormatter.Serialize(memoryStream, graph);
                             byte[] binary = memoryStream.ToArray();
                             memoryStream.Close();
@@ -354,8 +354,8 @@ namespace Modding.Patches
                         string json;
                         if (flag)
                         {
-                            BinaryFormatter binaryFormatter = new BinaryFormatter();
-                            MemoryStream serializationStream = new MemoryStream(fileBytes);
+                            BinaryFormatter binaryFormatter = new();
+                            MemoryStream serializationStream = new(fileBytes);
                             string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
                             json = Encryption.Decrypt(encryptedString);
                         }
@@ -461,8 +461,8 @@ namespace Modding.Patches
                         string json;
                         if (flag)
                         {
-                            BinaryFormatter binaryFormatter = new BinaryFormatter();
-                            MemoryStream serializationStream = new MemoryStream(fileBytes);
+                            BinaryFormatter binaryFormatter = new();
+                            MemoryStream serializationStream = new(fileBytes);
                             string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
                             json = Encryption.Decrypt(encryptedString);
                         }
@@ -491,8 +491,7 @@ namespace Modding.Patches
                         }
 
                         global::PlayerData playerData = saveGameData.playerData;
-                        SaveStats saveStats = new SaveStats
-                        (
+                        SaveStats saveStats = new                        (
                             playerData.maxHealthBase,
                             playerData.geo,
                             playerData.mapZone,

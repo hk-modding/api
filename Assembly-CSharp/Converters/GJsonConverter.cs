@@ -19,7 +19,7 @@ namespace Modding.Converters
         {
             if (typeof(TClass) == objectType)
             {
-                Dictionary<string, object> token = new Dictionary<string, object>();
+                Dictionary<string, object> token = new();
                 reader.Read();
                 while (reader.TokenType == JsonToken.PropertyName)
                 {

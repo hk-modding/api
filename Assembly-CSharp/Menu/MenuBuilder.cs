@@ -284,8 +284,8 @@ namespace Modding.Menu
             /// <summary>
             /// The style preset of a standard menu title in the vanilla game.
             /// </summary>
-            public static readonly MenuTitleStyle vanillaStyle = new MenuTitleStyle
-            {
+            public static readonly MenuTitleStyle vanillaStyle = new()
+			{
                 pos = new AnchoredPosition
                 {
                     ChildAnchor = new Vector2(0.5f, 0.5f),

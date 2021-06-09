@@ -142,7 +142,7 @@ namespace Modding
 
                 if (_console == null)
                 {
-                    GameObject go = new GameObject();
+                    GameObject go = new();
                     Object.DontDestroyOnLoad(go);
                     _console = go.AddComponent<Console>();
                 }
@@ -350,7 +350,7 @@ namespace Modding
 
             using FileStream fileStream = File.Create(SettingsPath);
 
-            using StreamWriter writer = new StreamWriter(fileStream);
+            using StreamWriter writer = new(fileStream);
 
             try
             {
@@ -396,7 +396,7 @@ namespace Modding
             try
             {
                 using FileStream fileStream = File.OpenRead(SettingsPath);
-                using StreamReader reader = new StreamReader(fileStream);
+                using StreamReader reader = new(fileStream);
 
                 string json = reader.ReadToEnd();
 

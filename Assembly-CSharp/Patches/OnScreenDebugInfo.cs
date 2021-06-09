@@ -16,7 +16,7 @@ namespace Modding.Patches
         {
             Logger.APILogger.Log("Main menu loading");
 
-            GameObject obj = new GameObject();
+            GameObject obj = new();
             DontDestroyOnLoad(obj);
 
             // Preload reflection

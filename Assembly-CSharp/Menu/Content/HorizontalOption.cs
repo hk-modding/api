@@ -249,8 +249,8 @@ namespace Modding.Menu
             /// <summary>
             /// The style preset of a horizontal option in the vanilla game.
             /// </summary>
-            public static readonly HorizontalOptionStyle VanillaStyle = new HorizontalOptionStyle
-            {
+            public static readonly HorizontalOptionStyle VanillaStyle = new()
+			{
                 Size = new RelVector2
                 {
                     Relative = new Vector2(),
@@ -297,8 +297,8 @@ namespace Modding.Menu
             /// <summary>
             /// The style preset of a single line description in the vanilla game.
             /// </summary>
-            public static readonly DescriptionStyle SingleLineVanillaStyle = new DescriptionStyle
-            {
+            public static readonly DescriptionStyle SingleLineVanillaStyle = new()
+			{
                 TextSize = 38,
                 Height = new RelLength(40),
             };

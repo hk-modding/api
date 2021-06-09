@@ -76,7 +76,7 @@ namespace Modding.Menu
             RectTransformData sibling,
             Vector2 siblingAnchor,
             Vector2 offset
-        ) => new AnchoredPosition(
+        ) => new(
             ParentPointFromChild(sibling, siblingAnchor),
             selfAnchor,
             sibling.anchoredPosition + offset
@@ -96,7 +96,7 @@ namespace Modding.Menu
         /// <summary>
         /// Translates an anchored position by a relative vector.
         /// </summary>
-        public static AnchoredPosition operator +(AnchoredPosition lhs, RelVector2 rhs) => new AnchoredPosition(
+        public static AnchoredPosition operator +(AnchoredPosition lhs, RelVector2 rhs) => new(
             lhs.ParentAnchor + rhs.Relative,
             lhs.ChildAnchor,
             lhs.Offset + rhs.Delta
@@ -126,7 +126,7 @@ namespace Modding.Menu
         /// </summary>
         public RelLength x
         {
-            get => new RelLength(Delta.x, Relative.x);
+            get => new(Delta.x, Relative.x);
             set
             {
                 Delta.x = value.Delta;
@@ -139,7 +139,7 @@ namespace Modding.Menu
         /// </summary>
         public RelLength y
         {
-            get => new RelLength(Delta.y, Relative.y);
+            get => new(Delta.y, Relative.y);
             set
             {
                 Delta.y = value.Delta;
@@ -181,8 +181,8 @@ namespace Modding.Menu
         /// Gets a <c>RectTransformData</c> with the correct sizing information.
         /// </summary>
         /// <returns></returns>
-        public RectTransformData GetBaseTransformData() => new RectTransformData
-        {
+        public RectTransformData GetBaseTransformData() => new()
+		{
             sizeDelta = Delta,
             anchorMin = new Vector2(),
             anchorMax = Relative
@@ -191,28 +191,28 @@ namespace Modding.Menu
         /// <summary>  
         /// Negates each element in a <c>RelVector2</c>.
         /// </summary>
-        public static RelVector2 operator -(RelVector2 self) => new RelVector2(
+        public static RelVector2 operator -(RelVector2 self) => new(
             -self.Delta,
             -self.Relative
         );
         /// <summary>
         /// Adds two <c>RelVector2</c>s together.
         /// </summary>
-        public static RelVector2 operator +(RelVector2 lhs, RelVector2 rhs) => new RelVector2(
+        public static RelVector2 operator +(RelVector2 lhs, RelVector2 rhs) => new(
             lhs.Delta + rhs.Delta,
             lhs.Relative + rhs.Relative
         );
         /// <summary>
         /// Subtracts one <c>RelVector2</c> from another.
         /// </summary>
-        public static RelVector2 operator -(RelVector2 lhs, RelVector2 rhs) => new RelVector2(
+        public static RelVector2 operator -(RelVector2 lhs, RelVector2 rhs) => new(
             lhs.Delta - rhs.Delta,
             lhs.Relative - rhs.Relative
         );
         /// <summary>
         /// Scales both dimensions of a <c>RelVector2</c> up by a constant factor.
         /// </summary>
-        public static RelVector2 operator *(RelVector2 lhs, float rhs) => new RelVector2(
+        public static RelVector2 operator *(RelVector2 lhs, float rhs) => new(
             lhs.Delta * rhs,
             lhs.Relative * rhs
         );
@@ -223,14 +223,14 @@ namespace Modding.Menu
         /// <summary>
         /// Scales both dimensions of a <c>RelVector2</c> up by the respective factor in a <c>Vector2</c>.
         /// </summary>
-        public static RelVector2 operator *(RelVector2 lhs, Vector2 rhs) => new RelVector2(
+        public static RelVector2 operator *(RelVector2 lhs, Vector2 rhs) => new(
             lhs.Delta * rhs,
             lhs.Relative * rhs
         );
         /// <summary>
         /// Scales both dimensions of a <c>RelVector2</c> down by a constant factor.
         /// </summary>
-        public static RelVector2 operator /(RelVector2 lhs, float rhs) => new RelVector2(
+        public static RelVector2 operator /(RelVector2 lhs, float rhs) => new(
             lhs.Delta / rhs,
             lhs.Relative / rhs
         );
@@ -270,28 +270,28 @@ namespace Modding.Menu
         /// <summary>
         /// Negates the <c>RelLenght</c>.
         /// </summary>
-        public static RelLength operator -(RelLength self) => new RelLength(
+        public static RelLength operator -(RelLength self) => new(
             -self.Delta,
             -self.Relative
         );
         /// <summary>
         /// Adds two <c>RelLength</c>s together.
         /// </summary>
-        public static RelLength operator +(RelLength lhs, RelLength rhs) => new RelLength(
+        public static RelLength operator +(RelLength lhs, RelLength rhs) => new(
             lhs.Delta + rhs.Delta,
             lhs.Relative + rhs.Relative
         );
         /// <summary>
         /// Subtracts one <c>RelVector2</c> from another.
         /// </summary>
-        public static RelLength operator -(RelLength lhs, RelLength rhs) => new RelLength(
+        public static RelLength operator -(RelLength lhs, RelLength rhs) => new(
             lhs.Delta - rhs.Delta,
             lhs.Relative - rhs.Relative
         );
         /// <summary>
         /// Scales both dimensions of a <c>RelVector2</c> up by a constant factor.
         /// </summary>
-        public static RelLength operator *(RelLength lhs, float rhs) => new RelLength(
+        public static RelLength operator *(RelLength lhs, float rhs) => new(
             lhs.Delta * rhs,
             lhs.Relative * rhs
         );
@@ -302,7 +302,7 @@ namespace Modding.Menu
         /// <summary>
         /// Scales both dimensions of a <c>RelVector2</c> down by a constant factor.
         /// </summary>
-        public static RelLength operator /(RelLength lhs, float rhs) => new RelLength(
+        public static RelLength operator /(RelLength lhs, float rhs) => new(
             lhs.Delta / rhs,
             lhs.Relative / rhs
         );
@@ -377,6 +377,6 @@ namespace Modding.Menu
         /// <summary>
         /// Convenience conversion to get the data from a <c>RectTransform</c>.
         /// </summary>
-        public static implicit operator RectTransformData(RectTransform r) => new RectTransformData(r);
+        public static implicit operator RectTransformData(RectTransform r) => new(r);
     }
 }

@@ -358,7 +358,7 @@ namespace Modding
             }
 
             // Create version text
-            GameObject gameObject = new GameObject();
+            GameObject gameObject = new();
             _draw = gameObject.AddComponent<ModVersionDraw>();
             Object.DontDestroyOnLoad(gameObject);
             UpdateModText();
@@ -367,7 +367,7 @@ namespace Modding
 
             ModHooks.SaveGlobalSettings();
             
-            ModListMenu menu = new ModListMenu();
+            ModListMenu menu = new();
             menu.InitMenu();
 
             Object.Destroy(coroutineHolder.gameObject);
@@ -590,7 +590,7 @@ namespace Modding
 
         private static void UpdateModText()
         {
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
             
             builder.AppendLine("Modding API: " + ModHooks.ModVersion);
             

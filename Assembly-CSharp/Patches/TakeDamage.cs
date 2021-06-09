@@ -11,8 +11,8 @@ namespace Modding.Patches
         [MonoModReplace]
         public override void OnEnter()
         {
-            HitInstance hit = new HitInstance
-            {
+            HitInstance hit = new()
+			{
                 Source = base.Owner,
                 AttackType = (AttackTypes) AttackType.Value,
                 CircleDirection = CircleDirection.Value,

@@ -203,8 +203,8 @@ namespace Modding.Menu
             /// <summary>
             /// The style preset of a menu button in the vanilla game.
             /// </summary>
-            public static readonly MenuButtonStyle VanillaStyle = new MenuButtonStyle
-            {
+            public static readonly MenuButtonStyle VanillaStyle = new()
+			{
                 Height = new RelLength(60f),
                 TextSize = 45
             };

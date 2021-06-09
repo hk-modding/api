@@ -25,11 +25,11 @@ namespace Modding.Patches
         public extern IEnumerator orig_ShowCurrentButtonMappings();
         public extern void orig_SetupRefs();
 
-        private HashSet<MappableKey> customKeys = new HashSet<MappableKey>();
+        private HashSet<MappableKey> customKeys = new();
         public void AddMappableKey(MappableKey b) => customKeys.Add(b);
         public void RemoveMappableKey(MappableKey b) => customKeys.Remove(b);
 
-        private HashSet<MappableControllerButton> customButtons = new HashSet<MappableControllerButton>();
+        private HashSet<MappableControllerButton> customButtons = new();
         public void AddMappableControllerButton(MappableControllerButton b) => customButtons.Add(b);
         public void RemoveMappableControllerButton(MappableControllerButton b) => customButtons.Remove(b);
 

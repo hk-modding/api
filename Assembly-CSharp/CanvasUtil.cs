@@ -78,7 +78,7 @@ namespace Modding
         /// <returns></returns>
         public static Sprite NullSprite(byte[] data = null)
         {
-            Texture2D tex = new Texture2D(1, 1);
+            Texture2D tex = new(1, 1);
             
             data ??= new byte[] { 0x00, 0x00, 0x00, 0x00 };
 
@@ -98,7 +98,7 @@ namespace Modding
         /// <returns></returns>
         public static Sprite CreateSprite(byte[] data, int x, int y, int width, int height)
         {
-            Texture2D tex = new Texture2D(1, 1);
+            Texture2D tex = new(1, 1);
             tex.LoadImage(data);
             tex.anisoLevel = 0;
             return Sprite.Create(tex, new Rect(x, y, width, height), Vector2.zero);
@@ -113,7 +113,7 @@ namespace Modding
         /// <returns></returns>
         public static GameObject CreateBasePanel(GameObject parent, RectData rd)
         {
-            GameObject basePanel = new GameObject();
+            GameObject basePanel = new();
             if (parent != null)
             {
                 basePanel.transform.SetParent(parent.transform);
@@ -218,7 +218,7 @@ namespace Modding
 
         private static GameObject CreateCanvas(RenderMode renderMode)
         {
-            GameObject c = new GameObject();
+            GameObject c = new();
             c.AddComponent<Canvas>().renderMode = renderMode;
             CanvasScaler cs = c.AddComponent<CanvasScaler>();
             cs.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
@@ -345,8 +345,8 @@ namespace Modding
             {
                 button.transition = Selectable.Transition.SpriteSwap;
                 button.targetGraphic = img;
-                SpriteState sprState = new SpriteState
-                {
+                SpriteState sprState = new()
+				{
                     highlightedSprite = extraSprites[0],
                     pressedSprite = extraSprites[1],
                     disabledSprite = extraSprites[2]
@@ -402,8 +402,8 @@ namespace Modding
 
             toggle.transition = Selectable.Transition.ColorTint;
 
-            ColorBlock cb = new ColorBlock
-            {
+            ColorBlock cb = new()
+			{
                 normalColor = new Color(1, 1, 1, 1),
                 highlightedColor = new Color(1, 1, 1, 1),
                 pressedColor = new Color(0.8f, 0.8f, 0.8f, 1.0f),
@@ -430,7 +430,7 @@ namespace Modding
         /// <returns></returns>
         public static GameObject CreateToggleGroup()
         {
-            GameObject panel = new GameObject();
+            GameObject panel = new();
 
             AddRectTransform(panel,
                 new RectData(new Vector2(0, 0), new Vector2(0, 0), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
