@@ -295,8 +295,10 @@ namespace Modding
                         Label = entry.name,
                         Options = entry.values,
                         Style = HorizontalOptionStyle.VanillaStyle
-                    }
+                    },
+                    out var option
                 );
+                option.menuSetting.RefreshValueFromGameSettings();
             }
         }
     }
