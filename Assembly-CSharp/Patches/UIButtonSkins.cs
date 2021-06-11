@@ -44,7 +44,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public ButtonSkin GetButtonSkinFor(PlayerAction action) => this.ih.lastActiveController switch
         {
-            BindingSourceType.None | BindingSourceType.KeyBindingSource | BindingSourceType.MouseBindingSource
+            BindingSourceType.None or BindingSourceType.KeyBindingSource or BindingSourceType.MouseBindingSource
                 => GetKeyboardSkinFor(action),
             BindingSourceType.DeviceBindingSource => GetControllerButtonSkinFor(action),
             _ => null
