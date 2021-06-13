@@ -15,6 +15,10 @@ namespace Modding
 
         private Dictionary<string, bool> modEnabledSettings = ModHooks.GlobalSettings.ModEnabledSettings;
 
+        public void ReAdd(){
+            // maybe there is a better way to do this without re-building all menus
+            InitMenu();
+        }
         public void InitMenu()
         {
             var builder = new MenuBuilder(UIManager.instance.UICanvas.gameObject, "ModListMenu");

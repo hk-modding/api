@@ -50,7 +50,7 @@ namespace Modding
 
         // Hook name, method hooked, ITogglableMod used by hook
         private static readonly List<(EventInfo, MethodInfo, Type)> EventSubscriptions = new();
-
+        private static ModListMenu menu;
         /// <summary>
         ///     Loads the mod by searching for assemblies in hollow_knight_Data\Managed\Mods\
         /// </summary>
@@ -367,12 +367,16 @@ namespace Modding
 
             ModHooks.SaveGlobalSettings();
             
-            ModListMenu menu = new ModListMenu();
+            menu = new ModListMenu();
             menu.InitMenu();
-
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += ReAddModListMenuOnQuitToMenu;
             Object.Destroy(coroutineHolder.gameObject);
         }
-
+        private static void ReAddModListMenuOnQuitToMenu(Scene scene,LoadSceneMode mode){
+            if(scene.name == "Menu_Title" && menu != null){
+                menu.ReAdd();
+            }
+        }
         private static IEnumerator PreloadScenes
         (
             GameObject coroutineHolder,
