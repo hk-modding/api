@@ -92,9 +92,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ILRepack" Version="2.1.0-beta1">
-            <IncludeAssets>build;compile</IncludeAssets>
-        </PackageReference>
         <PackageReference Include="MonoMod" Version="21.4.29.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
