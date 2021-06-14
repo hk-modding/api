@@ -15,9 +15,12 @@ namespace Modding
 
         private Dictionary<string, bool> modEnabledSettings = ModHooks.GlobalSettings.ModEnabledSettings;
 
-        public void InitMenu()
+        // Due to the lifecycle of the UIManager object, The `EditMenus` event has to be used to create custom menus.
+        // This event is called every time a UIManager is created,
+        // and will also call the added action if the UIManager has already started.
+        internal void InitMenuCreation() => Patch.UIManager.EditMenus += () =>
         {
-            var builder = new MenuBuilder(UIManager.instance.UICanvas.gameObject, "ModListMenu");
+            var builder = new MenuBuilder("ModListMenu");
             this.screen = builder.Screen;
             builder.CreateAutoMenuNav()
                 .CreateTitle("Mods", MenuTitleStyle.vanillaStyle)
@@ -169,7 +172,7 @@ namespace Modding
                     }
                 );
             mbl.RecalculateNavigation();
-        }
+        };
 
         private void ApplyChanges()
         {
@@ -201,7 +204,7 @@ namespace Modding
             var name = mod.GetName();
             var entries = mod.GetMenuData();
             MenuButton backButton = null;
-            var builder = new MenuBuilder(UIManager.instance.UICanvas.gameObject, name)
+            var builder = new MenuBuilder(name)
                 .CreateTitle(name, MenuTitleStyle.vanillaStyle)
                 .CreateContentPane(RectTransformData.FromSizeAndPos(
                     new RelVector2(new Vector2(1920f, 903f)),

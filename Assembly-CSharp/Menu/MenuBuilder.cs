@@ -33,10 +33,16 @@ namespace Modding.Menu
         public event Action<MenuBuilder> OnBuild;
 
         /// <summary>
+        /// Creates a new <c>MenuBuilder</c> on the UIManager instance canvas.
+        /// </summary>
+        /// <param name="name">The name of the root menu.</param>
+        public MenuBuilder(string name) : this(UIManager.instance.UICanvas.gameObject, name) { }
+
+        /// <summary>
         /// Creates a new <c>MenuBuilder</c> on a canvas.
         /// </summary>
-        /// <param name="canvas">The canvas to make the root menu on</param>
-        /// <param name="name">The name of the root menu</param>
+        /// <param name="canvas">The canvas to make the root menu on.</param>
+        /// <param name="name">The name of the root menu.</param>
         public MenuBuilder(GameObject canvas, string name)
         {
             this.MenuObject = new GameObject(name);

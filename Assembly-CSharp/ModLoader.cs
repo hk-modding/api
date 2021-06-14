@@ -366,9 +366,8 @@ namespace Modding
             Loaded = true;
 
             ModHooks.SaveGlobalSettings();
-            
-            ModListMenu menu = new ModListMenu();
-            menu.InitMenu();
+
+            new ModListMenu().InitMenuCreation();
 
             Object.Destroy(coroutineHolder.gameObject);
         }

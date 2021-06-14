@@ -2,6 +2,7 @@
 using UnityEngine;
 using MonoMod;
 using System.Collections;
+using System;
 
 // ReSharper disable All
 #pragma warning disable 1591, 0108, 0169, 0649, 0414, CS0626
@@ -39,6 +40,30 @@ namespace Modding.Patches
             return UIManager._instance;
         }
 
+        public static event Action EditMenus
+        {
+            add
+            {
+                _editMenus += value;
+                if (_instance != null && _instance.hasCalledEditMenus) value();
+            }
+            remove => _editMenus -= value;
+        }
+        private static Action _editMenus;
+
+        public extern void orig_Awake();
+        public void Awake()
+        {
+            orig_Awake();
+            if (_instance == this)
+            {
+                _editMenus?.Invoke();
+                this.hasCalledEditMenus = true;
+            }
+        }
+
+        private bool hasCalledEditMenus = false;
+
         public extern IEnumerator orig_HideCurrentMenu();
 
         public IEnumerator HideCurrentMenu()
@@ -66,7 +91,7 @@ namespace Modding.Patches
         public IEnumerator GoToDynamicMenu(MenuScreen menu, System.Action preLeaveAction = null)
         {
             this.ih.StopUIInput();
-            if (preLeaveAction != null) preLeaveAction();
+            preLeaveAction?.Invoke();
             yield return this.HideCurrentMenu();
             yield return this.ShowMenu(menu);
             this.currentDynamicMenu = menu;
@@ -75,11 +100,13 @@ namespace Modding.Patches
             yield break;
         }
 
-        public void UILeaveDynamicMenu(MenuScreen to, MainMenuState state) {
+        public void UILeaveDynamicMenu(MenuScreen to, MainMenuState state)
+        {
             this.StartMenuAnimationCoroutine(this.LeaveDynamicMenu(to, state));
         }
 
-        public IEnumerator LeaveDynamicMenu(MenuScreen to, MainMenuState state) {
+        public IEnumerator LeaveDynamicMenu(MenuScreen to, MainMenuState state)
+        {
             this.ih.StopUIInput();
             yield return this.HideCurrentMenu();
             yield return this.ShowMenu(to);
