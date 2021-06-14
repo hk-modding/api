@@ -373,10 +373,45 @@ namespace Modding.Menu
             rt.pivot = this.pivot;
         }
 
+        /// <summary>
+        /// Add a <c>RectTransform</c> to a game object based on the data in this struct.
+        /// </summary>
+        /// <param name="obj">The game object to add the <c>RectTransform</c> to</param>
+        /// <returns></returns>
+        public RectTransform AddRectTransform(GameObject obj)
+        {
+            var rt = obj.AddComponent<RectTransform>();
+            this.Apply(rt);
+            return rt;
+        }
+
         // Is this a good idea? I think it probably is
         /// <summary>
         /// Convenience conversion to get the data from a <c>RectTransform</c>.
         /// </summary>
         public static implicit operator RectTransformData(RectTransform r) => new RectTransformData(r);
+
+        /// <summary>
+        /// Convert from the <c>RectData</c> struct that CanvasUtil uses.
+        /// </summary>
+        public static implicit operator RectTransformData(CanvasUtil.RectData r) => new RectTransformData
+        {
+            sizeDelta = r.RectSizeDelta,
+            anchorMin = r.AnchorMin,
+            anchorMax = r.AnchorMax,
+            anchoredPosition = r.AnchorPosition,
+            pivot = r.AnchorPivot
+        };
+
+        /// <summary>
+        /// Convert to the <c>RectData</c> struct that CanvasUtil uses.
+        /// </summary>
+        public static implicit operator CanvasUtil.RectData(RectTransformData r) => new CanvasUtil.RectData(
+            r.sizeDelta,
+            r.anchoredPosition,
+            r.anchorMin,
+            r.anchorMax,
+            r.pivot
+        );
     }
 }
