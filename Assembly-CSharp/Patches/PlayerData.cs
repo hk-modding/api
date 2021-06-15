@@ -15,64 +15,64 @@ namespace Modding.Patches
 
         public void SetBoolInternal(string boolName, bool value)
         {
-            ReflectionHelper.SetAttrSafe(this, boolName, value);
+            ReflectionHelper.SetFieldSafe(this, boolName, value);
         }
 
         public bool GetBoolInternal(string boolName)
         {
-            return ReflectionHelper.GetAttr<PlayerData, bool, bool?>(this, boolName) ?? false;
+            return ReflectionHelper.GetField<PlayerData, bool, bool?>(this, boolName) ?? false;
         }
 
         public void SetIntInternal(string intName, int value)
         {
-            ReflectionHelper.SetAttrSafe(this, intName, value);
+            ReflectionHelper.SetFieldSafe(this, intName, value);
         }
 
         public int GetIntInternal(string intName)
         {
-            return ReflectionHelper.GetAttr<PlayerData, int, int?>(this, intName) ?? -9999;
+            return ReflectionHelper.GetField<PlayerData, int, int?>(this, intName) ?? -9999;
         }
 
         public void SetFloatInternal(string floatName, float value)
         {
-            ReflectionHelper.SetAttrSafe(this, floatName, value);
+            ReflectionHelper.SetFieldSafe(this, floatName, value);
         }
 
         public float GetFloatInternal(string floatName)
         {
-            return ReflectionHelper.GetAttr<PlayerData, float, float?>(this, floatName) ?? -9999f;
+            return ReflectionHelper.GetField<PlayerData, float, float?>(this, floatName) ?? -9999f;
         }
 
         public void SetStringInternal(string stringName, string value)
         {
-            ReflectionHelper.SetAttrSafe(this, stringName, value);
+            ReflectionHelper.SetFieldSafe(this, stringName, value);
         }
 
         public string GetStringInternal(string stringName)
         {
-            return ReflectionHelper.GetAttr<PlayerData, string, string>(this, stringName) ?? " ";
+            return ReflectionHelper.GetField<PlayerData, string, string>(this, stringName) ?? " ";
         }
 
         public void SetVector3Internal(string vector3Name, Vector3 value)
         {
-            ReflectionHelper.SetAttrSafe(this, vector3Name, value);
+            ReflectionHelper.SetFieldSafe(this, vector3Name, value);
         }
 
         public Vector3 GetVector3Internal(string vector3Name)
         {
-            return ReflectionHelper.GetAttr<PlayerData, Vector3, Vector3?>(this, vector3Name) ?? Vector3.zero;
+            return ReflectionHelper.GetField<PlayerData, Vector3, Vector3?>(this, vector3Name) ?? Vector3.zero;
         }
 
         public void SetVariableInternal<T>(string variableName, T value)
         {
-            ReflectionHelper.SetAttrSafe(this, variableName, value);
+            ReflectionHelper.SetFieldSafe(this, variableName, value);
         }
 
         public T GetVariableInternal<T>(string variableName)
         {
             try
             {
-                return ReflectionHelper.GetAttr<PlayerData, T, T>(this, variableName);
+                return ReflectionHelper.GetField<PlayerData, T, T>(this, variableName);
             }
             catch
             {
@@ -107,7 +107,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public void IncrementInt(string intName)
         {
-            if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
+            if (ReflectionHelper.GetFieldInfo(typeof(PlayerData), intName) != null)
             {
                 ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) + 1);
                 return;
@@ -119,7 +119,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public void DecrementInt(string intName)
         {
-            if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
+            if (ReflectionHelper.GetFieldInfo(typeof(PlayerData), intName) != null)
             {
                 ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) - 1);
             }
@@ -128,7 +128,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public void IntAdd(string intName, int amount)
         {
-            if (ReflectionHelper.GetField(typeof(PlayerData), intName) != null)
+            if (ReflectionHelper.GetFieldInfo(typeof(PlayerData), intName) != null)
             {
                 ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) + amount);
                 return;

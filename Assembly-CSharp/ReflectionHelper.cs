@@ -70,7 +70,7 @@ namespace Modding
         /// <param name="field">Field name</param>
         /// <param name="instance"></param>
         /// <returns>FieldInfo for field or null if field does not exist.</returns>
-        public static FieldInfo GetField(Type t, string field, bool instance = true)
+        public static FieldInfo GetFieldInfo(Type t, string field, bool instance = true)
         {
             if (!Fields.TryGetValue(t, out Dictionary<string, FieldInfo> typeFields))
             {
@@ -267,9 +267,9 @@ namespace Modding
         /// <typeparam name="TCast">Type of return.</typeparam>
         /// <returns>The value of a field on an object/type</returns>
         [PublicAPI]
-        public static TCast GetAttr<TObject, TField, TCast>(TObject obj, string name, TCast @default = default)
+        public static TCast GetField<TObject, TField, TCast>(TObject obj, string name, TCast @default = default)
         {
-            FieldInfo fi = GetField(typeof(TObject), name);
+            FieldInfo fi = GetFieldInfo(typeof(TObject), name);
 
             return fi == null
                 ? @default
@@ -285,9 +285,9 @@ namespace Modding
         /// <typeparam name="TObject">Type of object being passed in</typeparam>
         /// <returns>The value of a field on an object/type</returns>
         [PublicAPI]
-        public static TField GetAttr<TObject, TField>(TObject obj, string name)
+        public static TField GetField<TObject, TField>(TObject obj, string name)
         {
-            FieldInfo fi = GetField(typeof(TObject), name) ?? throw new MissingFieldException();
+            FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException();
 
             return ((Func<TObject, TField>) GetGetter<TObject, TField>(fi))(obj);
         }
@@ -300,9 +300,9 @@ namespace Modding
         /// <typeparam name="TField">Type of field</typeparam>
         /// <returns>The value of a field on an object/type</returns>
         [PublicAPI]
-        public static TField GetAttr<TType, TField>(string name)
+        public static TField GetField<TType, TField>(string name)
         {
-            FieldInfo fi = GetField(typeof(TType), name, false);
+            FieldInfo fi = GetFieldInfo(typeof(TType), name, false);
 
             return fi == null ? default : ((Func<TField>) GetGetter<TType, TField>(fi))();
         }
@@ -316,9 +316,9 @@ namespace Modding
         /// <typeparam name="TField">Type of field</typeparam>
         /// <typeparam name="TObject">Type of object being passed in</typeparam>
         [PublicAPI]
-        public static void SetAttrSafe<TObject, TField>(TObject obj, string name, TField value)
+        public static void SetFieldSafe<TObject, TField>(TObject obj, string name, TField value)
         {
-            FieldInfo fi = GetField(typeof(TObject), name);
+            FieldInfo fi = GetFieldInfo(typeof(TObject), name);
 
             if (fi == null)
             {
@@ -337,10 +337,10 @@ namespace Modding
         /// <typeparam name="TField">Type of field</typeparam>
         /// <typeparam name="TObject">Type of object being passed in</typeparam>
         [PublicAPI]
-        public static void SetAttr<TObject, TField>(TObject obj, string name, TField value)
+        public static void SetField<TObject, TField>(TObject obj, string name, TField value)
         {
-            FieldInfo fi = GetField(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
-
+            FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
+            
             ((Action<TObject, TField>) GetSetter<TObject, TField>(fi))(obj, value);
         }
 
@@ -352,9 +352,9 @@ namespace Modding
         /// <typeparam name="TType">Type which static field resides upon</typeparam>
         /// <typeparam name="TField">Type of field</typeparam>
         [PublicAPI]
-        public static void SetAttr<TType, TField>(string name, TField value)
+        public static void SetField<TType, TField>(string name, TField value)
         {
-            ((Action<TField>) GetGetter<TType, TField>(GetField(typeof(TType), name, false)))(value);
+            ((Action<TField>) GetGetter<TType, TField>(GetFieldInfo(typeof(TType), name, false)))(value);
         }
     }
 }

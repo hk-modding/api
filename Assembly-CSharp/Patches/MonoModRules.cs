@@ -1,6 +1,10 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using MonoMod.InlineRT;
+using MonoMod.Utils;
 
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable once CheckNamespace
