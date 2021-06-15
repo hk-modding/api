@@ -38,15 +38,9 @@ namespace Modding
 
         /// <inheritdoc />
         /// <summary>
-        ///     Legacy constructor instead of optional argument to not break old mods
-        /// </summary>
-        protected Mod() : this(null) { }
-
-        /// <inheritdoc />
-        /// <summary>
         ///     Constructs the mod, assigns the instance and sets the name.
         /// </summary>
-        protected Mod(string name)
+        protected Mod(string name = null)
         {
             if (string.IsNullOrEmpty(name))
             {
