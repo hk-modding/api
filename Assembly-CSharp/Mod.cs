@@ -47,9 +47,13 @@ namespace Modding
                 name = GetType().Name;
             }
 
-            if (this.GetType().GetInterfaces().Where(
-                x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IGlobalSettings<>)
-            ).FirstOrDefault() is Type globalType)
+            if
+            (
+                this.GetType()
+                    .GetInterfaces()
+                    .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IGlobalSettings<>)) 
+                    is Type globalType
+            )
             {
                 this.globalSettingsType = globalType.GetGenericArguments()[0];
                 foreach (var mi in globalType.GetMethods())
@@ -65,11 +69,17 @@ namespace Modding
                     }
                 }
             }
-            if (this.GetType().GetInterfaces().Where(
-                x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ILocalSettings<>)
-            ).FirstOrDefault() is Type saveType)
+
+            if
+            (
+                this.GetType()
+                    .GetInterfaces()
+                    .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(ILocalSettings<>))
+                    is Type saveType
+            )
             {
                 this.saveSettingsType = saveType.GetGenericArguments()[0];
+
                 foreach (var mi in saveType.GetMethods())
                 {
                     switch (mi.Name)
@@ -181,7 +191,8 @@ namespace Modding
                     using var reader = new StreamReader(fileStream);
                     string json = reader.ReadToEnd();
 
-                    var obj = JsonConvert.DeserializeObject(
+                    var obj = JsonConvert.DeserializeObject
+                    (
                         json,
                         saveType,
                         new JsonSerializerSettings
@@ -218,7 +229,8 @@ namespace Modding
                     if (File.Exists(_globalSettingsPath)) File.Move(_globalSettingsPath, _globalSettingsPath + ".bak");
                     using FileStream fileStream = File.Create(_globalSettingsPath);
                     using var writer = new StreamWriter(fileStream);
-                    writer.Write(
+                    writer.Write
+                    (
                         JsonConvert.SerializeObject
                         (
                             obj,
@@ -243,27 +255,30 @@ namespace Modding
         {
             try
             {
-                if (this.saveSettingsType is Type saveType)
-                {
-                    if (data.modData.TryGetValue(this.GetName(), out var obj))
-                    {
-                        this.onLoadSaveSettings(
-                            this,
-                            obj.ToObject(
-                                saveType,
-                                JsonSerializer.Create(
-                                    new JsonSerializerSettings
-                                    {
-                                        ContractResolver = ShouldSerializeContractResolver.Instance,
-                                        TypeNameHandling = TypeNameHandling.Auto,
-                                        ObjectCreationHandling = ObjectCreationHandling.Replace,
-                                        Converters = JsonConverterTypes.ConverterTypes
-                                    }
-                                )
-                            )
-                        );
-                    }
-                }
+                if (this.saveSettingsType is not Type saveType) 
+                    return;
+
+                if (!data.modData.TryGetValue(this.GetName(), out var obj)) 
+                    return;
+                
+                this.onLoadSaveSettings
+                (
+                    this,
+                    obj.ToObject
+                    (
+                        saveType,
+                        JsonSerializer.Create
+                        (
+                            new JsonSerializerSettings
+                            {
+                                ContractResolver = ShouldSerializeContractResolver.Instance,
+                                TypeNameHandling = TypeNameHandling.Auto,
+                                ObjectCreationHandling = ObjectCreationHandling.Replace,
+                                Converters = JsonConverterTypes.ConverterTypes
+                            }
+                        )
+                    )
+                );
             }
             catch (Exception e)
             {
@@ -275,32 +290,35 @@ namespace Modding
         {
             try
             {
-                if (this.saveSettingsType is Type saveType)
+                if (this.saveSettingsType is not Type saveType) 
+                    return;
+                
+                var settings = this.onSaveSaveSettings(this);
+                
+                switch (settings)
                 {
-                    var settings = this.onSaveSaveSettings(this);
-                    switch (settings)
-                    {
-                        // No point in serializing nothing.
-                        case null:
-                            return;
-                        // ReSharper disable once SuspiciousTypeConversion.Global
-                        case ISerializationCallbackReceiver receiver:
-                            receiver.OnBeforeSerialize();
-                            break;
-                    }
-                    data.modData[this.GetName()] = JToken.FromObject(
-                        settings,
-                        JsonSerializer.Create(
-                            new JsonSerializerSettings
-                            {
-                                ContractResolver = ShouldSerializeContractResolver.Instance,
-                                TypeNameHandling = TypeNameHandling.Auto,
-                                Converters = JsonConverterTypes.ConverterTypes
-                            }
-                        )
-                    );
+                    // No point in serializing nothing.
+                    case null:
+                        return;
+                    // ReSharper disable once SuspiciousTypeConversion.Global
+                    case ISerializationCallbackReceiver receiver:
+                        receiver.OnBeforeSerialize();
+                        break;
                 }
 
+                data.modData[this.GetName()] = JToken.FromObject
+                (
+                    settings,
+                    JsonSerializer.Create
+                    (
+                        new JsonSerializerSettings
+                        {
+                            ContractResolver = ShouldSerializeContractResolver.Instance,
+                            TypeNameHandling = TypeNameHandling.Auto,
+                            Converters = JsonConverterTypes.ConverterTypes
+                        }
+                    )
+                );
             }
             catch (Exception e)
             {
