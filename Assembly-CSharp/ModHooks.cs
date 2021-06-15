@@ -12,7 +12,6 @@ using Object = UnityEngine.Object;
 
 // ReSharper disable PossibleInvalidCastExceptionInForeachLoop
 // ReSharper disable SuggestVarOrType_SimpleTypes
-#pragma warning disable 1591
 
 namespace Modding
 {
@@ -193,7 +192,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -257,7 +256,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -290,7 +289,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -326,7 +325,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -439,6 +438,9 @@ namespace Modding
             }
         }
 
+        /// <summary>
+        /// Called whenever a HitInstance is created. Overrides hit.
+        /// </summary>
         public static event HitInstanceHandler HitInstanceHook;
 
         /// <summary>
@@ -464,7 +466,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -497,7 +499,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -528,7 +530,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -574,7 +576,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -616,7 +618,7 @@ namespace Modding
                     }
                     catch (Exception ex)
                     {
-                        Logger.APILogger.LogError("" + ex);
+                        Logger.APILogger.LogError(ex);
                     }
                 }
             }
@@ -638,6 +640,8 @@ namespace Modding
         /// <param name="val">Value to set</param>
         internal static void SetPlayerBool(string target, bool val)
         {
+            bool value = val;
+            
             if (SetPlayerBoolHook != null)
             {
                 Delegate[] invocationList = SetPlayerBoolHook.GetInvocationList();
@@ -646,18 +650,17 @@ namespace Modding
                 {
                     try
                     {
-                        toInvoke.Invoke(target, val);
+                        if (toInvoke(target, value) is bool ret)
+                            value = ret;
                     }
                     catch (Exception ex)
                     {
-                        Logger.APILogger.LogError("" + ex);
+                        Logger.APILogger.LogError(ex);
                     }
                 }
-
-                return;
             }
 
-            Patches.PlayerData.instance.SetBoolInternal(target, val);
+            Patches.PlayerData.instance.SetBoolInternal(target, value);
         }
 
 
@@ -673,13 +676,10 @@ namespace Modding
         /// <param name="target">Target Field Name</param>
         internal static bool GetPlayerBool(string target)
         {
-            bool boolInternal = Patches.PlayerData.instance.GetBoolInternal(target);
-            bool result = boolInternal;
-            bool gotValue = false;
+            bool result = Patches.PlayerData.instance.GetBoolInternal(target);
+            
             if (GetPlayerBoolHook == null)
-            {
                 return result;
-            }
 
             Delegate[] invocationList = GetPlayerBoolHook.GetInvocationList();
 
@@ -687,19 +687,12 @@ namespace Modding
             {
                 try
                 {
-                    bool flag2 = toInvoke.Invoke(target);
-
-                    if (flag2 == boolInternal || gotValue)
-                    {
-                        continue;
-                    }
-
-                    result = flag2;
-                    gotValue = true;
+                    if (toInvoke(target, result) is bool ret)
+                        result = ret;
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -719,6 +712,8 @@ namespace Modding
         /// <param name="val">Value to set</param>
         internal static void SetPlayerInt(string target, int val)
         {
+            int value = val;
+            
             if (SetPlayerIntHook != null)
             {
                 Delegate[] invocationList = SetPlayerIntHook.GetInvocationList();
@@ -727,18 +722,19 @@ namespace Modding
                 {
                     try
                     {
-                        toInvoke.Invoke(target, val);
+                        if (toInvoke(target, value) is int ret)
+                            value = ret;
                     }
                     catch (Exception ex)
                     {
-                        Logger.APILogger.LogError("" + ex);
+                        Logger.APILogger.LogError(ex);
                     }
                 }
 
                 return;
             }
 
-            Patches.PlayerData.instance.SetIntInternal(target, val);
+            Patches.PlayerData.instance.SetIntInternal(target, value);
         }
 
         /// <summary>
@@ -753,14 +749,10 @@ namespace Modding
         /// <param name="target">Target Field Name</param>
         internal static int GetPlayerInt(string target)
         {
-            int intInternal = Patches.PlayerData.instance.GetIntInternal(target);
-            int result = intInternal;
-            bool gotValue = false;
+            int result = Patches.PlayerData.instance.GetIntInternal(target);
 
             if (GetPlayerIntHook == null)
-            {
                 return result;
-            }
 
             Delegate[] invocationList = GetPlayerIntHook.GetInvocationList();
 
@@ -768,18 +760,12 @@ namespace Modding
             {
                 try
                 {
-                    int num = toInvoke.Invoke(target);
-                    if (num == intInternal || gotValue)
-                    {
-                        continue;
-                    }
-
-                    result = num;
-                    gotValue = true;
+                    if (toInvoke(target, result) is int ret)
+                        result = ret;
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -799,6 +785,8 @@ namespace Modding
         /// <param name="val">Value to set</param>
         internal static void SetPlayerFloat(string target, float val)
         {
+            float value = val;
+            
             if (SetPlayerFloatHook != null)
             {
                 Delegate[] invocationList = SetPlayerFloatHook.GetInvocationList();
@@ -807,18 +795,17 @@ namespace Modding
                 {
                     try
                     {
-                        toInvoke.Invoke(target, val);
+                        if (toInvoke.Invoke(target, val) is float res)
+                            value = res;
                     }
                     catch (Exception ex)
                     {
-                        Logger.APILogger.LogError("" + ex);
+                        Logger.APILogger.LogError(ex);
                     }
                 }
-
-                return;
             }
 
-            Patches.PlayerData.instance.SetFloatInternal(target, val);
+            Patches.PlayerData.instance.SetFloatInternal(target, value);
         }
 
         /// <summary>
@@ -833,14 +820,10 @@ namespace Modding
         /// <param name="target">Target Field Name</param>
         internal static float GetPlayerFloat(string target)
         {
-            float floatInternal = Patches.PlayerData.instance.GetFloatInternal(target);
-            float result = floatInternal;
-            bool gotValue = false;
+            float result = Patches.PlayerData.instance.GetFloatInternal(target);
 
             if (GetPlayerFloatHook == null)
-            {
                 return result;
-            }
 
             Delegate[] invocationList = GetPlayerFloatHook.GetInvocationList();
 
@@ -848,20 +831,12 @@ namespace Modding
             {
                 try
                 {
-                    float f = toInvoke.Invoke(target);
-
-                    // ReSharper disable once CompareOfFloatsByEqualityOperator 
-                    if (f == floatInternal || gotValue)
-                    {
-                        continue;
-                    }
-
-                    result = f;
-                    gotValue = true;
+                    if (toInvoke.Invoke(target, result) is float ret)
+                        result = ret;
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -881,6 +856,8 @@ namespace Modding
         /// <param name="val">Value to set</param>
         internal static void SetPlayerString(string target, string val)
         {
+            string value = val;
+            
             if (SetPlayerStringHook != null)
             {
                 Delegate[] invocationList = SetPlayerStringHook.GetInvocationList();
@@ -889,18 +866,17 @@ namespace Modding
                 {
                     try
                     {
-                        toInvoke.Invoke(target, val);
+                        if (toInvoke.Invoke(target, value, out string res))
+                            value = res;
                     }
                     catch (Exception ex)
                     {
-                        Logger.APILogger.LogError("" + ex);
+                        Logger.APILogger.LogError(ex);
                     }
                 }
-
-                return;
             }
 
-            Patches.PlayerData.instance.SetStringInternal(target, val);
+            Patches.PlayerData.instance.SetStringInternal(target, value);
         }
 
         /// <summary>
@@ -915,13 +891,10 @@ namespace Modding
         /// <param name="target">Target Field Name</param>
         internal static string GetPlayerString(string target)
         {
-            string stringInternal = Patches.PlayerData.instance.GetStringInternal(target);
-            string result = stringInternal;
-            bool gotValue = false;
+            string value = Patches.PlayerData.instance.GetStringInternal(target);
+            
             if (GetPlayerStringHook == null)
-            {
-                return result;
-            }
+                return value;
 
             Delegate[] invocationList = GetPlayerStringHook.GetInvocationList();
 
@@ -929,22 +902,16 @@ namespace Modding
             {
                 try
                 {
-                    string s = toInvoke.Invoke(target);
-                    if (s == stringInternal || gotValue)
-                    {
-                        continue;
-                    }
-
-                    result = s;
-                    gotValue = true;
+                    if (toInvoke(target, value, out string res))
+                        value = res;
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
-            return result;
+            return value;
         }
 
         /// <summary>
@@ -957,9 +924,11 @@ namespace Modding
         ///     Called by the game in PlayerData.SetVector3
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        /// <param name="val">Value to set</param>
-        internal static void SetPlayerVector3(string target, Vector3 val)
+        /// <param name="orig">Value to set</param>
+        internal static void SetPlayerVector3(string target, Vector3 orig)
         {
+            Vector3 val = orig;
+            
             if (SetPlayerVector3Hook != null)
             {
                 Delegate[] invocationList = SetPlayerVector3Hook.GetInvocationList();
@@ -968,11 +937,12 @@ namespace Modding
                 {
                     try
                     {
-                        toInvoke.Invoke(target, val);
+                        if (toInvoke.Invoke(target, val) is Vector3 res)
+                            val = res;
                     }
                     catch (Exception ex)
                     {
-                        Logger.APILogger.LogError("" + ex);
+                        Logger.APILogger.LogError(ex);
                     }
                 }
 
@@ -994,14 +964,10 @@ namespace Modding
         /// <param name="target">Target Field Name</param>
         internal static Vector3 GetPlayerVector3(string target)
         {
-            Vector3 vecInternal = Patches.PlayerData.instance.GetVector3Internal(target);
-            Vector3 result = vecInternal;
-            bool gotValue = false;
-
+            Vector3 res = Patches.PlayerData.instance.GetVector3Internal(target);
+            
             if (GetPlayerVector3Hook == null)
-            {
-                return result;
-            }
+                return res;
 
             Delegate[] invocationList = GetPlayerVector3Hook.GetInvocationList();
 
@@ -1009,23 +975,16 @@ namespace Modding
             {
                 try
                 {
-                    Vector3 vec = toInvoke.Invoke(target);
-
-                    if (vec == vecInternal || gotValue)
-                    {
-                        continue;
-                    }
-
-                    result = vec;
-                    gotValue = true;
+                    if (toInvoke(target, res) is Vector3 v)
+                        res = v;
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
-            return result;
+            return res;
         }
 
         /// <summary>
@@ -1038,67 +997,69 @@ namespace Modding
         ///     Called by the game in PlayerData.SetVariable
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        /// <param name="val">Value to set</param>
-        internal static void SetPlayerVariable<T>(string target, T val)
+        /// <param name="orig">Value to set</param>
+        internal static void SetPlayerVariable<T>(string target, T orig)
         {
             Type t = typeof(T);
 
             if (t == typeof(bool))
             {
-                SetPlayerBool(target, (bool)(object)val);
+                SetPlayerBool(target, (bool) (object) orig);
                 return;
             }
 
             if (t == typeof(int))
             {
-                SetPlayerInt(target, (int)(object)val);
+                SetPlayerInt(target, (int) (object) orig);
                 return;
             }
 
             if (t == typeof(float))
             {
-                SetPlayerFloat(target, (float)(object)val);
+                SetPlayerFloat(target, (float) (object) orig);
                 return;
             }
 
             if (t == typeof(string))
             {
-                SetPlayerString(target, (string)(object)val);
+                SetPlayerString(target, (string) (object) orig);
                 return;
             }
 
             if (t == typeof(Vector3))
             {
-                SetPlayerVector3(target, (Vector3)(object)val);
+                SetPlayerVector3(target, (Vector3) (object) orig);
                 return;
             }
 
+            T val = orig;
+            
             if (SetPlayerVariableHook != null)
             {
-                bool gotValue = false;
                 Delegate[] invocationList = SetPlayerVariableHook.GetInvocationList();
 
                 foreach (SetVariableProxy toInvoke in invocationList)
                 {
                     try
                     {
-                        T v = (T)toInvoke.Invoke(typeof(T), target, val);
-                        if (v == null || v.Equals(val) || gotValue)
-                        {
+                        if (!toInvoke(t, target, val, out object res)) 
                             continue;
-                        }
 
-                        val = v;
-                        gotValue = true;
+                        val = res switch
+                        {
+                            T res_t => res_t,
+                            null => default,
+                            _ => throw new InvalidOperationException($"Returned object was of type {res.GetType().Name} instead of {t.Name}")
+                        };
                     }
                     catch (Exception ex)
                     {
-                        Logger.APILogger.LogError("" + ex);
+                        Logger.APILogger.LogError(ex);
                     }
                 }
             }
 
-            Patches.PlayerData.instance.SetVariableInternal(target, val);
+            Patches.PlayerData.instance.SetVariableInternal(target, orig);
         }
 
         /// <summary>
@@ -1118,37 +1079,33 @@ namespace Modding
 
             if (t == typeof(bool))
             {
-                return (T)(object)GetPlayerBool(target);
+                return (T) (object) GetPlayerBool(target);
             }
 
             if (t == typeof(int))
             {
-                return (T)(object)GetPlayerInt(target);
+                return (T) (object) GetPlayerInt(target);
             }
 
             if (t == typeof(float))
             {
-                return (T)(object)GetPlayerFloat(target);
+                return (T) (object) GetPlayerFloat(target);
             }
 
             if (t == typeof(string))
             {
-                return (T)(object)GetPlayerString(target);
+                return (T) (object) GetPlayerString(target);
             }
 
             if (t == typeof(Vector3))
             {
-                return (T)(object)GetPlayerVector3(target);
+                return (T) (object) GetPlayerVector3(target);
             }
 
-            T varInternal = Patches.PlayerData.instance.GetVariableInternal<T>(target);
-            T result = varInternal;
-            bool gotValue = false;
-
+            T value = Patches.PlayerData.instance.GetVariableInternal<T>(target);
+            
             if (GetPlayerVariableHook == null)
-            {
-                return result;
-            }
+                return value;
 
             Delegate[] invocationList = GetPlayerVariableHook.GetInvocationList();
 
@@ -1156,22 +1113,23 @@ namespace Modding
             {
                 try
                 {
-                    T v = (T)toInvoke.Invoke(typeof(T), target, varInternal);
-                    if (v == null || v.Equals(varInternal) || gotValue)
-                    {
+                    if (!toInvoke(t, target, value, out object res))
                         continue;
-                    }
 
-                    result = v;
-                    gotValue = true;
+                    value = res switch
+                    {
+                        T res_t => res_t,
+                        null => default,
+                        _ => throw new InvalidOperationException($"Returned object was of type {res.GetType().Name}, expected {t.Name}")
+                    };
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
-            return result;
+            return value;
         }
 
         /// <summary>
@@ -1202,7 +1160,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -1239,7 +1197,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -1275,7 +1233,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -1309,7 +1267,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -1345,7 +1303,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1379,7 +1337,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1413,7 +1371,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1445,7 +1403,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1481,7 +1439,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1518,7 +1476,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1552,7 +1510,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1586,7 +1544,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1620,7 +1578,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -1656,7 +1614,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -1691,7 +1649,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -1728,7 +1686,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -1766,7 +1724,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -1807,7 +1765,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1841,7 +1799,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1875,7 +1833,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1910,7 +1868,7 @@ namespace Modding
 
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1945,7 +1903,7 @@ namespace Modding
 
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -1980,7 +1938,7 @@ namespace Modding
 
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -2015,7 +1973,7 @@ namespace Modding
 
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
@@ -2049,7 +2007,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -2098,7 +2056,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
         }
@@ -2132,7 +2090,7 @@ namespace Modding
                 }
                 catch (Exception ex)
                 {
-                    Logger.APILogger.LogError("" + ex);
+                    Logger.APILogger.LogError(ex);
                 }
             }
 
