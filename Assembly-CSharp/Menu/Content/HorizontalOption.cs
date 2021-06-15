@@ -90,6 +90,8 @@ namespace Modding.Menu
             labelText.alignment = TextAnchor.MiddleLeft;
             labelText.text = config.Label;
             labelText.supportRichText = true;
+            labelText.verticalOverflow = VerticalWrapMode.Overflow;
+            labelText.horizontalOverflow = HorizontalWrapMode.Overflow;
             // FixVerticalAlign
             label.AddComponent<FixVerticalAlign>();
 
@@ -114,6 +116,8 @@ namespace Modding.Menu
             optionTextText.alignment = TextAnchor.MiddleRight;
             optionTextText.text = config.Label;
             optionTextText.supportRichText = true;
+            optionTextText.verticalOverflow = VerticalWrapMode.Overflow;
+            optionTextText.horizontalOverflow = HorizontalWrapMode.Overflow;
             // FixVerticalAlign
             optionText.AddComponent<FixVerticalAlign>();
             // Post Component Config
@@ -176,7 +180,7 @@ namespace Modding.Menu
                 GameObject.DontDestroyOnLoad(description);
                 description.transform.SetParent(option.transform, false);
                 // CanvasRenderer
-                cursorR.AddComponent<CanvasRenderer>();
+                description.AddComponent<CanvasRenderer>();
                 // RectTransform
                 var rt = description.AddComponent<RectTransform>();
                 RectTransformData.FromSizeAndPos(
@@ -187,6 +191,7 @@ namespace Modding.Menu
                 var anim = description.AddComponent<Animator>();
                 anim.runtimeAnimatorController = MenuResources.TextHideShowAnimator;
                 anim.updateMode = AnimatorUpdateMode.UnscaledTime;
+                anim.applyRootMotion = false;
                 // Text
                 var descText = description.AddComponent<Text>();
                 descText.font = MenuResources.Perpetua;
@@ -195,6 +200,8 @@ namespace Modding.Menu
                 descText.alignment = TextAnchor.UpperLeft;
                 descText.text = descInfo.Text;
                 descText.supportRichText = true;
+                descText.verticalOverflow = VerticalWrapMode.Overflow;
+                descText.horizontalOverflow = HorizontalWrapMode.Wrap;
                 // Post Component Config
                 menuOptionHorizontal.descriptionText = anim;
             }

@@ -168,6 +168,8 @@ namespace Modding.Menu
             titleText.alignment = TextAnchor.MiddleCenter;
             titleText.text = title;
             titleText.supportRichText = true;
+            titleText.verticalOverflow = VerticalWrapMode.Overflow;
+            titleText.horizontalOverflow = HorizontalWrapMode.Overflow;
 
             // TopFleur
             var fleur = new GameObject("TopFleur");

@@ -28,8 +28,16 @@ namespace Modding.Menu
             {
                 yield return null;
             }
-            selectable.Select();
-            if (selectable is MenuSelectable ms) ms.DontPlaySelectSound = false;
+            if (selectable is MenuSelectable ms)
+            {
+                ms.DontPlaySelectSound = true;
+                selectable.Select();
+                ms.DontPlaySelectSound = false;
+            }
+            else
+            {
+                selectable.Select();
+            }
             foreach (Animator animator in selectable.GetComponentsInChildren<Animator>())
             {
                 if (animator.HasParameter("hide", null))

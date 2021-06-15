@@ -84,6 +84,8 @@ namespace Modding.Menu
             labelText.alignment = TextAnchor.MiddleCenter;
             labelText.text = config.Label;
             labelText.supportRichText = true;
+            labelText.verticalOverflow = VerticalWrapMode.Overflow;
+            labelText.horizontalOverflow = HorizontalWrapMode.Overflow;
             // FixVerticalAlign
             label.AddComponent<FixVerticalAlign>();
             // ContentSizeFitter
