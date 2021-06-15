@@ -4,14 +4,6 @@ using UnityEngine;
 namespace Modding
 {
     /// <summary>
-    ///     Called whenever localization specific strings are requested
-    /// </summary>
-    /// <param name="key"></param>
-    /// <param name="sheetTitle"></param>
-    /// <returns>Localized Value</returns>
-    public delegate string LanguageGetHandler(string key, string sheetTitle);
-
-    /// <summary>
     ///     Called after player values for charms have been set
     /// </summary>
     /// <param name="data">Current PlayerData</param>

@@ -4,6 +4,16 @@ using UnityEngine;
 namespace Modding
 {
     /// <summary>
+    ///     Called whenever localization specific strings are requested
+    /// </summary>
+    /// <param name="key">The key within the sheet</param>
+    /// <param name="sheetTitle">The title of the sheet</param>
+    /// <param name="orig">The original localized value</param>
+    /// <param name="current">The current value, including overrides from other mods.</param>
+    /// <returns>Whether or not to use the overriden out param.</returns>
+    public delegate bool LanguageGetProxy(string key, string sheetTitle, string orig, string current, out string res);
+
+    /// <summary>
     ///     Called when anything in the game tries to get a bool
     /// </summary>
     /// <example>

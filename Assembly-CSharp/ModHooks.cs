@@ -158,7 +158,7 @@ namespace Modding
         ///     Called whenever localization specific strings are requested
         /// </summary>
         /// <remarks>N/A</remarks>
-        public static event LanguageGetHandler LanguageGetHook;
+        public static event LanguageGetProxy LanguageGetHook;
 
         /// <summary>
         ///     Called whenever localization specific strings are requested
@@ -166,29 +166,20 @@ namespace Modding
         /// <remarks>N/A</remarks>
         internal static string LanguageGet(string key, string sheet)
         {
-            string @internal = Patches.Language.GetInternal(key, sheet);
-            string result = @internal;
-            bool gotText = false;
-
+            string orig = Patches.Language.GetInternal(key, sheet);
+            string res = orig;
+            
             if (LanguageGetHook == null)
-            {
-                return result;
-            }
+                return res;
 
             Delegate[] invocationList = LanguageGetHook.GetInvocationList();
 
-            foreach (LanguageGetHandler toInvoke in invocationList)
+            foreach (LanguageGetProxy toInvoke in invocationList)
             {
                 try
                 {
-                    string text = toInvoke.Invoke(key, sheet);
-                    if (text == @internal || gotText)
-                    {
-                        continue;
-                    }
-
-                    result = text;
-                    gotText = true;
+                    if (toInvoke(key, sheet, orig, res, out string @override))
+                        res = @override;
                 }
                 catch (Exception ex)
                 {
@@ -196,7 +187,7 @@ namespace Modding
                 }
             }
 
-            return result;
+            return res;
         }
 
         /// <summary>
