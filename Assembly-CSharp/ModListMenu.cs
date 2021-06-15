@@ -22,8 +22,8 @@ namespace Modding
         {
             var builder = new MenuBuilder("ModListMenu");
             this.screen = builder.Screen;
-            builder.CreateAutoMenuNav()
-                .CreateTitle("Mods", MenuTitleStyle.vanillaStyle)
+            builder.CreateTitle("Mods", MenuTitleStyle.vanillaStyle)
+                .SetDefaultNavGraph(new ChainedNavGraph())
                 .CreateContentPane(RectTransformData.FromSizeAndPos(
                     new RelVector2(new Vector2(1920f, 903f)),
                     new AnchoredPosition(
@@ -222,7 +222,7 @@ namespace Modding
                         new Vector2(0f, -502f)
                     )
                 ))
-                .CreateAutoMenuNav()
+                .SetDefaultNavGraph(new ChainedNavGraph())
                 .AddControls(
                     new SingleContentLayout(new AnchoredPosition(
                         new Vector2(0.5f, 0.5f),

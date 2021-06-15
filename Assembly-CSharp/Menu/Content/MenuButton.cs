@@ -61,7 +61,7 @@ namespace Modding.Menu
             menuButton.cancelAction = (CancelAction)Patch.CancelAction.CustomCancelAction;
             menuButton.proceed = config.Proceed;
             ((Patch.MenuSelectable)(MenuSelectable)menuButton).customCancelAction = config.CancelAction;
-            content.RegisterMenuItem(menuButton);
+            content.NavGraph.AddNavigationNode(menuButton);
 
             // Label object
             var label = new GameObject("Label");

@@ -87,7 +87,7 @@ namespace Modding.Menu
             // CanvasRenderer
             scrollPane.AddComponent<CanvasRenderer>();
 
-            action(new ContentArea(scrollPane, layout).CopyEvents(content));
+            action(new ContentArea(scrollPane, layout, content.NavGraph));
 
             scroll.onValueChanged = CreateScrollEvent(f =>
             {

@@ -57,7 +57,7 @@ namespace Modding.Menu
             // CanvasRenderer
             wrapper.AddComponent<CanvasRenderer>();
 
-            action(new ContentArea(wrapper, new SingleContentLayout(new Vector2(0.5f, 0.5f))).CopyEvents(content));
+            action(new ContentArea(wrapper, new SingleContentLayout(new Vector2(0.5f, 0.5f)), content.NavGraph));
 
             return content;
         }

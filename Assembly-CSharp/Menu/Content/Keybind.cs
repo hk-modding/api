@@ -66,7 +66,7 @@ namespace Modding.Menu
                 mapKey.AbortRebind();
                 config.CancelAction?.Invoke(mapKey);
             };
-            content.RegisterMenuItem(mapKey);
+            content.NavGraph.AddNavigationNode(mapKey);
 
             // Text object
             var text = new GameObject("Text");

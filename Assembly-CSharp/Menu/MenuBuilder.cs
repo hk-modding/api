@@ -20,17 +20,14 @@ namespace Modding.Menu
         public MenuScreen Screen { get; set; }
 
         /// <summary>
-        /// An event that gets called before content is added in <c>AddContent</c>.
-        /// </summary>
-        public event Action<MenuBuilder, ContentArea> BeforeAddContent;
-        /// <summary>
-        /// An event that gets called before content is added in <c>AddControls</c>.
-        /// </summary>
-        public event Action<MenuBuilder, ContentArea> BeforeAddControls;
-        /// <summary>
         /// An event that gets called at the start of <c>Build</c>.
         /// </summary>
         public event Action<MenuBuilder> OnBuild;
+
+        /// <summary>
+        /// The current default navigation graph that gets used for <c>AddContent</c> and <c>AddControls</c> calls.
+        /// </summary>
+        public INavigationGraph DefaultNavGraph { get; private set; } = new NullNavigationGraph();
 
         /// <summary>
         /// Creates a new <c>MenuBuilder</c> on the UIManager instance canvas.
@@ -72,6 +69,10 @@ namespace Modding.Menu
         public MenuScreen Build()
         {
             this.OnBuild?.Invoke(this);
+            if (this.DefaultNavGraph?.BuildNavigation() is Selectable sel)
+            {
+                this.MenuObject.AddComponent<AutoSelector>().Start = sel;
+            }
             return this.Screen;
         }
 
@@ -80,51 +81,60 @@ namespace Modding.Menu
         /// If <c>CreateContentPane</c> has not been called yet, this method will immeddiately return.
         /// </summary>
         /// <param name="layout">The layout of the added content</param>
+        /// <param name="navgraph">The navigation graph to place the selectables in.</param>
         /// <param name="action">The action that will get called to add the content</param>
         /// <returns></returns>
-        public MenuBuilder AddContent(IContentLayout layout, Action<ContentArea> action)
+        public MenuBuilder AddContent(IContentLayout layout, INavigationGraph navgraph, Action<ContentArea> action)
         {
             if (this.Screen.content == null)
             {
                 return this;
             }
-            var ca = new ContentArea(this.Screen.content.gameObject, layout);
-            this.BeforeAddContent?.Invoke(this, ca);
-            action(ca);
+            action(new ContentArea(this.Screen.content.gameObject, layout, navgraph));
             return this;
         }
 
         /// <summary>
-        /// Adds "content" to the control pane in a certain layout. <br/>
+        /// Adds "content" to the menu in a certain layout with the default navigation graph.<br/>
+        /// If <c>CreateContentPane</c> has not been called yet, this method will immeddiately return.
+        /// </summary>
+        /// <param name="layout">The layout of the added content</param>
+        /// <param name="action">The action that will get called to add the content</param>
+        /// <returns></returns>
+        public MenuBuilder AddContent(
+            IContentLayout layout,
+            Action<ContentArea> action
+        ) => this.AddContent(layout, this.DefaultNavGraph, action);
+
+        /// <summary>
+        /// Adds "content" to the control pane in a certain layout.<br/>
         /// If <c>CreateControlPane</c> has not been called yet, this method will immeddiately return.
         /// </summary>
         /// <param name="layout">The layout to apply to the added content.</param>
+        /// <param name="navgraph">The navigation graph to place the selectables in.</param>
         /// <param name="action">The action that will get called to add the content.</param>
         /// <returns></returns>
-        public MenuBuilder AddControls(IContentLayout layout, Action<ContentArea> action)
+        public MenuBuilder AddControls(IContentLayout layout, INavigationGraph navgraph, Action<ContentArea> action)
         {
             if (this.Screen.controls == null)
             {
                 return this;
             }
-            var ca = new ContentArea(this.Screen.controls.gameObject, layout);
-            this.BeforeAddControls?.Invoke(this, ca);
-            action(ca);
+            action(new ContentArea(this.Screen.controls.gameObject, layout, navgraph));
             return this;
         }
 
         /// <summary>
-        /// Adds a <c>MenuItemNav</c> component to the root menu object.
+        /// Adds "content" to the control pane in a certain layout with the default navigation graph.<br/>
+        /// If <c>CreateControlPane</c> has not been called yet, this method will immeddiately return.
         /// </summary>
+        /// <param name="layout">The layout to apply to the added content.</param>
+        /// <param name="action">The action that will get called to add the content.</param>
         /// <returns></returns>
-        public MenuBuilder CreateAutoMenuNav()
-        {
-            var itemNavList = this.MenuObject.AddComponent<MenuItemNav>();
-            this.BeforeAddContent += (self, c) => c.OnMenuItemAdd += itemNavList.Content.Add;
-            this.BeforeAddControls += (self, c) => c.OnMenuItemAdd += itemNavList.Controls.Add;
-            this.OnBuild += self => itemNavList.RecalculateNavigation();
-            return this;
-        }
+        public MenuBuilder AddControls(
+            IContentLayout layout,
+            Action<ContentArea> action
+        ) => this.AddControls(layout, this.DefaultNavGraph, action);
 
         /// <summary>
         /// Adds a title and top fleur to the menu.
@@ -229,6 +239,17 @@ namespace Modding.Menu
 
             return this;
         }
+
+        /// <summary>
+        /// Sets the default navigation graph to use for <c>AddContent</c> and <c>AddControls</c> calls.
+        /// </summary>
+        /// <param name="navGraph">The default navigation graph to set.</param>
+        /// <returns></returns>
+        public MenuBuilder SetDefaultNavGraph(INavigationGraph navGraph)
+        {
+            this.DefaultNavGraph = navGraph ?? new NullNavigationGraph();
+            return this;
+        }
     }
 
     /// <summary>
@@ -236,11 +257,6 @@ namespace Modding.Menu
     /// </summary>
     public class ContentArea
     {
-        /// <summary>
-        /// Event that gets called when a suitable <c>MenuSelectable</c> is added to the canvas.
-        /// </summary>
-        public event Action<MenuSelectable> OnMenuItemAdd;
-
         /// <summary>
         /// The game object to place the new content in.
         /// </summary>
@@ -252,32 +268,29 @@ namespace Modding.Menu
         public IContentLayout Layout { get; set; }
 
         /// <summary>
+        /// The navigation graph builder to place selectables in.
+        /// </summary>
+        public INavigationGraph NavGraph { get; set; }
+
+        /// <summary>
         /// Creates a new <c>ContentArea</c>.
         /// </summary>
         /// <param name="obj">The object to place the added content in.</param>
-        /// <param name="layout">The layout to applly to the content being added.</param>
-        public ContentArea(GameObject obj, IContentLayout layout)
+        /// <param name="layout">The layout to apply to the content being added.</param>
+        /// <param name="navGraph">The navigation graph to place the selectables in.</param>
+        public ContentArea(GameObject obj, IContentLayout layout, INavigationGraph navGraph)
         {
             this.ContentObject = obj;
             this.Layout = layout;
+            this.NavGraph = navGraph;
         }
 
         /// <summary>
-        /// Overwrite the events in this <c>ContentArea</c> with the events in another one.
+        /// Creates a new <c>ContentArea</c> with no navigation graph.
         /// </summary>
-        /// <param name="src">The source of the events to copy.</param>
-        /// <returns></returns>
-        public ContentArea CopyEvents(ContentArea src)
-        {
-            this.OnMenuItemAdd = src.OnMenuItemAdd;
-            return this;
-        }
-
-        /// <summary>
-        /// Registers a <c>MenuSelectable</c> to be added. Calls the <c>OnMenuItemAdd</c> event.
-        /// </summary>
-        /// <param name="sel">The menu item to add.</param>
-        public void RegisterMenuItem(MenuSelectable sel) => this.OnMenuItemAdd?.Invoke(sel);
+        /// <param name="obj">The object to place the added content in.</param>
+        /// <param name="layout">The layout to apply to the content being added.</param>
+        public ContentArea(GameObject obj, IContentLayout layout) : this(obj, layout, new NullNavigationGraph()) { }
     }
 
     namespace Config

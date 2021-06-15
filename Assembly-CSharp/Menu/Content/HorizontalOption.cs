@@ -58,7 +58,7 @@ namespace Modding.Menu
             menuOptionHorizontal.applySettingOn = MenuOptionHorizontal.ApplyOnType.Scroll;
             menuOptionHorizontal.cancelAction = (CancelAction)Patch.CancelAction.CustomCancelAction;
             ((Patch.MenuSelectable)(MenuSelectable)menuOptionHorizontal).customCancelAction = config.CancelAction;
-            content.RegisterMenuItem(menuOptionHorizontal);
+            content.NavGraph.AddNavigationNode(menuOptionHorizontal);
             // MenuSetting
             var menuSetting = (Patch.MenuSetting)option.AddComponent<MenuSetting>();
             menuSetting.settingType = (MenuSetting.MenuSettingType)Patch.MenuSetting.MenuSettingType.CustomSetting;
