@@ -2,9 +2,9 @@ name: .NET
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, ci ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, ci ]
 
 jobs:
   build:
@@ -21,12 +21,25 @@ jobs:
       run: sudo apt-get install -y nuget mono-devel mono-xbuild
     - name: Restore dependencies
       run: dotnet restore
-    - name: Build
+    - name: Build PrePatcher
       run: |
         dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
+    - name: Build Assembly-CSharp (Windows)
+      run: |
         dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
-    - name: Upload Binary
+    - name: Upload Windows Binary
       uses: actions/upload-artifact@v2
       with:
-        name: ModdingApi
+        name: ModdingApiWin
+        path: ./OutputFinal/
+    - name: Build Assembly-CSharp (Unix-like)
+      run: |
+        rm -rf Vanilla 
+        wget https://files.catbox.moe/7vwcga.zip -O Vanilla.zip
+        unzip Vanilla.zip -d Vanilla
+        dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
+    - name: Upload Unix-like Binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: ModdingApiUnix
         path: ./OutputFinal/
