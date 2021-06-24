@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Modding.Menu
+namespace Modding.Menu.Components
 {
     /// <summary>
     /// A component to automatically select a menu item.
