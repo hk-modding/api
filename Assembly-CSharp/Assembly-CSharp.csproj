@@ -70,6 +70,7 @@
         <!-- Copy the API, the documentation, the overridden mscorlib, and the README. -->
         <Copy SourceFiles="$(SolutionDir)/README.ModdingApi.md" DestinationFiles="$(OutputDir)/README.md" />
         <Copy SourceFiles="$(SolutionDir)/override/mscorlib.dll" DestinationFiles="$(OutputDir)/mscorlib.dll" />
+        <Copy SourceFiles="$(SolutionDir)/override/mscorlib.xml" DestinationFiles="$(OutputDir)/mscorlib.xml" />
         <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(OutputDir)/Assembly-CSharp.dll" />
         <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(OutputDir)/Assembly-CSharp.xml" />
         
