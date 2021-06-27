@@ -88,14 +88,14 @@ namespace Modding
 
             Logger.APILogger.Log("Attempting to determine type of mod assemblies (library/mod/addon)");
             Dictionary<int, string> modTypeNames = typeof(AssemblyTypeAttribute)
-                .GetFields(BindingFlags.Public | BindingFlags.Static)
-                .ToDictionary(f => (int)f.GetValue(null), f => f.Name);
+                                                   .GetFields(BindingFlags.Public | BindingFlags.Static)
+                                                   .ToDictionary(f => (int) f.GetValue(null), f => f.Name);
 
-            Dictionary<int, List<string>> modTypes = new ();
+            Dictionary<int, List<string>> modTypes = new();
             foreach (string modPath in Directory.GetFiles(path, "*.dll"))
             {
                 AssemblyDefinition def;
-                
+
                 try
                 {
                     def = AssemblyDefinition.ReadAssembly(modPath);
@@ -112,9 +112,11 @@ namespace Modding
                                              .FirstOrDefault(a => a.AttributeType.FullName == typeof(AssemblyTypeAttribute).FullName);
 
                 bool hasAttr = attr != null;
-                int type = (int?) attr?.ConstructorArguments[0].Value ?? (AssemblyContainsMod(asmDef)
-                    ? AssemblyTypeAttribute.MOD
-                    : AssemblyTypeAttribute.LIBRARY);
+                
+                int type = (int?) attr?.ConstructorArguments[0].Value
+                    ?? (AssemblyContainsMod(asmDef)
+                        ? AssemblyTypeAttribute.MOD
+                        : AssemblyTypeAttribute.LIBRARY);
 
                 if (!modTypeNames.TryGetValue(type, out string _))
                 {
@@ -160,95 +162,7 @@ namespace Modding
                             LoadedMods.Add(mod);
                         }
 
-                        // Search for method annotations
-                        foreach (MethodInfo method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
-                        {
-                            SubscribeEventAttribute[] attributes;
-
-                            try
-                            {
-                                attributes = (SubscribeEventAttribute[]) method.GetCustomAttributes(typeof(SubscribeEventAttribute), false);
-                            }
-                            catch (FileNotFoundException)
-                            {
-                                // Tried to load an assembly which doesn't exist.
-                                Logger.APILogger.LogWarn($"Skipping method {method.Name} of type {type} for attribute events as it tried to load a non-existent assembly.");
-                                
-                                continue;
-                            }
-                            
-                            foreach (SubscribeEventAttribute attr in attributes)
-                            {
-                                if (attr.ModType != null && !attr.ModType.IsSubclassOf(typeof(Mod)))
-                                {
-                                    Logger.APILogger.LogWarn($"Mod type '{attr.ModType.FullName}' on '{type.FullName}.{method.Name}' is not a Mod.");
-                                    continue;
-                                }
-
-                                if (string.IsNullOrEmpty(attr.HookName))
-                                {
-                                    Logger.APILogger.LogWarn($"Null hook specified on method '{type.FullName}.{method.Name}'.");
-                                    continue;
-                                }
-
-                                if (method.ContainsGenericParameters)
-                                {
-                                    Logger.APILogger.LogWarn($"Cannot subscribe method '{type.FullName}.{method.Name}', it contains generic parameters.");
-                                    continue;
-                                }
-
-                                if (!ModHooksEvents.TryGetValue(attr.HookName, out EventInfo e))
-                                {
-                                    Logger.APILogger.LogWarn($"Cannot subscribe method '{type.FullName}.{method.Name}' to nonexistent event '{attr.HookName}'.");
-                                    continue;
-                                }
-
-                                MethodInfo invoke = e.EventHandlerType.GetMethod("Invoke");
-
-                                if (invoke == null)
-                                {
-                                    // This should never happen
-                                    Logger.APILogger.LogWarn($"Event '{attr.HookName}' has no public method 'Invoke'.");
-                                    continue;
-                                }
-
-                                if (invoke.ReturnType != method.ReturnType)
-                                {
-                                    Logger.APILogger.LogWarn($"Cannot subscribe method '{type.FullName}.{method.Name}' to event '{attr.HookName}', return types do not match.");
-                                    continue;
-                                }
-
-                                ParameterInfo[] invokeParams = invoke.GetParameters();
-                                ParameterInfo[] subscriberParams = method.GetParameters();
-
-                                if (invokeParams.Length != subscriberParams.Length
-                                    || invokeParams.Where((param, index) => param.ParameterType != subscriberParams[index].ParameterType).Any())
-                                {
-                                    Logger.APILogger.LogWarn($"Cannot subscribe method '{type.FullName}.{method.Name}' to event '{attr.HookName}', parameters do not match.");
-                                    continue;
-                                }
-
-                                EventSubscriptions.Add((e, method, attr.ModType));
-                            }
-                        }
-
-                        // Search for field annotations
-                        foreach (FieldInfo field in type.GetFields(
-                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
-                        {
-                            if (!field.GetCustomAttributes(typeof(EventSubscriberAttribute), false).Any())
-                            {
-                                continue;
-                            }
-
-                            if (!field.IsStatic && !type.IsSubclassOf(typeof(Mod)))
-                            {
-                                Logger.APILogger.LogWarn($"'{type.FullName}.{field.Name}' cannot be an event subscriber, it is an instance method on a non-Mod.");
-                                continue;
-                            }
-
-                            EventSubscribers.Add(field);
-                        }
+                        SubscribeAnnotations(type);
                     }
                 }
                 catch (Exception ex)
@@ -258,8 +172,8 @@ namespace Modding
                 }
             }
 
-            List<string> scenes = new ();
-            
+            List<string> scenes = new();
+
             for (int i = 0; i < USceneManager.sceneCountInBuildSettings; i++)
             {
                 string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
@@ -269,14 +183,75 @@ namespace Modding
             IMod[] orderedMods = LoadedMods.OrderBy(x => x.LoadPriority()).ToArray();
 
             // dict<scene name, list<(mod, list<objectNames>)>
-            Dictionary<string, List<(IMod, List<string> objectNames)>> toPreload = new ();
+            Dictionary<string, List<(IMod, List<string> objectNames)>> toPreload = new();
 
             // dict<mod, dict<scene, dict<objName, object>>>
-            Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects = new ();
+            Dictionary<IMod, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects = new();
 
             Logger.APILogger.Log("Preloading");
 
             // Setup dict of scene preloads
+            GetPreloads(orderedMods, scenes, toPreload);
+
+            if (toPreload.Count > 0)
+            {
+                yield return PreloadScenes(coroutineHolder, toPreload, preloadedObjects);
+            }
+
+            ModHooks.LoadGlobalSettings();
+
+            foreach (IMod mod in orderedMods)
+            {
+                try
+                {
+                    preloadedObjects.TryGetValue(mod, out Dictionary<string, Dictionary<string, GameObject>> preloads);
+                    LoadMod(mod, false, false, preloads);
+                }
+                catch (Exception ex)
+                {
+                    Errors.Add(string.Concat(mod.GetName(), ": FAILED TO LOAD! Check ModLog.txt."));
+                    Logger.APILogger.LogError("Error: " + ex);
+                }
+            }
+
+            // Subscribe events without a parent Mod
+            SubscribeEvents(null, true);
+
+            // Clean out the ModEnabledSettings for any mods that don't exist.
+            LoadedMods.RemoveAll(mod => !ModHooks.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()));
+
+            // Get previously disabled mods and disable them.
+            foreach ((string modName, bool _) in ModHooks.GlobalSettings.ModEnabledSettings.Where(x => !x.Value))
+            {
+                IMod mod = LoadedMods.FirstOrDefault(x => x.GetName() == modName);
+
+                if (mod is not ITogglableMod togglable)
+                {
+                    continue;
+                }
+
+                togglable.Unload();
+
+                Logger.LogDebug($"Mod {mod} was unloaded.");
+            }
+
+            // Create version text
+            GameObject gameObject = new GameObject();
+            _draw = gameObject.AddComponent<ModVersionDraw>();
+            Object.DontDestroyOnLoad(gameObject);
+            UpdateModText();
+
+            Loaded = true;
+
+            ModHooks.SaveGlobalSettings();
+
+            new ModListMenu().InitMenuCreation();
+
+            Object.Destroy(coroutineHolder.gameObject);
+        }
+
+        private static void GetPreloads(IMod[] orderedMods, List<string> scenes, Dictionary<string, List<(IMod, List<string> objectNames)>> toPreload)
+        {
             foreach (IMod mod in orderedMods)
             {
                 Logger.APILogger.Log($"Checking preloads for mod \"{mod.GetName()}\"");
@@ -288,7 +263,7 @@ namespace Modding
                 }
 
                 // dict<scene, list<objects>>
-                Dictionary<string, List<string>> modPreloads = new ();
+                Dictionary<string, List<string>> modPreloads = new();
 
                 foreach ((string scene, string obj) in preloadNames)
                 {
@@ -327,62 +302,100 @@ namespace Modding
                     toPreload[scene] = scenePreloads;
                 }
             }
+        }
 
-            if (toPreload.Count > 0)
+        private static void SubscribeAnnotations(Type type)
+        {
+            // Search for method annotations
+            foreach (MethodInfo method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
             {
-                yield return PreloadScenes(coroutineHolder, toPreload, preloadedObjects);
-            }
-            
-            ModHooks.LoadGlobalSettings();
+                SubscribeEventAttribute[] attributes;
 
-            foreach (IMod mod in orderedMods)
-            {
                 try
                 {
-                    preloadedObjects.TryGetValue(mod, out Dictionary<string, Dictionary<string, GameObject>> preloads);
-                    LoadMod(mod, false, false, preloads);
+                    attributes = (SubscribeEventAttribute[]) method.GetCustomAttributes(typeof(SubscribeEventAttribute), false);
                 }
-                catch (Exception ex)
+                catch (FileNotFoundException)
                 {
-                    Errors.Add(string.Concat(mod.GetName(), ": FAILED TO LOAD! Check ModLog.txt."));
-                    Logger.APILogger.LogError("Error: " + ex);
+                    // Tried to load an assembly which doesn't exist.
+                    Logger.APILogger.LogWarn($"Skipping method {method.Name} of type {type} for attribute events as it tried to load a non-existent assembly.");
+
+                    continue;
+                }
+
+                foreach (SubscribeEventAttribute attr in attributes)
+                {
+                    if (attr.ModType != null && !attr.ModType.IsSubclassOf(typeof(Mod)))
+                    {
+                        Logger.APILogger.LogWarn($"Mod type '{attr.ModType.FullName}' on '{type.FullName}.{method.Name}' is not a Mod.");
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(attr.HookName))
+                    {
+                        Logger.APILogger.LogWarn($"Null hook specified on method '{type.FullName}.{method.Name}'.");
+                        continue;
+                    }
+
+                    if (method.ContainsGenericParameters)
+                    {
+                        Logger.APILogger.LogWarn($"Cannot subscribe method '{type.FullName}.{method.Name}', it contains generic parameters.");
+                        continue;
+                    }
+
+                    if (!ModHooksEvents.TryGetValue(attr.HookName, out EventInfo e))
+                    {
+                        Logger.APILogger.LogWarn($"Cannot subscribe method '{type.FullName}.{method.Name}' to nonexistent event '{attr.HookName}'.");
+                        continue;
+                    }
+
+                    MethodInfo invoke = e.EventHandlerType.GetMethod("Invoke");
+
+                    if (invoke == null)
+                    {
+                        // This should never happen
+                        Logger.APILogger.LogWarn($"Event '{attr.HookName}' has no public method 'Invoke'.");
+                        continue;
+                    }
+
+                    if (invoke.ReturnType != method.ReturnType)
+                    {
+                        Logger.APILogger.LogWarn
+                            ($"Cannot subscribe method '{type.FullName}.{method.Name}' to event '{attr.HookName}', return types do not match.");
+                        continue;
+                    }
+
+                    ParameterInfo[] invokeParams = invoke.GetParameters();
+                    ParameterInfo[] subscriberParams = method.GetParameters();
+
+                    if (invokeParams.Length != subscriberParams.Length
+                        || invokeParams.Where((param, index) => param.ParameterType != subscriberParams[index].ParameterType).Any())
+                    {
+                        Logger.APILogger.LogWarn
+                            ($"Cannot subscribe method '{type.FullName}.{method.Name}' to event '{attr.HookName}', parameters do not match.");
+                        continue;
+                    }
+
+                    EventSubscriptions.Add((e, method, attr.ModType));
                 }
             }
 
-            // Subscribe events without a parent Mod
-            SubscribeEvents(null, true);
-
-            // Clean out the ModEnabledSettings for any mods that don't exist.
-            LoadedMods.RemoveAll(mod => !ModHooks.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()));
-
-            // Get previously disabled mods and disable them.
-            foreach ((string modName, bool _) in ModHooks.GlobalSettings.ModEnabledSettings.Where(x => !x.Value))
+            // Search for field annotations
+            foreach (FieldInfo field in type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static))
             {
-                IMod mod = LoadedMods.FirstOrDefault(x => x.GetName() == modName);
-                
-                if (mod is not ITogglableMod togglable)
+                if (!field.GetCustomAttributes(typeof(EventSubscriberAttribute), false).Any())
                 {
                     continue;
                 }
 
-                togglable.Unload();
-                
-                Logger.LogDebug($"Mod {mod} was unloaded.");
+                if (!field.IsStatic && !type.IsSubclassOf(typeof(Mod)))
+                {
+                    Logger.APILogger.LogWarn($"'{type.FullName}.{field.Name}' cannot be an event subscriber, it is an instance method on a non-Mod.");
+                    continue;
+                }
+
+                EventSubscribers.Add(field);
             }
-
-            // Create version text
-            GameObject gameObject = new GameObject();
-            _draw = gameObject.AddComponent<ModVersionDraw>();
-            Object.DontDestroyOnLoad(gameObject);
-            UpdateModText();
-
-            Loaded = true;
-
-            ModHooks.SaveGlobalSettings();
-
-            new ModListMenu().InitMenuCreation();
-
-            Object.Destroy(coroutineHolder.gameObject);
         }
 
         private static IEnumerator PreloadScenes
@@ -398,7 +411,7 @@ namespace Modding
             // Create a blanker so the preloading is invisible
             GameObject blanker = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
             Object.DontDestroyOnLoad(blanker);
-            
+
             var nb = coroutineHolder.GetComponent<NonBouncer>();
 
             CanvasUtil.CreateImagePanel
@@ -448,11 +461,13 @@ namespace Modding
 
             void updateLoadingBarProgress()
             {
-                loadingBarRect.sizeDelta = new Vector2(
+                loadingBarRect.sizeDelta = new Vector2
+                (
                     progress / (float) toPreload.Count * 975,
                     loadingBarRect.sizeDelta.y
                 );
             }
+
             IEnumerator PreloadScene(string s)
             {
                 Logger.APILogger.Log($"Loading scene \"{s}\"");
@@ -559,7 +574,7 @@ namespace Modding
                 updateLoadingBarProgress();
             }
 
-            List<IEnumerator> batch = new ();
+            List<IEnumerator> batch = new();
             int maxKeys = toPreload.Keys.Count;
 
             foreach (string sceneName in toPreload.Keys)
@@ -585,9 +600,9 @@ namespace Modding
             Logger.APILogger.Log("Preload done, returning to main menu");
 
             Preloaded = true;
-            
+
             yield return USceneManager.LoadSceneAsync("Quit_To_Menu");
-            
+
             while (USceneManager.GetActiveScene().name != Constants.MENU_SCENE)
             {
                 yield return new WaitForEndOfFrame();
@@ -603,9 +618,9 @@ namespace Modding
         private static void UpdateModText()
         {
             StringBuilder builder = new StringBuilder();
-            
+
             builder.AppendLine("Modding API: " + ModHooks.ModVersion);
-            
+
             foreach (string error in Errors)
             {
                 builder.AppendLine(error);
@@ -631,8 +646,13 @@ namespace Modding
             _draw.drawString = builder.ToString();
         }
 
-        internal static void LoadMod(IMod mod, bool updateModText, bool changeSettings = true,
-            Dictionary<string, Dictionary<string, GameObject>> preloadedObjects = null)
+        internal static void LoadMod
+        (
+            IMod mod,
+            bool updateModText,
+            bool changeSettings = true,
+            Dictionary<string, Dictionary<string, GameObject>> preloadedObjects = null
+        )
         {
             if (changeSettings || !ModHooks.GlobalSettings.ModEnabledSettings.ContainsKey(mod.GetName()))
             {
@@ -756,7 +776,8 @@ namespace Modding
                     }
                     catch (Exception exception)
                     {
-                        Logger.APILogger.LogError($"Could not create delegate for event subscriber '{method.DeclaringType?.FullName}.{method.Name}':\n{exception}");
+                        Logger.APILogger.LogError
+                            ($"Could not create delegate for event subscriber '{method.DeclaringType?.FullName}.{method.Name}':\n{exception}");
                         continue;
                     }
                 }
@@ -768,7 +789,8 @@ namespace Modding
                     }
                     catch (Exception exception)
                     {
-                        Logger.APILogger.LogError($"Could not create delegate for event subscriber '{method.DeclaringType.FullName}.{method.Name}':\n{exception}");
+                        Logger.APILogger.LogError
+                            ($"Could not create delegate for event subscriber '{method.DeclaringType.FullName}.{method.Name}':\n{exception}");
                         continue;
                     }
                 }
@@ -788,7 +810,8 @@ namespace Modding
                             if (fieldMod == null)
                             {
                                 // Shouldn't ever happen
-                                Logger.APILogger.LogWarn($"Cannot find Mod '{field.DeclaringType}', requested by '{method.DeclaringType.FullName}.{method.Name}'");
+                                Logger.APILogger.LogWarn
+                                    ($"Cannot find Mod '{field.DeclaringType}', requested by '{method.DeclaringType.FullName}.{method.Name}'");
                                 break;
                             }
 
@@ -807,7 +830,8 @@ namespace Modding
                         }
                         catch (Exception exception)
                         {
-                            Logger.APILogger.LogError($"Could not create delegate for event subscriber '{method.DeclaringType.FullName}.{method.Name}':\n{exception}");
+                            Logger.APILogger.LogError
+                                ($"Could not create delegate for event subscriber '{method.DeclaringType.FullName}.{method.Name}':\n{exception}");
                             continue;
                         }
 
@@ -834,7 +858,8 @@ namespace Modding
                 }
                 catch (Exception exception)
                 {
-                    Logger.APILogger.LogError($"Could not {(subscribe ? "subscribe" : "unsubscribe")} event '{method.DeclaringType?.FullName}.{method.Name}':\n{exception}");
+                    Logger.APILogger.LogError
+                        ($"Could not {(subscribe ? "subscribe" : "unsubscribe")} event '{method.DeclaringType?.FullName}.{method.Name}':\n{exception}");
                 }
             }
         }
