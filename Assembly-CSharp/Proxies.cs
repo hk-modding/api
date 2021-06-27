@@ -10,6 +10,7 @@ namespace Modding
     /// <param name="sheetTitle">The title of the sheet</param>
     /// <param name="orig">The original localized value</param>
     /// <param name="current">The current value, including overrides from other mods.</param>
+    /// <param name="res">Output string, if overriding, otherwise can be anything, typically null.</param>
     /// <returns>Whether or not to use the overriden out param.</returns>
     public delegate bool LanguageGetProxy(string key, string sheetTitle, string orig, string current, out string res);
 
