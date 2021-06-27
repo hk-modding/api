@@ -15,7 +15,7 @@ namespace Modding
     /// </summary>
     public static class ReflectionHelper
     {
-        private static readonly ConcurrentDictionary<Type, Dictionary<string, FieldInfo>> Fields = new();
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, FieldInfo>> Fields = new();
 
         private static readonly ConcurrentDictionary<FieldInfo, Delegate> Getters = new();
 
@@ -31,9 +31,9 @@ namespace Modding
         {
             Type t = typeof(T);
 
-            if (!Fields.TryGetValue(t, out Dictionary<string, FieldInfo> tFields))
+            if (!Fields.TryGetValue(t, out ConcurrentDictionary<string, FieldInfo> tFields))
             {
-                tFields = new Dictionary<string, FieldInfo>();
+                tFields = new ConcurrentDictionary<string, FieldInfo>();
             }
 
             const BindingFlags privStatic = BindingFlags.NonPublic | BindingFlags.Static;
@@ -72,9 +72,9 @@ namespace Modding
         /// <returns>FieldInfo for field or null if field does not exist.</returns>
         public static FieldInfo GetFieldInfo(Type t, string field, bool instance = true)
         {
-            if (!Fields.TryGetValue(t, out Dictionary<string, FieldInfo> typeFields))
+            if (!Fields.TryGetValue(t, out ConcurrentDictionary<string, FieldInfo> typeFields))
             {
-                Fields[t] = typeFields = new Dictionary<string, FieldInfo>();
+                Fields[t] = typeFields = new ConcurrentDictionary<string, FieldInfo>();
             }
 
             if (typeFields.TryGetValue(field, out FieldInfo fi))
@@ -90,7 +90,7 @@ namespace Modding
 
             if (fi != null)
             {
-                typeFields.Add(field, fi);
+                typeFields.TryAdd(field, fi);
             }
 
             return fi;
