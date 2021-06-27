@@ -1,8 +1,8 @@
-﻿using Modding.Menu;
-using UnityEngine;
+﻿using UnityEngine;
 using MonoMod;
 using System.Collections;
 using System;
+using System.Reflection;
 
 // ReSharper disable All
 #pragma warning disable 1591, 0108, 0169, 0649, 0414, CS0626
@@ -49,26 +49,69 @@ namespace Modding.Patches
             }
             remove => _editMenus -= value;
         }
+
         private static Action _editMenus;
 
         public extern void orig_Awake();
+
+        private Sprite LoadImage()
+        {
+            var asm = Assembly.GetExecutingAssembly();
+
+            using var stream = asm.GetManifestResourceStream("Modding.logo.png");
+
+            var buffer = new byte[stream.Length];
+            stream.Read(buffer, 0, buffer.Length);
+
+            var tex = new Texture2D(2, 2);
+
+            tex.LoadImage(buffer, true);
+
+            return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.one * 0.5f);
+        }
+
         public void Awake()
         {
             orig_Awake();
-            if (_instance == this)
-            {
-                _editMenus?.Invoke();
-                this.hasCalledEditMenus = true;
-            }
+
+            if (_instance != this) 
+                return;
+            
+            _editMenus?.Invoke();
+            this.hasCalledEditMenus = true;
         }
 
+        private extern void orig_Start();
+
+        private void Start()
+        {
+            orig_Start();
+
+            if (_instance != this)
+                return;
+            
+            var dlc = transform.Find("UICanvas/MainMenuScreen/TeamCherryLogo/Hidden_Dreams_Logo").gameObject;
+
+            var clone = Instantiate(dlc, dlc.transform.parent);
+            clone.SetActive(true);
+
+            var pos = clone.transform.position;
+            
+            clone.transform.position = pos - new Vector3(0.4f, 0.1f, 0);
+            dlc.transform.position = pos + new Vector3(0.6f, 0f, 0);
+            clone.transform.localScale *= 0.1f;
+            
+            var sr = clone.GetComponent<SpriteRenderer>();
+            sr.sprite = LoadImage();
+        }
+        
         private bool hasCalledEditMenus = false;
 
         public extern IEnumerator orig_HideCurrentMenu();
 
         public IEnumerator HideCurrentMenu()
         {
-            if (((MainMenuState)this.menuState) == MainMenuState.DYNAMIC_MENU)
+            if (((MainMenuState) this.menuState) == MainMenuState.DYNAMIC_MENU)
             {
                 return this.HideMenu(this.currentDynamicMenu);
             }
@@ -80,6 +123,7 @@ namespace Modding.Patches
 
         [MonoModIgnore]
         public extern void SetMenuState(MainMenuState state);
+
         [MonoModIgnore]
         public extern Coroutine StartMenuAnimationCoroutine(IEnumerator coro);
 
@@ -141,6 +185,7 @@ namespace Modding.Patches
         EXTRAS_CONTENT_MENU,
         ENGAGE_MENU,
         NO_SAVE_MENU,
+
         // Added for the dynamic menu API
         DYNAMIC_MENU
     }

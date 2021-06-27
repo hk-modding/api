@@ -106,6 +106,10 @@
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
         </ProjectReference>
     </ItemGroup>
+    
+    <ItemGroup>
+        <EmbeddedResource Include="logo.png"/>
+    </ItemGroup>
 
     <ItemGroup>
         <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
