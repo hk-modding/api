@@ -94,9 +94,22 @@ namespace Modding
             Dictionary<int, List<string>> modTypes = new ();
             foreach (string modPath in Directory.GetFiles(path, "*.dll"))
             {
-                using AssemblyDefinition asmDef = AssemblyDefinition.ReadAssembly(modPath);
+                AssemblyDefinition def;
+                
+                try
+                {
+                    def = AssemblyDefinition.ReadAssembly(modPath);
+                }
+                catch (Exception e)
+                {
+                    Logger.APILogger.LogError($"Unable to load dll: {modPath}, {e.Message}");
+                    continue;
+                }
+
+                using var asmDef = def;
+
                 CustomAttribute attr = asmDef.CustomAttributes
-                    .FirstOrDefault(a => a.AttributeType.FullName == typeof(AssemblyTypeAttribute).FullName);
+                                             .FirstOrDefault(a => a.AttributeType.FullName == typeof(AssemblyTypeAttribute).FullName);
 
                 bool hasAttr = attr != null;
                 int type = (int?) attr?.ConstructorArguments[0].Value ?? (AssemblyContainsMod(asmDef)
