@@ -157,6 +157,7 @@ namespace Modding
         /// <summary>
         ///     Called whenever localization specific strings are requested
         /// </summary>
+        /// <see cref="LanguageGetProxy"/>
         /// <remarks>N/A</remarks>
         public static event LanguageGetProxy LanguageGetHook;
 
@@ -168,7 +169,7 @@ namespace Modding
         {
             string orig = Patches.Language.GetInternal(key, sheet);
             string res = orig;
-            
+
             if (LanguageGetHook == null)
                 return res;
 
@@ -344,15 +345,19 @@ namespace Modding
 
             try
             {
-                string json = JsonConvert.SerializeObject(GlobalSettings, Formatting.Indented, new JsonSerializerSettings
-                {
-                    ContractResolver = ShouldSerializeContractResolver.Instance,
-                    TypeNameHandling = TypeNameHandling.Auto,
-                    Converters = JsonConverterTypes.ConverterTypes
-                });
+                string json = JsonConvert.SerializeObject
+                (
+                    GlobalSettings,
+                    Formatting.Indented,
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = ShouldSerializeContractResolver.Instance,
+                        TypeNameHandling = TypeNameHandling.Auto,
+                        Converters = JsonConverterTypes.ConverterTypes
+                    }
+                );
 
                 writer.Write(json);
-
             }
             catch (Exception e)
             {
@@ -432,6 +437,7 @@ namespace Modding
         /// <summary>
         /// Called whenever a HitInstance is created. Overrides hit.
         /// </summary>
+        /// <see cref="HitInstanceHandler"/>
         public static event HitInstanceHandler HitInstanceHook;
 
         /// <summary>
@@ -499,6 +505,7 @@ namespace Modding
         ///     Called when an enemy is enabled. Check this isDead flag to see if they're already dead. If you return true, this
         ///     will mark the enemy as already dead on load. Default behavior is to return the value inside "isAlreadyDead".
         /// </summary>
+        /// <see cref="OnEnableEnemyHandler"/>
         /// <remarks>HealthManager.CheckPersistence</remarks>
         public static event OnEnableEnemyHandler OnEnableEnemyHook;
 
@@ -532,6 +539,7 @@ namespace Modding
         ///     Called when an enemy recieves a death event. It looks like this event may be called multiple times on an enemy, so
         ///     check "eventAlreadyRecieved" to see if the event has been fired more than once.
         /// </summary>
+        /// <see cref="OnReceiveDeathEventHandler"/>
         /// <remarks>EnemyDeathEffects.RecieveDeathEvent</remarks>
         public static event OnReceiveDeathEventHandler OnReceiveDeathEventHook;
 
@@ -576,6 +584,7 @@ namespace Modding
         ///     Called when an enemy dies and a journal kill is recorded. You may use the "playerDataName" string or one of the
         ///     additional pre-formatted player data strings to look up values in playerData.
         /// </summary>
+        /// <see cref="RecordKillForJournalHandler"/>
         /// <remarks>EnemyDeathEffects.OnRecordKillForJournal</remarks>
         public static event RecordKillForJournalHandler RecordKillForJournalHook;
 
@@ -620,8 +629,50 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to set a bool in player data
         /// </summary>
-        /// <remarks>PlayerData.SetBool</remarks>
+        /// <example>
+        /// <code>
+        /// public int KillCount { get; set; }
+        /// 
+        /// ModHooks.Instance.SetPlayerBoolHook += SetBool;
+        ///
+        /// /*
+        ///  * This uses the bool set to trigger a death, killing the player
+        ///  * as well as preventing them from picking up dash, which could be used
+        ///  * in something like a dashless mod.
+        ///  *
+        ///  * We are also able to use SetBool for counting things, as it is often
+        ///  * called every time sometthing happens, regardless of the value
+        ///  * this can be seen in our check for "killedMageLord", which counts the
+        ///  * number of times the player kills Soul Master with the mod on.
+        ///  */
+        /// bool? SetBool(string name, bool orig) {
+        ///     switch (name) {
+        ///         case "hasDash":
+        ///             var hc = HeroController.instance;
+        ///
+        ///             // Kill the player
+        ///             hc.StartCoroutine(hc.Die());
+        ///
+        ///             // Prevent dash from being picked up
+        ///             return false;
+        ///         case "killedMageLord":
+        ///             // Just increment the counter.
+        ///             KillCount++;
+        ///
+        ///             // We could also do something like award them geo for each kill
+        ///             // And despite being a set, this would trigger on *every* kill
+        ///             HeroController.instance.AddGeo(300);
+        /// 
+        ///             // Not changing the value.
+        ///             return null;
+        ///         default:
+        ///             return null;
+        ///     }
+        /// }
+        /// </code>
+        /// </example>
         /// <see cref="SetBoolProxy" />
+        /// <remarks>PlayerData.SetBool</remarks>
         public static event SetBoolProxy SetPlayerBoolHook;
 
         /// <summary>
@@ -632,7 +683,7 @@ namespace Modding
         internal static void SetPlayerBool(string target, bool val)
         {
             bool value = val;
-            
+
             if (SetPlayerBoolHook != null)
             {
                 Delegate[] invocationList = SetPlayerBoolHook.GetInvocationList();
@@ -658,6 +709,18 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to get a bool from player data
         /// </summary>
+        /// <example>
+        /// <code>
+        /// ModHooks.GetPlayerBoolHook += GetBool;
+        ///
+        /// // In this example, we always give the player dash, and
+        /// // leave other bools as-is.
+        /// bool? GetBool(string name, bool orig) {
+        ///     return name == "canDash" ? true : null;
+        /// }
+        /// </code>
+        /// </example>
+        /// <see cref="GetBoolProxy"/>
         /// <remarks>PlayerData.GetBool</remarks>
         public static event GetBoolProxy GetPlayerBoolHook;
 
@@ -668,7 +731,7 @@ namespace Modding
         internal static bool GetPlayerBool(string target)
         {
             bool result = Patches.PlayerData.instance.GetBoolInternal(target);
-            
+
             if (GetPlayerBoolHook == null)
                 return result;
 
@@ -693,6 +756,27 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to set an int in player data
         /// </summary>
+        /// <example>
+        /// <code>
+        /// ModHooks.Instance.SetPlayerIntHook += SetInt;
+        ///
+        /// int? SetInt(string name, int orig) {
+        ///      // We could do something every time the player 
+        ///      // receives or loses geo.
+        ///     if (name == "geo") {
+        ///         // Let's give the player soul if they *gain* geo
+        ///         if (PlayerData.instance.geo &lt; orig) {
+        ///             PlayerData.instance.AddMPChargeSpa(10);
+        ///         }
+        ///     }
+        ///
+        ///     // In this case, we aren't changing the value being set
+        ///     // at all, so we just leave the value as null for everything.
+        ///     return null;
+        /// }
+        /// </code>
+        /// </example>
+        /// <see cref="SetIntProxy"/>
         /// <remarks>PlayerData.SetInt</remarks>
         public static event SetIntProxy SetPlayerIntHook;
 
@@ -704,7 +788,7 @@ namespace Modding
         internal static void SetPlayerInt(string target, int val)
         {
             int value = val;
-            
+
             if (SetPlayerIntHook != null)
             {
                 Delegate[] invocationList = SetPlayerIntHook.GetInvocationList();
@@ -731,6 +815,20 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to get an int from player data
         /// </summary>
+        /// <see cref="GetIntProxy"/>
+        /// <example>
+        /// <code>
+        /// ModHooks.GetPlayerIntHook += GetInt;
+        ///
+        /// // This overrides the number of charm slots we have to 999,
+        /// // effectively giving us infinite charm notches.
+        /// // We ignore any other GetInt calls.
+        /// int? GetInt(string name, int orig) {
+        ///     return name == "charmSlots" ? 999 : nulll;
+        /// }
+        /// </code>
+        /// </example>
+        /// <see cref="GetIntProxy"/>
         /// <remarks>PlayerData.GetInt</remarks>
         public static event GetIntProxy GetPlayerIntHook;
 
@@ -766,6 +864,7 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to set a float in player data
         /// </summary>
+        /// <see cref="SetFloatProxy"/>
         /// <remarks>PlayerData.SetFloat</remarks>
         public static event SetFloatProxy SetPlayerFloatHook;
 
@@ -777,7 +876,7 @@ namespace Modding
         internal static void SetPlayerFloat(string target, float val)
         {
             float value = val;
-            
+
             if (SetPlayerFloatHook != null)
             {
                 Delegate[] invocationList = SetPlayerFloatHook.GetInvocationList();
@@ -802,6 +901,7 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to get a float from player data
         /// </summary>
+        /// <see cref="GetFloatProxy"/>
         /// <remarks>PlayerData.GetFloat</remarks>
         public static event GetFloatProxy GetPlayerFloatHook;
 
@@ -837,6 +937,7 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to set a string in player data
         /// </summary>
+        /// <see cref="SetStringProxy"/>
         /// <remarks>PlayerData.SetString</remarks>
         public static event SetStringProxy SetPlayerStringHook;
 
@@ -848,7 +949,7 @@ namespace Modding
         internal static void SetPlayerString(string target, string val)
         {
             string value = val;
-            
+
             if (SetPlayerStringHook != null)
             {
                 Delegate[] invocationList = SetPlayerStringHook.GetInvocationList();
@@ -873,6 +974,7 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to get a string from player data
         /// </summary>
+        /// <see cref="GetStringProxy"/>
         /// <remarks>PlayerData.GetString</remarks>
         public static event GetStringProxy GetPlayerStringHook;
 
@@ -883,7 +985,7 @@ namespace Modding
         internal static string GetPlayerString(string target)
         {
             string value = Patches.PlayerData.instance.GetStringInternal(target);
-            
+
             if (GetPlayerStringHook == null)
                 return value;
 
@@ -908,6 +1010,7 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to set a Vector3 in player data
         /// </summary>
+        /// <see cref="SetVector3Proxy"/>
         /// <remarks>PlayerData.SetVector3</remarks>
         public static event SetVector3Proxy SetPlayerVector3Hook;
 
@@ -919,7 +1022,7 @@ namespace Modding
         internal static void SetPlayerVector3(string target, Vector3 orig)
         {
             Vector3 val = orig;
-            
+
             if (SetPlayerVector3Hook != null)
             {
                 Delegate[] invocationList = SetPlayerVector3Hook.GetInvocationList();
@@ -946,6 +1049,7 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to get a Vector3 from player data
         /// </summary>
+        /// <see cref="GetVector3Proxy"/>
         /// <remarks>PlayerData.GetVector3</remarks>
         public static event GetVector3Proxy GetPlayerVector3Hook;
 
@@ -956,7 +1060,7 @@ namespace Modding
         internal static Vector3 GetPlayerVector3(string target)
         {
             Vector3 res = Patches.PlayerData.instance.GetVector3Internal(target);
-            
+
             if (GetPlayerVector3Hook == null)
                 return res;
 
@@ -981,6 +1085,7 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to set a generic variable in player data
         /// </summary>
+        /// <see cref="SetVariableProxy"/>
         /// <remarks>PlayerData.SetVariable</remarks>
         public static event SetVariableProxy SetPlayerVariableHook;
 
@@ -1024,7 +1129,7 @@ namespace Modding
             }
 
             T val = orig;
-            
+
             if (SetPlayerVariableHook != null)
             {
                 Delegate[] invocationList = SetPlayerVariableHook.GetInvocationList();
@@ -1033,7 +1138,7 @@ namespace Modding
                 {
                     try
                     {
-                        if (!toInvoke(t, target, val, out object res)) 
+                        if (!toInvoke(t, target, val, out object res))
                             continue;
 
                         val = res switch
@@ -1056,6 +1161,7 @@ namespace Modding
         /// <summary>
         ///     Called when anything in the game tries to get a generic variable from player data
         /// </summary>
+        /// <see cref="GetVariableProxy"/>
         /// <remarks>PlayerData.GetVariable</remarks>
         [PublicAPI]
         public static event GetVariableProxy GetPlayerVariableHook;
@@ -1094,7 +1200,7 @@ namespace Modding
             }
 
             T value = Patches.PlayerData.instance.GetVariableInternal<T>(target);
-            
+
             if (GetPlayerVariableHook == null)
                 return value;
 
@@ -1198,6 +1304,7 @@ namespace Modding
         /// <summary>
         ///     Called when damage is dealt to the player
         /// </summary>
+        /// <see cref="TakeDamageProxy"/>
         /// <remarks>HeroController.TakeDamage</remarks>
         public static event TakeDamageProxy TakeDamageHook;
 
@@ -1234,6 +1341,7 @@ namespace Modding
         /// <summary>
         ///     Called at the end of the take damage function
         /// </summary>
+        /// <see cref="AfterTakeDamageHandler"/>
         public static event AfterTakeDamageHandler AfterTakeDamageHook;
 
         /// <summary>
@@ -1438,6 +1546,7 @@ namespace Modding
         /// <summary>
         ///     Called whenever nail strikes something
         /// </summary>
+        /// <see cref="SlashHitHandler"/>
         public static event SlashHitHandler SlashHitHook;
 
         /// <summary>
@@ -1475,6 +1584,7 @@ namespace Modding
         /// <summary>
         ///     Called after player values for charms have been set
         /// </summary>
+        /// <see cref="CharmUpdateHandler"/>
         /// <remarks>HeroController.CharmUpdate</remarks>
         public static event CharmUpdateHandler CharmUpdateHook;
 
@@ -1541,7 +1651,7 @@ namespace Modding
         }
 
         /// <summary>
-        ///     Called whenever the player heals
+        ///     Called whenever the player heals, overrides health added.
         /// </summary>
         /// <remarks>PlayerData.health</remarks>
         public static event Func<int, int> BeforeAddHealthHook;
@@ -1577,7 +1687,7 @@ namespace Modding
         }
 
         /// <summary>
-        ///     Called whenever focus cost is calculated
+        ///     Called whenever focus cost is calculated, allows a focus cost multiplier.
         /// </summary>
         public static event Func<float> FocusCostHook;
 
@@ -1614,8 +1724,8 @@ namespace Modding
 
         /// <summary>
         ///     Called when Hero recovers Soul from hitting enemies
-        ///     <returns>The amount of soul to recover</returns>
         /// </summary>
+        /// <returns>The amount of soul to recover</returns>
         public static event Func<int, int> SoulGainHook;
 
         /// <summary>
@@ -1651,6 +1761,7 @@ namespace Modding
         /// <summary>
         ///     Called during dash function to change velocity
         /// </summary>
+        /// <returns>A changed vector.</returns>
         /// <remarks>HeroController.Dash</remarks>
         public static event Func<Vector2, Vector2> DashVectorHook;
 
@@ -1685,7 +1796,8 @@ namespace Modding
         }
 
         /// <summary>
-        ///     Called whenever the dash key is pressed. Returns whether or not to override normal dash functionality
+        ///     Called whenever the dash key is pressed.
+        ///     Returns whether or not to override normal dash functionality - if true, preventing a normal dash
         /// </summary>
         /// <remarks>HeroController.LookForQueueInput</remarks>
         public static event Func<bool> DashPressedHook;
@@ -2013,6 +2125,7 @@ namespace Modding
             data.loadedMods = LoadedModsWithVersions;
             SaveLocalSettings?.Invoke(data);
         }
+
         internal static void OnLoadLocalSettings(ModSavegameData data) => LoadLocalSettings?.Invoke(data);
 
 

@@ -20,9 +20,9 @@ namespace Modding
     /// <summary>
     ///     Called whenever nail strikes something
     /// </summary>
-    /// <param name="otherCollider"></param>
-    /// <param name="gameObject"></param>
-    public delegate void SlashHitHandler(Collider2D otherCollider, GameObject gameObject);
+    /// <param name="otherCollider">What the nail is colliding with</param>
+    /// <param name="slash">The NailSlash gameObject</param>
+    public delegate void SlashHitHandler(Collider2D otherCollider, GameObject slash);
 
     /// <summary>
     ///     Called when a HitInstance is created in TakeDamage. The hit instance returned defines the hit behavior that will

@@ -17,17 +17,6 @@ namespace Modding
     /// <summary>
     ///     Called when anything in the game tries to get a bool
     /// </summary>
-    /// <example>
-    /// <code>
-    /// ModHooks.GetPlayerBoolHook += GetBool;
-    ///
-    /// // In this example, we always give the player dash, and
-    /// // leave other bools as-is.
-    /// bool? GetBool(string name, bool orig) {
-    ///     return name == "canDash" ? true : null;
-    /// }
-    /// </code>
-    /// </example>
     /// <param name="name">The field being gotten</param>
     /// <param name="orig">The original value of the bool</param>
     /// <returns>The bool, if you are overriding it, otherwise null.</returns>
@@ -36,48 +25,6 @@ namespace Modding
     /// <summary>
     ///     Called when anything in the game tries to set a bool
     /// </summary>
-    /// <example>
-    /// <code>
-    /// public int KillCount { get; set; }
-    /// 
-    /// ModHooks.Instance.SetPlayerBoolHook += SetBool;
-    ///
-    /// /*
-    ///  * This uses the bool set to trigger a death, killing the player
-    ///  * as well as preventing them from picking up dash, which could be used
-    ///  * in something like a dashless mod.
-    ///  *
-    ///  * We are also able to use SetBool for counting things, as it is often
-    ///  * called every time sometthing happens, regardless of the value
-    ///  * this can be seen in our check for "killedMageLord", which counts the
-    ///  * number of times the player kills Soul Master with the mod on.
-    ///  */
-    /// bool? SetBool(string name, bool orig) {
-    ///     switch (name) {
-    ///         case "hasDash":
-    ///             var hc = HeroController.instance;
-    ///
-    ///             // Kill the player
-    ///             hc.StartCoroutine(hc.Die());
-    ///
-    ///             // Prevent dash from being picked up
-    ///             return false;
-    ///         case "killedMageLord":
-    ///             // Just increment the counter.
-    ///             KillCount++;
-    ///
-    ///             // We could also do something like award them geo for each kill
-    ///             // And despite being a set, this would trigger on *every* kill
-    ///             HeroController.instance.AddGeo(300);
-    /// 
-    ///             // Not changing the value.
-    ///             return null;
-    ///         default:
-    ///             return null;
-    ///     }
-    /// }
-    /// </code>
-    /// </example>
     /// <param name="name">The field being set</param>
     /// <param name="orig">The original value the bool was being set to</param>
     /// <returns>The bool, if overriden, else null.</returns>
@@ -86,18 +33,6 @@ namespace Modding
     /// <summary>
     ///     Called when anything in the game tries to get an int
     /// </summary>
-    /// <example>
-    /// <code>
-    /// ModHooks.GetPlayerIntHook += GetInt;
-    ///
-    /// // This overrides the number of charm slots we have to 999,
-    /// // effectively giving us infinite charm notches.
-    /// // We ignore any other GetInt calls.
-    /// int? GetInt(string name, int orig) {
-    ///     return name == "charmSlots" ? 999 : nulll;
-    /// }
-    /// </code>
-    /// </example>
     /// <param name="name">The field being gotten</param>
     /// <param name="orig">The original value of the field</param>
     /// <returns>The int if overrode, else null.</returns>
@@ -106,26 +41,6 @@ namespace Modding
     /// <summary>
     ///     Called when anything in the game tries to set an int
     /// </summary>
-    /// <example>
-    /// <code>
-    /// ModHooks.Instance.SetPlayerIntHook += SetInt;
-    ///
-    /// int? SetInt(string name, int orig) {
-    ///      // We could do something every time the player 
-    ///      // receives or loses geo.
-    ///     if (name == "geo") {
-    ///         // Let's give the player soul if they *gain* geo
-    ///         if (PlayerData.instance.geo &lt; orig) {
-    ///             PlayerData.instance.AddMPChargeSpa(10);
-    ///         }
-    ///     }
-    ///
-    ///     // In this case, we aren't changing the value being set
-    ///     // at all, so we just leave the value as null for everything.
-    ///     return null;
-    /// }
-    /// </code>
-    /// </example>
     /// <param name="name">The field which is being set</param>
     /// <param name="orig">The original value</param>
     /// <returns>The int if overrode, else null</returns>
