@@ -127,15 +127,14 @@ namespace Modding.Patches
         [MonoModIgnore]
         public extern Coroutine StartMenuAnimationCoroutine(IEnumerator coro);
 
-        public void UIGoToDynamicMenu(MenuScreen menu, System.Action preLeaveAction = null)
+        public void UIGoToDynamicMenu(MenuScreen menu)
         {
-            this.StartMenuAnimationCoroutine(this.GoToDynamicMenu(menu, preLeaveAction));
+            this.StartMenuAnimationCoroutine(this.GoToDynamicMenu(menu));
         }
 
-        public IEnumerator GoToDynamicMenu(MenuScreen menu, System.Action preLeaveAction = null)
+        public IEnumerator GoToDynamicMenu(MenuScreen menu)
         {
             this.ih.StopUIInput();
-            preLeaveAction?.Invoke();
             yield return this.HideCurrentMenu();
             yield return this.ShowMenu(menu);
             this.currentDynamicMenu = menu;
@@ -156,6 +155,45 @@ namespace Modding.Patches
             yield return this.ShowMenu(to);
             this.SetMenuState(state);
             this.ih.StartUIInput();
+            yield break;
+        }
+
+        [MonoModIgnore]
+        private bool ignoreUnpause;
+
+        // mimics the behaviour of the UIManager.SetState method
+        public void UIPauseToDynamicMenu(MenuScreen to)
+        {
+            if (this.uiState != GlobalEnums.UIState.PAUSED)
+            {
+                this.StartMenuAnimationCoroutine(this.PauseToDynamicMenu(to));
+                this.uiState = GlobalEnums.UIState.PAUSED;
+            }
+        }
+
+        public IEnumerator PauseToDynamicMenu(MenuScreen to)
+        {
+            this.ih.StopUIInput();
+            this.ignoreUnpause = true;
+            if (this.uiState == GlobalEnums.UIState.PAUSED)
+            {
+                if (
+                    this.menuState == GlobalEnums.MainMenuState.OPTIONS_MENU ||
+                    this.menuState == GlobalEnums.MainMenuState.EXIT_PROMPT
+                )
+                {
+                    yield return this.HideCurrentMenu();
+                }
+            }
+            else
+            {
+                this.StartCoroutine(this.FadeInCanvasGroupAlpha(this.modalDimmer, 0.8f));
+            }
+            yield return this.ShowMenu(to);
+            this.currentDynamicMenu = to;
+            this.SetMenuState(MainMenuState.DYNAMIC_MENU);
+            this.ih.StartUIInput();
+            this.ignoreUnpause = false;
             yield break;
         }
     }
