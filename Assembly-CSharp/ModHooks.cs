@@ -803,8 +803,6 @@ namespace Modding
                         Logger.APILogger.LogError(ex);
                     }
                 }
-
-                return;
             }
 
             Patches.PlayerData.instance.SetIntInternal(target, value);
@@ -1031,8 +1029,6 @@ namespace Modding
                         Logger.APILogger.LogError(ex);
                     }
                 }
-
-                return;
             }
 
             Patches.PlayerData.instance.SetVector3Internal(target, val);
