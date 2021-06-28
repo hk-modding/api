@@ -106,6 +106,9 @@ namespace Modding
 
                 LoadGlobalSettings();
 
+                if (_globalSettings is null)
+                    throw new NullReferenceException(nameof(_globalSettings));
+
                 _globalSettings.ModEnabledSettings ??= new Dictionary<string, bool>();
 
                 return _globalSettings;
@@ -167,8 +170,7 @@ namespace Modding
         /// <remarks>N/A</remarks>
         internal static string LanguageGet(string key, string sheet)
         {
-            string orig = Patches.Language.GetInternal(key, sheet);
-            string res = orig;
+            string res = Patches.Language.GetInternal(key, sheet);
 
             if (LanguageGetHook == null)
                 return res;
@@ -179,8 +181,7 @@ namespace Modding
             {
                 try
                 {
-                    if (toInvoke(key, sheet, orig, res, out string @override))
-                        res = @override;
+                    res = toInvoke(key, sheet, res);
                 }
                 catch (Exception ex)
                 {
@@ -645,7 +646,7 @@ namespace Modding
         ///  * this can be seen in our check for "killedMageLord", which counts the
         ///  * number of times the player kills Soul Master with the mod on.
         ///  */
-        /// bool? SetBool(string name, bool orig) {
+        /// bool SetBool(string name, bool orig) {
         ///     switch (name) {
         ///         case "hasDash":
         ///             var hc = HeroController.instance;
@@ -664,9 +665,9 @@ namespace Modding
         ///             HeroController.instance.AddGeo(300);
         /// 
         ///             // Not changing the value.
-        ///             return null;
+        ///             return orig;
         ///         default:
-        ///             return null;
+        ///             return orig;
         ///     }
         /// }
         /// </code>
@@ -692,8 +693,7 @@ namespace Modding
                 {
                     try
                     {
-                        if (toInvoke(target, value) is bool ret)
-                            value = ret;
+                        value = toInvoke(target, value);
                     }
                     catch (Exception ex)
                     {
@@ -716,7 +716,7 @@ namespace Modding
         /// // In this example, we always give the player dash, and
         /// // leave other bools as-is.
         /// bool? GetBool(string name, bool orig) {
-        ///     return name == "canDash" ? true : null;
+        ///     return name == "canDash" ? true : orig;
         /// }
         /// </code>
         /// </example>
@@ -741,8 +741,7 @@ namespace Modding
             {
                 try
                 {
-                    if (toInvoke(target, result) is bool ret)
-                        result = ret;
+                    result = toInvoke(target, result);
                 }
                 catch (Exception ex)
                 {
@@ -771,8 +770,8 @@ namespace Modding
         ///     }
         ///
         ///     // In this case, we aren't changing the value being set
-        ///     // at all, so we just leave the value as null for everything.
-        ///     return null;
+        ///     // at all, so we just leave the value as the original for everything.
+        ///     return orig;
         /// }
         /// </code>
         /// </example>
@@ -797,8 +796,7 @@ namespace Modding
                 {
                     try
                     {
-                        if (toInvoke(target, value) is int ret)
-                            value = ret;
+                        value = toInvoke(target, value);
                     }
                     catch (Exception ex)
                     {
@@ -824,7 +822,7 @@ namespace Modding
         /// // effectively giving us infinite charm notches.
         /// // We ignore any other GetInt calls.
         /// int? GetInt(string name, int orig) {
-        ///     return name == "charmSlots" ? 999 : nulll;
+        ///     return name == "charmSlots" ? 999 : orig;
         /// }
         /// </code>
         /// </example>
@@ -849,8 +847,7 @@ namespace Modding
             {
                 try
                 {
-                    if (toInvoke(target, result) is int ret)
-                        result = ret;
+                    result = toInvoke(target, result);
                 }
                 catch (Exception ex)
                 {
@@ -885,8 +882,7 @@ namespace Modding
                 {
                     try
                     {
-                        if (toInvoke.Invoke(target, val) is float res)
-                            value = res;
+                        val = toInvoke.Invoke(target, val);
                     }
                     catch (Exception ex)
                     {
@@ -922,8 +918,7 @@ namespace Modding
             {
                 try
                 {
-                    if (toInvoke.Invoke(target, result) is float ret)
-                        result = ret;
+                    result = toInvoke.Invoke(target, result);
                 }
                 catch (Exception ex)
                 {
@@ -958,8 +953,7 @@ namespace Modding
                 {
                     try
                     {
-                        if (toInvoke.Invoke(target, value, out string res))
-                            value = res;
+                        value = toInvoke.Invoke(target, value);
                     }
                     catch (Exception ex)
                     {
@@ -995,8 +989,7 @@ namespace Modding
             {
                 try
                 {
-                    if (toInvoke(target, value, out string res))
-                        value = res;
+                    value = toInvoke(target, value);
                 }
                 catch (Exception ex)
                 {
@@ -1031,8 +1024,7 @@ namespace Modding
                 {
                     try
                     {
-                        if (toInvoke.Invoke(target, val) is Vector3 res)
-                            val = res;
+                        val = toInvoke.Invoke(target, val);
                     }
                     catch (Exception ex)
                     {
@@ -1070,8 +1062,7 @@ namespace Modding
             {
                 try
                 {
-                    if (toInvoke(target, res) is Vector3 v)
-                        res = v;
+                    res = toInvoke(target, res);
                 }
                 catch (Exception ex)
                 {
@@ -1138,15 +1129,7 @@ namespace Modding
                 {
                     try
                     {
-                        if (!toInvoke(t, target, val, out object res))
-                            continue;
-
-                        val = res switch
-                        {
-                            T res_t => res_t,
-                            null => default,
-                            _ => throw new InvalidOperationException($"Returned object was of type {res.GetType().Name} instead of {t.Name}")
-                        };
+                        val = (T) toInvoke(t, target, val);
                     }
                     catch (Exception ex)
                     {
@@ -1155,7 +1138,7 @@ namespace Modding
                 }
             }
 
-            Patches.PlayerData.instance.SetVariableInternal(target, orig);
+            Patches.PlayerData.instance.SetVariableInternal(target, val);
         }
 
         /// <summary>
@@ -1210,15 +1193,7 @@ namespace Modding
             {
                 try
                 {
-                    if (!toInvoke(t, target, value, out object res))
-                        continue;
-
-                    value = res switch
-                    {
-                        T res_t => res_t,
-                        null => default,
-                        _ => throw new InvalidOperationException($"Returned object was of type {res.GetType().Name}, expected {t.Name}")
-                    };
+                    value = (T) toInvoke(t, target, value);
                 }
                 catch (Exception ex)
                 {
