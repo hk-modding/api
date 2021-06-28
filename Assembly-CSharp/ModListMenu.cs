@@ -15,11 +15,14 @@ namespace Modding
 
         private Dictionary<string, bool> modEnabledSettings = ModHooks.GlobalSettings.ModEnabledSettings;
 
+        public static Dictionary<IMod, MenuScreen> ModScreens = new Dictionary<IMod, MenuScreen>();
+
         // Due to the lifecycle of the UIManager object, The `EditMenus` event has to be used to create custom menus.
         // This event is called every time a UIManager is created,
         // and will also call the added action if the UIManager has already started.
         internal void InitMenuCreation() => Patch.UIManager.EditMenus += () =>
         {
+            ModScreens = new Dictionary<IMod, MenuScreen>();
             var builder = new MenuBuilder("ModListMenu");
             this.screen = builder.Screen;
             builder.CreateTitle("Mods", MenuTitleStyle.vanillaStyle)
@@ -106,6 +109,7 @@ namespace Modding
                                             Proceed = true
                                         }
                                     );
+                                    ModScreens[mod] = menu;
                                 }
                                 else if (mod is ICustomMenuMod icmmod)
                                 {
@@ -124,6 +128,7 @@ namespace Modding
                                             Proceed = true
                                         }
                                     );
+                                    ModScreens[mod] = menu;
                                 }
                             }
                         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using GlobalEnums;
 using HutongGames.PlayMaker;
@@ -33,6 +34,22 @@ namespace Modding
         ///     Currently Loaded Mods
         /// </summary>
         public static readonly List<string> LoadedMods = new();
+
+        /// <summary>
+        ///     A list of all loaded IMod instances.
+        /// </summary>
+        public static ReadOnlyCollection<IMod> LoadedModInstances
+        {
+            get => ModLoader.LoadedMods.AsReadOnly();
+        }
+
+        /// <summary>
+        ///     A map of mods to their built menu screens.
+        /// </summary>
+        public static ReadOnlyDictionary<IMod, MenuScreen> BuiltModMenuScreens
+        {
+            get => new ReadOnlyDictionary<IMod, MenuScreen>(ModListMenu.ModScreens);
+        }
 
         /// <summary>
         ///     Dictionary of mods and their version #s
@@ -1087,31 +1104,31 @@ namespace Modding
 
             if (t == typeof(bool))
             {
-                SetPlayerBool(target, (bool) (object) orig);
+                SetPlayerBool(target, (bool)(object)orig);
                 return;
             }
 
             if (t == typeof(int))
             {
-                SetPlayerInt(target, (int) (object) orig);
+                SetPlayerInt(target, (int)(object)orig);
                 return;
             }
 
             if (t == typeof(float))
             {
-                SetPlayerFloat(target, (float) (object) orig);
+                SetPlayerFloat(target, (float)(object)orig);
                 return;
             }
 
             if (t == typeof(string))
             {
-                SetPlayerString(target, (string) (object) orig);
+                SetPlayerString(target, (string)(object)orig);
                 return;
             }
 
             if (t == typeof(Vector3))
             {
-                SetPlayerVector3(target, (Vector3) (object) orig);
+                SetPlayerVector3(target, (Vector3)(object)orig);
                 return;
             }
 
@@ -1125,7 +1142,7 @@ namespace Modding
                 {
                     try
                     {
-                        val = (T) toInvoke(t, target, val);
+                        val = (T)toInvoke(t, target, val);
                     }
                     catch (Exception ex)
                     {
@@ -1155,27 +1172,27 @@ namespace Modding
 
             if (t == typeof(bool))
             {
-                return (T) (object) GetPlayerBool(target);
+                return (T)(object)GetPlayerBool(target);
             }
 
             if (t == typeof(int))
             {
-                return (T) (object) GetPlayerInt(target);
+                return (T)(object)GetPlayerInt(target);
             }
 
             if (t == typeof(float))
             {
-                return (T) (object) GetPlayerFloat(target);
+                return (T)(object)GetPlayerFloat(target);
             }
 
             if (t == typeof(string))
             {
-                return (T) (object) GetPlayerString(target);
+                return (T)(object)GetPlayerString(target);
             }
 
             if (t == typeof(Vector3))
             {
-                return (T) (object) GetPlayerVector3(target);
+                return (T)(object)GetPlayerVector3(target);
             }
 
             T value = Patches.PlayerData.instance.GetVariableInternal<T>(target);
@@ -1189,7 +1206,7 @@ namespace Modding
             {
                 try
                 {
-                    value = (T) toInvoke(t, target, value);
+                    value = (T)toInvoke(t, target, value);
                 }
                 catch (Exception ex)
                 {
