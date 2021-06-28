@@ -71,7 +71,7 @@ namespace Modding.Menu
             this.OnBuild?.Invoke(this);
             if (this.DefaultNavGraph?.BuildNavigation() is Selectable sel)
             {
-                this.MenuObject.AddComponent<AutoSelector>().Start = sel;
+                this.MenuObject.AddComponent<Components.AutoSelector>().Start = sel;
             }
             return this.Screen;
         }
