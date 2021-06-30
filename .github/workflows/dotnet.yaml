@@ -2,7 +2,7 @@ name: .NET
 
 on:
   push:
-    branches: [ master, ci ]
+    branches: [ master, ci, docs ]
   pull_request:
     branches: [ master, ci ]
 
@@ -60,6 +60,7 @@ jobs:
         path: ./OutputFinal/
   docfx:
     needs: [build-win, build-unix]
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     
     steps:
