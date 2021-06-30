@@ -31,7 +31,6 @@ namespace Modding.Patches
     {
         public static void SetDynamicMenuCancel(
             this UnityEngine.UI.MenuSelectable ms,
-            Action preScreenSwapDelegate,
             MenuScreen to
         )
         {
@@ -39,7 +38,7 @@ namespace Modding.Patches
             (ms as MenuSelectable).customCancelAction = (self) =>
             {
                 var uim = (UIManager)global::UIManager.instance;
-                uim.StartMenuAnimationCoroutine(uim.GoToDynamicMenu(to, preScreenSwapDelegate));
+                uim.StartMenuAnimationCoroutine(uim.GoToDynamicMenu(to));
             };
         }
     }

@@ -144,7 +144,8 @@ namespace Modding.Patches
                         SaveGameData obj = new SaveGameData(this.playerData, this.sceneData);
 
                         ModHooks.OnBeforeSaveGameSave(obj);
-                        if(this.moddedData == null) {
+                        if (this.moddedData == null)
+                        {
                             this.moddedData = new ModSavegameData();
                         }
                         ModHooks.OnSaveLocalSettings(this.moddedData);
@@ -621,6 +622,57 @@ namespace Modding.Patches
             ModHooks.OnNewGame();
         }
 
+        #endregion
+
+        #region PauseToDynamicMenu
+        [MonoModIgnore]
+        public extern void SetTimeScale(float timescale);
+
+        // code has been copied from PauseGameToggle
+        public IEnumerator PauseToggleDynamicMenu(MenuScreen screen, bool allowUnpause = false)
+        {
+            if (!this.TimeSlowed)
+            {
+                if (!this.playerData.disablePause && this.gameState == GlobalEnums.GameState.PLAYING)
+                {
+                    this.gameCams.StopCameraShake();
+                    this.inputHandler.PreventPause();
+                    this.inputHandler.StopUIInput();
+                    this.actorSnapshotPaused.TransitionTo(0f);
+                    this.isPaused = true;
+                    this.SetState(GlobalEnums.GameState.PAUSED);
+                    this.ui.AudioGoToPauseMenu(0.2f);
+                    this.ui.UIPauseToDynamicMenu(screen);
+                    if (HeroController.instance != null)
+                    {
+                        HeroController.instance.Pause();
+                    }
+                    this.gameCams.MoveMenuToHUDCamera();
+                    this.SetTimeScale(0f);
+                    yield return new WaitForSecondsRealtime(0.8f);
+                    this.inputHandler.AllowPause();
+                }
+                else if (allowUnpause && this.gameState == GlobalEnums.GameState.PAUSED)
+                {
+                    this.gameCams.ResumeCameraShake();
+                    this.inputHandler.PreventPause();
+                    this.actorSnapshotUnpaused.TransitionTo(0f);
+                    this.isPaused = false;
+                    this.ui.AudioGoToGameplay(0.2f);
+                    this.ui.SetState( GlobalEnums.UIState.PLAYING);
+                    this.SetState( GlobalEnums.GameState.PLAYING);
+                    if (HeroController.instance != null)
+                    {
+                        HeroController.instance.UnPause();
+                    }
+                    MenuButtonList.ClearAllLastSelected();
+                    this.SetTimeScale(1f);
+                    yield return new WaitForSecondsRealtime(0.8f);
+                    this.inputHandler.AllowPause();
+                }
+            }
+            yield break;
+        }
         #endregion
 
         [MonoModIgnore]
