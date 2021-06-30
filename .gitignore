@@ -279,3 +279,5 @@ OutputFinal/
 ExampleMods/**/*.zip
 ExampleMods/**/Distribution/*
 ModdingAPI.zip
+
+docs

@@ -66,11 +66,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-      - name: Checkout docs
-        uses: actions/checkout@v2
-        with:
-          ref: docs
-          path: docs
+      - name: Get docs
+        run: git worktree add --guess-remote docs 
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
       - name: Setup ms-build, mono
