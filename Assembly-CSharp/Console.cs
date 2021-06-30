@@ -104,7 +104,7 @@ namespace Modding
         {
             IEnumerable<string> chunks = Chunks(message, MSG_LENGTH);
 
-			string color;
+			string color = "<color=white>";
 
 			if (ModHooks.GlobalSettings.LogColors)
 			{
@@ -124,10 +124,6 @@ namespace Modding
 						break;
 					case LogLevel.Error:
 						color = "<color=red>";
-						break;
-					case LogLevel.Off:
-					default:
-						color = "<color=white>";
 						break;
 				}
 			}
