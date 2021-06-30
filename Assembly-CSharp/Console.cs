@@ -104,31 +104,31 @@ namespace Modding
         {
             IEnumerable<string> chunks = Chunks(message, MSG_LENGTH);
 
-			string color = "<color=white>";
+            string color = $"<color={ModHooks.GlobalSettings.DefaultColor}>";
 
-			if (ModHooks.GlobalSettings.LogColors)
-			{
-				switch (level)
-				{
-					case LogLevel.Fine:
-						color = "<color=grey>";
-						break;
-					case LogLevel.Info:
-						color = "<color=cyan>";
-						break;
-					case LogLevel.Debug:
-						color = "<color=white>";
-						break;
-					case LogLevel.Warn:
-						color = "<color=yellow>";
-						break;
-					case LogLevel.Error:
-						color = "<color=red>";
-						break;
-				}
-			}
+            if (ModHooks.GlobalSettings.UseLogColors)
+            {
+                switch (level)
+                {
+                    case LogLevel.Fine:
+                        color = $"<color={ModHooks.GlobalSettings.FineColor}>";
+                        break;
+                    case LogLevel.Info:
+                        color = $"<color={ModHooks.GlobalSettings.InfoColor}>";
+                        break;
+                    case LogLevel.Debug:
+                        color = $"<color={ModHooks.GlobalSettings.DebugColor}>";
+                        break;
+                    case LogLevel.Warn:
+                        color = $"<color={ModHooks.GlobalSettings.WarningColor}>";
+                        break;
+                    case LogLevel.Error:
+                        color = $"<color={ModHooks.GlobalSettings.ErrorColor}>";
+                        break;
+                }
+            }
 
-			foreach (string s in chunks)
+            foreach (string s in chunks)
                 _messages.Add(color + s + "</color>");
 
             while (_messages.Count > 24)
