@@ -1,0 +1,10 @@
+apiRules:
+- exclude:
+    uidRegex: ^Modding\.Patches\.*
+    type: Namespace
+- exclude:
+    uidRegex: ^System\.Runtime\.CompilerServices
+    type: Namespace
+- exclude:
+    uidRegex: ^MonoMod\.MonoModRules
+    type: Type

@@ -1,0 +1,13 @@
+/**/DROP/
+/**/TEMP/
+/**/packages/
+/**/bin/
+/**/obj/
+
+_site
+
+api/.manifest
+api/*.yml
+
+.idea
+.vs
