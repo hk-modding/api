@@ -180,12 +180,12 @@ namespace Modding
             Log(message, LogLevel.Error);
         }
 
-		/// <summary>
-		///     Locks file to write, writes to file, releases lock.
-		/// </summary>
-		/// <param name="text">Text to write</param>
-		/// <param name="level">Level of log</param>
-		private static void WriteToFile(string text, LogLevel level)
+        /// <summary>
+        ///     Locks file to write, writes to file, releases lock.
+        /// </summary>
+        /// <param name="text">Text to write</param>
+        /// <param name="level">Level of log</param>
+        private static void WriteToFile(string text, LogLevel level)
         {
             lock (Locker)
             {
