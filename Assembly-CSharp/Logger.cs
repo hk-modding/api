@@ -76,7 +76,7 @@ namespace Modding
             
             string levelText = $"[{level.ToString().ToUpper()}]:";
             
-            WriteToFile(levelText + message.Replace("\n", "\n" + levelText) + Environment.NewLine);
+            WriteToFile(levelText + message.Replace("\n", "\n" + levelText) + Environment.NewLine, level);
         }
 
         /// <summary>
@@ -180,17 +180,18 @@ namespace Modding
             Log(message, LogLevel.Error);
         }
 
-        /// <summary>
-        ///     Locks file to write, writes to file, releases lock.
-        /// </summary>
-        /// <param name="text">Text to write</param>
-        private static void WriteToFile(string text)
+		/// <summary>
+		///     Locks file to write, writes to file, releases lock.
+		/// </summary>
+		/// <param name="text">Text to write</param>
+		/// <param name="level">Level of log</param>
+		private static void WriteToFile(string text, LogLevel level)
         {
             lock (Locker)
             {
                 if (ModHooks.IsInitialized)
                 {
-                    ModHooks.LogConsole(text);
+                    ModHooks.LogConsole(text, level);
                 }
 
                 Writer.Write(text);

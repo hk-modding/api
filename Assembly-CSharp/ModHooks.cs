@@ -133,7 +133,7 @@ namespace Modding
             }
         }
 
-        internal static void LogConsole(string message)
+        internal static void LogConsole(string message, LogLevel level)
         {
             try
             {
@@ -149,7 +149,7 @@ namespace Modding
                     _console = go.AddComponent<Console>();
                 }
 
-                _console.AddText(message);
+                _console.AddText(message, level);
             }
             catch (Exception ex)
             {
