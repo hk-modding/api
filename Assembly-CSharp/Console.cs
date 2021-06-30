@@ -104,7 +104,7 @@ namespace Modding
         {
             IEnumerable<string> chunks = Chunks(message, MSG_LENGTH);
 
-			string color = "";
+			string color;
 
 			if (ModHooks.GlobalSettings.LogColors)
 			{
