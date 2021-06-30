@@ -7,7 +7,7 @@ on:
     branches: [ master, ci ]
 
 jobs:
-  build:
+  build-win:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -32,11 +32,26 @@ jobs:
       with:
         name: ModdingApiWin
         path: ./OutputFinal/
-    - name: Build Assembly-CSharp (Unix-like)
+
+  build-unix:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Vanilla
       run: |
-        rm -rf Vanilla 
         wget https://files.catbox.moe/c5domo.zip -O Vanilla.zip
         unzip Vanilla.zip -d Vanilla
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+    - name: Setup ms-build
+      run: sudo apt-get install -y nuget mono-devel mono-xbuild
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build PrePatcher
+      run: |
+        dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
+    - name: Build Assembly-CSharp 
+      run: |
         dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
     - name: Upload Unix-like Binary
       uses: actions/upload-artifact@v2
@@ -44,7 +59,7 @@ jobs:
         name: ModdingApiUnix
         path: ./OutputFinal/
   docfx:
-    needs: build
+    needs: [build-win, build-unix]
     runs-on: ubuntu-latest
     
     steps:
