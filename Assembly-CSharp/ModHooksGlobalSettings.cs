@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace Modding
 {
-    /// <inheritdoc />
-    /// <summary>
-    ///     Class to hold GlobalSettings for the Modding API
-    /// </summary>
-    [PublicAPI]
+	/// <inheritdoc />
+	/// <summary>
+	///     Class to hold GlobalSettings for the Modding API
+	/// </summary>
+	[PublicAPI]
     public class ModHooksGlobalSettings
     {
         /// <summary>
@@ -21,6 +20,11 @@ namespace Modding
         ///     Logging Level to use.
         /// </summary>
         public LogLevel LoggingLevel = LogLevel.Info;
+
+        /// <summary>
+        ///     All settings related to the the in game console
+        /// </summary>
+        public InGameConsoleSettings ConsoleSettings = new();
 
         /// <summary>
         ///     Determines if Debug Console (Which displays Messages from Logger) should be shown.
