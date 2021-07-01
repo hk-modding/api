@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace ExampleMods
 {
-    // Define a new mod named `SimpleHooks` that implements `IToggleableMod`
+    // Define a new mod named `SimpleHooks` that implements `ITogglableMod`
     // to signify that it can be toggled on or off.
     public class SimpleHooks : Mod, ITogglableMod
     {
@@ -19,7 +19,7 @@ namespace ExampleMods
 
         // Code that should run on mod initialization.
         //
-        // If your mod implements `IToggleableMod`, this method will be run on loaded the mod up again
+        // If your mod implements `ITogglableMod`, this method will be run on loaded the mod up again
         // so make sure to write it in a way that it will not fail if ran multiple times.
         public override void Initialize()
         {

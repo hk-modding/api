@@ -174,7 +174,7 @@ namespace Modding.Menu
             // Description
             if (config.Description is DescriptionInfo descInfo)
             {
-                var descStyle = descInfo.Style ?? DescriptionStyle.SingleLineVanillaStyle;
+                var descStyle = descInfo.Style ?? DescriptionStyle.HorizOptionSingleLineVanillaStyle;
 
                 var description = new GameObject("Description");
                 GameObject.DontDestroyOnLoad(description);
@@ -184,7 +184,7 @@ namespace Modding.Menu
                 // RectTransform
                 var rt = description.AddComponent<RectTransform>();
                 RectTransformData.FromSizeAndPos(
-                    new RelVector2(new RelLength(0, 1), descStyle.Height),
+                    descStyle.Size,
                     new AnchoredPosition(new Vector2(0, 0), new Vector2(0, 1), new Vector2(60, 0))
                 ).Apply(rt);
                 // Animator
@@ -197,7 +197,7 @@ namespace Modding.Menu
                 descText.font = MenuResources.Perpetua;
                 descText.fontSize = descStyle.TextSize;
                 descText.resizeTextMaxSize = descStyle.TextSize;
-                descText.alignment = TextAnchor.UpperLeft;
+                descText.alignment = descStyle.TextAnchor;
                 descText.text = descInfo.Text;
                 descText.supportRichText = true;
                 descText.verticalOverflow = VerticalWrapMode.Overflow;
@@ -304,19 +304,33 @@ namespace Modding.Menu
             /// <summary>
             /// The style preset of a single line description in the vanilla game.
             /// </summary>
-            public static readonly DescriptionStyle SingleLineVanillaStyle = new DescriptionStyle
+            public static readonly DescriptionStyle HorizOptionSingleLineVanillaStyle = new DescriptionStyle
             {
                 TextSize = 38,
-                Height = new RelLength(40),
+                TextAnchor = TextAnchor.UpperLeft,
+                Size = new RelVector2(new RelLength(0, 1), new RelLength(40)),
+            };
+            /// <summary>
+            /// The style preset of a single line description in the vanilla game.
+            /// </summary>
+            public static readonly DescriptionStyle MenuButtonSingleLineVanillaStyle = new DescriptionStyle
+            {
+                TextSize = 38,
+                TextAnchor = TextAnchor.UpperCenter,
+                Size = new RelVector2(new RelLength(1000), new RelLength(40)),
             };
             /// <summary>
             /// The size of the text on the description.
             /// </summary>
             public int TextSize;
             /// <summary>
+            /// The position the text should be anchored in.
+            /// </summary>
+            public TextAnchor TextAnchor;
+            /// <summary>
             /// The height of the description text.
             /// </summary>
-            public RelLength Height;
+            public RelVector2 Size;
         }
     }
 }

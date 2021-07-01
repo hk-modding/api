@@ -163,6 +163,41 @@ namespace Modding.Menu
             // Post Component Config
             menuButton.flashEffect = flashAnimator;
 
+            // Description
+            if (config.Description is DescriptionInfo descInfo)
+            {
+                var descStyle = descInfo.Style ?? DescriptionStyle.MenuButtonSingleLineVanillaStyle;
+
+                var description = new GameObject("Description");
+                GameObject.DontDestroyOnLoad(description);
+                description.transform.SetParent(option.transform, false);
+                // CanvasRenderer
+                description.AddComponent<CanvasRenderer>();
+                // RectTransform
+                var rt = description.AddComponent<RectTransform>();
+                RectTransformData.FromSizeAndPos(
+                    descStyle.Size,
+                    new AnchoredPosition(new Vector2(0.5f, 0), new Vector2(0.5f, 1))
+                ).Apply(rt);
+                // Animator
+                var anim = description.AddComponent<Animator>();
+                anim.runtimeAnimatorController = MenuResources.TextHideShowAnimator;
+                anim.updateMode = AnimatorUpdateMode.UnscaledTime;
+                anim.applyRootMotion = false;
+                // Text
+                var descText = description.AddComponent<Text>();
+                descText.font = MenuResources.Perpetua;
+                descText.fontSize = descStyle.TextSize;
+                descText.resizeTextMaxSize = descStyle.TextSize;
+                descText.alignment = descStyle.TextAnchor;
+                descText.text = descInfo.Text;
+                descText.supportRichText = true;
+                descText.verticalOverflow = VerticalWrapMode.Overflow;
+                descText.horizontalOverflow = HorizontalWrapMode.Wrap;
+                // Post Component Config
+                menuButton.descriptionText = anim;
+            }
+
             button = menuButton;
             return content;
         }
@@ -195,6 +230,10 @@ namespace Modding.Menu
             /// The styling of the menu button.
             /// </summary>
             public MenuButtonStyle? Style;
+            /// <summary>
+            /// The description of the option that gets displayed underneath.
+            /// </summary>
+            public DescriptionInfo? Description;
         }
 
         /// <summary>
