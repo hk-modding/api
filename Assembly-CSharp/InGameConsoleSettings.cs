@@ -18,7 +18,7 @@
         /// <summary>
         ///	    The color to use for Info logging when UseLogColors is enabled
         /// </summary>
-        public string InfoColor = "cyan";
+        public string InfoColor = "white";
 
         /// <summary>
         ///	    The color to use for Debug logging when UseLogColors is enabled
