@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection.Emit;
 using JetBrains.Annotations;
+using Modding.Patches;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,8 +17,10 @@ namespace Modding
         private static Font _font;
         private readonly List<string> _messages = new(25);
         private bool _enabled = true;
+		private static InGameConsoleSettings _consoleSettings;
+		private static readonly string SettingsPath = Path.Combine(Application.persistentDataPath, "ModdingApi.ConsoleSettings.json");
 
-        private const int MSG_LENGTH = 80;
+		private const int MSG_LENGTH = 80;
 
         private static readonly string[] OSFonts =
         {
@@ -80,9 +85,11 @@ namespace Modding
             );
 
             _textPanel.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap;
-        }
 
-        [PublicAPI]
+			ModHooks.ApplicationQuitHook += SaveGlobalSettings;
+		}
+
+		[PublicAPI]
         public void Update()
         {
             if (!Input.GetKeyDown(KeyCode.F10))
@@ -104,26 +111,26 @@ namespace Modding
         {
             IEnumerable<string> chunks = Chunks(message, MSG_LENGTH);
 
-            string color = $"<color={ModHooks.GlobalSettings.DefaultColor}>";
+            string color = $"<color={ConsoleSettings.DefaultColor}>";
 
-            if (ModHooks.GlobalSettings.UseLogColors)
+            if (ConsoleSettings.UseLogColors)
             {
                 switch (level)
                 {
                     case LogLevel.Fine:
-                        color = $"<color={ModHooks.GlobalSettings.FineColor}>";
+                        color = $"<color={ConsoleSettings.FineColor}>";
                         break;
                     case LogLevel.Info:
-                        color = $"<color={ModHooks.GlobalSettings.InfoColor}>";
+                        color = $"<color={ConsoleSettings.InfoColor}>";
                         break;
                     case LogLevel.Debug:
-                        color = $"<color={ModHooks.GlobalSettings.DebugColor}>";
+                        color = $"<color={ConsoleSettings.DebugColor}>";
                         break;
                     case LogLevel.Warn:
-                        color = $"<color={ModHooks.GlobalSettings.WarningColor}>";
+                        color = $"<color={ConsoleSettings.WarningColor}>";
                         break;
                     case LogLevel.Error:
-                        color = $"<color={ModHooks.GlobalSettings.ErrorColor}>";
+                        color = $"<color={ConsoleSettings.ErrorColor}>";
                         break;
                 }
             }
@@ -147,5 +154,129 @@ namespace Modding
             for (int i = 0; i < str.Length; i += maxChunkSize) 
                 yield return str.Substring(i, Math.Min(maxChunkSize, str.Length-i));
         }
-    }
+
+		internal static InGameConsoleSettings ConsoleSettings
+		{
+			get
+			{
+				if (_consoleSettings != null)
+				{
+					return _consoleSettings;
+				}
+
+				_consoleSettings = new InGameConsoleSettings();
+
+				LoadConsoleSettings();
+
+				if (_consoleSettings == null)
+					throw new NullReferenceException(nameof(_consoleSettings));
+
+				return _consoleSettings;
+			}
+		}
+
+		/// <summary>
+		///     Loads console settings from disk (if they exist)
+		/// </summary>
+		internal static void LoadConsoleSettings()
+		{
+			Logger.APILogger.Log("Loading ModdingApi Console Settings.");
+
+			if (!File.Exists(SettingsPath))
+			{
+				_consoleSettings = new InGameConsoleSettings();
+
+				return;
+			}
+
+			try
+			{
+				using FileStream fileStream = File.OpenRead(SettingsPath);
+				using StreamReader reader = new StreamReader(fileStream);
+
+				string json = reader.ReadToEnd();
+
+				try
+				{
+					_consoleSettings = JsonConvert.DeserializeObject<InGameConsoleSettings>
+					(
+						json,
+						new JsonSerializerSettings
+						{
+							ContractResolver = ShouldSerializeContractResolver.Instance,
+							TypeNameHandling = TypeNameHandling.Auto,
+							ObjectCreationHandling = ObjectCreationHandling.Replace,
+							Converters = JsonConverterTypes.ConverterTypes
+						}
+					);
+				}
+				catch (Exception e)
+				{
+					Logger.APILogger.LogError("Failed to deserialize settings using Json.NET, falling back.");
+					Logger.APILogger.LogError(e);
+
+					_consoleSettings = JsonUtility.FromJson<InGameConsoleSettings>(json);
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.APILogger.LogError("Failed to load console settings, creating new settings file:\n" + e);
+
+				if (File.Exists(SettingsPath))
+				{
+					File.Move(SettingsPath, SettingsPath + ".error");
+				}
+
+				_consoleSettings = new InGameConsoleSettings();
+			}
+		}
+
+		/// <summary>
+		///     Save InGameConsoleSettings to disk. (backs up the current console settings if it exists)
+		/// </summary>
+		internal static void SaveGlobalSettings()
+		{
+			Logger.APILogger.Log("Saving console Settings");
+
+			if (File.Exists(SettingsPath + ".bak"))
+			{
+				File.Delete(SettingsPath + ".bak");
+			}
+
+			if (File.Exists(SettingsPath))
+			{
+				File.Move(SettingsPath, SettingsPath + ".bak");
+			}
+
+			using FileStream fileStream = File.Create(SettingsPath);
+
+			using StreamWriter writer = new StreamWriter(fileStream);
+
+			try
+			{
+				string json = JsonConvert.SerializeObject
+				(
+					ConsoleSettings,
+					Formatting.Indented,
+					new JsonSerializerSettings
+					{
+						ContractResolver = ShouldSerializeContractResolver.Instance,
+						TypeNameHandling = TypeNameHandling.Auto,
+						Converters = JsonConverterTypes.ConverterTypes
+					}
+				);
+
+				writer.Write(json);
+			}
+			catch (Exception e)
+			{
+				Logger.APILogger.LogError("Failed to save console settings using Json.NET.");
+				Logger.APILogger.LogError(e);
+
+				string json = JsonUtility.ToJson(ConsoleSettings, true);
+
+				writer.Write(json);
+			}
+		}
+	}
 }
