@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace Modding
 {
-	/// <inheritdoc />
-	/// <summary>
-	///     Class to hold GlobalSettings for the Modding API
-	/// </summary>
-	[PublicAPI]
+    /// <inheritdoc />
+    /// <summary>
+    ///     Class to hold GlobalSettings for the Modding API
+    /// </summary>
+    [PublicAPI]
     public class ModHooksGlobalSettings
     {
         /// <summary>
