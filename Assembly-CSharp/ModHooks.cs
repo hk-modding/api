@@ -380,10 +380,11 @@ namespace Modding
 
             if (!File.Exists(SettingsPath))
             {
-                _globalSettings = new ModHooksGlobalSettings
-                {
-                    LoggingLevel = LogLevel.Info,
-                    ModEnabledSettings = new Dictionary<string, bool>()
+				_globalSettings = new ModHooksGlobalSettings
+				{
+					LoggingLevel = LogLevel.Info,
+					ModEnabledSettings = new Dictionary<string, bool>(),
+					ConsoleSettings = new InGameConsoleSettings()
                 };
 
                 return;
@@ -430,7 +431,8 @@ namespace Modding
                 _globalSettings = new ModHooksGlobalSettings
                 {
                     LoggingLevel = LogLevel.Info,
-                    ModEnabledSettings = new Dictionary<string, bool>()
+                    ModEnabledSettings = new Dictionary<string, bool>(),
+					ConsoleSettings = new InGameConsoleSettings()
                 };
             }
         }
