@@ -229,10 +229,14 @@ namespace Modding
                 {
                     continue;
                 }
+                try {
+                    togglable.Unload();
 
-                togglable.Unload();
-
-                Logger.LogDebug($"Mod {mod} was unloaded.");
+                    Logger.LogDebug($"Mod {mod} was unloaded.");
+                } catch (Exception ex)
+                {
+                    Logger.APILogger.LogError($"Failed to unload Mod - {togglable.GetName()} - {Environment.NewLine} - {ex} ");
+                }
             }
 
             // Create version text
