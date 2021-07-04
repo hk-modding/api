@@ -3,6 +3,7 @@ using GlobalEnums;
 using UnityEngine;
 using UnityEngine.UI;
 using Modding.Menu.Config;
+using Modding.Menu.Components;
 
 namespace Modding.Menu
 {
@@ -87,7 +88,17 @@ namespace Modding.Menu
             // CanvasRenderer
             scrollPane.AddComponent<CanvasRenderer>();
 
-            action(new ContentArea(scrollPane, layout, content.NavGraph));
+            action(new ContentArea(
+                scrollPane,
+                layout,
+                new ScrollMovingNavGraph
+                {
+                    Inner = content.NavGraph,
+                    Scrollbar = scroll,
+                    ScrollPaneTransform = scrollPaneRt,
+                    SelectionPadding = config.SelectionPadding ?? (_ => (0, 0))
+                }
+            ));
 
             scroll.onValueChanged = CreateScrollEvent(f =>
             {
@@ -219,6 +230,31 @@ namespace Modding.Menu
             ret.AddListener(action.Invoke);
             return ret;
         }
+
+        private struct ScrollMovingNavGraph : INavigationGraph
+        {
+            public INavigationGraph Inner;
+            public RectTransform ScrollPaneTransform;
+            public Scrollbar Scrollbar;
+            public Func<RectTransform, (float, float)> SelectionPadding { get; set; }
+
+            public void AddNavigationNode(Selectable selectable)
+            {
+                var selector = selectable.gameObject.GetComponent<ScrollPaneSelector>();
+                if (selector == null)
+                {
+                    selector = selectable.gameObject.AddComponent<ScrollPaneSelector>();
+                }
+                selector.Scrollbar = this.Scrollbar;
+                selector.PaneRect = this.ScrollPaneTransform;
+                selector.MaskRect = (RectTransform)this.ScrollPaneTransform.parent;
+                selector.SelectionPadding = this.SelectionPadding;
+                Inner.AddNavigationNode(selectable);
+            }
+
+            // I doubt this will be called
+            public Selectable BuildNavigation() => Inner.BuildNavigation();
+        }
     }
 
     namespace Config
@@ -240,6 +276,10 @@ namespace Modding.Menu
             /// The action to run when pressing the menu cancel key while selecting this item.
             /// </summary>
             public Action<MenuPreventDeselect> CancelAction;
+            /// <summary>
+            /// A function to get padding for the selection scrolling. The returned tuple is `(bottom, top)`.
+            /// </summary>
+            public Func<RectTransform, (float, float)> SelectionPadding { get; set; }
         }
     }
 }

@@ -3,7 +3,6 @@ using JetBrains.Annotations;
 
 namespace Modding
 {
-    /// <inheritdoc />
     /// <summary>
     ///     Class to hold GlobalSettings for the Modding API
     /// </summary>
@@ -11,8 +10,8 @@ namespace Modding
     public class ModHooksGlobalSettings
     {
         /// <summary>
-        ///     Lists the known mods that are currently installed and whether or not they've been enabled or disabled via the Mod
-        ///     Manager Menu.
+        ///     Lists the known mods that are installed and whether or not
+        ///     they've been enabled or disabled via the Mod Manager Menu.
         /// </summary>
         public Dictionary<string, bool> ModEnabledSettings = new();
 

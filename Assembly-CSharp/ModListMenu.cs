@@ -4,6 +4,7 @@ using Modding.Menu;
 using Modding.Menu.Config;
 using UnityEngine;
 using UnityEngine.UI;
+using static Modding.ModLoader;
 using Patch = Modding.Patches;
 
 namespace Modding
@@ -12,9 +13,7 @@ namespace Modding
     {
         private MenuScreen screen;
 
-        private Dictionary<ITogglableMod, bool> changedMods = new Dictionary<ITogglableMod, bool>();
-
-        private Dictionary<string, bool> modEnabledSettings = ModHooks.GlobalSettings.ModEnabledSettings;
+        private Dictionary<ModInstance, bool> changedMods = new Dictionary<ModInstance, bool>();
 
         public static Dictionary<IMod, MenuScreen> ModScreens = new Dictionary<IMod, MenuScreen>();
 
@@ -56,19 +55,21 @@ namespace Modding
                                 ChildAnchor = new Vector2(0f, 1f),
                                 ParentAnchor = new Vector2(1f, 1f),
                                 Offset = new Vector2(-310f, 0f)
-                            }
+                            },
+                            SelectionPadding = _ => (-60, 0)
                         },
                         new RelLength(0f),
                         RegularGridLayout.CreateVerticalLayout(105f),
                         c =>
                         {
-                            foreach (var mod in ModLoader.LoadedMods)
+                            foreach (var modInst in ModLoader.ModInstances)
                             {
+                                if (modInst.Error != null) continue;
                                 ModToggleDelegates? toggleDels = null;
-                                if (mod is ITogglableMod itmod)
+                                if (modInst.Mod is ITogglableMod itmod)
                                 {
                                     if (
-                                        mod is not (
+                                        modInst.Mod is not (
                                             IMenuMod { ToggleButtonInsideMenu: true } or
                                             ICustomMenuMod { ToggleButtonInsideMenu: true }
                                         )
@@ -77,23 +78,23 @@ namespace Modding
                                         var rt = c.ContentObject.GetComponent<RectTransform>();
                                         rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
                                         c.AddHorizontalOption(
-                                            itmod.GetName(),
+                                            modInst.Name,
                                             new HorizontalOptionConfig
                                             {
                                                 ApplySetting = (self, ind) =>
                                                 {
-                                                    changedMods[itmod] = ind == 1;
+                                                    changedMods[modInst] = ind == 1;
                                                 },
                                                 CancelAction = _ => this.ApplyChanges(),
-                                                Label = itmod.GetName(),
+                                                Label = modInst.Name,
                                                 Options = new string[] { "Off", "On" },
                                                 RefreshSetting = (self, apply) => self.optionList.SetOptionTo(
-                                                    this.modEnabledSettings[itmod.GetName()] ? 1 : 0
+                                                    modInst.Enabled ? 1 : 0
                                                 ),
                                                 Style = HorizontalOptionStyle.VanillaStyle,
                                                 Description = new DescriptionInfo
                                                 {
-                                                    Text = $"Version {mod.GetVersion()}"
+                                                    Text = $"Version {modInst.Mod.GetVersion()}"
                                                 }
                                             },
                                             out var opt
@@ -103,29 +104,25 @@ namespace Modding
                                     else
                                     {
                                         bool? change = null;
-                                        string name = itmod.GetName();
+                                        string name = modInst.Name;
                                         toggleDels = new ModToggleDelegates
                                         {
                                             SetModEnabled = enabled =>
                                             {
                                                 change = enabled;
                                             },
-                                            GetModEnabled = () => this.modEnabledSettings[name],
+                                            GetModEnabled = () => modInst.Enabled,
                                             ApplyChange = () =>
                                             {
                                                 if (change is bool enabled)
                                                 {
-                                                    if (this.modEnabledSettings[name] != enabled)
-                                                    {
-                                                        this.modEnabledSettings[name] = enabled;
-                                                    }
                                                     if (enabled)
                                                     {
-                                                        ModLoader.LoadMod(itmod, true);
+                                                        ModLoader.LoadMod(modInst, true);
                                                     }
                                                     else
                                                     {
-                                                        ModLoader.UnloadMod(itmod);
+                                                        ModLoader.UnloadMod(modInst);
                                                     }
                                                 }
                                                 change = null;
@@ -133,51 +130,51 @@ namespace Modding
                                         };
                                     }
                                 }
-                                if (mod is IMenuMod immod)
+                                if (modInst.Mod is IMenuMod immod)
                                 {
-                                    var menu = CreateModMenu(immod, toggleDels);
+                                    var menu = CreateModMenu(modInst, toggleDels);
                                     var rt = c.ContentObject.GetComponent<RectTransform>();
                                     rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
                                     c.AddMenuButton(
-                                        $"{immod.GetName()}_Settings",
+                                        $"{modInst.Name}_Settings",
                                         new MenuButtonConfig
                                         {
                                             Style = MenuButtonStyle.VanillaStyle,
                                             CancelAction = _ => this.ApplyChanges(),
-                                            Label = $"{immod.GetName()} Settings",
+                                            Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
                                             SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
                                                 .UIGoToDynamicMenu(menu),
                                             Proceed = true,
                                             Description = new DescriptionInfo
                                             {
-                                                Text = $"Version {mod.GetVersion()}"
+                                                Text = $"Version {modInst.Mod.GetVersion()}"
                                             }
                                         }
                                     );
-                                    ModScreens[mod] = menu;
+                                    ModScreens[modInst.Mod] = menu;
                                 }
-                                else if (mod is ICustomMenuMod icmmod)
+                                else if (modInst.Mod is ICustomMenuMod icmmod)
                                 {
                                     var menu = icmmod.GetMenuScreen(this.screen, toggleDels);
                                     var rt = c.ContentObject.GetComponent<RectTransform>();
                                     rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
                                     c.AddMenuButton(
-                                        $"{icmmod.GetName()}_Settings",
+                                        $"{modInst.Name}_Settings",
                                         new MenuButtonConfig
                                         {
                                             Style = MenuButtonStyle.VanillaStyle,
                                             CancelAction = _ => this.ApplyChanges(),
-                                            Label = $"{icmmod.GetName()} Settings",
+                                            Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
                                             SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
                                                 .UIGoToDynamicMenu(menu),
                                             Proceed = true,
                                             Description = new DescriptionInfo
                                             {
-                                                Text = $"Version {mod.GetVersion()}"
+                                                Text = $"Version {modInst.Mod.GetVersion()}"
                                             }
                                         }
                                     );
-                                    ModScreens[mod] = menu;
+                                    ModScreens[modInst.Mod] = menu;
                                 }
                             }
                         }
@@ -232,18 +229,14 @@ namespace Modding
         {
             foreach (var (mod, enabled) in changedMods)
             {
-                var name = mod.GetName();
-                if (this.modEnabledSettings[name] != enabled)
+                var name = mod.Name;
+                if (enabled)
                 {
-                    this.modEnabledSettings[name] = enabled;
-                    if (enabled)
-                    {
-                        ModLoader.LoadMod(mod, true);
-                    }
-                    else
-                    {
-                        ModLoader.UnloadMod(mod);
-                    }
+                    ModLoader.LoadMod(mod, true);
+                }
+                else
+                {
+                    ModLoader.UnloadMod(mod);
                 }
             }
             changedMods.Clear();
@@ -253,11 +246,12 @@ namespace Modding
             );
         }
 
-        private MenuScreen CreateModMenu(IMenuMod mod, ModToggleDelegates? toggleDelegates)
+        private MenuScreen CreateModMenu(ModInstance modInst, ModToggleDelegates? toggleDelegates)
         {
+            var mod = modInst.Mod as IMenuMod;
             IMenuMod.MenuEntry? toggleEntry = toggleDelegates is ModToggleDelegates dels ? new IMenuMod.MenuEntry
             {
-                Name = mod.GetName(),
+                Name = modInst.Name,
                 Values = new string[] { "Off", "On" },
                 Saver = v => dels.SetModEnabled(v == 1),
                 Loader = () => dels.GetModEnabled() ? 1 : 0,
@@ -272,7 +266,7 @@ namespace Modding
             }
             : this.GoToModListMenu;
 
-            var name = mod.GetName();
+            var name = modInst.Name;
             var entries = mod.GetMenuData(toggleEntry);
             MenuButton backButton = null;
             var builder = new MenuBuilder(name)
