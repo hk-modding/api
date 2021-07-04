@@ -2,9 +2,8 @@
 {
     /// <inheritdoc />
     /// <summary>
-    ///     Provides access to the logging system with a formatted prefix of a given name "[ExampleClass] - My Message".  This
-    ///     is usefull when you have a class that you can't inherit from Loggable in but that you still want tailored logging
-    ///     for.
+    ///     Provides access to the logging system with a formatted prefix of a given name "[Name] - Message".  This
+    ///     is useful when you have a class that can't inherit from Loggable where you want easy logging.
     /// </summary>
     public class SimpleLogger : Loggable
     {
