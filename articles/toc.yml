@@ -2,3 +2,5 @@
   href: intro.md
 - name: Logging
   href: logs.md
+- name: Charms
+  href: charms.md
