@@ -59,8 +59,6 @@ namespace Modding
 
         static ModHooks()
         {
-            Logger.SetLogLevel(GlobalSettings.LoggingLevel);
-
             GameVersion gameVersion;
             try
             {
@@ -90,8 +88,7 @@ namespace Modding
 
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
-                Logger.APILogger.Log($"Couldn't resolve assembly {args.Name}, with sender {sender}");
-
+                Logger.APILogger.LogDebug($"Couldn't resolve assembly {args.Name}, with sender {sender}");
                 return null;
             };
 
@@ -101,7 +98,7 @@ namespace Modding
         /// <summary>
         /// The global ModHooks settings.
         /// </summary>
-        public static ModHooksGlobalSettings GlobalSettings { get; internal set; } = new ModHooksGlobalSettings();
+        public static ModHooksGlobalSettings GlobalSettings { get; private set; } = new ModHooksGlobalSettings();
 
         internal static void LoadGlobalSettings()
         {
@@ -124,7 +121,10 @@ namespace Modding
                         Converters = JsonConverterTypes.ConverterTypes
                     }
                 );
-                if(de != null) GlobalSettings = de;
+                if(de != null) {
+                    GlobalSettings = de;
+                    Logger.SetLogLevel(GlobalSettings.LoggingLevel);
+                }
             }
             catch (Exception e)
             {
