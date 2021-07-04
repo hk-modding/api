@@ -1,10 +1,6 @@
-name: .NET
+name: build
 
-on:
-  push:
-    branches: [ master, ci, docs ]
-  pull_request:
-    branches: [ master, ci ]
+on: [push, pull_request]
 
 jobs:
   build-win:
