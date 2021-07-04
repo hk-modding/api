@@ -1,0 +1,38 @@
+name: docs
+
+on:
+  push:
+    branches: [ master, docs ]
+
+jobs:
+  docfx:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Checkout docs
+        uses: actions/checkout@v2
+        with:
+          ref: docs
+          path: docs
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+      - name: Setup ms-build, mono
+        run: sudo apt-get install -y nuget mono-devel mono-xbuild
+      - name: Download DocFX
+        working-directory: docs
+        run: |
+          wget https://github.com/dotnet/docfx/releases/latest/download/docfx.zip -O docfx.zip
+          unzip docfx.zip -d docfx
+      - name: Build docs
+        working-directory: docs
+        run: |
+          mono docfx/docfx.exe 
+      - name: Publish
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: DocFX
+          force_orphan: true
