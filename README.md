@@ -7,6 +7,8 @@ A Hollow Knight Modding API/loader. Uses [MonoMod](https://github.com/MonoMod/Mo
 
 If you're a mod developer, there are [examples](https://github.com/hk-modding/api/tree/master/Examples) in the repo.
 
+Documentation can be found [here](https://hk-modding.github.io/api/).
+
 Build
 =======
 
