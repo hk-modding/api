@@ -6,7 +6,6 @@ on:
 
 jobs:
   docfx:
-    needs: [build-win, build-unix]
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     
