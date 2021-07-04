@@ -23,7 +23,7 @@ using Modding;
 // This changes the cost of Wayward Compass to 0
 public class Example : Mod {
     public override void Initialize() {
-        ModHooks.GetIntHook += GetInt;
+        ModHooks.GetPlayerIntHook += GetInt;
     }
 
     private int GetInt(string name, int orig) {
