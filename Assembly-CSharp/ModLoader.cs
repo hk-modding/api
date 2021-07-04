@@ -73,7 +73,7 @@ namespace Modding
                     GameObject.Destroy(coroutineHolder);
                     yield break;
             }
-
+            ModHooks.LoadGlobalSettings();
             var modTypes = new List<String>();
             Logger.APILogger.LogDebug($"Loading assemblies and constructing mods");
             foreach (string assemblyPath in Directory.GetFiles(path, "*.dll"))
@@ -142,16 +142,12 @@ namespace Modding
             var preloadedObjects = new Dictionary<ModInstance, Dictionary<string, Dictionary<string, GameObject>>>();
 
             Logger.APILogger.Log("Creating mod preloads");
-
             // Setup dict of scene preloads
             GetPreloads(orderedMods, scenes, toPreload);
-
             if (toPreload.Count > 0)
             {
                 yield return PreloadScenes(coroutineHolder, toPreload, preloadedObjects);
             }
-
-            ModHooks.LoadGlobalSettings();
 
             foreach (ModInstance mod in orderedMods)
             {
@@ -177,16 +173,14 @@ namespace Modding
             // Create version text
             GameObject gameObject = new GameObject();
             modVersionDraw = gameObject.AddComponent<ModVersionDraw>();
-            Object.DontDestroyOnLoad(gameObject);
+            GameObject.DontDestroyOnLoad(gameObject);
             UpdateModText();
 
             Loaded = true;
 
-            ModHooks.SaveGlobalSettings();
-
             new ModListMenu().InitMenuCreation();
 
-            Object.Destroy(coroutineHolder.gameObject);
+            GameObject.Destroy(coroutineHolder.gameObject);
         }
 
         private static void GetPreloads(
@@ -466,7 +460,7 @@ namespace Modding
             }
 
             // Remove the black screen
-            Object.Destroy(blanker);
+            GameObject.Destroy(blanker);
 
             // Restore the audio
             AudioListener.pause = false;

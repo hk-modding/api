@@ -46,8 +46,6 @@ namespace Modding
 
         private static Console _console;
 
-        private static ModHooksGlobalSettings _globalSettings;
-
         /// <summary>
         ///     The Version of the Modding API
         /// </summary>
@@ -100,23 +98,69 @@ namespace Modding
             IsInitialized = true;
         }
 
-        internal static ModHooksGlobalSettings GlobalSettings
+        /// <summary>
+        /// The global ModHooks settings.
+        /// </summary>
+        public static ModHooksGlobalSettings GlobalSettings { get; internal set; } = new ModHooksGlobalSettings();
+
+        internal static void LoadGlobalSettings()
         {
-            get
+            try
             {
-                if (_globalSettings != null)
-                {
-                    return _globalSettings;
-                }
+                if (!File.Exists(SettingsPath))
+                    return;
+                Logger.APILogger.Log("Loading Global Settings");
+                using FileStream fileStream = File.OpenRead(SettingsPath);
+                using var reader = new StreamReader(fileStream);
+                string json = reader.ReadToEnd();
 
-                LoadGlobalSettings();
+                var de = JsonConvert.DeserializeObject<ModHooksGlobalSettings>(
+                    json,
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = ShouldSerializeContractResolver.Instance,
+                        TypeNameHandling = TypeNameHandling.Auto,
+                        ObjectCreationHandling = ObjectCreationHandling.Replace,
+                        Converters = JsonConverterTypes.ConverterTypes
+                    }
+                );
+                if(de != null) GlobalSettings = de;
+            }
+            catch (Exception e)
+            {
+                Logger.APILogger.LogError(e);
+            }
+        }
 
-                if (_globalSettings is null)
-                    throw new NullReferenceException(nameof(_globalSettings));
-
-                _globalSettings.ModEnabledSettings ??= new Dictionary<string, bool>();
-
-                return _globalSettings;
+        internal static void SaveGlobalSettings()
+        {
+            try
+            {
+                Logger.APILogger.Log("Saving Global Settings");
+                var obj = GlobalSettings;
+                if (obj is null)
+                    return;
+                obj.ModEnabledSettings = new Dictionary<string, bool>(
+                    ModLoader.ModInstances.Select(x => KeyValuePair.Create(x.Name, x.Enabled))
+                );
+                if (File.Exists(SettingsPath + ".bak")) File.Delete(SettingsPath + ".bak");
+                if (File.Exists(SettingsPath)) File.Move(SettingsPath, SettingsPath + ".bak");
+                using FileStream fileStream = File.Create(SettingsPath);
+                using var writer = new StreamWriter(fileStream);
+                writer.Write(JsonConvert.SerializeObject(
+                    obj,
+                    Formatting.Indented,
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = ShouldSerializeContractResolver.Instance,
+                        TypeNameHandling = TypeNameHandling.Auto,
+                        Converters = JsonConverterTypes.ConverterTypes
+                    }
+                ));
+            }
+            catch (Exception e)
+            {
+                Logger.APILogger.LogError(e);
             }
         }
 
@@ -325,100 +369,6 @@ namespace Modding
                 {
                     Logger.APILogger.LogError(ex);
                 }
-            }
-        }
-
-        /// <summary>
-        ///     Save GlobalSettings to disk. (backs up the current global settings if it exists)
-        /// </summary>
-        internal static void SaveGlobalSettings()
-        {
-            Logger.APILogger.Log("Saving Global Settings");
-            if (File.Exists(SettingsPath + ".bak")) File.Delete(SettingsPath + ".bak");
-            if (File.Exists(SettingsPath)) File.Move(SettingsPath, SettingsPath + ".bak");
-
-            using FileStream fileStream = File.Create(SettingsPath);
-            using StreamWriter writer = new StreamWriter(fileStream);
-
-            var settings = GlobalSettings;
-            settings.ModEnabledSettings = new Dictionary<string, bool>(
-                ModLoader.ModInstances.Select(x => KeyValuePair.Create(x.Name, x.Enabled))
-            );
-
-            try
-            {
-                writer.Write(JsonConvert.SerializeObject(
-                    GlobalSettings,
-                    Formatting.Indented,
-                    new JsonSerializerSettings
-                    {
-                        ContractResolver = ShouldSerializeContractResolver.Instance,
-                        TypeNameHandling = TypeNameHandling.Auto,
-                        Converters = JsonConverterTypes.ConverterTypes
-                    }
-                ));
-            }
-            catch (Exception e)
-            {
-                Logger.APILogger.LogError(e);
-            }
-        }
-
-        /// <summary>
-        ///     Loads global settings from disk (if they exist)
-        /// </summary>
-        internal static void LoadGlobalSettings()
-        {
-            Logger.APILogger.Log("Loading Global Settings");
-
-            if (!File.Exists(SettingsPath))
-            {
-                _globalSettings = new ModHooksGlobalSettings();
-                return;
-            }
-
-            try
-            {
-                using FileStream fileStream = File.OpenRead(SettingsPath);
-                using StreamReader reader = new StreamReader(fileStream);
-
-                string json = reader.ReadToEnd();
-
-                try
-                {
-                    _globalSettings = JsonConvert.DeserializeObject<ModHooksGlobalSettings>
-                    (
-                        json,
-                        new JsonSerializerSettings
-                        {
-                            ContractResolver = ShouldSerializeContractResolver.Instance,
-                            TypeNameHandling = TypeNameHandling.Auto,
-                            ObjectCreationHandling = ObjectCreationHandling.Replace,
-                            Converters = JsonConverterTypes.ConverterTypes
-                        }
-                    );
-                }
-                catch (Exception e)
-                {
-                    Logger.APILogger.LogError(e);
-                    _globalSettings = new ModHooksGlobalSettings();
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.APILogger.LogError("Failed to load global settings, creating new settings file:\n" + e);
-
-                if (File.Exists(SettingsPath))
-                {
-                    File.Move(SettingsPath, SettingsPath + ".error");
-                }
-
-                _globalSettings = new ModHooksGlobalSettings
-                {
-                    LoggingLevel = LogLevel.Info,
-                    ModEnabledSettings = new Dictionary<string, bool>(),
-                    ConsoleSettings = new InGameConsoleSettings()
-                };
             }
         }
 
@@ -2177,7 +2127,7 @@ namespace Modding
         )
         {
             var mod = ModLoader.ModInstanceNameMap[name];
-            return mod == null || onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null? null: mod.Mod;
+            return mod == null || onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null ? null : mod.Mod;
         }
 
         /// <summary>
@@ -2194,7 +2144,7 @@ namespace Modding
         )
         {
             var mod = ModLoader.ModInstanceTypeMap[type];
-            return mod == null || onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null? null: mod.Mod;
+            return mod == null || onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null ? null : mod.Mod;
         }
 
         /// <summary>

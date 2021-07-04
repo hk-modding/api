@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace Modding
 {
@@ -9,11 +10,8 @@ namespace Modding
     [PublicAPI]
     public class ModHooksGlobalSettings
     {
-        /// <summary>
-        ///     Lists the known mods that are installed and whether or not
-        ///     they've been enabled or disabled via the Mod Manager Menu.
-        /// </summary>
-        public Dictionary<string, bool> ModEnabledSettings = new();
+        // now used to serialize and deserialize the save data. Not updated until save.
+        internal Dictionary<string, bool> ModEnabledSettings = new();
 
         /// <summary>
         ///     Logging Level to use.
