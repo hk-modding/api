@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
@@ -99,12 +100,36 @@ namespace Modding
             _enabled = !_enabled;
         }
 
-        public void AddText(string message)
+        public void AddText(string message, LogLevel level)
         {
             IEnumerable<string> chunks = Chunks(message, MSG_LENGTH);
 
+            string color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.DefaultColor}>";
+
+            if (ModHooks.GlobalSettings.ConsoleSettings.UseLogColors)
+            {
+                switch (level)
+                {
+                    case LogLevel.Fine:
+                        color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.FineColor}>";
+                        break;
+                    case LogLevel.Info:
+                        color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.InfoColor}>";
+                        break;
+                    case LogLevel.Debug:
+                        color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.DebugColor}>";
+                        break;
+                    case LogLevel.Warn:
+                        color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.WarningColor}>";
+                        break;
+                    case LogLevel.Error:
+                        color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.ErrorColor}>";
+                        break;
+                }
+            }
+
             foreach (string s in chunks)
-                _messages.Add(s);
+                _messages.Add(color + s + "</color>");
 
             while (_messages.Count > 24)
             {

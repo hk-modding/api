@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup Vanilla
       run: |
-        wget https://files.catbox.moe/xmbovq.zip -O Vanilla.zip
+        wget https://files.catbox.moe/b7ulxr.zip -O Vanilla.zip
         unzip Vanilla.zip -d Vanilla
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
@@ -35,7 +35,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup Vanilla
       run: |
-        wget https://files.catbox.moe/c5domo.zip -O Vanilla.zip
+        wget https://files.catbox.moe/998qrb.zip -O Vanilla.zip
         unzip Vanilla.zip -d Vanilla
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
