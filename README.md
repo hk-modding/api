@@ -1,43 +1,22 @@
-Preface
+Hollow Knight Modding API
+=========================
+![build](https://github.com/hk-modding/api/actions/workflows/build.yml/badge.svg)
+![docs](https://github.com/hk-modding/api/actions/workflows/docs.yml/badge.svg)
+
+A Hollow Knight Modding API/loader. Uses [MonoMod](https://github.com/MonoMod/MonoMod).
+
+If you're a mod developer, there are [examples](https://github.com/hk-modding/api/tree/master/Examples) in the repo.
+
+Build
 =======
 
-Hollow Knight Modding generally requires changing the game's code using an assembly editor such as dnSpy.   While this works, it means that each time the game releases a new version, all mods had to be recoded by hand.  The Hollow Knight API aims to remove this requirement by exposing hooks to perform most needed operations without having to rewrite decompiled code.
+**If you want to use the API, for making mods or using them, please use a release or the installer.**
 
-We use the MonoMod patcher to greatly reduce the effort in patching the assembly. Go check it out! https://github.com/MonoMod/MonoMod
+1. Clone the repository!
+2. Copy the Managed folder from your Hollow Knight installation into the solution folder and name it Vanilla.
+3. Build the solution using an IDE or `dotnet build`.
+4. The result will be in `OutputFinal`
 
-Building The API
-============================
-Building the API is fairly straightforward.
-
-Using an IDE:
-1. Clone this!
-2. Go to one of the directories listed below and copy it's contents to the `Vanilla` folder in this repository. (Create the Vanilla folder if it does not exist.)
-    * Windows: `%HollowKnightGameInstallPath%/hollow_knight_Data/Managed/`
-    * Linux: `~/.steam/steam/steamapps/common/Hollow Knight/hollow_knight_Data/Managed/`
-    * Mac: `~/Library/Application Support/Steam/steamapps/common/Hollow Knight/hollow_knight.app/hollow_knight_Data/Managed/`
-3. Open the solution in your IDE of choice.
-5. The patched assembly should be in `RepoPath/OutputFinal/` 
-6. Copy `Assembly-CSharp.dll` to `%HollowKnightGameInstallPath%/hollow_knight_Data/Managed/`
-
-To use the `dotnet` cli:
-1. Follow steps 1-3 of "Using an IDE".
-2. Navigate to the root of the project
-3. Run `dotnet build -p:Configuration=Debug`
-
-Contributors
+License
 =======
-Original Authors:  
-MyEyes / Firzen  
-Seresharp  
-
-Contributors:  
-iamwyza  
-esipode  
-Kerr1291  
-fifty-six  
-natis1  
-Ayugradow  
-Katie  
-SFGrenade  
-Yurihaia
-mandar1jn
+Distributed under the MIT [license](https://github.com/hk-modding/api/blob/master/LICENSE).
