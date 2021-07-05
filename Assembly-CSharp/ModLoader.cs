@@ -54,6 +54,11 @@ namespace Modding
         /// <returns></returns>
         public static IEnumerator LoadModsInit(GameObject coroutineHolder)
         {
+            if(Loaded || Preloaded)
+            {
+                GameObject.Destroy(coroutineHolder);
+                yield break;
+            }
             Logger.APILogger.Log("Starting mod loading");
             string path;
             switch (SystemInfo.operatingSystemFamily)
