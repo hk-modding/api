@@ -9,6 +9,7 @@ using Modding.Patches;
 using MonoMod;
 using Newtonsoft.Json;
 using UnityEngine;
+using System.Linq;
 using Object = UnityEngine.Object;
 
 // ReSharper disable PossibleInvalidCastExceptionInForeachLoop
@@ -31,19 +32,6 @@ namespace Modding
         private static ModHooks _instance;
 
         /// <summary>
-        ///     Currently Loaded Mods
-        /// </summary>
-        public static readonly List<string> LoadedMods = new();
-
-        /// <summary>
-        ///     A list of all loaded IMod instances.
-        /// </summary>
-        public static ReadOnlyCollection<IMod> LoadedModInstances
-        {
-            get => ModLoader.LoadedMods.AsReadOnly();
-        }
-
-        /// <summary>
         ///     A map of mods to their built menu screens.
         /// </summary>
         public static ReadOnlyDictionary<IMod, MenuScreen> BuiltModMenuScreens
@@ -58,8 +46,6 @@ namespace Modding
 
         private static Console _console;
 
-        private static ModHooksGlobalSettings _globalSettings;
-
         /// <summary>
         ///     The Version of the Modding API
         /// </summary>
@@ -73,8 +59,6 @@ namespace Modding
 
         static ModHooks()
         {
-            Logger.SetLogLevel(GlobalSettings.LoggingLevel);
-
             GameVersion gameVersion;
             try
             {
@@ -104,31 +88,83 @@ namespace Modding
 
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
-                Logger.APILogger.Log($"Couldn't resolve assembly {args.Name}, with sender {sender}");
-
+                Logger.APILogger.LogDebug($"Couldn't resolve assembly {args.Name}, with sender {sender}");
                 return null;
             };
 
             IsInitialized = true;
         }
 
-        internal static ModHooksGlobalSettings GlobalSettings
+        /// <summary>
+        /// The global ModHooks settings.
+        /// </summary>
+        public static ModHooksGlobalSettings GlobalSettings { get; private set; } = new ModHooksGlobalSettings();
+
+        internal static void LoadGlobalSettings()
         {
-            get
+            try
             {
-                if (_globalSettings != null)
+                if (!File.Exists(SettingsPath))
+                    return;
+                Logger.APILogger.Log("Loading Global Settings");
+                using FileStream fileStream = File.OpenRead(SettingsPath);
+                using var reader = new StreamReader(fileStream);
+                string json = reader.ReadToEnd();
+
+                var de = JsonConvert.DeserializeObject<ModHooksGlobalSettings>(
+                    json,
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = ShouldSerializeContractResolver.Instance,
+                        TypeNameHandling = TypeNameHandling.Auto,
+                        ObjectCreationHandling = ObjectCreationHandling.Replace,
+                        Converters = JsonConverterTypes.ConverterTypes
+                    }
+                );
+                if (de != null)
                 {
-                    return _globalSettings;
+                    GlobalSettings = de;
+                    Logger.SetLogLevel(GlobalSettings.LoggingLevel);
                 }
+            }
+            catch (Exception e)
+            {
+                Logger.APILogger.LogError(e);
+            }
+        }
 
-                LoadGlobalSettings();
-
-                if (_globalSettings is null)
-                    throw new NullReferenceException(nameof(_globalSettings));
-
-                _globalSettings.ModEnabledSettings ??= new Dictionary<string, bool>();
-
-                return _globalSettings;
+        internal static void SaveGlobalSettings()
+        {
+            try
+            {
+                Logger.APILogger.Log("Saving Global Settings");
+                var obj = GlobalSettings;
+                if (obj is null)
+                    return;
+                obj.ModEnabledSettings = new Dictionary<string, bool>();
+                foreach (var x in ModLoader.ModInstances)
+                {
+                    if (x.Mod is ITogglableMod) obj.ModEnabledSettings.Add(x.Name, x.Enabled);
+                }
+                Logger.APILogger.Log(obj.ModEnabledSettings);
+                if (File.Exists(SettingsPath + ".bak")) File.Delete(SettingsPath + ".bak");
+                if (File.Exists(SettingsPath)) File.Move(SettingsPath, SettingsPath + ".bak");
+                using FileStream fileStream = File.Create(SettingsPath);
+                using var writer = new StreamWriter(fileStream);
+                writer.Write(JsonConvert.SerializeObject(
+                    obj,
+                    Formatting.Indented,
+                    new JsonSerializerSettings
+                    {
+                        ContractResolver = ShouldSerializeContractResolver.Instance,
+                        TypeNameHandling = TypeNameHandling.Auto,
+                        Converters = JsonConverterTypes.ConverterTypes
+                    }
+                ));
+            }
+            catch (Exception e)
+            {
+                Logger.APILogger.LogError(e);
             }
         }
 
@@ -337,120 +373,6 @@ namespace Modding
                 {
                     Logger.APILogger.LogError(ex);
                 }
-            }
-        }
-
-        /// <summary>
-        ///     Save GlobalSettings to disk. (backs up the current global settings if it exists)
-        /// </summary>
-        internal static void SaveGlobalSettings()
-        {
-            Logger.APILogger.Log("Saving Global Settings");
-
-            if (File.Exists(SettingsPath + ".bak"))
-            {
-                File.Delete(SettingsPath + ".bak");
-            }
-
-            if (File.Exists(SettingsPath))
-            {
-                File.Move(SettingsPath, SettingsPath + ".bak");
-            }
-
-            using FileStream fileStream = File.Create(SettingsPath);
-
-            using StreamWriter writer = new StreamWriter(fileStream);
-
-            try
-            {
-                string json = JsonConvert.SerializeObject
-                (
-                    GlobalSettings,
-                    Formatting.Indented,
-                    new JsonSerializerSettings
-                    {
-                        ContractResolver = ShouldSerializeContractResolver.Instance,
-                        TypeNameHandling = TypeNameHandling.Auto,
-                        Converters = JsonConverterTypes.ConverterTypes
-                    }
-                );
-
-                writer.Write(json);
-            }
-            catch (Exception e)
-            {
-                Logger.APILogger.LogError("Failed to save global settings using Json.NET.");
-                Logger.APILogger.LogError(e);
-
-                string json = JsonUtility.ToJson(GlobalSettings, true);
-
-                writer.Write(json);
-            }
-        }
-
-        /// <summary>
-        ///     Loads global settings from disk (if they exist)
-        /// </summary>
-        internal static void LoadGlobalSettings()
-        {
-            Logger.APILogger.Log("Loading ModdingApi Global Settings.");
-
-            if (!File.Exists(SettingsPath))
-            {
-                _globalSettings = new ModHooksGlobalSettings
-                {
-                    LoggingLevel = LogLevel.Info,
-                    ModEnabledSettings = new Dictionary<string, bool>(),
-                    ConsoleSettings = new InGameConsoleSettings()
-                };
-
-                return;
-            }
-
-            try
-            {
-                using FileStream fileStream = File.OpenRead(SettingsPath);
-                using StreamReader reader = new StreamReader(fileStream);
-
-                string json = reader.ReadToEnd();
-
-                try
-                {
-                    _globalSettings = JsonConvert.DeserializeObject<ModHooksGlobalSettings>
-                    (
-                        json,
-                        new JsonSerializerSettings
-                        {
-                            ContractResolver = ShouldSerializeContractResolver.Instance,
-                            TypeNameHandling = TypeNameHandling.Auto,
-                            ObjectCreationHandling = ObjectCreationHandling.Replace,
-                            Converters = JsonConverterTypes.ConverterTypes
-                        }
-                    );
-                }
-                catch (Exception e)
-                {
-                    Logger.APILogger.LogError("Failed to deserialize settings using Json.NET, falling back.");
-                    Logger.APILogger.LogError(e);
-
-                    _globalSettings = JsonUtility.FromJson<ModHooksGlobalSettings>(json);
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.APILogger.LogError("Failed to load global settings, creating new settings file:\n" + e);
-
-                if (File.Exists(SettingsPath))
-                {
-                    File.Move(SettingsPath, SettingsPath + ".error");
-                }
-
-                _globalSettings = new ModHooksGlobalSettings
-                {
-                    LoggingLevel = LogLevel.Info,
-                    ModEnabledSettings = new Dictionary<string, bool>(),
-                    ConsoleSettings = new InGameConsoleSettings()
-                };
             }
         }
 
@@ -2190,6 +2112,84 @@ namespace Modding
 
             return sceneName;
         }
+
+        #endregion
+
+        #region mod loading values
+
+        /// <summary>
+        /// Gets a mod instance by name.
+        /// </summary>
+        /// <param name="name">The name of the mod.</param>
+        /// <param name="onlyEnabled">Should the method only return the mod if it is enabled.</param>
+        /// <param name="allowLoadError">Should the method return the mod even if it had load errors.</param>
+        /// <returns></returns>
+        public static IMod GetMod(
+            string name,
+            bool onlyEnabled = false,
+            bool allowLoadError = false
+        )
+        {
+            var mod = ModLoader.ModInstanceNameMap[name];
+            return mod == null || onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null ? null : mod.Mod;
+        }
+
+        /// <summary>
+        /// Gets a mod instance by type.
+        /// </summary>
+        /// <param name="type">The type of the mod.</param>
+        /// <param name="onlyEnabled">Should the method only return the mod if it is enabled.</param>
+        /// <param name="allowLoadError">Should the method return the mod even if it had load errors.</param>
+        /// <returns></returns>
+        public static IMod GetMod(
+            Type type,
+            bool onlyEnabled = false,
+            bool allowLoadError = false
+        )
+        {
+            var mod = ModLoader.ModInstanceTypeMap[type];
+            return mod == null || onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null ? null : mod.Mod;
+        }
+
+        /// <summary>
+        /// Gets if the mod is currently enabled.
+        /// </summary>
+        /// <param name="mod">The togglable mod to check.</param>
+        /// <returns></returns>
+        public static bool ModEnabled(
+            ITogglableMod mod
+        ) => ModEnabled(mod.GetType());
+
+        /// <summary>
+        /// Gets if a mod is currently enabled.
+        /// </summary>
+        /// <param name="name">The name of the mod to check.</param>
+        /// <returns></returns>
+        public static bool ModEnabled(
+            string name
+        ) => ModLoader.ModInstanceNameMap[name]?.Enabled ?? true;
+
+        /// <summary>
+        /// Gets if a mod is currently enabled.
+        /// </summary>
+        /// <param name="type">The type of the mod to check.</param>
+        /// <returns></returns>
+        public static bool ModEnabled(
+            Type type
+        ) => ModLoader.ModInstanceTypeMap[type]?.Enabled ?? true;
+
+        /// <summary>
+        /// Returns an iterator over all mods.
+        /// </summary>
+        /// <param name="onlyEnabled">Should the iterator only contain enabled mods.</param>
+        /// <param name="allowLoadError">Should the iterator contain mods which have load errors.</param>
+        /// <returns></returns>
+        public static IEnumerable<IMod> GetAllMods(
+            bool onlyEnabled = false,
+            bool allowLoadError = false
+        ) => ModLoader.ModInstances
+            .Where(x => onlyEnabled && !x.Enabled || !allowLoadError && x.Error != null)
+            .Select(x => x.Mod);
 
         #endregion
     }

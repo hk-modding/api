@@ -23,7 +23,7 @@ namespace Modding.Patches
             new Thread(ReflectionHelper.PreloadCommonTypes).Start();
 
             // NonBouncer does absolutely nothing, which makes it a good dummy to run the loader
-            obj.AddComponent<NonBouncer>().StartCoroutine(ModLoader.LoadMods(obj));
+            obj.AddComponent<NonBouncer>().StartCoroutine(ModLoader.LoadModsInit(obj));
 
             orig_Awake();
         }

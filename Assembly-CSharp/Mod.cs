@@ -51,7 +51,7 @@ namespace Modding
             (
                 this.GetType()
                     .GetInterfaces()
-                    .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IGlobalSettings<>)) 
+                    .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IGlobalSettings<>))
                     is Type globalType
             )
             {
@@ -191,8 +191,7 @@ namespace Modding
                     using var reader = new StreamReader(fileStream);
                     string json = reader.ReadToEnd();
 
-                    var obj = JsonConvert.DeserializeObject
-                    (
+                    var obj = JsonConvert.DeserializeObject(
                         json,
                         saveType,
                         new JsonSerializerSettings
@@ -229,20 +228,16 @@ namespace Modding
                     if (File.Exists(_globalSettingsPath)) File.Move(_globalSettingsPath, _globalSettingsPath + ".bak");
                     using FileStream fileStream = File.Create(_globalSettingsPath);
                     using var writer = new StreamWriter(fileStream);
-                    writer.Write
-                    (
-                        JsonConvert.SerializeObject
-                        (
-                            obj,
-                            Formatting.Indented,
-                            new JsonSerializerSettings
-                            {
-                                ContractResolver = ShouldSerializeContractResolver.Instance,
-                                TypeNameHandling = TypeNameHandling.Auto,
-                                Converters = JsonConverterTypes.ConverterTypes
-                            }
-                        )
-                    );
+                    writer.Write(JsonConvert.SerializeObject(
+                        obj,
+                        Formatting.Indented,
+                        new JsonSerializerSettings
+                        {
+                            ContractResolver = ShouldSerializeContractResolver.Instance,
+                            TypeNameHandling = TypeNameHandling.Auto,
+                            Converters = JsonConverterTypes.ConverterTypes
+                        }
+                    ));
                 }
             }
             catch (Exception e)
@@ -255,12 +250,12 @@ namespace Modding
         {
             try
             {
-                if (this.saveSettingsType is not Type saveType) 
+                if (this.saveSettingsType is not Type saveType)
                     return;
 
-                if (!data.modData.TryGetValue(this.GetName(), out var obj)) 
+                if (!data.modData.TryGetValue(this.GetName(), out var obj))
                     return;
-                
+
                 this.onLoadSaveSettings
                 (
                     this,
@@ -290,11 +285,11 @@ namespace Modding
         {
             try
             {
-                if (this.saveSettingsType is not Type saveType) 
+                if (this.saveSettingsType is not Type saveType)
                     return;
-                
+
                 var settings = this.onSaveSaveSettings(this);
-                
+
                 switch (settings)
                 {
                     // No point in serializing nothing.
