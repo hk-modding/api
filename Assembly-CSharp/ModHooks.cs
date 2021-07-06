@@ -121,7 +121,8 @@ namespace Modding
                         Converters = JsonConverterTypes.ConverterTypes
                     }
                 );
-                if(de != null) {
+                if (de != null)
+                {
                     GlobalSettings = de;
                     Logger.SetLogLevel(GlobalSettings.LoggingLevel);
                 }
@@ -140,9 +141,11 @@ namespace Modding
                 var obj = GlobalSettings;
                 if (obj is null)
                     return;
-                obj.ModEnabledSettings = new Dictionary<string, bool>(
-                    ModLoader.ModInstances.Select(x => new KeyValuePair<string, bool>(x.Name, x.Enabled))
-                );
+                obj.ModEnabledSettings = new Dictionary<string, bool>();
+                foreach (var x in ModLoader.ModInstances)
+                {
+                    obj.ModEnabledSettings[x.Name] = x.Enabled;
+                }
                 if (File.Exists(SettingsPath + ".bak")) File.Delete(SettingsPath + ".bak");
                 if (File.Exists(SettingsPath)) File.Move(SettingsPath, SettingsPath + ".bak");
                 using FileStream fileStream = File.Create(SettingsPath);
