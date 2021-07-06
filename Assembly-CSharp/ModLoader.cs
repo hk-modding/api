@@ -160,8 +160,9 @@ namespace Modding
                 {
                     preloadedObjects.TryGetValue(mod, out Dictionary<string, Dictionary<string, GameObject>> preloads);
                     LoadMod(mod, false, preloads);
-                    var enabled = true;
-                    ModHooks.GlobalSettings.ModEnabledSettings.TryGetValue(mod.Name, out enabled);
+                    if (!ModHooks.GlobalSettings.ModEnabledSettings.TryGetValue(mod.Name, out var enabled)) {
+                        enabled = true;
+                    }
                     if (mod.Error == null && mod.Mod is ITogglableMod itmod && !enabled)
                     {
                         UnloadMod(mod, false);

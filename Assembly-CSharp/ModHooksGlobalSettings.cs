@@ -11,6 +11,7 @@ namespace Modding
     public class ModHooksGlobalSettings
     {
         // now used to serialize and deserialize the save data. Not updated until save.
+        [JsonProperty]
         internal Dictionary<string, bool> ModEnabledSettings = new();
 
         /// <summary>

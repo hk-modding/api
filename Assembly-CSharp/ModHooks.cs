@@ -144,8 +144,9 @@ namespace Modding
                 obj.ModEnabledSettings = new Dictionary<string, bool>();
                 foreach (var x in ModLoader.ModInstances)
                 {
-                    obj.ModEnabledSettings[x.Name] = x.Enabled;
+                    if (x.Mod is ITogglableMod) obj.ModEnabledSettings.Add(x.Name, x.Enabled);
                 }
+                Logger.APILogger.Log(obj.ModEnabledSettings);
                 if (File.Exists(SettingsPath + ".bak")) File.Delete(SettingsPath + ".bak");
                 if (File.Exists(SettingsPath)) File.Move(SettingsPath, SettingsPath + ".bak");
                 using FileStream fileStream = File.Create(SettingsPath);
