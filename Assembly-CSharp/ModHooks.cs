@@ -141,7 +141,7 @@ namespace Modding
                 if (obj is null)
                     return;
                 obj.ModEnabledSettings = new Dictionary<string, bool>(
-                    ModLoader.ModInstances.Select(x => KeyValuePair.Create(x.Name, x.Enabled))
+                    ModLoader.ModInstances.Select(x => new KeyValuePair<string, bool>(x.Name, x.Enabled))
                 );
                 if (File.Exists(SettingsPath + ".bak")) File.Delete(SettingsPath + ".bak");
                 if (File.Exists(SettingsPath)) File.Move(SettingsPath, SettingsPath + ".bak");

@@ -54,7 +54,7 @@ namespace Modding
         /// <returns></returns>
         public static IEnumerator LoadModsInit(GameObject coroutineHolder)
         {
-            if(Loaded || Preloaded)
+            if (Loaded || Preloaded)
             {
                 GameObject.Destroy(coroutineHolder);
                 yield break;
@@ -160,11 +160,9 @@ namespace Modding
                 {
                     preloadedObjects.TryGetValue(mod, out Dictionary<string, Dictionary<string, GameObject>> preloads);
                     LoadMod(mod, false, preloads);
-                    if (
-                        mod.Error == null &&
-                        mod.Mod is ITogglableMod itmod &&
-                        !ModHooks.GlobalSettings.ModEnabledSettings.GetValueOrDefault(mod.Name, true)
-                    )
+                    var enabled = true;
+                    ModHooks.GlobalSettings.ModEnabledSettings.TryGetValue(mod.Name, out enabled);
+                    if (mod.Error == null && mod.Mod is ITogglableMod itmod && !enabled)
                     {
                         UnloadMod(mod, false);
                     }
@@ -479,7 +477,7 @@ namespace Modding
             {
                 if (mod.Error is not ModErrorState err)
                 {
-                    if(mod.Enabled) builder.AppendLine($"{mod.Name} : {mod.Mod.GetVersion()}");
+                    if (mod.Enabled) builder.AppendLine($"{mod.Name} : {mod.Mod.GetVersion()}");
                 }
                 else
                 {
