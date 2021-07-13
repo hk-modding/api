@@ -146,7 +146,6 @@ namespace Modding
                 {
                     if (x.Mod is ITogglableMod) obj.ModEnabledSettings.Add(x.Name, x.Enabled);
                 }
-                Logger.APILogger.Log(obj.ModEnabledSettings);
                 if (File.Exists(SettingsPath + ".bak")) File.Delete(SettingsPath + ".bak");
                 if (File.Exists(SettingsPath)) File.Move(SettingsPath, SettingsPath + ".bak");
                 using FileStream fileStream = File.Create(SettingsPath);
@@ -2128,11 +2127,9 @@ namespace Modding
             string name,
             bool onlyEnabled = false,
             bool allowLoadError = false
-        )
-        {
-            var mod = ModLoader.ModInstanceNameMap[name];
-            return mod == null || onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null ? null : mod.Mod;
-        }
+        ) => ModLoader.ModInstanceNameMap.TryGetValue(name, out var mod) && !(
+            onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null
+        ) ? mod.Mod : null;
 
         /// <summary>
         /// Gets a mod instance by type.
@@ -2145,11 +2142,9 @@ namespace Modding
             Type type,
             bool onlyEnabled = false,
             bool allowLoadError = false
-        )
-        {
-            var mod = ModLoader.ModInstanceTypeMap[type];
-            return mod == null || onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null ? null : mod.Mod;
-        }
+        ) => ModLoader.ModInstanceTypeMap.TryGetValue(type, out var mod) && !(
+            onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null
+        ) ? mod.Mod : null;
 
         /// <summary>
         /// Gets if the mod is currently enabled.
@@ -2167,7 +2162,7 @@ namespace Modding
         /// <returns></returns>
         public static bool ModEnabled(
             string name
-        ) => ModLoader.ModInstanceNameMap[name]?.Enabled ?? true;
+        ) => ModLoader.ModInstanceNameMap.TryGetValue(name, out var instance) ? instance.Enabled : true;
 
         /// <summary>
         /// Gets if a mod is currently enabled.
@@ -2176,7 +2171,7 @@ namespace Modding
         /// <returns></returns>
         public static bool ModEnabled(
             Type type
-        ) => ModLoader.ModInstanceTypeMap[type]?.Enabled ?? true;
+        ) => ModLoader.ModInstanceTypeMap.TryGetValue(type, out var instance) ? instance.Enabled : true;
 
         /// <summary>
         /// Returns an iterator over all mods.
