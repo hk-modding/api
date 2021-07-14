@@ -14,8 +14,9 @@ equip charms can be changed with `PlayerData.instance.charmCost_X`.
 Overriding values
 =================
 You can directly set `PlayerData` values, however, this permanently changes a
-save file. It's often better to use the [`GetIntHook`](xref:Modding.ModHooks.GetIntHook).
-This makes the change only apply when the mod is active, which is generally preferable.
+save file. It's often better to use the
+[`GetPlayerIntHook`](xref:Modding.ModHooks.GetPlayerIntHook).  This makes the
+change only apply when the mod is active, which is generally preferable.
 
 ```cs
 using Modding;

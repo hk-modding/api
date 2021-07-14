@@ -5,8 +5,9 @@ of the API.
 
 ## Logging within a mod
 
-Mods, inheriting from `Mod`, implement `ILogger`, giving you access to a
-variety of logging methods, ranging in level from fine to error.
+Mods, inheriting from [`Mod`](xref:Modding.Mod), implement
+[`ILogger`](xref:Modding.ILogger), giving you access to a variety of logging
+methods, ranging in level from fine to error.
 
 ```cs
 public class Example : Mod {
