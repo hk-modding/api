@@ -40,7 +40,7 @@
     "resource": [
       {
         "files": [
-          "images/**"
+          "img/**"
         ]
       }
     ],
