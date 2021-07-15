@@ -1,5 +1,5 @@
 # Custom Menu Creation API Guide
-The [`Modding.Menu`](Modding.Menu) namespace contains the systems for creating custom and
+The [`Modding.Menu`](xref:Modding.Menu) namespace contains the systems for creating custom and
 realistic menus is a simple and streamlined way.  There are multiple ways to
 add custom menus into the game, from a simple list of options to a fully
 customized menu.
@@ -76,7 +76,7 @@ the [`MenuBuilder`](xref:Modding.Menu.MenuBuilder) provides two constructors:
   Creates a new builder that places the menu on `parent` with the name of the
   string `name`.
 
-* [`MenuBuilder(string name)`](Modding.Menu.MenuBuilder.%23ctor(System.String)):
+* [`MenuBuilder(string name)`](xref:Modding.Menu.MenuBuilder.%23ctor(System.String)):
   Creates a new builder with named by the string
   `name` and placed on the `UIManager`'s ui canvas.
 
