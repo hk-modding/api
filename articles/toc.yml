@@ -4,3 +4,5 @@
   href: logs.md
 - name: Charms
   href: charms.md
+- name: Menu API
+  href: menu_api.md
