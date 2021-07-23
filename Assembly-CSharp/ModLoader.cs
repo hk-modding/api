@@ -7,11 +7,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using JetBrains.Annotations;
-using Mono.Cecil;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
+using UObject = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace Modding
@@ -36,6 +35,7 @@ namespace Modding
         public static Dictionary<Type, ModInstance> ModInstanceTypeMap { get; private set; } = new();
         public static Dictionary<string, ModInstance> ModInstanceNameMap { get; private set; } = new();
         public static HashSet<ModInstance> ModInstances { get; private set; } = new();
+        
         private static void AddModInstance(Type ty, ModInstance mod)
         {
             ModInstanceTypeMap[ty] = mod;
@@ -56,31 +56,35 @@ namespace Modding
         {
             if (Loaded || Preloaded)
             {
-                GameObject.Destroy(coroutineHolder);
+                UObject.Destroy(coroutineHolder);
                 yield break;
             }
             Logger.APILogger.Log("Starting mod loading");
-            string path;
-            switch (SystemInfo.operatingSystemFamily)
+            
+            string path = SystemInfo.operatingSystemFamily switch
             {
-                case OperatingSystemFamily.Windows:
-                    path = Application.dataPath + "\\Managed\\Mods\\";
-                    break;
-                case OperatingSystemFamily.Linux:
-                    path = Application.dataPath + "/Managed/Mods/";
-                    break;
-                case OperatingSystemFamily.MacOSX:
-                    path = Application.dataPath + "/Resources/Data/Managed/Mods/";
-                    break;
-                default:
-                    Logger.LogWarn($"Operating system of {SystemInfo.operatingSystem} is unknown. Unable to load mods.");
-                    Loaded = true;
-                    GameObject.Destroy(coroutineHolder);
-                    yield break;
+                OperatingSystemFamily.Windows => Path.Combine(Application.dataPath, "Managed", "Mods"),
+                OperatingSystemFamily.MacOSX => Path.Combine(Application.dataPath, "Resources", "Data", "Managed", "Mods"),
+                OperatingSystemFamily.Linux => Path.Combine(Application.dataPath, "Managed", "Mods"),
+                
+                OperatingSystemFamily.Other => null,
+                
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            if (path is null)
+            {
+                Loaded = true;
+                
+                UObject.Destroy(coroutineHolder);
+
+                yield break;
             }
+            
             ModHooks.LoadGlobalSettings();
-            var modTypes = new List<String>();
+            
             Logger.APILogger.LogDebug($"Loading assemblies and constructing mods");
+            
             foreach (string assemblyPath in Directory.GetFiles(path, "*.dll"))
             {
                 Logger.APILogger.LogDebug($"Loading assembly `{assemblyPath}`");
@@ -88,39 +92,41 @@ namespace Modding
                 {
                     foreach (Type ty in Assembly.LoadFrom(assemblyPath).GetTypes())
                     {
-                        if (ty.IsClass && !ty.IsAbstract && ty.IsSubclassOf(typeof(Mod)))
+                        if (!ty.IsClass || ty.IsAbstract || !ty.IsSubclassOf(typeof(Mod))) 
+                            continue;    
+                        
+                        Logger.APILogger.LogDebug($"Constructing mod `{ty.FullName}`");
+                        
+                        try
                         {
-                            Logger.APILogger.LogDebug($"Constructing mod `{ty.FullName}`");
-                            try
+                            if (ty.GetConstructor(new Type[0])?.Invoke(new object[0]) is Mod mod)
                             {
-                                if (ty.GetConstructor(new Type[0])?.Invoke(new object[0]) is Mod mod)
-                                {
-                                    AddModInstance(
-                                        ty,
-                                        new ModInstance
-                                        {
-                                            Mod = mod,
-                                            Enabled = false,
-                                            Error = null,
-                                            Name = mod.GetName()
-                                        }
-                                    );
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                Logger.APILogger.LogError(e);
                                 AddModInstance(
                                     ty,
                                     new ModInstance
                                     {
-                                        Mod = null,
+                                        Mod = mod,
                                         Enabled = false,
-                                        Error = ModErrorState.Construct,
-                                        Name = ty.Name
+                                        Error = null,
+                                        Name = mod.GetName()
                                     }
                                 );
                             }
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.APILogger.LogError(e);
+                            
+                            AddModInstance(
+                                ty,
+                                new ModInstance
+                                {
+                                    Mod = null,
+                                    Enabled = false,
+                                    Error = ModErrorState.Construct,
+                                    Name = ty.Name
+                                }
+                            );
                         }
                     }
                 }
@@ -163,7 +169,7 @@ namespace Modding
                     if (!ModHooks.GlobalSettings.ModEnabledSettings.TryGetValue(mod.Name, out var enabled)) {
                         enabled = true;
                     }
-                    if (mod.Error == null && mod.Mod is ITogglableMod itmod && !enabled)
+                    if (mod.Error == null && mod.Mod is ITogglableMod && !enabled)
                     {
                         UnloadMod(mod, false);
                     }
@@ -175,16 +181,17 @@ namespace Modding
             }
 
             // Create version text
-            GameObject gameObject = new GameObject();
-            modVersionDraw = gameObject.AddComponent<ModVersionDraw>();
-            GameObject.DontDestroyOnLoad(gameObject);
+            GameObject version = new GameObject();
+            modVersionDraw = version.AddComponent<ModVersionDraw>();
+            UObject.DontDestroyOnLoad(version);
+            
             UpdateModText();
 
             Loaded = true;
 
             new ModListMenu().InitMenuCreation();
 
-            GameObject.Destroy(coroutineHolder.gameObject);
+            UObject.Destroy(coroutineHolder.gameObject);
         }
 
         private static void GetPreloads(
@@ -262,7 +269,7 @@ namespace Modding
 
             // Create a blanker so the preloading is invisible
             GameObject blanker = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
-            Object.DontDestroyOnLoad(blanker);
+            UObject.DontDestroyOnLoad(blanker);
 
             var nb = coroutineHolder.GetComponent<NonBouncer>();
 
@@ -412,8 +419,8 @@ namespace Modding
                         }
 
                         // Create inactive duplicate of requested object
-                        obj = Object.Instantiate(obj);
-                        Object.DontDestroyOnLoad(obj);
+                        obj = UObject.Instantiate(obj);
+                        UObject.DontDestroyOnLoad(obj);
                         obj.SetActive(false);
 
                         // Set object to be passed to mod
@@ -464,7 +471,7 @@ namespace Modding
             }
 
             // Remove the black screen
-            GameObject.Destroy(blanker);
+            UObject.Destroy(blanker);
 
             // Restore the audio
             AudioListener.pause = false;
@@ -493,8 +500,8 @@ namespace Modding
                         case ModErrorState.Unload:
                             builder.AppendLine($"{mod.Name} : Failed to unload! Check ModLog.txt");
                             break;
-                        default:
-                            break;
+                        default: 
+                            throw new ArgumentOutOfRangeException();
                     }
                 }
             }
