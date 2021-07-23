@@ -86,12 +86,6 @@ namespace Modding
 
             ApplicationQuitHook += SaveGlobalSettings;
 
-            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
-            {
-                Logger.APILogger.LogDebug($"Couldn't resolve assembly {args.Name}, with sender {sender}");
-                return null;
-            };
-
             IsInitialized = true;
         }
 
@@ -138,20 +132,31 @@ namespace Modding
             try
             {
                 Logger.APILogger.Log("Saving Global Settings");
-                var obj = GlobalSettings;
-                if (obj is null)
+                
+                var settings = GlobalSettings;
+                
+                if (settings is null)
                     return;
-                obj.ModEnabledSettings = new Dictionary<string, bool>();
+                
+                settings.ModEnabledSettings = new Dictionary<string, bool>();
+                
                 foreach (var x in ModLoader.ModInstances)
                 {
-                    if (x.Mod is ITogglableMod) obj.ModEnabledSettings.Add(x.Name, x.Enabled);
+                    if (x.Mod is ITogglableMod && x.Error is not null) 
+                        settings.ModEnabledSettings.Add(x.Name, x.Enabled);
                 }
-                if (File.Exists(SettingsPath + ".bak")) File.Delete(SettingsPath + ".bak");
-                if (File.Exists(SettingsPath)) File.Move(SettingsPath, SettingsPath + ".bak");
+                
+                if (File.Exists(SettingsPath + ".bak")) 
+                    File.Delete(SettingsPath + ".bak");
+                
+                if (File.Exists(SettingsPath)) 
+                    File.Move(SettingsPath, SettingsPath + ".bak");
+                
                 using FileStream fileStream = File.Create(SettingsPath);
                 using var writer = new StreamWriter(fileStream);
+                
                 writer.Write(JsonConvert.SerializeObject(
-                    obj,
+                    settings,
                     Formatting.Indented,
                     new JsonSerializerSettings
                     {
