@@ -61,18 +61,18 @@ namespace Modding
             }
             Logger.APILogger.Log("Starting mod loading");
             
-            string path = SystemInfo.operatingSystemFamily switch
+            string managed_path = SystemInfo.operatingSystemFamily switch
             {
-                OperatingSystemFamily.Windows => Path.Combine(Application.dataPath, "Managed", "Mods"),
-                OperatingSystemFamily.MacOSX => Path.Combine(Application.dataPath, "Resources", "Data", "Managed", "Mods"),
-                OperatingSystemFamily.Linux => Path.Combine(Application.dataPath, "Managed", "Mods"),
+                OperatingSystemFamily.Windows => Path.Combine(Application.dataPath, "Managed"),
+                OperatingSystemFamily.MacOSX => Path.Combine(Application.dataPath, "Resources", "Data", "Managed"),
+                OperatingSystemFamily.Linux => Path.Combine(Application.dataPath, "Managed"),
                 
                 OperatingSystemFamily.Other => null,
                 
                 _ => throw new ArgumentOutOfRangeException()
             };
 
-            if (path is null)
+            if (managed_path is null)
             {
                 Loaded = true;
                 
@@ -84,8 +84,28 @@ namespace Modding
             ModHooks.LoadGlobalSettings();
             
             Logger.APILogger.LogDebug($"Loading assemblies and constructing mods");
+
+            string mods = Path.Combine(managed_path, "Mods");
+
+            string[] files = Directory.GetDirectories(mods)
+                                      .SelectMany(d => Directory.GetFiles(d, "*.dll"))
+                                      .ToArray();
             
-            foreach (string assemblyPath in Directory.GetFiles(path, "*.dll"))
+            Logger.APILogger.LogDebug(string.Join(",\n", files));
+            
+            Assembly Resolve(object sender, ResolveEventArgs args)
+            {
+                var asm_name = new AssemblyName(args.Name);
+                
+                if (files.FirstOrDefault(x => x.EndsWith($"{asm_name.Name}.dll")) is string path)
+                    return Assembly.LoadFrom(path);
+
+                return null;
+            }
+            
+            AppDomain.CurrentDomain.AssemblyResolve += Resolve;
+            
+            foreach (string assemblyPath in files)
             {
                 Logger.APILogger.LogDebug($"Loading assembly `{assemblyPath}`");
                 try
@@ -186,6 +206,8 @@ namespace Modding
             UObject.DontDestroyOnLoad(version);
             
             UpdateModText();
+            
+            Logger.APILogger.LogDebug("Updated mod text.");
 
             Loaded = true;
 
