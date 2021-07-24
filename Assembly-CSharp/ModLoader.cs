@@ -88,9 +88,10 @@ namespace Modding
             string mods = Path.Combine(managed_path, "Mods");
 
             string[] files = Directory.GetDirectories(mods)
+                                      .Except(new string[] { Path.Combine(mods, "Disabled") })
                                       .SelectMany(d => Directory.GetFiles(d, "*.dll"))
                                       .ToArray();
-            
+
             Logger.APILogger.LogDebug(string.Join(",\n", files));
             
             Assembly Resolve(object sender, ResolveEventArgs args)
