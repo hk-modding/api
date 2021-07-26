@@ -55,11 +55,23 @@ CharmIconList.Instance.spriteList[i] = sprite;
 A few charms, such as grimmchild and the unbreakable charms have separate
 fields in the CharmIconList class.
 
+The sprites for the kings soul and shade soul also have to be defined by code when the CharmDisplay starts.
+For this you can use the `On` hook for `CharmDisplay.Start`. For brevity, only the handler will
+be shown below.
+```cs
+public void OnCharmDisplayStart(On.CharmDisplay.orig_Start orig, CharmDisplay self)
+{
+    self.whiteCharm = kingsSoulSprite;
+    self.blackCharm = shadeSoulSprite;
+    orig(self);
+}
+```
+
 # [Shops](#tab/tabid-2)
 Shops are a little more complicated, but can be most easily done using
 the `On` hook for `ShopItems.Awake`. For brevity, only the handler will
 be shown below.
-```
+```cs
 // An example of storing multiple sprites which your mod would fill.
 private Dictionary<int, Sprite> _sprites = new();
 
