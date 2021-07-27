@@ -1,14 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31424.327
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp\Assembly-CSharp.csproj", "{1CACEA6A-D114-46B1-8C47-F2F92062B844}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Assembly-CSharp", "Assembly-CSharp\Assembly-CSharp.csproj", "{1CACEA6A-D114-46B1-8C47-F2F92062B844}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E06FBDDA-0A27-45EC-AC28-259C23715C50} = {E06FBDDA-0A27-45EC-AC28-259C23715C50}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrePatcher", "PrePatcher\PrePatcher.csproj", "{E06FBDDA-0A27-45EC-AC28-259C23715C50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrePatcher", "PrePatcher\PrePatcher.csproj", "{E06FBDDA-0A27-45EC-AC28-259C23715C50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{75E25F85-CAEE-44D1-A7C9-06D0A45B8B09}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,7 +35,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {302E6FBA-6F4E-4F15-948A-E61E409A3B45}
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal
