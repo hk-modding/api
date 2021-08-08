@@ -61,8 +61,9 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v2
-        with: path: ./artifacts
+        with: 
+          path: ./artifacts
       - name: Create release if a new tag is pushed
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/*
+          files: ./artifacts/*
