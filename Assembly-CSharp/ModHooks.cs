@@ -10,6 +10,7 @@ using MonoMod;
 using Newtonsoft.Json;
 using UnityEngine;
 using System.Linq;
+using Modding.Delegates;
 using Object = UnityEngine.Object;
 
 // ReSharper disable PossibleInvalidCastExceptionInForeachLoop

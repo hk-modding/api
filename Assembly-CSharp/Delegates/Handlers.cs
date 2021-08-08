@@ -1,7 +1,7 @@
 ﻿using HutongGames.PlayMaker;
 using UnityEngine;
 
-namespace Modding
+namespace Modding.Delegates
 {
     /// <summary>
     ///     Called after player values for charms have been set

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Modding
+namespace Modding.Delegates
 {
     /// <summary>
     ///     Called whenever localization specific strings are requested
