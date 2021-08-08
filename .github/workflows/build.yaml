@@ -54,3 +54,15 @@ jobs:
       with:
         name: ModdingApiUnix
         path: ./OutputFinal/
+
+  release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags')
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with: path: ./artifacts
+      - name: Create release if a new tag is pushed
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/*
