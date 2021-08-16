@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup Vanilla
       run: |
-        wget https://files.catbox.moe/xhyphs.zip -O Vanilla.zip
+        wget https://files.catbox.moe/vw87a0.zip -O Vanilla.zip
         unzip Vanilla.zip -d Vanilla
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
