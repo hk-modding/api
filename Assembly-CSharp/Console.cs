@@ -55,8 +55,6 @@ namespace Modding
                 return;
             }
 
-            CanvasUtil.CreateFonts();
-
             _overlayCanvas = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
             _overlayCanvas.name = "ModdingApiConsoleLog";
 

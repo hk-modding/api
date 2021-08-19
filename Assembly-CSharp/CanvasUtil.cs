@@ -16,33 +16,55 @@ namespace Modding
     [PublicAPI]
     public static class CanvasUtil
     {
+        private static Font _trajanBold;
+        private static Font _trajanNormal;
+        
         /// <summary>
         ///     Access to the TrajanBold Font
         /// </summary>
-        public static Font TrajanBold;
+        public static Font TrajanBold 
+        {
+            get
+            {
+                if (!_trajanBold)
+                    CreateFonts();
+                
+                return _trajanBold;
+            }
+            
+        }
 
         /// <summary>
         ///     Access to the TrajanNormal Font
         /// </summary>
-        public static Font TrajanNormal;
+        public static Font TrajanNormal
+        {
+            get
+            {
+                if (!_trajanNormal)
+                    CreateFonts();
+
+                return _trajanNormal;
+            }
+        }
 
         private static readonly Dictionary<string, Font> Fonts = new();
 
         /// <summary>
         ///     Fetches the Trajan fonts to be cached and used.
         /// </summary>
-        public static void CreateFonts()
+        private static void CreateFonts()
         {
             foreach (Font f in Resources.FindObjectsOfTypeAll<Font>())
             {
                 if (f != null && f.name == "TrajanPro-Bold")
                 {
-                    TrajanBold = f;
+                    _trajanBold = f;
                 }
 
                 if (f != null && f.name == "TrajanPro-Regular")
                 {
-                    TrajanNormal = f;
+                    _trajanNormal = f;
                 }
             }
         }
