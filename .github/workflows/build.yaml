@@ -67,4 +67,6 @@ jobs:
       - name: Create release if a new tag is pushed
         uses: softprops/action-gh-release@v1
         with:
-          files: ./artifacts/*
+          files: |
+            ./artifacts/ModdingApiUnix/*
+            ./artifacts/ModdingApiWindows/*
