@@ -290,16 +290,8 @@ namespace Modding
 
                 var settings = this.onSaveSaveSettings(this);
 
-                switch (settings)
-                {
-                    // No point in serializing nothing.
-                    case null:
-                        return;
-                    // ReSharper disable once SuspiciousTypeConversion.Global
-                    case ISerializationCallbackReceiver receiver:
-                        receiver.OnBeforeSerialize();
-                        break;
-                }
+                if (settings is null)
+                    return;
 
                 data.modData[this.GetName()] = JToken.FromObject
                 (
