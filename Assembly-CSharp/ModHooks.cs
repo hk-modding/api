@@ -826,7 +826,7 @@ namespace Modding
                 {
                     try
                     {
-                        val = toInvoke.Invoke(target, val);
+                        value = toInvoke.Invoke(target, value);
                     }
                     catch (Exception ex)
                     {
