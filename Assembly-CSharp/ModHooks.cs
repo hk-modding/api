@@ -626,10 +626,10 @@ namespace Modding
         ///     Called by the game in PlayerData.SetBool
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        /// <param name="val">Value to set</param>
-        internal static void SetPlayerBool(string target, bool val)
+        /// <param name="orig">Value to set</param>
+        internal static void SetPlayerBool(string target, bool orig)
         {
-            bool value = val;
+            bool value = orig;
 
             if (SetPlayerBoolHook != null)
             {
@@ -729,10 +729,10 @@ namespace Modding
         ///     Called by the game in PlayerData.SetInt
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        /// <param name="val">Value to set</param>
-        internal static void SetPlayerInt(string target, int val)
+        /// <param name="orig">Value to set</param>
+        internal static void SetPlayerInt(string target, int orig)
         {
-            int value = val;
+            int value = orig;
 
             if (SetPlayerIntHook != null)
             {
@@ -813,10 +813,10 @@ namespace Modding
         ///     Called by the game in PlayerData.SetFloat
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        /// <param name="val">Value to set</param>
-        internal static void SetPlayerFloat(string target, float val)
+        /// <param name="orig">Value to set</param>
+        internal static void SetPlayerFloat(string target, float orig)
         {
-            float value = val;
+            float value = orig;
 
             if (SetPlayerFloatHook != null)
             {
@@ -884,10 +884,10 @@ namespace Modding
         ///     Called by the game in PlayerData.SetString
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        /// <param name="val">Value to set</param>
-        internal static void SetPlayerString(string target, string val)
+        /// <param name="orig">Value to set</param>
+        internal static void SetPlayerString(string target, string orig)
         {
-            string value = val;
+            string value = orig;
 
             if (SetPlayerStringHook != null)
             {
@@ -958,7 +958,7 @@ namespace Modding
         /// <param name="orig">Value to set</param>
         internal static void SetPlayerVector3(string target, Vector3 orig)
         {
-            Vector3 val = orig;
+            Vector3 value = orig;
 
             if (SetPlayerVector3Hook != null)
             {
@@ -968,7 +968,7 @@ namespace Modding
                 {
                     try
                     {
-                        val = toInvoke.Invoke(target, val);
+                        value = toInvoke.Invoke(target, value);
                     }
                     catch (Exception ex)
                     {
@@ -977,7 +977,7 @@ namespace Modding
                 }
             }
 
-            Patches.PlayerData.instance.SetVector3Internal(target, val);
+            Patches.PlayerData.instance.SetVector3Internal(target, value);
         }
 
         /// <summary>
@@ -1061,7 +1061,7 @@ namespace Modding
                 return;
             }
 
-            T val = orig;
+            T value = orig;
 
             if (SetPlayerVariableHook != null)
             {
@@ -1071,7 +1071,7 @@ namespace Modding
                 {
                     try
                     {
-                        val = (T)toInvoke(t, target, val);
+                        value = (T)toInvoke(t, target, value);
                     }
                     catch (Exception ex)
                     {
@@ -1080,7 +1080,7 @@ namespace Modding
                 }
             }
 
-            Patches.PlayerData.instance.SetVariableInternal(target, val);
+            Patches.PlayerData.instance.SetVariableInternal(target, value);
         }
 
         /// <summary>
