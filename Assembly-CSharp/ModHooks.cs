@@ -24,7 +24,7 @@ namespace Modding
     [PublicAPI]
     public class ModHooks
     {
-        private const int _modVersion = 62;
+        private const int _modVersion = 63;
 
         internal static bool IsInitialized;
 
