@@ -64,9 +64,13 @@ jobs:
         uses: actions/download-artifact@v2
         with: 
           path: ./artifacts
+      - name: Zip
+        run: |
+            zip -jr ModdingApiWin.zip ./artifacts/ModdingApiWin/*
+            zip -jr ModdingApiUnix.zip ./artifacts/ModdingApiUnix/*
       - name: Create release if a new tag is pushed
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ./artifacts/ModdingApiUnix
-            ./artifacts/ModdingApiWin
+            ./ModdingApiWin.zip
+            ./ModdingApiUnix.zip
