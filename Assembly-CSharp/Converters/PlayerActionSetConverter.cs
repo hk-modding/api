@@ -40,7 +40,7 @@ namespace Modding.Converters
                 {
                     if (reader.Value is string val)
                     {
-                        if (val == new InputHandler.KeyOrMouseBinding().ToString())
+                        if (val == new InputHandler.KeyOrMouseBinding().ToString() || val == InputControlType.None.ToString())
                         {
                             ac.ClearBindings();
                         }
@@ -48,6 +48,11 @@ namespace Modding.Converters
                         {
                             ac.ClearBindings();
                             ac.AddKeyOrMouseBinding(bind);
+                        }
+                        else if (KeybindUtil.ParseInputControlTypeBinding(val) is InputControlType button)
+                        {
+                            ac.ClearBindings();
+                            ac.AddInputControlType(button);
                         }
                         else
                         {
@@ -82,7 +87,15 @@ namespace Modding.Converters
                 if (filter(ac.Name))
                 {
                     writer.WritePropertyName(ac.Name);
-                    writer.WriteValue(ac.GetKeyOrMouseBinding().ToString());
+                    var keyOrMouse = ac.GetKeyOrMouseBinding();
+                    var controllerButton = ac.GetControllerButtonBinding();
+                    if(keyOrMouse.Key != Key.None){
+                        writer.WriteValue(keyOrMouse.ToString());
+                    } else if(controllerButton != InputControlType.None) {
+                        writer.WriteValue(controllerButton.ToString()); 
+                    } else {
+                        writer.WriteValue("None");
+                    }
                 }
             }
             writer.WriteEndObject();
