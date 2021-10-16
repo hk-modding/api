@@ -105,13 +105,41 @@ namespace Modding
             }
             
             AppDomain.CurrentDomain.AssemblyResolve += Resolve;
-            
-            foreach (string assemblyPath in files)
+
+            List<Assembly> asms = new (files.Length);
+
+            // Load all the assemblies first to avoid dependency issues
+            // Dependencies are lazy-loaded, so we won't have attempted loads
+            // until the mod initialization.
+            foreach (string path in files)
             {
-                Logger.APILogger.LogDebug($"Loading assembly `{assemblyPath}`");
+                Logger.APILogger.LogDebug("Loading assembly `{path}`");
+                
                 try
                 {
-                    foreach (Type ty in Assembly.LoadFrom(assemblyPath).GetTypes())
+                    asms.Add(Assembly.LoadFrom(path));
+                }
+                catch (FileLoadException e)
+                {
+                    Logger.APILogger.LogError($"Unable to load assembly - {e}");
+                }
+                catch (BadImageFormatException e)
+                {
+                    Logger.APILogger.LogError($"Assembly is bad image. {e}");
+                }
+                catch (PathTooLongException)
+                {
+                    Logger.APILogger.LogError("Unable to load, path to dll is too long!");
+                }
+            }
+
+            foreach (Assembly asm in asms)
+            {
+                Logger.APILogger.LogDebug($"Loading mods in assembly `{asm.FullName}`");
+                
+                try
+                {
+                    foreach (Type ty in asm.GetTypes())
                     {
                         if (!ty.IsClass || ty.IsAbstract || !ty.IsSubclassOf(typeof(Mod))) 
                             continue;    
