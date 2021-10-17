@@ -91,5 +91,36 @@ namespace Modding
             }
             return InputControlType.None;
         }
+
+        
+        /// <summary>
+        /// Adds a controller button binding to the player action based on a <c>InputControlType</c>.
+        /// </summary>
+        /// <param name="action">The player action</param>
+        /// <param name="binding">The binding</param>
+        public static void AddInputControlType(this PlayerAction action, InputControlType binding)
+        {
+            if (binding != InputControlType.None)
+            {
+                action.AddBinding(new DeviceBindingSource(binding));
+            }
+        }
+
+        /// <summary>
+        /// Parses a InputControlType binding from a string.
+        /// </summary>
+        /// <param name="src">The source string</param>
+        /// <returns></returns>
+        public static InputControlType? ParseInputControlTypeBinding(string src)
+        {
+            if (Enum.TryParse<InputControlType>(src, out var key))
+            {
+                return key;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }
