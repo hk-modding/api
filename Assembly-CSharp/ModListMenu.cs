@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Modding.Menu;
 using Modding.Menu.Config;
-using static Modding.Logger;
 using UnityEngine;
 using UnityEngine.UI;
 using static Modding.ModLoader;
@@ -180,7 +179,7 @@ namespace Modding
                                     }
                                     catch (Exception e)
                                     {
-                                        LogError(e);
+                                        Logger.APILogger.LogError(e);
                                     }
                                 }
                             }
