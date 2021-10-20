@@ -113,7 +113,7 @@ namespace Modding
             // until the mod initialization.
             foreach (string path in files)
             {
-                Logger.APILogger.LogDebug("Loading assembly `{path}`");
+                Logger.APILogger.LogDebug($"Loading assembly `{path}`");
                 
                 try
                 {
