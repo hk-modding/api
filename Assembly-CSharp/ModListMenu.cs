@@ -155,26 +155,32 @@ namespace Modding
                                 }
                                 else if (modInst.Mod is ICustomMenuMod icmmod)
                                 {
-                                    var menu = icmmod.GetMenuScreen(this.screen, toggleDels);
-                                    var rt = c.ContentObject.GetComponent<RectTransform>();
-                                    rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
-                                    c.AddMenuButton(
-                                        $"{modInst.Name}_Settings",
-                                        new MenuButtonConfig
-                                        {
-                                            Style = MenuButtonStyle.VanillaStyle,
-                                            CancelAction = _ => this.ApplyChanges(),
-                                            Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
-                                            SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
-                                                .UIGoToDynamicMenu(menu),
-                                            Proceed = true,
-                                            Description = new DescriptionInfo
+                                    try {
+                                        var menu = icmmod.GetMenuScreen(this.screen, toggleDels);
+                                        var rt = c.ContentObject.GetComponent<RectTransform>();
+                                        rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
+                                        c.AddMenuButton(
+                                            $"{modInst.Name}_Settings",
+                                            new MenuButtonConfig
                                             {
-                                                Text = $"Version {modInst.Mod.GetVersion()}"
+                                                Style = MenuButtonStyle.VanillaStyle,
+                                                CancelAction = _ => this.ApplyChanges(),
+                                                Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
+                                                SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
+                                                    .UIGoToDynamicMenu(menu),
+                                                Proceed = true,
+                                                Description = new DescriptionInfo
+                                                {
+                                                    Text = $"Version {modInst.Mod.GetVersion()}"
+                                                }
                                             }
-                                        }
-                                    );
-                                    ModScreens[modInst.Mod] = menu;
+                                        );
+                                        ModScreens[modInst.Mod] = menu;
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Logger.APILogger.LogError(e);
+                                    }
                                 }
                             }
                         }
