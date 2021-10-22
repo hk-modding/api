@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -143,7 +143,7 @@ namespace Modding
                 
                 foreach (var x in ModLoader.ModInstances)
                 {
-                    if (x.Mod is ITogglableMod && x.Error is not null) 
+                    if (x.Mod is ITogglableMod && x.Error is null) 
                         settings.ModEnabledSettings.Add(x.Name, x.Enabled);
                 }
                 
