@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -193,7 +193,7 @@ namespace Modding
             }
 
             ModInstance[] orderedMods = ModInstanceTypeMap.Values
-                .OrderBy(x => x.Mod.LoadPriority())
+                .OrderBy(x => x.Mod?.LoadPriority() ?? 0)
                 .ToArray();
 
             // dict<scene name, list<(mod, list<objectNames>)>
