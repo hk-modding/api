@@ -21,42 +21,42 @@ public class MyMod: Mod, IMenuMod
 
     // The rest of the class... 
 
-    public override List<IMenuMod.MenuEntry> GetMenuData()
+    public List<IMenuMod.MenuEntry> GetMenuData(IMenuMod.MenuEntry? toggleButtonEntry)
     {
-        return List<IMenuMod.MenuEntry>
+        return new List<IMenuMod.MenuEntry>
         {
             new IMenuMod.MenuEntry {
-                name = "My First Option",
-                description = "Will be displayed in small text",
-                values = new string[] {
+                Name = "My First Option",
+                Description = "Will be displayed in small text",
+                Values = new string[] {
                     "Option 1",
                     "Option 2",
                     "Option 3"
                 },
                 // opt will be the index of the option that has been chosen
-                saver = opt => this.optionOne = opt,
-                loader = () => this.optionOne
+                Saver = opt => this.optionOne = opt,
+                Loader = () => this.optionOne
             },
             new IMenuMod.MenuEntry {
-                name = "My Second Option",
+                Name = "My Second Option",
                 // Nothing will be displayed
-                description = null,
-                values = new string[] {
+                Description = null,
+                Values = new string[] {
                     "Off",
                     "On"
                 },
-                saver = opt => opt switch {
+                Saver = opt => opt switch {
                     0 => this.optionTwo = false,
                     1 => this.OptionTwo = true,
                     // This should never be called
                     _ => throw new InvalidOperationException()
                 },
-                loader = () => this.optionOne switch {
+                Loader = () => this.optionOne switch {
                     false => 0,
                     true => 1
                 }
             }
-        }
+        };
     }
 }
 ```
