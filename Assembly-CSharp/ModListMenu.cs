@@ -68,90 +68,104 @@ namespace Modding
                                 ModToggleDelegates? toggleDels = null;
                                 if (modInst.Mod is ITogglableMod itmod)
                                 {
-                                    if (
-                                        modInst.Mod is not (
-                                            IMenuMod { ToggleButtonInsideMenu: true } or
-                                            ICustomMenuMod { ToggleButtonInsideMenu: true }
+                                    try 
+                                    {    
+                                        if (
+                                            modInst.Mod is not (
+                                                IMenuMod { ToggleButtonInsideMenu: true } or
+                                                ICustomMenuMod { ToggleButtonInsideMenu: true }
+                                            )
                                         )
-                                    )
-                                    {
-                                        var rt = c.ContentObject.GetComponent<RectTransform>();
-                                        rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
-                                        c.AddHorizontalOption(
-                                            modInst.Name,
-                                            new HorizontalOptionConfig
-                                            {
-                                                ApplySetting = (self, ind) =>
-                                                {
-                                                    changedMods[modInst] = ind == 1;
-                                                },
-                                                CancelAction = _ => this.ApplyChanges(),
-                                                Label = modInst.Name,
-                                                Options = new string[] { "Off", "On" },
-                                                RefreshSetting = (self, apply) => self.optionList.SetOptionTo(
-                                                    modInst.Enabled ? 1 : 0
-                                                ),
-                                                Style = HorizontalOptionStyle.VanillaStyle,
-                                                Description = new DescriptionInfo
-                                                {
-                                                    Text = $"Version {modInst.Mod.GetVersion()}"
-                                                }
-                                            },
-                                            out var opt
-                                        );
-                                        opt.menuSetting.RefreshValueFromGameSettings();
-                                    }
-                                    else
-                                    {
-                                        bool? change = null;
-                                        string name = modInst.Name;
-                                        toggleDels = new ModToggleDelegates
                                         {
-                                            SetModEnabled = enabled =>
-                                            {
-                                                change = enabled;
-                                            },
-                                            GetModEnabled = () => modInst.Enabled,
-                                            ApplyChange = () =>
-                                            {
-                                                if (change is bool enabled)
+                                            var rt = c.ContentObject.GetComponent<RectTransform>();
+                                            rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
+                                            c.AddHorizontalOption(
+                                                modInst.Name,
+                                                new HorizontalOptionConfig
                                                 {
-                                                    if (enabled)
+                                                    ApplySetting = (self, ind) =>
                                                     {
-                                                        ModLoader.LoadMod(modInst, true);
-                                                    }
-                                                    else
+                                                        changedMods[modInst] = ind == 1;
+                                                    },
+                                                    CancelAction = _ => this.ApplyChanges(),
+                                                    Label = modInst.Name,
+                                                    Options = new string[] { "Off", "On" },
+                                                    RefreshSetting = (self, apply) => self.optionList.SetOptionTo(
+                                                        modInst.Enabled ? 1 : 0
+                                                    ),
+                                                    Style = HorizontalOptionStyle.VanillaStyle,
+                                                    Description = new DescriptionInfo
                                                     {
-                                                        ModLoader.UnloadMod(modInst);
+                                                        Text = $"Version {modInst.Mod.GetVersion()}"
                                                     }
+                                                },
+                                                out var opt
+                                            );
+                                            opt.menuSetting.RefreshValueFromGameSettings();
+                                        }
+                                        else
+                                        {
+                                            bool? change = null;
+                                            string name = modInst.Name;
+                                            toggleDels = new ModToggleDelegates
+                                            {
+                                                SetModEnabled = enabled =>
+                                                {
+                                                    change = enabled;
+                                                },
+                                                GetModEnabled = () => modInst.Enabled,
+                                                ApplyChange = () =>
+                                                {
+                                                    if (change is bool enabled)
+                                                    {
+                                                        if (enabled)
+                                                        {
+                                                            ModLoader.LoadMod(modInst, true);
+                                                        }
+                                                        else
+                                                        {
+                                                            ModLoader.UnloadMod(modInst);
+                                                        }
+                                                    }
+                                                    change = null;
                                                 }
-                                                change = null;
-                                            }
-                                        };
+                                            };
+                                        }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Logger.APILogger.LogError(e);
                                     }
                                 }
                                 if (modInst.Mod is IMenuMod immod)
                                 {
-                                    var menu = CreateModMenu(modInst, toggleDels);
-                                    var rt = c.ContentObject.GetComponent<RectTransform>();
-                                    rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
-                                    c.AddMenuButton(
-                                        $"{modInst.Name}_Settings",
-                                        new MenuButtonConfig
-                                        {
-                                            Style = MenuButtonStyle.VanillaStyle,
-                                            CancelAction = _ => this.ApplyChanges(),
-                                            Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
-                                            SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
-                                                .UIGoToDynamicMenu(menu),
-                                            Proceed = true,
-                                            Description = new DescriptionInfo
+                                    try 
+                                    {
+                                        var menu = CreateModMenu(modInst, toggleDels);
+                                        var rt = c.ContentObject.GetComponent<RectTransform>();
+                                        rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
+                                        c.AddMenuButton(
+                                            $"{modInst.Name}_Settings",
+                                            new MenuButtonConfig
                                             {
-                                                Text = $"Version {modInst.Mod.GetVersion()}"
+                                                Style = MenuButtonStyle.VanillaStyle,
+                                                CancelAction = _ => this.ApplyChanges(),
+                                                Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
+                                                SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
+                                                    .UIGoToDynamicMenu(menu),
+                                                Proceed = true,
+                                                Description = new DescriptionInfo
+                                                {
+                                                    Text = $"Version {modInst.Mod.GetVersion()}"
+                                                }
                                             }
-                                        }
-                                    );
-                                    ModScreens[modInst.Mod] = menu;
+                                        );
+                                        ModScreens[modInst.Mod] = menu;
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Logger.APILogger.LogError(e);
+                                    }
                                 }
                                 else if (modInst.Mod is ICustomMenuMod icmmod)
                                 {
