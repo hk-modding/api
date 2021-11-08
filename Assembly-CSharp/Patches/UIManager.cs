@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using MonoMod;
 using System.Collections;
 using System;
@@ -108,11 +108,13 @@ namespace Modding.Patches
         private bool hasCalledEditMenus = false;
 
         public extern IEnumerator orig_HideCurrentMenu();
-
+        
+        public static event Action BeforeHideDynamicMenu;
         public IEnumerator HideCurrentMenu()
         {
             if (((MainMenuState) this.menuState) == MainMenuState.DYNAMIC_MENU)
             {
+                BeforeHideDynamicMenu?.Invoke();
                 return this.HideMenu(this.currentDynamicMenu);
             }
             else
