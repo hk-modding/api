@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -108,6 +108,7 @@ namespace Modding
             (
                 CacheFields<PlayerData>,
                 CacheFields<HeroController>,
+                CacheFields<HeroControllerStates>,
                 CacheFields<GameManager>,
                 CacheFields<UIManager>
             );
@@ -354,7 +355,7 @@ namespace Modding
         [PublicAPI]
         public static void SetField<TType, TField>(string name, TField value)
         {
-            ((Action<TField>) GetGetter<TType, TField>(GetFieldInfo(typeof(TType), name, false)))(value);
+            ((Action<TField>) GetSetter<TType, TField>(GetFieldInfo(typeof(TType), name, false)))(value);
         }
     }
 }
