@@ -22,6 +22,8 @@ namespace Modding
         // and will also call the added action if the UIManager has already started.
         internal void InitMenuCreation() => Patch.UIManager.EditMenus += () =>
         {
+            Patch.UIManager.BeforeHideDynamicMenu += ToggleMods;
+            
             ModScreens = new Dictionary<IMod, MenuScreen>();
             var builder = new MenuBuilder("ModListMenu");
             this.screen = builder.Screen;
@@ -111,24 +113,10 @@ namespace Modding
                                             {
                                                 SetModEnabled = enabled =>
                                                 {
-                                                    change = enabled;
+                                                    changedMods[modInst] = enabled;
                                                 },
                                                 GetModEnabled = () => modInst.Enabled,
-                                                ApplyChange = () =>
-                                                {
-                                                    if (change is bool enabled)
-                                                    {
-                                                        if (enabled)
-                                                        {
-                                                            ModLoader.LoadMod(modInst, true);
-                                                        }
-                                                        else
-                                                        {
-                                                            ModLoader.UnloadMod(modInst);
-                                                        }
-                                                    }
-                                                    change = null;
-                                                }
+                                                ApplyChange = () => {  } //dont wanna break every mod in existance so im leaving it here even tho its useless now
                                             };
                                         }
                                     }
@@ -245,7 +233,7 @@ namespace Modding
             mbl.RecalculateNavigation();
         };
 
-        private void ApplyChanges()
+        private void ToggleMods()
         {
             foreach (var (mod, enabled) in changedMods)
             {
@@ -258,8 +246,13 @@ namespace Modding
                 {
                     ModLoader.UnloadMod(mod);
                 }
-            }
+            } 
             changedMods.Clear();
+        }
+
+        private void ApplyChanges()
+        {
+            ToggleMods();
             ((Patch.UIManager)UIManager.instance).UILeaveDynamicMenu(
                 UIManager.instance.optionsMenuScreen,
                 Patch.MainMenuState.OPTIONS_MENU
@@ -276,6 +269,7 @@ namespace Modding
                 Saver = v => dels.SetModEnabled(v == 1),
                 Loader = () => dels.GetModEnabled() ? 1 : 0,
             } : null;
+            
             Action<MenuSelectable> returnDelegate = toggleDelegates is ModToggleDelegates
             {
                 ApplyChange: var applyChange
@@ -285,7 +279,7 @@ namespace Modding
                 this.GoToModListMenu();
             }
             : this.GoToModListMenu;
-
+            
             var name = modInst.Name;
             var entries = mod.GetMenuData(toggleEntry);
             MenuButton backButton = null;
@@ -351,7 +345,7 @@ namespace Modding
                     {
                         Label = "Back",
                         CancelAction = returnDelegate,
-                        SubmitAction = this.GoToModListMenu,
+                        SubmitAction = returnDelegate,
                         Proceed = true,
                         Style = MenuButtonStyle.VanillaStyle
                     },
