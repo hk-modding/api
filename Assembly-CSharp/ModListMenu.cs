@@ -20,10 +20,11 @@ namespace Modding
         // Due to the lifecycle of the UIManager object, The `EditMenus` event has to be used to create custom menus.
         // This event is called every time a UIManager is created,
         // and will also call the added action if the UIManager has already started.
-        internal void InitMenuCreation() => Patch.UIManager.EditMenus += () =>
+        internal void InitMenuCreation()
         {
             Patch.UIManager.BeforeHideDynamicMenu += ToggleMods;
-            
+            Patch.UIManager.EditMenus += () =>
+            {
             ModScreens = new Dictionary<IMod, MenuScreen>();
             var builder = new MenuBuilder("ModListMenu");
             this.screen = builder.Screen;
@@ -232,6 +233,7 @@ namespace Modding
                 );
             mbl.RecalculateNavigation();
         };
+        }
 
         private void ToggleMods()
         {
