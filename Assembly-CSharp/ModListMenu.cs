@@ -108,8 +108,6 @@ namespace Modding
                                         }
                                         else
                                         {
-                                            bool? change = null;
-                                            string name = modInst.Name;
                                             toggleDels = new ModToggleDelegates
                                             {
                                                 SetModEnabled = enabled =>
@@ -117,7 +115,8 @@ namespace Modding
                                                     changedMods[modInst] = enabled;
                                                 },
                                                 GetModEnabled = () => modInst.Enabled,
-                                                ApplyChange = () => {  } //dont wanna break every mod in existance so im leaving it here even tho its useless now
+                                                // Kept for backwards compatability.
+                                                ApplyChange = () => {  } 
                                             };
                                         }
                                     }
@@ -126,7 +125,7 @@ namespace Modding
                                         Logger.APILogger.LogError(e);
                                     }
                                 }
-                                if (modInst.Mod is IMenuMod immod)
+                                if (modInst.Mod is IMenuMod)
                                 {
                                     try 
                                     {
