@@ -15,8 +15,8 @@ namespace Modding.Patches
         [MonoModIgnore]
         private extern ButtonSkin GetButtonSkinFor(string buttonName);
         [MonoModIgnore]
-        private extern ButtonSkin GetButtonSkinFor(InputControlType inputControlType);
-        [MonoModIgnore]
+        private extern ButtonSkin orig_GetButtonSkinFor(InputControlType inputControlType);
+        
         private InputHandler ih;
 
         public extern void orig_RefreshKeyMappings();
@@ -93,6 +93,14 @@ namespace Modding.Patches
             var enumerator = orig_ShowCurrentButtonMappings();
             while (enumerator.MoveNext()) yield return enumerator.Current;
             yield break;
+        }
+        
+        private ButtonSkin GetButtonSkinFor(InputControlType inputControlType)
+	    {
+            if(this.ih == null){
+                this.ih = (Modding.Patches.InputHandler)InputHandler.Instance;
+            }
+            return orig_GetButtonSkinFor(inputControlType);
         }
 
         private void SetupRefs()
