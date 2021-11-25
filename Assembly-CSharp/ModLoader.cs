@@ -238,6 +238,7 @@ namespace Modding
             
             Logger.APILogger.LogDebug("Updated mod text.");
 
+            ModHooks.OnFinishedLoadingMods();
             Loaded = true;
 
             new ModListMenu().InitMenuCreation();
