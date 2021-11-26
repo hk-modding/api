@@ -101,16 +101,17 @@ namespace Modding
     public struct ModToggleDelegates
     {
         /// <summary>
-        /// Sets the mod to an enabled or disabled state. This will not be updated until `ApplyChange` is called.
+        /// Sets the mod to an enabled or disabled state. This will not be updated until menu is hidden
         /// </summary>
         public Action<bool> SetModEnabled;
         /// <summary>
-        /// Gets if the mod is enabled or disabled. This will not be updated until `ApplyChange` is called.
+        /// Gets if the mod is enabled or disabled. This will not be updated until menu is hidden
         /// </summary>
         public Func<bool> GetModEnabled;
         /// <summary>
-        /// Loads or unloads the mod based on the changed state.
+        /// Left in for backwards compatibility.
         /// </summary>
+        [Obsolete("No longer needed to explicitly call this. Using 'SetModEnabled' is enough to toggle the state of the mod")]
         public Action ApplyChange;
     }
 }
