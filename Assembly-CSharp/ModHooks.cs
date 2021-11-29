@@ -85,7 +85,8 @@ namespace Modding
 
             ModVersion = version.GetGameVersionString() + "-" + _modVersion;
 
-            ApplicationQuitHook += SaveGlobalSettings;
+            // Save global settings only if mods have finished loading
+            FinishedLoadingModsHook += () => ApplicationQuitHook += SaveGlobalSettings;
 
             IsInitialized = true;
         }
@@ -2193,5 +2194,53 @@ namespace Modding
             .Select(x => x.Mod);
 
         #endregion
+
+        private static event Action _finishedLoadingModsHook;
+        /// <summary>
+        /// Event invoked when mods have finished loading. If modloading has already finished, subscribers will be invoked immediately.
+        /// </summary>
+        public static event Action FinishedLoadingModsHook
+        {
+            add
+            {
+                _finishedLoadingModsHook += value;
+                if (ModLoader.Loaded)
+                {
+                    try
+                    {
+                        value.Invoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.APILogger.LogError(ex);
+                    }
+                }
+            }
+            remove
+            {
+                _finishedLoadingModsHook -= value;
+            }
+        }
+        internal static void OnFinishedLoadingMods()
+        {
+            if (_finishedLoadingModsHook == null)
+            {
+                return;
+            }
+
+            Delegate[] invocationList = _finishedLoadingModsHook.GetInvocationList();
+
+            foreach (Action toInvoke in invocationList)
+            {
+                try
+                {
+                    toInvoke.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Logger.APILogger.LogError(ex);
+                }
+            }
+        }
     }
 }
