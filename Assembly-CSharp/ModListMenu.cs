@@ -25,213 +25,215 @@ namespace Modding
             Patch.UIManager.BeforeHideDynamicMenu += ToggleMods;
             Patch.UIManager.EditMenus += () =>
             {
-            ModScreens = new Dictionary<IMod, MenuScreen>();
-            var builder = new MenuBuilder("ModListMenu");
-            this.screen = builder.Screen;
-            builder.CreateTitle("Mods", MenuTitleStyle.vanillaStyle)
-                .SetDefaultNavGraph(new ChainedNavGraph())
-                .CreateContentPane(RectTransformData.FromSizeAndPos(
-                    new RelVector2(new Vector2(1920f, 903f)),
-                    new AnchoredPosition(
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0f, -60f)
-                    )
-                ))
-                .CreateControlPane(RectTransformData.FromSizeAndPos(
-                    new RelVector2(new Vector2(1920f, 259f)),
-                    new AnchoredPosition(
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0f, -502f)
-                    )
-                ))
-                .AddContent(
-                    new NullContentLayout(),
-                    c => c.AddScrollPaneContent(
-                        new ScrollbarConfig
-                        {
-                            CancelAction = _ => this.ApplyChanges(),
-                            Navigation = new Navigation { mode = Navigation.Mode.Explicit },
-                            Position = new AnchoredPosition
+                ModScreens = new Dictionary<IMod, MenuScreen>();
+                var builder = new MenuBuilder("ModListMenu");
+                this.screen = builder.Screen;
+                builder.CreateTitle("Mods", MenuTitleStyle.vanillaStyle)
+                    .SetDefaultNavGraph(new ChainedNavGraph())
+                    .CreateContentPane(RectTransformData.FromSizeAndPos(
+                        new RelVector2(new Vector2(1920f, 903f)),
+                        new AnchoredPosition(
+                            new Vector2(0.5f, 0.5f),
+                            new Vector2(0.5f, 0.5f),
+                            new Vector2(0f, -60f)
+                        )
+                    ))
+                    .CreateControlPane(RectTransformData.FromSizeAndPos(
+                        new RelVector2(new Vector2(1920f, 259f)),
+                        new AnchoredPosition(
+                            new Vector2(0.5f, 0.5f),
+                            new Vector2(0.5f, 0.5f),
+                            new Vector2(0f, -502f)
+                        )
+                    ))
+                    .AddContent(
+                        new NullContentLayout(),
+                        c => c.AddScrollPaneContent(
+                            new ScrollbarConfig
                             {
-                                ChildAnchor = new Vector2(0f, 1f),
-                                ParentAnchor = new Vector2(1f, 1f),
-                                Offset = new Vector2(-310f, 0f)
-                            },
-                            SelectionPadding = _ => (-60, 0)
-                        },
-                        new RelLength(0f),
-                        RegularGridLayout.CreateVerticalLayout(105f),
-                        c =>
-                        {
-                            foreach (var modInst in ModLoader.ModInstances)
-                            {
-                                if (modInst.Error != null) continue;
-                                ModToggleDelegates? toggleDels = null;
-                                if (modInst.Mod is ITogglableMod itmod)
+                                CancelAction = _ => this.ApplyChanges(),
+                                Navigation = new Navigation { mode = Navigation.Mode.Explicit },
+                                Position = new AnchoredPosition
                                 {
-                                    try 
-                                    {    
-                                        if (
-                                            modInst.Mod is not (
-                                                IMenuMod { ToggleButtonInsideMenu: true } or
-                                                ICustomMenuMod { ToggleButtonInsideMenu: true }
+                                    ChildAnchor = new Vector2(0f, 1f),
+                                    ParentAnchor = new Vector2(1f, 1f),
+                                    Offset = new Vector2(-310f, 0f)
+                                },
+                                SelectionPadding = _ => (-60, 0)
+                            },
+                            new RelLength(0f),
+                            RegularGridLayout.CreateVerticalLayout(105f),
+                            c =>
+                            {
+                                foreach (var modInst in ModLoader.ModInstances)
+                                {
+                                    if (modInst.Error != null) continue;
+                                    ModToggleDelegates? toggleDels = null;
+                                    if (modInst.Mod is ITogglableMod itmod)
+                                    {
+                                        try 
+                                        {    
+                                            if (
+                                                modInst.Mod is not (
+                                                    IMenuMod { ToggleButtonInsideMenu: true } or
+                                                    ICustomMenuMod { ToggleButtonInsideMenu: true }
+                                                )
                                             )
-                                        )
+                                            {
+                                                var rt = c.ContentObject.GetComponent<RectTransform>();
+                                                rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
+                                                c.AddHorizontalOption(
+                                                    modInst.Name,
+                                                    new HorizontalOptionConfig
+                                                    {
+                                                        ApplySetting = (self, ind) =>
+                                                        {
+                                                            changedMods[modInst] = ind == 1;
+                                                        },
+                                                        CancelAction = _ => this.ApplyChanges(),
+                                                        Label = modInst.Name,
+                                                        Options = new string[] { "Off", "On" },
+                                                        RefreshSetting = (self, apply) => self.optionList.SetOptionTo(
+                                                            modInst.Enabled ? 1 : 0
+                                                        ),
+                                                        Style = HorizontalOptionStyle.VanillaStyle,
+                                                        Description = new DescriptionInfo
+                                                        {
+                                                            Text = $"Version {modInst.Mod.GetVersion()}"
+                                                        }
+                                                    },
+                                                    out var opt
+                                                );
+                                                opt.menuSetting.RefreshValueFromGameSettings();
+                                            }
+                                            else
+                                            {
+                                                toggleDels = new ModToggleDelegates
+                                                {
+                                                    SetModEnabled = enabled =>
+                                                    {
+                                                        changedMods[modInst] = enabled;
+                                                    },
+                                                    GetModEnabled = () => modInst.Enabled,
+                                                    #pragma warning disable CS0618
+                                                    // Kept for backwards compatability.
+                                                    ApplyChange = () => {  }
+                                                    #pragma warning restore CS0618
+                                                };
+                                            }
+                                        }
+                                        catch (Exception e)
                                         {
+                                            Logger.APILogger.LogError(e);
+                                        }
+                                    }
+                                    if (modInst.Mod is IMenuMod)
+                                    {
+                                        try 
+                                        {
+                                            var menu = CreateModMenu(modInst, toggleDels);
                                             var rt = c.ContentObject.GetComponent<RectTransform>();
                                             rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
-                                            c.AddHorizontalOption(
-                                                modInst.Name,
-                                                new HorizontalOptionConfig
+                                            c.AddMenuButton(
+                                                $"{modInst.Name}_Settings",
+                                                new MenuButtonConfig
                                                 {
-                                                    ApplySetting = (self, ind) =>
-                                                    {
-                                                        changedMods[modInst] = ind == 1;
-                                                    },
+                                                    Style = MenuButtonStyle.VanillaStyle,
                                                     CancelAction = _ => this.ApplyChanges(),
-                                                    Label = modInst.Name,
-                                                    Options = new string[] { "Off", "On" },
-                                                    RefreshSetting = (self, apply) => self.optionList.SetOptionTo(
-                                                        modInst.Enabled ? 1 : 0
-                                                    ),
-                                                    Style = HorizontalOptionStyle.VanillaStyle,
+                                                    Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
+                                                    SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
+                                                        .UIGoToDynamicMenu(menu),
+                                                    Proceed = true,
                                                     Description = new DescriptionInfo
                                                     {
                                                         Text = $"Version {modInst.Mod.GetVersion()}"
                                                     }
-                                                },
-                                                out var opt
+                                                }
                                             );
-                                            opt.menuSetting.RefreshValueFromGameSettings();
+                                            ModScreens[modInst.Mod] = menu;
                                         }
-                                        else
+                                        catch (Exception e)
                                         {
-                                            toggleDels = new ModToggleDelegates
-                                            {
-                                                SetModEnabled = enabled =>
-                                                {
-                                                    changedMods[modInst] = enabled;
-                                                },
-                                                GetModEnabled = () => modInst.Enabled,
-                                                // Kept for backwards compatability.
-                                                ApplyChange = () => {  } 
-                                            };
+                                            Logger.APILogger.LogError(e);
                                         }
                                     }
-                                    catch (Exception e)
+                                    else if (modInst.Mod is ICustomMenuMod icmmod)
                                     {
-                                        Logger.APILogger.LogError(e);
-                                    }
-                                }
-                                if (modInst.Mod is IMenuMod)
-                                {
-                                    try 
-                                    {
-                                        var menu = CreateModMenu(modInst, toggleDels);
-                                        var rt = c.ContentObject.GetComponent<RectTransform>();
-                                        rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
-                                        c.AddMenuButton(
-                                            $"{modInst.Name}_Settings",
-                                            new MenuButtonConfig
-                                            {
-                                                Style = MenuButtonStyle.VanillaStyle,
-                                                CancelAction = _ => this.ApplyChanges(),
-                                                Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
-                                                SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
-                                                    .UIGoToDynamicMenu(menu),
-                                                Proceed = true,
-                                                Description = new DescriptionInfo
+                                        try {
+                                            var menu = icmmod.GetMenuScreen(this.screen, toggleDels);
+                                            var rt = c.ContentObject.GetComponent<RectTransform>();
+                                            rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
+                                            c.AddMenuButton(
+                                                $"{modInst.Name}_Settings",
+                                                new MenuButtonConfig
                                                 {
-                                                    Text = $"Version {modInst.Mod.GetVersion()}"
+                                                    Style = MenuButtonStyle.VanillaStyle,
+                                                    CancelAction = _ => this.ApplyChanges(),
+                                                    Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
+                                                    SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
+                                                        .UIGoToDynamicMenu(menu),
+                                                    Proceed = true,
+                                                    Description = new DescriptionInfo
+                                                    {
+                                                        Text = $"Version {modInst.Mod.GetVersion()}"
+                                                    }
                                                 }
-                                            }
-                                        );
-                                        ModScreens[modInst.Mod] = menu;
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Logger.APILogger.LogError(e);
-                                    }
-                                }
-                                else if (modInst.Mod is ICustomMenuMod icmmod)
-                                {
-                                    try {
-                                        var menu = icmmod.GetMenuScreen(this.screen, toggleDels);
-                                        var rt = c.ContentObject.GetComponent<RectTransform>();
-                                        rt.sizeDelta = new Vector2(0f, rt.sizeDelta.y + 105f);
-                                        c.AddMenuButton(
-                                            $"{modInst.Name}_Settings",
-                                            new MenuButtonConfig
-                                            {
-                                                Style = MenuButtonStyle.VanillaStyle,
-                                                CancelAction = _ => this.ApplyChanges(),
-                                                Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
-                                                SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
-                                                    .UIGoToDynamicMenu(menu),
-                                                Proceed = true,
-                                                Description = new DescriptionInfo
-                                                {
-                                                    Text = $"Version {modInst.Mod.GetVersion()}"
-                                                }
-                                            }
-                                        );
-                                        ModScreens[modInst.Mod] = menu;
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Logger.APILogger.LogError(e);
+                                            );
+                                            ModScreens[modInst.Mod] = menu;
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            Logger.APILogger.LogError(e);
+                                        }
                                     }
                                 }
                             }
-                        }
+                        )
                     )
-                )
-                .AddControls(
-                    new SingleContentLayout(new AnchoredPosition(
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0f, -64f)
-                    )),
-                    c => c.AddMenuButton(
-                        "BackButton",
-                        new MenuButtonConfig
-                        {
-                            Label = "Back",
-                            CancelAction = _ => this.ApplyChanges(),
-                            SubmitAction = _ => this.ApplyChanges(),
-                            Proceed = true,
-                            Style = MenuButtonStyle.VanillaStyle
-                        }
-                    )
-                )
-                .Build();
-
-            var optScreen = UIManager.instance.optionsMenuScreen;
-            var mbl = (Modding.Patches.MenuButtonList)optScreen.gameObject.GetComponent<MenuButtonList>();
-            new ContentArea(optScreen.content.gameObject, new SingleContentLayout(new Vector2(0.5f, 0.5f)))
-                .AddWrappedItem(
-                    "ModMenuButtonWrapper",
-                    c =>
-                    {
-                        c.AddMenuButton(
-                            "ModMenuButton",
+                    .AddControls(
+                        new SingleContentLayout(new AnchoredPosition(
+                            new Vector2(0.5f, 0.5f),
+                            new Vector2(0.5f, 0.5f),
+                            new Vector2(0f, -64f)
+                        )),
+                        c => c.AddMenuButton(
+                            "BackButton",
                             new MenuButtonConfig
                             {
-                                CancelAction = self => UIManager.instance.UIGoToMainMenu(),
-                                Label = "Mods",
-                                SubmitAction = GoToModListMenu,
+                                Label = "Back",
+                                CancelAction = _ => this.ApplyChanges(),
+                                SubmitAction = _ => this.ApplyChanges(),
                                 Proceed = true,
                                 Style = MenuButtonStyle.VanillaStyle
-                            },
-                            out var modButton
-                        );
-                        mbl.AddSelectableEnd(modButton, 1);
-                    }
-                );
-            mbl.RecalculateNavigation();
-        };
+                            }
+                        )
+                    )
+                    .Build();
+
+                var optScreen = UIManager.instance.optionsMenuScreen;
+                var mbl = (Modding.Patches.MenuButtonList)optScreen.gameObject.GetComponent<MenuButtonList>();
+                new ContentArea(optScreen.content.gameObject, new SingleContentLayout(new Vector2(0.5f, 0.5f)))
+                    .AddWrappedItem(
+                        "ModMenuButtonWrapper",
+                        c =>
+                        {
+                            c.AddMenuButton(
+                                "ModMenuButton",
+                                new MenuButtonConfig
+                                {
+                                    CancelAction = self => UIManager.instance.UIGoToMainMenu(),
+                                    Label = "Mods",
+                                    SubmitAction = GoToModListMenu,
+                                    Proceed = true,
+                                    Style = MenuButtonStyle.VanillaStyle
+                                },
+                                out var modButton
+                            );
+                            mbl.AddSelectableEnd(modButton, 1);
+                        }
+                    );
+                mbl.RecalculateNavigation();
+            };
         }
 
         private void ToggleMods()
@@ -271,121 +273,13 @@ namespace Modding
                 Loader = () => dels.GetModEnabled() ? 1 : 0,
             } : null;
             
-            Action<MenuSelectable> returnDelegate = toggleDelegates is ModToggleDelegates
-            {
-                ApplyChange: var applyChange
-            } ? _ =>
-            {
-                applyChange();
-                this.GoToModListMenu();
-            }
-            : this.GoToModListMenu;
-            
             var name = modInst.Name;
             var entries = mod.GetMenuData(toggleEntry);
-            MenuButton backButton = null;
-            var builder = new MenuBuilder(name)
-                .CreateTitle(name, MenuTitleStyle.vanillaStyle)
-                .CreateContentPane(RectTransformData.FromSizeAndPos(
-                    new RelVector2(new Vector2(1920f, 903f)),
-                    new AnchoredPosition(
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0f, -60f)
-                    )
-                ))
-                .CreateControlPane(RectTransformData.FromSizeAndPos(
-                    new RelVector2(new Vector2(1920f, 259f)),
-                    new AnchoredPosition(
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0.5f, 0.5f),
-                        new Vector2(0f, -502f)
-                    )
-                ))
-                .SetDefaultNavGraph(new ChainedNavGraph());
-            if (entries.Count > 5)
-            {
-                builder.AddContent(new NullContentLayout(), c => c.AddScrollPaneContent(
-                    new ScrollbarConfig
-                    {
-                        CancelAction = _ => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen),
-                        Navigation = new Navigation
-                        {
-                            mode = Navigation.Mode.Explicit,
-                            selectOnUp = backButton,
-                            selectOnDown = backButton
-                        },
-                        Position = new AnchoredPosition
-                        {
-                            ChildAnchor = new Vector2(0f, 1f),
-                            ParentAnchor = new Vector2(1f, 1f),
-                            Offset = new Vector2(-310f, 0f)
-                        }
-                    },
-                    new RelLength(entries.Count * 105f),
-                    RegularGridLayout.CreateVerticalLayout(105f),
-                    c => AddModMenuContent(entries, c, returnDelegate)
-                ));
-            }
-            else
-            {
-                builder.AddContent(
-                    RegularGridLayout.CreateVerticalLayout(105f),
-                    c => AddModMenuContent(entries, c, returnDelegate)
-                );
-            }
-            builder.AddControls(
-                new SingleContentLayout(new AnchoredPosition(
-                    new Vector2(0.5f, 0.5f),
-                    new Vector2(0.5f, 0.5f),
-                    new Vector2(0f, -64f)
-                )),
-                c => c.AddMenuButton(
-                    "BackButton",
-                    new MenuButtonConfig
-                    {
-                        Label = "Back",
-                        CancelAction = returnDelegate,
-                        SubmitAction = returnDelegate,
-                        Proceed = true,
-                        Style = MenuButtonStyle.VanillaStyle
-                    },
-                    out backButton
-                )
-            );
-            return builder.Build();
+            return MenuUtils.CreateMenuScreen(name, entries, this.screen);
         }
 
         private void GoToModListMenu(object _) => GoToModListMenu();
         private void GoToModListMenu() => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen);
 
-        private void AddModMenuContent(
-            List<IMenuMod.MenuEntry> entries,
-            ContentArea c,
-            Action<MenuSelectable> returnDelegate
-        )
-        {
-            foreach (var entry in entries)
-            {
-                c.AddHorizontalOption(
-                    entry.Name,
-                    new HorizontalOptionConfig
-                    {
-                        ApplySetting = (_, i) => entry.Saver(i),
-                        RefreshSetting = (s, _) => s.optionList.SetOptionTo(entry.Loader()),
-                        CancelAction = returnDelegate,
-                        Description = string.IsNullOrEmpty(entry.Description) ? null : new DescriptionInfo
-                        {
-                            Text = entry.Description
-                        },
-                        Label = entry.Name,
-                        Options = entry.Values,
-                        Style = HorizontalOptionStyle.VanillaStyle
-                    },
-                    out var option
-                );
-                option.menuSetting.RefreshValueFromGameSettings();
-            }
-        }
     }
 }
