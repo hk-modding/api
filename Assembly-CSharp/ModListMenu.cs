@@ -115,8 +115,10 @@ namespace Modding
                                                     changedMods[modInst] = enabled;
                                                 },
                                                 GetModEnabled = () => modInst.Enabled,
+                                                #pragma warning disable CS0618
                                                 // Kept for backwards compatability.
                                                 ApplyChange = () => {  } 
+                                                #pragma warning restore CS0618
                                             };
                                         }
                                     }
@@ -276,7 +278,9 @@ namespace Modding
                 ApplyChange: var applyChange
             } ? _ =>
             {
+                #pragma warning disable CS0618
                 applyChange();
+                #pragma warning restore CS0618
                 this.GoToModListMenu();
             }
             : this.GoToModListMenu;
