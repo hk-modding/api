@@ -52,7 +52,7 @@ namespace Modding.Menu
         /// <param name="returnScreen">The screen to return to when the user hits back.</param>
         /// <param name="backButton">The back button.</param>
         /// <returns>The MenuBuilder object.</returns>
-        public static MenuBuilder CreateMenuBuilder(string title, MenuScreen returnScreen, out MenuButton backButton)
+        public static MenuBuilder CreateMenuBuilderWithBackButton(string title, MenuScreen returnScreen, out MenuButton backButton)
         {
             MenuButton _backButton = null;
             MenuBuilder builder = CreateMenuBuilder(title)
@@ -123,7 +123,7 @@ namespace Modding.Menu
         /// <returns>A built menu screen in the default style.</returns>
         public static MenuScreen CreateMenuScreen(string title, List<IMenuMod.MenuEntry> menuData, MenuScreen returnScreen)
         {
-            MenuBuilder builder = CreateMenuBuilder(title, returnScreen, out MenuButton backButton);
+            MenuBuilder builder = CreateMenuBuilderWithBackButton(title, returnScreen, out MenuButton backButton);
 
             if (menuData.Count > 5)
             {
