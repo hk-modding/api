@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using GlobalEnums;
 using MonoMod;
 using UnityEngine;
@@ -765,6 +765,8 @@ namespace Modding.Patches
                 }
                 else if (this.cState.invulnerable && !this.cState.hazardDeath && !this.playerData.GetBool("isInvincible"))
                 {
+                    damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
+
                     if (hazardType == 2)
                     {
                         if (!this.takeNoDamage)
