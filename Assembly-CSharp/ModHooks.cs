@@ -1220,14 +1220,14 @@ namespace Modding
         }
 
         /// <summary>
-        ///     Called when damage is dealt to the player
+        ///     Called when damage is dealt to the player, at the start of the take damage function.
         /// </summary>
         /// <see cref="TakeDamageProxy"/>
         /// <remarks>HeroController.TakeDamage</remarks>
         public static event TakeDamageProxy TakeDamageHook;
 
         /// <summary>
-        ///     Called when damage is dealt to the player
+        ///     Called when damage is dealt to the player, at the start of the take damage function.
         /// </summary>
         /// <remarks>HeroController.TakeDamage</remarks>
         internal static int OnTakeDamage(ref int hazardType, int damage)
@@ -1257,13 +1257,13 @@ namespace Modding
         }
 
         /// <summary>
-        ///     Called at the end of the take damage function
+        ///     Called in the take damage function, immediately before applying damage (just before checking overcharm)
         /// </summary>
         /// <see cref="AfterTakeDamageHandler"/>
         public static event AfterTakeDamageHandler AfterTakeDamageHook;
 
         /// <summary>
-        ///     Called at the end of the take damage function
+        ///     Called in the take damage function, immediately before applying damage (just before checking overcharm)
         /// </summary>
         internal static int AfterTakeDamage(int hazardType, int damageAmount)
         {
