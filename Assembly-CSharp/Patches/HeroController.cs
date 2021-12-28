@@ -651,7 +651,6 @@ namespace Modding.Patches
                         }
                     }
 
-                    damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
                     if (this.playerData.GetBool("equippedCharm_5") && this.playerData.GetInt("blockerHits") > 0 && hazardType == 1 && this.cState.focusing && !flag)
                     {
                         this.proxyFSM.SendEvent("HeroCtrl-TookBlockerHit");
@@ -698,6 +697,7 @@ namespace Modding.Patches
                         this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
                     }
 
+                    damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
                     if (!this.takeNoDamage && !this.playerData.GetBool("invinciTest"))
                     {
                         if (this.playerData.GetBool("overcharmed"))
@@ -765,12 +765,11 @@ namespace Modding.Patches
                 }
                 else if (this.cState.invulnerable && !this.cState.hazardDeath && !this.playerData.GetBool("isInvincible"))
                 {
-                    damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
-
                     if (hazardType == 2)
                     {
                         if (!this.takeNoDamage)
                         {
+                            damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
                             this.playerData.TakeHealth(damageAmount);
                         }
 
@@ -787,6 +786,7 @@ namespace Modding.Patches
                     }
                     else if (hazardType == 3)
                     {
+                        damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
                         this.playerData.TakeHealth(damageAmount);
                         this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
                         if (this.playerData.GetInt("health") == 0)
