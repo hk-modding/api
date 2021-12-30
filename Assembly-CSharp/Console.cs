@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using JetBrains.Annotations;
@@ -57,7 +57,9 @@ namespace Modding
 
             _overlayCanvas = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(1920, 1080));
             _overlayCanvas.name = "ModdingApiConsoleLog";
-
+            CanvasGroup cg = _overlayCanvas.GetComponent<CanvasGroup>();
+            cg.interactable = false;
+            cg.blocksRaycasts = false;
             DontDestroyOnLoad(_overlayCanvas);
 
             GameObject background = CanvasUtil.CreateImagePanel
