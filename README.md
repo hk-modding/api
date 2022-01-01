@@ -2,6 +2,7 @@ Hollow Knight Modding API
 =========================
 ![build](https://github.com/hk-modding/api/actions/workflows/build.yaml/badge.svg)
 ![docs](https://github.com/hk-modding/api/actions/workflows/docs.yaml/badge.svg)
+![GitHub all releases](https://img.shields.io/github/downloads/hk-modding/api/total)
 
 A Hollow Knight Modding API/loader. Uses [MonoMod](https://github.com/MonoMod/MonoMod).
 
