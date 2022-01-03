@@ -46,7 +46,7 @@ jobs:
     - name: Build PrePatcher
       run: |
         dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
-    - name: Build Assembly-CSharp 
+    - name: Build Assembly-CSharp
       run: |
         dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
     - name: Upload Linux Binary
@@ -72,7 +72,7 @@ jobs:
     - name: Build PrePatcher
       run: |
         dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
-    - name: Build Assembly-CSharp 
+    - name: Build Assembly-CSharp
       run: |
         dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
     - name: Upload Mac Binary
@@ -88,16 +88,31 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v2
-        with: 
+        with:
           path: ./artifacts
       - name: Zip
         run: |
             zip -jr ModdingApiWin.zip ./artifacts/ModdingApiWin/*
             zip -jr ModdingApiLinux.zip ./artifacts/ModdingApiLinux/*
             zip -jr ModdingApiMac.zip ./artifacts/ModdingApiMac/*
+      - name: Generate release info
+        run: |
+            echo "# Checksums" > ChangeLog.txt ;
+            echo "* Linux:" >> ChangeLog.txt ;
+            echo -n "    * " >> ChangeLog.txt ;
+            sha256sum -b ModdingApiLinux.zip | cut -d " " -f 1 >> ChangeLog.txt ;
+            echo "* Mac:" >> ChangeLog.txt ;
+            echo -n "    * " >> ChangeLog.txt ;
+            sha256sum -b ModdingApiMac.zip | cut -d " " -f 1 >> ChangeLog.txt ;
+            echo "* Windows:" >> ChangeLog.txt ;
+            echo -n "    * " >> ChangeLog.txt ;
+            sha256sum -b ModdingApiWin.zip | cut -d " " -f 1 >> ChangeLog.txt ;
+            echo "# Changelog" >> ChangeLog.txt ;
+            echo "${{ github.event.head_commit.message }}" >> ChangeLog.txt ;
       - name: Create release if a new tag is pushed
         uses: softprops/action-gh-release@v1
         with:
+          body_path: ChangeLog.txt
           files: |
             ./ModdingApiWin.zip
             ./ModdingApiLinux.zip
