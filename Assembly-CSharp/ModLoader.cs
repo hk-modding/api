@@ -12,6 +12,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UObject = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
+using Modding.Extensions;
 
 namespace Modding
 {
@@ -139,7 +140,7 @@ namespace Modding
                 
                 try
                 {
-                    foreach (Type ty in asm.GetTypes())
+                    foreach (Type ty in asm.GetTypesSafely())
                     {
                         if (!ty.IsClass || ty.IsAbstract || !ty.IsSubclassOf(typeof(Mod))) 
                             continue;    
