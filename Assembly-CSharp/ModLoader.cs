@@ -12,7 +12,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UObject = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
-using Modding.Extensions;
 
 namespace Modding
 {
