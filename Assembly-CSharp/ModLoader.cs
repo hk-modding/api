@@ -139,7 +139,7 @@ namespace Modding
                 
                 try
                 {
-                    foreach (Type ty in asm.GetTypes())
+                    foreach (Type ty in asm.GetTypesSafely())
                     {
                         if (!ty.IsClass || ty.IsAbstract || !ty.IsSubclassOf(typeof(Mod))) 
                             continue;    
