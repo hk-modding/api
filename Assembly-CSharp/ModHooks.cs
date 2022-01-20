@@ -2190,7 +2190,7 @@ namespace Modding
             bool onlyEnabled = false,
             bool allowLoadError = false
         ) => ModLoader.ModInstances
-            .Where(x => onlyEnabled && !x.Enabled || !allowLoadError && x.Error != null)
+            .Where(x => !(onlyEnabled && !x.Enabled || !allowLoadError && x.Error != null))
             .Select(x => x.Mod);
 
         #endregion
