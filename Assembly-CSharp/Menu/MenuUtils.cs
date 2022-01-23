@@ -8,6 +8,7 @@ using Modding.Menu.Config;
 using UnityEngine;
 using UnityEngine.UI;
 using Patch = Modding.Patches;
+using Lang = Language.Language;
 
 
 namespace Modding.Menu
@@ -66,7 +67,7 @@ namespace Modding.Menu
                     "BackButton",
                     new MenuButtonConfig
                     {
-                        Label = "Back",
+                        Label = Lang.Get("NAV_BACK", "MainMenu"),
                         CancelAction = _ => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(returnScreen),
                         SubmitAction = _ => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(returnScreen),
                         Proceed = true,

@@ -80,6 +80,7 @@ namespace Modding.Menu
                 TextPanelConfig.TextFont.TrajanRegular => MenuResources.TrajanRegular,
                 TextPanelConfig.TextFont.TrajanBold => MenuResources.TrajanBold,
                 TextPanelConfig.TextFont.Perpetua => MenuResources.Perpetua,
+                TextPanelConfig.TextFont.NotoSerifCJKSCRegular => MenuResources.NotoSerifCJKSCRegular,
                 _ => MenuResources.TrajanRegular
             };
             text.supportRichText = true;
@@ -207,7 +208,7 @@ namespace Modding.Menu
             public TextAnchor Anchor;
 
             /// <summary>
-            /// The three main fonts that Hollow Knight uses in the menus.
+            /// The four main fonts that Hollow Knight uses in the menus.
             /// </summary>
             public enum TextFont
             {
@@ -222,7 +223,11 @@ namespace Modding.Menu
                 /// <summary>
                 /// The perpetua font.
                 /// </summary>
-                Perpetua
+                Perpetua,
+                /// <summary>
+                /// The Noto Serif CJK SC regular font.
+                /// </summary>
+                NotoSerifCJKSCRegular,
             }
         }
     }

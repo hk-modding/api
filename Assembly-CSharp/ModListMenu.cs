@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static Modding.ModLoader;
 using Patch = Modding.Patches;
+using Lang = Language.Language;
 
 namespace Modding
 {
@@ -92,14 +93,17 @@ namespace Modding
                                                         },
                                                         CancelAction = _ => this.ApplyChanges(),
                                                         Label = modInst.Name,
-                                                        Options = new string[] { "Off", "On" },
+                                                        Options = new string[] {
+                                                            Lang.Get("MOH_OFF", "MainMenu"),
+                                                            Lang.Get("MOH_ON", "MainMenu")
+                                                        },
                                                         RefreshSetting = (self, apply) => self.optionList.SetOptionTo(
                                                             modInst.Enabled ? 1 : 0
                                                         ),
                                                         Style = HorizontalOptionStyle.VanillaStyle,
                                                         Description = new DescriptionInfo
                                                         {
-                                                            Text = $"Version {modInst.Mod.GetVersion()}"
+                                                            Text = $"v{modInst.Mod.GetVersion()}"
                                                         }
                                                     },
                                                     out var opt
@@ -140,13 +144,13 @@ namespace Modding
                                                 {
                                                     Style = MenuButtonStyle.VanillaStyle,
                                                     CancelAction = _ => this.ApplyChanges(),
-                                                    Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
+                                                    Label = toggleDels == null ? $"{modInst.Name} {Lang.Get("MAIN_OPTIONS", "MainMenu")}" : modInst.Name,
                                                     SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
                                                         .UIGoToDynamicMenu(menu),
                                                     Proceed = true,
                                                     Description = new DescriptionInfo
                                                     {
-                                                        Text = $"Version {modInst.Mod.GetVersion()}"
+                                                        Text = $"v{modInst.Mod.GetVersion()}"
                                                     }
                                                 }
                                             );
@@ -169,13 +173,13 @@ namespace Modding
                                                 {
                                                     Style = MenuButtonStyle.VanillaStyle,
                                                     CancelAction = _ => this.ApplyChanges(),
-                                                    Label = toggleDels == null ? $"{modInst.Name} Settings" : modInst.Name,
+                                                    Label = toggleDels == null ? $"{modInst.Name} {Lang.Get("MAIN_OPTIONS", "MainMenu")}" : modInst.Name,
                                                     SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
                                                         .UIGoToDynamicMenu(menu),
                                                     Proceed = true,
                                                     Description = new DescriptionInfo
                                                     {
-                                                        Text = $"Version {modInst.Mod.GetVersion()}"
+                                                        Text = $"v{modInst.Mod.GetVersion()}"
                                                     }
                                                 }
                                             );
@@ -200,7 +204,7 @@ namespace Modding
                             "BackButton",
                             new MenuButtonConfig
                             {
-                                Label = "Back",
+                                Label = Lang.Get("NAV_BACK", "MainMenu"),
                                 CancelAction = _ => this.ApplyChanges(),
                                 SubmitAction = _ => this.ApplyChanges(),
                                 Proceed = true,
@@ -268,7 +272,10 @@ namespace Modding
             IMenuMod.MenuEntry? toggleEntry = toggleDelegates is ModToggleDelegates dels ? new IMenuMod.MenuEntry
             {
                 Name = modInst.Name,
-                Values = new string[] { "Off", "On" },
+                Values = new string[] {
+                    Lang.Get("MOH_OFF", "MainMenu"),
+                    Lang.Get("MOH_ON", "MainMenu")
+                },
                 Saver = v => dels.SetModEnabled(v == 1),
                 Loader = () => dels.GetModEnabled() ? 1 : 0,
             } : null;
