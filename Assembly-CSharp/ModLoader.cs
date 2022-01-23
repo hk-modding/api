@@ -237,7 +237,7 @@ namespace Modding
             UpdateModText();
 
             // Adding version nums to the modlog by default to make debugging significantly easier
-            Logger.APILogger.Log("Set mod text:\n" + modVersionDraw.drawString);
+            Logger.APILogger.LogDebug("Set mod text:\n" + modVersionDraw.drawString);
 
             ModHooks.OnFinishedLoadingMods();
             Loaded = true;
