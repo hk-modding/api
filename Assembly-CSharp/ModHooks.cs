@@ -2134,9 +2134,10 @@ namespace Modding
             string name,
             bool onlyEnabled = false,
             bool allowLoadError = false
-        ) => ModLoader.ModInstanceNameMap.TryGetValue(name, out var mod) && !(
-            onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null
-        ) ? mod.Mod : null;
+        ) => ModLoader.ModInstanceNameMap.TryGetValue(name, out var mod)
+            && (!onlyEnabled || mod.Enabled)
+            && (allowLoadError || mod.Error is null)
+         ? mod.Mod : null;
 
         /// <summary>
         /// Gets a mod instance by type.
@@ -2149,9 +2150,10 @@ namespace Modding
             Type type,
             bool onlyEnabled = false,
             bool allowLoadError = false
-        ) => ModLoader.ModInstanceTypeMap.TryGetValue(type, out var mod) && !(
-            onlyEnabled && !mod.Enabled || !allowLoadError && mod.Error != null
-        ) ? mod.Mod : null;
+        ) => ModLoader.ModInstanceTypeMap.TryGetValue(type, out var mod) 
+            && (!onlyEnabled || mod.Enabled) 
+            && (allowLoadError || mod.Error is null)
+         ? mod.Mod : null;
 
         /// <summary>
         /// Gets if the mod is currently enabled.
@@ -2190,7 +2192,7 @@ namespace Modding
             bool onlyEnabled = false,
             bool allowLoadError = false
         ) => ModLoader.ModInstances
-            .Where(x => onlyEnabled && !x.Enabled || !allowLoadError && x.Error != null)
+            .Where(x => (!onlyEnabled || x.Enabled) && (allowLoadError || x.Error is null))
             .Select(x => x.Mod);
 
         #endregion
