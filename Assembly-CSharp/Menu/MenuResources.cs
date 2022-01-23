@@ -14,6 +14,7 @@ namespace Modding.Menu
         public static Font TrajanRegular { get; private set; }
         public static Font TrajanBold { get; private set; }
         public static Font Perpetua { get; private set; }
+        public static Font NotoSerifCJKSCRegular { get; private set; }
 
         public static RuntimeAnimatorController MenuTopFleurAnimator { get; private set; }
         public static RuntimeAnimatorController MenuCursorAnimator { get; private set; }
@@ -72,6 +73,9 @@ namespace Modding.Menu
                             break;
                         case "Perpetua":
                             Perpetua = font;
+                            break;
+                        case "NotoSerifCJKsc-Regular":
+                            NotoSerifCJKSCRegular = font;
                             break;
                     }
             }
