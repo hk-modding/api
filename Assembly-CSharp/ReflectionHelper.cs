@@ -404,26 +404,6 @@ namespace Modding
             ((Action<TField>) GetSetter<TType, TField>(GetFieldInfo(typeof(TType), name, false)))(value);
         }
         
-        
-        /// <summary>
-        ///     Get a property on an object using a string. Cast to TCast before returning and if property doesn't exist return default.
-        /// </summary>
-        /// <param name="obj">Object/Object of type which the field is on</param>
-        /// <param name="name">Name of the field</param>
-        /// <param name="default">Default return</param>
-        /// <typeparam name="TObject">Type of object being passed in</typeparam>
-        /// <typeparam name="TCast">Type of return.</typeparam>
-        /// <returns>The value of a property on an object/type</returns>
-        [PublicAPI]
-        public static TCast GetProperty<TObject, TCast>(TObject obj, string name, TCast @default = default)
-        {
-            PropertyInfo pi = GetPropertyInfo(typeof(TObject), name);
-
-            return pi == null
-                ? @default
-                : (TCast)pi.GetValue(obj);
-        }
-        
         /// <summary>
         ///     Get a property on an object using a string.
         /// </summary>
@@ -453,27 +433,6 @@ namespace Modding
             PropertyInfo pi = GetPropertyInfo(typeof(TType), name, false);
 
             return pi == null ? default : (TProperty) pi.GetValue(null);
-        }
-
-        /// <summary>
-        ///     Set a property on an object using a string.
-        /// </summary>
-        /// <param name="obj">Object/Object of type which the field is on</param>
-        /// <param name="name">Name of the field</param>
-        /// <param name="value">Value to set the field to</param>
-        /// <typeparam name="TProperty">Type of property</typeparam>
-        /// <typeparam name="TObject">Type of object being passed in</typeparam>
-        [PublicAPI]
-        public static void SetPropertySafe<TObject, TProperty>(TObject obj, string name, TProperty value)
-        {
-            PropertyInfo pi = GetPropertyInfo(typeof(TObject), name);
-
-            if (pi == null)
-            {
-                return;
-            }
-
-            pi.SetValue(obj, value);
         }
 
         /// <summary>
