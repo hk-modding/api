@@ -16,6 +16,7 @@ namespace Modding
     public static class ReflectionHelper
     {
         private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, FieldInfo>> Fields = new();
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, PropertyInfo>> Properties = new();
 
         private static readonly ConcurrentDictionary<FieldInfo, Delegate> Getters = new();
 
@@ -34,6 +35,10 @@ namespace Modding
             if (!Fields.TryGetValue(t, out ConcurrentDictionary<string, FieldInfo> tFields))
             {
                 tFields = new ConcurrentDictionary<string, FieldInfo>();
+            }
+            if (!Properties.TryGetValue(t, out ConcurrentDictionary<string, PropertyInfo> tProperties))
+            {
+                tProperties = new ConcurrentDictionary<string, PropertyInfo>();
             }
 
             const BindingFlags privStatic = BindingFlags.NonPublic | BindingFlags.Static;
@@ -59,6 +64,14 @@ namespace Modding
                     {
                         getSetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
                     }
+                }
+            );
+            Parallel.ForEach
+            (
+                t.GetProperties(all),
+                property =>
+                {
+                    tProperties[property.Name] = property;
                 }
             );
         }
@@ -94,6 +107,39 @@ namespace Modding
             }
 
             return fi;
+        }
+        
+        /// <summary>
+        ///     Gets a property on a type
+        /// </summary>
+        /// <param name="t">Type</param>
+        /// <param name="property">Property name</param>
+        /// <param name="instance"></param>
+        /// <returns>FieldInfo for field or null if field does not exist.</returns>
+        public static PropertyInfo GetPropertyInfo(Type t, string property, bool instance = true)
+        {
+            if (!Properties.TryGetValue(t, out ConcurrentDictionary<string, PropertyInfo> typeProperties))
+            {
+                Properties[t] = typeProperties = new ConcurrentDictionary<string, PropertyInfo>();
+            }
+
+            if (typeProperties.TryGetValue(property, out PropertyInfo pi))
+            {
+                return pi;
+            }
+
+            pi = t.GetProperty
+            (
+                property,
+                BindingFlags.NonPublic | BindingFlags.Public | (instance ? BindingFlags.Instance : BindingFlags.Static)
+            );
+
+            if (pi != null)
+            {
+                typeProperties.TryAdd(property, pi);
+            }
+
+            return pi;
         }
 
         internal static void PreloadCommonTypes()
@@ -356,6 +402,109 @@ namespace Modding
         public static void SetField<TType, TField>(string name, TField value)
         {
             ((Action<TField>) GetSetter<TType, TField>(GetFieldInfo(typeof(TType), name, false)))(value);
+        }
+        
+        
+        /// <summary>
+        ///     Get a property on an object using a string. Cast to TCast before returning and if property doesn't exist return default.
+        /// </summary>
+        /// <param name="obj">Object/Object of type which the field is on</param>
+        /// <param name="name">Name of the field</param>
+        /// <param name="default">Default return</param>
+        /// <typeparam name="TObject">Type of object being passed in</typeparam>
+        /// <typeparam name="TCast">Type of return.</typeparam>
+        /// <returns>The value of a property on an object/type</returns>
+        [PublicAPI]
+        public static TCast GetProperty<TObject, TCast>(TObject obj, string name, TCast @default = default)
+        {
+            PropertyInfo pi = GetPropertyInfo(typeof(TObject), name);
+
+            return pi == null
+                ? @default
+                : (TCast)pi.GetValue(obj);
+        }
+        
+        /// <summary>
+        ///     Get a property on an object using a string.
+        /// </summary>
+        /// <param name="obj">Object/Object of type which the field is on</param>
+        /// <param name="name">Name of the field</param>
+        /// <typeparam name="TProperty">Type of property</typeparam>
+        /// <typeparam name="TObject">Type of object being passed in</typeparam>
+        /// <returns>The value of a property on an object/type</returns>
+        [PublicAPI]
+        public static TProperty GetProperty<TObject, TProperty>(TObject obj, string name)
+        {
+            PropertyInfo pi = GetPropertyInfo(typeof(TObject), name) ?? throw new MissingFieldException();
+
+            return (TProperty) pi.GetValue(obj);
+        }
+        
+        /// <summary>
+        ///     Get a static property on an type using a string.
+        /// </summary>
+        /// <param name="name">Name of the field</param>
+        /// <typeparam name="TType">Type which static field resides upon</typeparam>
+        /// <typeparam name="TProperty">Type of property</typeparam>
+        /// <returns>The value of a property on an object/type</returns>
+        [PublicAPI]
+        public static TProperty GetProperty<TType, TProperty>(string name)
+        {
+            PropertyInfo pi = GetPropertyInfo(typeof(TType), name, false);
+
+            return pi == null ? default : (TProperty) pi.GetValue(null);
+        }
+
+        /// <summary>
+        ///     Set a property on an object using a string.
+        /// </summary>
+        /// <param name="obj">Object/Object of type which the field is on</param>
+        /// <param name="name">Name of the field</param>
+        /// <param name="value">Value to set the field to</param>
+        /// <typeparam name="TProperty">Type of property</typeparam>
+        /// <typeparam name="TObject">Type of object being passed in</typeparam>
+        [PublicAPI]
+        public static void SetPropertySafe<TObject, TProperty>(TObject obj, string name, TProperty value)
+        {
+            PropertyInfo pi = GetPropertyInfo(typeof(TObject), name);
+
+            if (pi == null)
+            {
+                return;
+            }
+
+            pi.SetValue(obj, value);
+        }
+
+        /// <summary>
+        ///     Set a property on an object using a string.
+        /// </summary>
+        /// <param name="obj">Object/Object of type which the field is on</param>
+        /// <param name="name">Name of the field</param>
+        /// <param name="value">Value to set the field to</param>
+        /// <typeparam name="TProperty">Type of property</typeparam>
+        /// <typeparam name="TObject">Type of object being passed in</typeparam>
+        [PublicAPI]
+        public static void SetProperty<TObject, TProperty>(TObject obj, string name, TProperty value)
+        {
+            PropertyInfo pi = GetPropertyInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Property {name} does not exist!");
+            
+            pi.SetValue(obj,value);
+        }
+
+        /// <summary>
+        ///     Set a static property on an type using a string.
+        /// </summary>
+        /// <param name="name">Name of the field</param>
+        /// <param name="value">Value to set the field to</param>
+        /// <typeparam name="TType">Type which static field resides upon</typeparam>
+        /// <typeparam name="TProperty">Type of property</typeparam>
+        [PublicAPI]
+        public static void SetProperty<TType, TProperty>(string name, TProperty value)
+        {
+            PropertyInfo pi = GetPropertyInfo(typeof(TType), name) ?? throw new MissingFieldException($"Property {name} does not exist!");
+            
+            pi.SetValue(null,value);
         }
     }
 }
