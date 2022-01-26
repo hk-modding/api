@@ -25,6 +25,10 @@ namespace Modding
         private static readonly ConcurrentDictionary<PropertyInfo, Delegate> PropertyGetters = new();
         
         private static readonly ConcurrentDictionary<PropertyInfo, Delegate> PropertySetters = new();
+        
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, MethodInfo>> Methods = new();
+        
+        private static readonly ConcurrentDictionary<MethodInfo, FastReflectionDelegate> MethodsDelegates = new();
 
         private static bool _preloaded;
 
@@ -600,5 +604,113 @@ namespace Modding
 
         #endregion
 
+        #region Methods
+        /// <summary>
+        ///     Gets a method on a type 
+        /// </summary>
+        /// <param name="t">Type</param>
+        /// <param name="method">Method name</param>
+        /// <param name="instance"></param>
+        /// <returns>MethodInfo for method or null if method does not exist.</returns>
+        public static MethodInfo GetMethodInfo(Type t, string method, bool instance = true)
+        {
+            if (!Methods.TryGetValue(t, out ConcurrentDictionary<string, MethodInfo> typeMethods))
+            {
+                Methods[t] = typeMethods = new ConcurrentDictionary<string, MethodInfo>();
+            }
+
+            if (typeMethods.TryGetValue(method, out MethodInfo mi))
+            {
+                return mi;
+            }
+
+            mi = t.GetMethod
+            (
+                method,
+                BindingFlags.NonPublic | BindingFlags.Public | (instance ? BindingFlags.Instance : BindingFlags.Static) 
+            );
+
+            if (mi != null)
+            {
+                typeMethods.TryAdd(method, mi);
+            }
+
+            return mi;
+        }
+        
+        private static FastReflectionDelegate GetFastReflectionDelegate(MethodInfo mi)
+        {
+            if (MethodsDelegates.TryGetValue(mi, out FastReflectionDelegate d))
+            {
+                return d;
+            }
+            d = mi.GetFastDelegate();
+
+            MethodsDelegates[mi] = d;
+
+            return d;
+        }
+        
+        /// <summary>
+        /// Call an instance method with a return type
+        /// </summary>
+        /// <param name="obj">Object of type which the method is on</param>
+        /// <param name="name">Name of the method</param>
+        /// <param name="param">The paramters that need to be passed into the method.</param>
+        /// <typeparam name="TObject">Type of object being passed in</typeparam>
+        /// <typeparam name="TReturn">The return type of the method</typeparam>
+        /// <returns>The specified return type</returns>
+        [PublicAPI]
+        public static TReturn CallMethod<TObject, TReturn>(TObject obj, string name, params object[] param)
+        {
+            MethodInfo mi = GetMethodInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Method {name} does not exist!");
+            return (TReturn) GetFastReflectionDelegate(mi).Invoke(obj, param.Length == 0 ? null : param);
+        }
+
+        /// <summary>
+        /// Call an instance method without a return type
+        /// </summary>
+        /// <param name="obj">Object of type which the method is on</param>
+        /// <param name="name">Name of the method</param>
+        /// <param name="param">The paramters that need to be passed into the method.</param>
+        /// <typeparam name="TObject">Type of object being passed in</typeparam>
+        /// <returns>None</returns>
+        [PublicAPI]
+        public static void CallMethod<TObject>(TObject obj, string name, params object[] param)
+        {
+            MethodInfo mi = GetMethodInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Method {name} does not exist!");
+            GetFastReflectionDelegate(mi).Invoke(obj, param.Length == 0 ? null : param);
+        }
+        
+        /// <summary>
+        /// Call an static method with a return type
+        /// </summary>
+        /// <param name="name">Name of the method</param>
+        /// <param name="param">The paramters that need to be passed into the method.</param>
+        /// <typeparam name="TType">Type which static field resides upon</typeparam>
+        /// <typeparam name="TReturn">The return type of the method</typeparam>
+        /// <returns>The specified return type</returns>
+        [PublicAPI]
+        public static TReturn CallMethod<TType, TReturn>(string name, params object[] param)
+        {
+            MethodInfo mi = GetMethodInfo(typeof(TType), name, false) ?? throw new MissingFieldException($"Method {name} does not exist!");
+            return (TReturn) GetFastReflectionDelegate(mi).Invoke(null, param.Length == 0 ? null : param);
+        }
+        
+        /// <summary>
+        /// Call an static method with a return type
+        /// </summary>
+        /// <param name="name">Name of the method</param>
+        /// <param name="param">The paramters that need to be passed into the method.</param>
+        /// <typeparam name="TType">Type which static field resides upon</typeparam>
+        /// <returns>None</returns>
+        [PublicAPI]
+        public static void CallMethod<TType>(string name, params object[] param)
+        {
+            MethodInfo mi = GetMethodInfo(typeof(TType), name, false) ?? throw new MissingFieldException($"Method {name} does not exist!");
+            GetFastReflectionDelegate(mi).Invoke(null, param.Length == 0 ? null : param);
+        }
+
+        #endregion
     }
 }
