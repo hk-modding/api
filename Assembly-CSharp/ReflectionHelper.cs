@@ -683,31 +683,31 @@ namespace Modding
         }
         
         /// <summary>
-        /// Call an static method with a return type
+        /// Call a static method with a return type
         /// </summary>
+        /// <param name="type">Type which static method resides upon</param>
         /// <param name="name">Name of the method</param>
         /// <param name="param">The paramters that need to be passed into the method.</param>
-        /// <typeparam name="TType">Type which static field resides upon</typeparam>
         /// <typeparam name="TReturn">The return type of the method</typeparam>
         /// <returns>The specified return type</returns>
         [PublicAPI]
-        public static TReturn CallMethod<TType, TReturn>(string name, params object[] param)
+        public static TReturn CallMethod<TReturn>(Type type, string name, params object[] param)
         {
-            MethodInfo mi = GetMethodInfo(typeof(TType), name, false) ?? throw new MissingFieldException($"Method {name} does not exist!");
+            MethodInfo mi = GetMethodInfo(type, name, false) ?? throw new MissingFieldException($"Method {name} does not exist!");
             return (TReturn) GetFastReflectionDelegate(mi).Invoke(null, param.Length == 0 ? null : param);
         }
-        
+
         /// <summary>
-        /// Call an static method with a return type
+        /// Call a static method without a return type
         /// </summary>
+        /// <param name="type">Type which static method resides upon</param>
         /// <param name="name">Name of the method</param>
         /// <param name="param">The paramters that need to be passed into the method.</param>
-        /// <typeparam name="TType">Type which static field resides upon</typeparam>
         /// <returns>None</returns>
         [PublicAPI]
-        public static void CallMethod<TType>(string name, params object[] param)
+        public static void CallMethod(Type type, string name, params object[] param)
         {
-            MethodInfo mi = GetMethodInfo(typeof(TType), name, false) ?? throw new MissingFieldException($"Method {name} does not exist!");
+            MethodInfo mi = GetMethodInfo(type, name, false) ?? throw new MissingFieldException($"Method {name} does not exist!");
             GetFastReflectionDelegate(mi).Invoke(null, param.Length == 0 ? null : param);
         }
 
