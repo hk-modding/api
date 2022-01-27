@@ -235,8 +235,9 @@ namespace Modding
             UObject.DontDestroyOnLoad(version);
             
             UpdateModText();
-            
-            Logger.APILogger.LogDebug("Updated mod text.");
+
+            // Adding version nums to the modlog by default to make debugging significantly easier
+            Logger.APILogger.Log("Finished loading mods:\n" + modVersionDraw.drawString);
 
             ModHooks.OnFinishedLoadingMods();
             Loaded = true;
@@ -260,7 +261,15 @@ namespace Modding
                 }
                 Logger.APILogger.LogDebug($"Checking preloads for mod \"{mod.Mod.GetName()}\"");
 
-                List<(string, string)> preloadNames = mod.Mod.GetPreloadNames();
+                List<(string, string)> preloadNames = null;
+                try
+                {
+                    preloadNames = mod.Mod.GetPreloadNames();
+                }
+                catch (Exception ex)
+                {
+                    Logger.APILogger.LogError($"Error getting preload names for mod {mod.Name}\n" + ex);
+                }
                 if (preloadNames == null)
                 {
                     continue;
