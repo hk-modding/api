@@ -53,10 +53,17 @@ namespace Modding
             const BindingFlags all = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
 
             // Not gonna redesign this class to avoid reflection, this shouldn't be called during gameplay anyway
-            MethodInfo getFieldGetter = typeof(ReflectionHelper).GetMethod(nameof(GetFieldGetter), privStatic);
-            MethodInfo getFieldSetter = typeof(ReflectionHelper).GetMethod(nameof(GetFieldSetter), privStatic);
-            MethodInfo getPropertyGetter = typeof(ReflectionHelper).GetMethod(nameof(GetPropertyGetter), privStatic);
-            MethodInfo getPropertySetter = typeof(ReflectionHelper).GetMethod(nameof(GetPropertySetter), privStatic);
+
+            MethodInfo getInstanceFieldGetter = typeof(ReflectionHelper).GetMethod(nameof(GetInstanceFieldGetter), privStatic);
+            MethodInfo getStaticFieldGetter = typeof(ReflectionHelper).GetMethod(nameof(GetStaticFieldGetter), privStatic);
+            MethodInfo getInstanceFieldSetter = typeof(ReflectionHelper).GetMethod(nameof(GetInstanceFieldSetter), privStatic);
+            MethodInfo getStaticFieldSetter = typeof(ReflectionHelper).GetMethod(nameof(GetStaticFieldSetter), privStatic);
+            
+            MethodInfo getInstancePropertyGetter = typeof(ReflectionHelper).GetMethod(nameof(GetInstancePropertyGetter), privStatic);
+            MethodInfo getStaticPropertyGetter = typeof(ReflectionHelper).GetMethod(nameof(GetStaticPropertyGetter), privStatic);
+            MethodInfo getInstancePropertySetter = typeof(ReflectionHelper).GetMethod(nameof(GetInstancePropertySetter), privStatic);
+            MethodInfo getStaticPropertySetter = typeof(ReflectionHelper).GetMethod(nameof(GetStaticPropertySetter), privStatic);
+            
 
             Parallel.ForEach
             (
@@ -64,15 +71,29 @@ namespace Modding
                 field =>
                 {
                     tFields[field.Name] = field;
-
-                    if (!field.IsLiteral)
+                    
+                    if (!field.IsLiteral) //not const
                     {
-                        getFieldGetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
+                        if (!field.IsStatic) //if instance
+                        {
+                            getInstanceFieldGetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
+                        }
+                        else //if static
+                        {
+                            getStaticFieldGetter?.MakeGenericMethod(field.FieldType).Invoke(null, new object[] { field });
+                        }
                     }
-
-                    if (!field.IsLiteral && !field.IsInitOnly)
+                    if (!field.IsLiteral && !field.IsInitOnly) //not const and not readonly
                     {
-                        getFieldSetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
+                        if (!field.IsStatic) //if instance
+                        {
+                            getInstanceFieldSetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
+                        }
+                        else //if static
+                        {
+                            getStaticFieldSetter?.MakeGenericMethod(field.FieldType).Invoke(null, new object[] { field });
+                        }
+                        
                     }
                 }
             );
@@ -83,14 +104,29 @@ namespace Modding
                 {
                     tProperties[property.Name] = property;
                     
-                    if (property.CanRead)
+                    if (property.CanRead) //if it has a get method
                     {
-                        getPropertyGetter?.MakeGenericMethod(t, property.PropertyType).Invoke(null, new object[] { property });
+                        if (!property.GetMethod.IsStatic) //if instance
+                        {
+                            getInstancePropertyGetter?.MakeGenericMethod(t, property.PropertyType).Invoke(null, new object[] { property });
+                        }
+                        else //if static
+                        {
+                            getStaticPropertyGetter?.MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property });
+                        }
                     }
 
-                    if (property.CanWrite)
+                    if (property.CanWrite) //if it has set method
                     {
-                        getPropertySetter?.MakeGenericMethod(t, property.PropertyType).Invoke(null, new object[] { property });
+                        if (!property.SetMethod.IsStatic) //if instance
+                        {
+                            getInstancePropertySetter?.MakeGenericMethod(t, property.PropertyType).Invoke(null, new object[] { property });
+                        }
+                        else //if static
+                        {
+                            getStaticPropertySetter?.MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property });
+
+                        }
                     }
                 }
             );
@@ -129,6 +165,7 @@ namespace Modding
         /// <param name="field">Field name</param>
         /// <param name="instance"></param>
         /// <returns>FieldInfo for field or null if field does not exist.</returns>
+        [PublicAPI]
         public static FieldInfo GetFieldInfo(Type t, string field, bool instance = true)
         {
             if (!Fields.TryGetValue(t, out ConcurrentDictionary<string, FieldInfo> typeFields))
@@ -160,7 +197,7 @@ namespace Modding
         /// </summary>
         /// <param name="fi">FieldInfo for field.</param>
         /// <returns>Function which gets value of field</returns>
-        private static Delegate GetFieldGetter<TType, TField>(FieldInfo fi)
+        private static Delegate GetInstanceFieldGetter<TType, TField>(FieldInfo fi)
         {
             if (FieldGetters.TryGetValue(fi, out Delegate d))
             {
@@ -172,66 +209,6 @@ namespace Modding
                 throw new ArgumentException("Field cannot be const", nameof(fi));
             }
 
-            d = fi.IsStatic
-                ? CreateGetStaticFieldDelegate<TField>(fi)
-                : CreateGetFieldDelegate<TType, TField>(fi);
-
-            FieldGetters[fi] = d;
-
-            return d;
-        }
-
-        /// <summary>
-        ///     Gets delegate setting field on type
-        /// </summary>
-        /// <param name="fi">FieldInfo for field.</param>
-        /// <returns>Function which sets field passed as FieldInfo</returns>
-        private static Delegate GetFieldSetter<TType, TField>(FieldInfo fi)
-        {
-            if (FieldSetters.TryGetValue(fi, out Delegate d))
-            {
-                return d;
-            }
-
-            if (fi.IsLiteral || fi.IsInitOnly)
-            {
-                throw new ArgumentException("Field cannot be readonly or const", nameof(fi));
-            }
-
-            d = fi.IsStatic
-                ? CreateSetStaticFieldDelegate<TField>(fi)
-                : CreateSetFieldDelegate<TType, TField>(fi);
-
-            FieldSetters[fi] = d;
-
-            return d;
-        }
-
-        /// <summary>
-        ///     Create delegate returning value of static field.
-        /// </summary>
-        /// <param name="fi">FieldInfo of field</param>
-        /// <typeparam name="TField">Field type</typeparam>
-        /// <returns>Function returning static field</returns>
-        private static Delegate CreateGetStaticFieldDelegate<TField>(FieldInfo fi)
-        {
-            var dm = new DynamicMethodDefinition
-            (
-                "FieldAccess" + fi.DeclaringType?.Name + fi.Name,
-                typeof(TField),
-                new Type[0]
-            );
-
-            ILGenerator gen = dm.GetILGenerator();
-
-            gen.Emit(OpCodes.Ldsfld, fi);
-            gen.Emit(OpCodes.Ret);
-
-            return dm.Generate().CreateDelegate(typeof(Func<TField>));
-        }
-        
-        private static Delegate CreateGetFieldDelegate<TType, TField>(FieldInfo fi)
-        {
             var dm = new DynamicMethodDefinition
             (
                 "FieldAccess" + fi.DeclaringType?.Name + fi.Name,
@@ -245,11 +222,61 @@ namespace Modding
             gen.Emit(OpCodes.Ldfld, fi);
             gen.Emit(OpCodes.Ret);
 
-            return dm.Generate().CreateDelegate(typeof(Func<TType, TField>));
+            d = dm.Generate().CreateDelegate(typeof(Func<TType, TField>));
+
+            FieldGetters[fi] = d;
+
+            return d;
+        }
+        
+        private static Delegate GetStaticFieldGetter<TField>(FieldInfo fi)
+        {
+            if (FieldGetters.TryGetValue(fi, out Delegate d))
+            {
+                return d;
+            }
+
+            if (fi.IsLiteral)
+            {
+                throw new ArgumentException("Field cannot be const", nameof(fi));
+            }
+
+            var dm = new DynamicMethodDefinition
+            (
+                "FieldAccess" + fi.DeclaringType?.Name + fi.Name,
+                typeof(TField),
+                Type.EmptyTypes
+            );
+
+            ILGenerator gen = dm.GetILGenerator();
+
+            gen.Emit(OpCodes.Ldsfld, fi);
+            gen.Emit(OpCodes.Ret);
+
+            d = dm.Generate().CreateDelegate(typeof(Func<TField>));
+
+            FieldGetters[fi] = d;
+
+            return d;
         }
 
-        private static Delegate CreateSetFieldDelegate<TType, TField>(FieldInfo fi)
+        /// <summary>
+        ///     Gets delegate setting field on type
+        /// </summary>
+        /// <param name="fi">FieldInfo for field.</param>
+        /// <returns>Function which sets field passed as FieldInfo</returns>
+        private static Delegate GetInstanceFieldSetter<TType, TField>(FieldInfo fi)
         {
+            if (FieldSetters.TryGetValue(fi, out Delegate d))
+            {
+                return d;
+            }
+
+            if (fi.IsLiteral || fi.IsInitOnly)
+            {
+                throw new ArgumentException("Field cannot be readonly or const", nameof(fi));
+            }
+
             var dm = new DynamicMethodDefinition
             (
                 "FieldSet" + fi.DeclaringType?.Name + fi.Name,
@@ -264,11 +291,25 @@ namespace Modding
             gen.Emit(OpCodes.Stfld, fi);
             gen.Emit(OpCodes.Ret);
 
-            return dm.Generate().CreateDelegate(typeof(Action<TType, TField>));
-        }
+            d = dm.Generate().CreateDelegate(typeof(Action<TType, TField>));
 
-        private static Delegate CreateSetStaticFieldDelegate<TField>(FieldInfo fi)
+            FieldSetters[fi] = d;
+
+            return d;
+        }
+        
+        private static Delegate GetStaticFieldSetter<TField>(FieldInfo fi)
         {
+            if (FieldSetters.TryGetValue(fi, out Delegate d))
+            {
+                return d;
+            }
+
+            if (fi.IsLiteral || fi.IsInitOnly)
+            {
+                throw new ArgumentException("Field cannot be readonly or const", nameof(fi));
+            }
+
             var dm = new DynamicMethodDefinition
             (
                 "FieldSet" + fi.DeclaringType?.Name + fi.Name,
@@ -282,7 +323,11 @@ namespace Modding
             gen.Emit(OpCodes.Stsfld, fi);
             gen.Emit(OpCodes.Ret);
 
-            return dm.Generate().CreateDelegate(typeof(Action<TField>));
+            d =  dm.Generate().CreateDelegate(typeof(Action<TField>));
+
+            FieldSetters[fi] = d;
+
+            return d;
         }
 
         /// <summary>
@@ -302,7 +347,7 @@ namespace Modding
 
             return fi == null
                 ? @default
-                : (TCast)(object)((Func<TObject, TField>)GetFieldGetter<TObject, TField>(fi))(obj);
+                : (TCast)(object)((Func<TObject, TField>)GetInstanceFieldGetter<TObject, TField>(fi))(obj);
         }
 
         /// <summary>
@@ -318,7 +363,7 @@ namespace Modding
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
 
-            return ((Func<TObject, TField>) GetFieldGetter<TObject, TField>(fi))(obj);
+            return ((Func<TObject, TField>) GetInstanceFieldGetter<TObject, TField>(fi))(obj);
         }
 
         /// <summary>
@@ -333,7 +378,22 @@ namespace Modding
         {
             FieldInfo fi = GetFieldInfo(typeof(TType), name, false) ?? throw new MissingFieldException($"Field {name} does not exist!");
 
-            return ((Func<TField>)GetFieldGetter<TType, TField>(fi))();
+            return ((Func<TField>)GetStaticFieldGetter<TField>(fi))();
+        }
+
+        /// <summary>
+        ///     Get a static field on an type using a string. (for static classes)
+        /// </summary>
+        /// <param name="type">Static Type which static field resides upon</param>
+        /// <param name="name">Name of the field</param>
+        /// <typeparam name="TField">Type of field</typeparam>
+        /// <returns>The value of a field on an object/type</returns>
+        [PublicAPI]
+        public static TField GetField<TField>(Type type, string name)
+        {
+            FieldInfo fi = GetFieldInfo(type, name, false) ?? throw new MissingFieldException($"Field {name} does not exist!");
+
+            return ((Func<TField>)GetStaticFieldGetter<TField>(fi))();
         }
 
         /// <summary>
@@ -354,7 +414,7 @@ namespace Modding
                 return;
             }
 
-            ((Action<TObject, TField>)GetFieldSetter<TObject, TField>(fi))(obj, value);
+            ((Action<TObject, TField>)GetInstanceFieldSetter<TObject, TField>(fi))(obj, value);
         }
 
         /// <summary>
@@ -369,8 +429,7 @@ namespace Modding
         public static void SetField<TObject, TField>(TObject obj, string name, TField value)
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
-
-            ((Action<TObject, TField>)GetFieldSetter<TObject, TField>(fi))(obj, value);
+            ((Action<TObject, TField>)GetInstanceFieldSetter<TObject, TField>(fi))(obj, value);
         }
 
         /// <summary>
@@ -384,7 +443,21 @@ namespace Modding
         public static void SetField<TType, TField>(string name, TField value)
         {
             FieldInfo fi = GetFieldInfo(typeof(TType), name, false) ?? throw new MissingFieldException($"Field {name} does not exist!");
-            ((Action<TField>)GetFieldSetter<TType, TField>(fi))(value);
+            ((Action<TField>)GetInstanceFieldSetter<TType, TField>(fi))(value);
+        }
+
+        /// <summary>
+        ///     Set a static field on an type using a string. (for static classes)
+        /// </summary>
+        /// <param name="type">Static Type which static field resides upon</param>
+        /// <param name="name">Name of the field</param>
+        /// <param name="value">Value to set the field to</param>
+        /// <typeparam name="TField">Type of field</typeparam>
+        [PublicAPI]
+        public static void SetField<TField>(Type type, string name, TField value)
+        {
+            FieldInfo fi = GetFieldInfo(type, name, false) ?? throw new MissingFieldException($"Field {name} does not exist!");
+            ((Action<TField>)GetStaticFieldSetter<TField>(fi))(value);
         }
 
         #endregion
@@ -398,6 +471,7 @@ namespace Modding
         /// <param name="property">Property name</param>
         /// <param name="instance"></param>
         /// <returns>PropertyInfo for property or null if property does not exist.</returns>
+        [PublicAPI]
         public static PropertyInfo GetPropertyInfo(Type t, string property, bool instance = true)
         {
             if (!Properties.TryGetValue(t, out ConcurrentDictionary<string, PropertyInfo> typeProperties))
@@ -437,7 +511,7 @@ namespace Modding
         {
             PropertyInfo pi = GetPropertyInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Property {name} does not exist!");
 
-            return ((Func<TObject, TProperty>)GetPropertyGetter<TObject, TProperty>(pi))(obj);
+            return ((Func<TObject, TProperty>)GetInstancePropertyGetter<TObject, TProperty>(pi))(obj);
         }
 
         /// <summary>
@@ -452,7 +526,22 @@ namespace Modding
         {
             PropertyInfo pi = GetPropertyInfo(typeof(TType), name, false);
 
-            return pi == null ? default : ((Func<TProperty>)GetPropertyGetter<TType, TProperty>(pi))();
+            return pi == null ? default : ((Func<TProperty>)GetStaticPropertyGetter<TProperty>(pi))();
+        }
+
+        /// <summary>
+        ///     Get a static property on an type using a string. (for static classes)
+        /// </summary>
+        /// <param name="type">Static Type which static property resides upon</param>
+        /// <param name="name">Name of the property</param>
+        /// <typeparam name="TProperty">Type of property</typeparam>
+        /// <returns>The value of a property on an object/type</returns>
+        [PublicAPI]
+        public static TProperty GetProperty<TProperty>(Type type, string name)
+        {
+            PropertyInfo pi = GetPropertyInfo(type, name, false);
+
+            return pi == null ? default : ((Func<TProperty>)GetStaticPropertyGetter<TProperty>(pi))();
         }
 
         /// <summary>
@@ -467,7 +556,7 @@ namespace Modding
         public static void SetProperty<TObject, TProperty>(TObject obj, string name, TProperty value)
         {
             PropertyInfo pi = GetPropertyInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Property {name} does not exist!");
-            ((Action<TObject, TProperty>)GetPropertySetter<TObject, TProperty>(pi))(obj, value);
+            ((Action<TObject, TProperty>)GetInstancePropertySetter<TObject, TProperty>(pi))(obj, value);
         }
 
         /// <summary>
@@ -481,11 +570,25 @@ namespace Modding
         public static void SetProperty<TType, TProperty>(string name, TProperty value)
         {
             PropertyInfo pi = GetPropertyInfo(typeof(TType), name, false) ?? throw new MissingFieldException($"Property {name} does not exist!");
-            ((Action<TProperty>)GetPropertySetter<TType, TProperty>(pi))(value);
+            ((Action<TProperty>)GetStaticPropertySetter<TProperty>(pi))(value);
+        }
+
+        /// <summary>
+        ///     Set a static property on an type using a string. (for static classes)
+        /// </summary>
+        /// <param name="type">Static Type which static property resides upon</param>
+        /// <param name="name">Name of the property</param>
+        /// <param name="value">Value to set the property to</param>
+        /// <typeparam name="TProperty">Type of property</typeparam>
+        [PublicAPI]
+        public static void SetProperty<TProperty>(Type type, string name, TProperty value)
+        {
+            PropertyInfo pi = GetPropertyInfo(type, name, false) ?? throw new MissingFieldException($"Property {name} does not exist!");
+            ((Action<TProperty>)GetStaticPropertySetter<TProperty>(pi))(value);
         }
 
 
-        private static Delegate GetPropertyGetter<TType, TProperty>(PropertyInfo pi)
+        private static Delegate GetInstancePropertyGetter<TType, TProperty>(PropertyInfo pi)
         {
             if (PropertyGetters.TryGetValue(pi, out Delegate d))
             {
@@ -496,39 +599,7 @@ namespace Modding
             {
                 throw new ArgumentException($"Property doesn't have Get method", nameof(pi));
             }
-
-            d = pi.GetMethod.IsStatic
-                ? CreateGetStaticPropertyDelegate<TProperty>(pi)
-                : CreateGetPropertyDelegate<TType, TProperty>(pi);
-
-            PropertyGetters[pi] = d;
-
-            return d;
-        }
-        
-        private static Delegate GetPropertySetter<TType, TProperty>(PropertyInfo pi)
-        {
-            if (PropertySetters.TryGetValue(pi, out Delegate d))
-            {
-                return d;
-            }
-
-            if (!pi.CanWrite)
-            {
-                throw new ArgumentException("Property doesn't have a Set method", nameof(pi));
-            }
-
-            d = pi.SetMethod.IsStatic
-                ? CreateSetStaticPropertyDelegate<TProperty>(pi)
-                : CreateSetPropertyDelegate<TType, TProperty>(pi);
-
-            PropertySetters[pi] = d;
-
-            return d;
-        }
-        
-        private static Delegate CreateGetPropertyDelegate<TType, TProperty>(PropertyInfo pi)
-        {
+            
             var dm = new DynamicMethodDefinition
             (
                 "PropertyAccess" + pi.DeclaringType?.Name + pi.Name,
@@ -542,16 +613,30 @@ namespace Modding
             gen.Emit(OpCodes.Call, pi.GetMethod);
             gen.Emit(OpCodes.Ret);
 
-            return dm.Generate().CreateDelegate(typeof(Func<TType, TProperty>));
+            d =  dm.Generate().CreateDelegate(typeof(Func<TType, TProperty>));
+
+            PropertyGetters[pi] = d;
+
+            return d;
         }
         
-        private static Delegate CreateGetStaticPropertyDelegate<TProperty>(PropertyInfo pi)
+        private static Delegate GetStaticPropertyGetter<TProperty>(PropertyInfo pi)
         {
+            if (PropertyGetters.TryGetValue(pi, out Delegate d))
+            {
+                return d;
+            }
+
+            if (!pi.CanRead)
+            {
+                throw new ArgumentException($"Property doesn't have Get method", nameof(pi));
+            }
+
             var dm = new DynamicMethodDefinition
             (
                 "PropertyAccess" + pi.DeclaringType?.Name + pi.Name,
                 typeof(TProperty),
-                new Type[0]
+                Type.EmptyTypes
             );
 
             ILGenerator gen = dm.GetILGenerator();
@@ -559,13 +644,25 @@ namespace Modding
             gen.Emit(OpCodes.Call, pi.GetMethod);
             gen.Emit(OpCodes.Ret);
 
-            return dm.Generate().CreateDelegate(typeof(Func<TProperty>));
+            d =  dm.Generate().CreateDelegate(typeof(Func<TProperty>));
+
+            PropertyGetters[pi] = d;
+
+            return d;
         }
         
-
-        private static Delegate CreateSetPropertyDelegate<TType, TProperty>(PropertyInfo pi)
+        private static Delegate GetInstancePropertySetter<TType, TProperty>(PropertyInfo pi)
         {
-            
+            if (PropertySetters.TryGetValue(pi, out Delegate d))
+            {
+                return d;
+            }
+
+            if (!pi.CanWrite)
+            {
+                throw new ArgumentException("Property doesn't have a Set method", nameof(pi));
+            }
+
             var dm = new DynamicMethodDefinition
             (
                 "PropertySet" + pi.DeclaringType?.Name + pi.Name,
@@ -580,11 +677,25 @@ namespace Modding
             gen.Emit(OpCodes.Call, pi.SetMethod);
             gen.Emit(OpCodes.Ret);
 
-            return dm.Generate().CreateDelegate(typeof(Action<TType, TProperty>));
-        }
+            d =  dm.Generate().CreateDelegate(typeof(Action<TType, TProperty>));
 
-        private static Delegate CreateSetStaticPropertyDelegate<TProperty>(PropertyInfo pi)
+            PropertySetters[pi] = d;
+
+            return d;
+        }
+        
+        private static Delegate GetStaticPropertySetter<TProperty>(PropertyInfo pi)
         {
+            if (PropertySetters.TryGetValue(pi, out Delegate d))
+            {
+                return d;
+            }
+
+            if (!pi.CanWrite)
+            {
+                throw new ArgumentException("Property doesn't have a Set method", nameof(pi));
+            }
+
             var dm = new DynamicMethodDefinition
             (
                 "PropertySet" + pi.DeclaringType?.Name + pi.Name,
@@ -598,9 +709,12 @@ namespace Modding
             gen.Emit(OpCodes.Call, pi.SetMethod);
             gen.Emit(OpCodes.Ret);
 
-            return dm.Generate().CreateDelegate(typeof(Action<TProperty>));
+            d = dm.Generate().CreateDelegate(typeof(Action<TProperty>));
+
+            PropertySetters[pi] = d;
+
+            return d;
         }
-        
 
         #endregion
 
@@ -612,6 +726,7 @@ namespace Modding
         /// <param name="method">Method name</param>
         /// <param name="instance"></param>
         /// <returns>MethodInfo for method or null if method does not exist.</returns>
+        [PublicAPI]
         public static MethodInfo GetMethodInfo(Type t, string method, bool instance = true)
         {
             if (!Methods.TryGetValue(t, out ConcurrentDictionary<string, MethodInfo> typeMethods))
@@ -652,7 +767,7 @@ namespace Modding
         }
         
         /// <summary>
-        /// Call an instance method with a return type
+        ///     Call an instance method with a return type
         /// </summary>
         /// <param name="obj">Object of type which the method is on</param>
         /// <param name="name">Name of the method</param>
@@ -668,7 +783,7 @@ namespace Modding
         }
 
         /// <summary>
-        /// Call an instance method without a return type
+        ///     Call an instance method without a return type
         /// </summary>
         /// <param name="obj">Object of type which the method is on</param>
         /// <param name="name">Name of the method</param>
@@ -681,11 +796,32 @@ namespace Modding
             MethodInfo mi = GetMethodInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Method {name} does not exist!");
             GetFastReflectionDelegate(mi).Invoke(obj, param.Length == 0 ? null : param);
         }
+
+        /// <summary>
+        ///     Call a static method with a return type
+        /// </summary>
+        /// <param name="name">Name of the method</param>
+        /// <param name="param">The paramters that need to be passed into the method.</param>
+        /// <typeparam name="TType">The Type which static method resides upon</typeparam>
+        /// <typeparam name="TReturn">The return type of the method</typeparam>
+        /// <returns>The specified return type</returns>
+        [PublicAPI]
+        public static TReturn CallMethod<TType, TReturn>(string name, params object[] param) => CallMethod<TReturn>(typeof(TType), name, param);
         
         /// <summary>
-        /// Call a static method with a return type
+        ///     Call a static method without a return type
         /// </summary>
-        /// <param name="type">Type which static method resides upon</param>
+        /// <param name="name">Name of the method</param>
+        /// <param name="param">The paramters that need to be passed into the method.</param>
+        /// <typeparam name="TType">The Type which static method resides upon</typeparam>
+        /// <returns>None</returns>
+        [PublicAPI]
+        public static void CallMethod<TType>(string name, params object[] param) => CallMethod(typeof(TType), name, param);
+
+        /// <summary>
+        ///     Call a static method with a return type (for static classes)
+        /// </summary>
+        /// <param name="type">Static Type which static method resides upon</param>
         /// <param name="name">Name of the method</param>
         /// <param name="param">The paramters that need to be passed into the method.</param>
         /// <typeparam name="TReturn">The return type of the method</typeparam>
@@ -698,9 +834,9 @@ namespace Modding
         }
 
         /// <summary>
-        /// Call a static method without a return type
+        ///     Call a static method without a return type (for static classes)
         /// </summary>
-        /// <param name="type">Type which static method resides upon</param>
+        /// <param name="type">Static Type which static method resides upon</param>
         /// <param name="name">Name of the method</param>
         /// <param name="param">The paramters that need to be passed into the method.</param>
         /// <returns>None</returns>
