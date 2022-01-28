@@ -225,7 +225,7 @@ namespace Modding
                                 "ModMenuButton",
                                 new MenuButtonConfig
                                 {
-                                    CancelAction = self => UIManager.instance.UIGoToMainMenu(),
+                                    CancelAction = self => UIManager.instance.UILeaveOptionsMenu(),
                                     Label = "Mods",
                                     SubmitAction = GoToModListMenu,
                                     Proceed = true,
