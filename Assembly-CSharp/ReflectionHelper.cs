@@ -39,11 +39,7 @@ namespace Modding
             {
                 tFields = new ConcurrentDictionary<string, FieldInfo>();
             }
-            if (!Properties.TryGetValue(t, out ConcurrentDictionary<string, PropertyInfo> tProperties))
-            {
-                tProperties = new ConcurrentDictionary<string, PropertyInfo>();
-            }
-
+            
             const BindingFlags privStatic = BindingFlags.NonPublic | BindingFlags.Static;
             const BindingFlags all = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
 
@@ -54,75 +50,33 @@ namespace Modding
             MethodInfo getInstanceFieldSetter = typeof(ReflectionHelper).GetMethod(nameof(GetInstanceFieldSetter), privStatic);
             MethodInfo getStaticFieldSetter = typeof(ReflectionHelper).GetMethod(nameof(GetStaticFieldSetter), privStatic);
             
-            MethodInfo getInstancePropertyGetter = typeof(ReflectionHelper).GetMethod(nameof(GetInstancePropertyGetter), privStatic);
-            MethodInfo getStaticPropertyGetter = typeof(ReflectionHelper).GetMethod(nameof(GetStaticPropertyGetter), privStatic);
-            MethodInfo getInstancePropertySetter = typeof(ReflectionHelper).GetMethod(nameof(GetInstancePropertySetter), privStatic);
-            MethodInfo getStaticPropertySetter = typeof(ReflectionHelper).GetMethod(nameof(GetStaticPropertySetter), privStatic);
-            
-
             Parallel.ForEach
             (
                 t.GetFields(all),
                 field =>
                 {
                     tFields[field.Name] = field;
-                    
-                    if (!field.IsLiteral) //not const
-                    {
-                        if (!field.IsStatic) //if instance
-                        {
-                            getInstanceFieldGetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
-                        }
-                        else //if static
-                        {
-                            getStaticFieldGetter?.MakeGenericMethod(field.FieldType).Invoke(null, new object[] { field });
-                        }
-                    }
-                    if (!field.IsLiteral && !field.IsInitOnly) //not const and not readonly
-                    {
-                        if (!field.IsStatic) //if instance
-                        {
-                            getInstanceFieldSetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, new object[] { field });
-                        }
-                        else //if static
-                        {
-                            getStaticFieldSetter?.MakeGenericMethod(field.FieldType).Invoke(null, new object[] { field });
-                        }
-                        
-                    }
-                }
-            );
-            Parallel.ForEach
-            (
-                t.GetProperties(all),
-                property =>
-                {
-                    tProperties[property.Name] = property;
-                    
-                    if (property.CanRead) //if it has a get method
-                    {
-                        if (!property.GetMethod.IsStatic) //if instance
-                        {
-                            getInstancePropertyGetter?.MakeGenericMethod(t, property.PropertyType).Invoke(null, new object[] { property });
-                        }
-                        else //if static
-                        {
-                            getStaticPropertyGetter?.MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property });
-                        }
-                    }
 
-                    if (property.CanWrite) //if it has set method
-                    {
-                        if (!property.SetMethod.IsStatic) //if instance
-                        {
-                            getInstancePropertySetter?.MakeGenericMethod(t, property.PropertyType).Invoke(null, new object[] { property });
-                        }
-                        else //if static
-                        {
-                            getStaticPropertySetter?.MakeGenericMethod(property.PropertyType).Invoke(null, new object[] { property });
+                    // Don't need to preload consts, immutable anyways.
+                    if (field.IsLiteral)
+                        return;
+                    
+                    object[] @params = { field };
 
-                        }
-                    }
+                    // Getters
+                    if (field.IsStatic)
+                        getStaticFieldGetter?.MakeGenericMethod(field.FieldType).Invoke(null, @params);
+                    else
+                        getInstanceFieldGetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, @params);
+
+                    // Don't get a setter if it's readonly
+                    if (field.IsInitOnly) 
+                        return;
+
+                    if (field.IsStatic)
+                        getStaticFieldSetter?.MakeGenericMethod(field.FieldType).Invoke(null, @params);
+                    else
+                        getInstanceFieldSetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, @params);
                 }
             );
         }
