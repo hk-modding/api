@@ -15,19 +15,14 @@ namespace Modding
     public static class ReflectionHelper
     {
         private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, FieldInfo>> Fields = new();
-        
-        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, PropertyInfo>> Properties = new();
-
         private static readonly ConcurrentDictionary<FieldInfo, Delegate> FieldGetters = new();
-
         private static readonly ConcurrentDictionary<FieldInfo, Delegate> FieldSetters = new();
         
+        private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, PropertyInfo>> Properties = new();
         private static readonly ConcurrentDictionary<PropertyInfo, Delegate> PropertyGetters = new();
-        
         private static readonly ConcurrentDictionary<PropertyInfo, Delegate> PropertySetters = new();
         
         private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, MethodInfo>> Methods = new();
-        
         private static readonly ConcurrentDictionary<MethodInfo, FastReflectionDelegate> MethodsDelegates = new();
 
         private static bool _preloaded;
