@@ -208,11 +208,7 @@ namespace Modding
             GetPreloads(orderedMods, scenes, toPreload);
             if (toPreload.Count > 0)
             {
-                Preloader pld = coroutineHolder.GetComponent<Preloader>();
-                if (pld == null)
-                {
-                    pld = coroutineHolder.AddComponent<Preloader>();
-                }
+                Preloader pld = coroutineHolder.GetOrAddComponent<Preloader>();
                 yield return pld.Preload(toPreload, preloadedObjects);
             }
 
