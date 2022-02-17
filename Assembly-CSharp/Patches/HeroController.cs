@@ -107,11 +107,11 @@ namespace Modding.Patches
 
                             if (this.playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.MANTIS_CHARM_SCALE);
+                                this.grubberFlyBeam.transform.SetScaleY(this.MANTIS_CHARM_SCALE);
                             }
                             else
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, 1f);
+                                this.grubberFlyBeam.transform.SetScaleY(1f);
                             }
                         }
 
@@ -128,11 +128,11 @@ namespace Modding.Patches
 
                             if (this.playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.MANTIS_CHARM_SCALE);
+                                this.grubberFlyBeam.transform.SetScaleY(this.MANTIS_CHARM_SCALE);
                             }
                             else
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, 1f);
+                                this.grubberFlyBeam.transform.SetScaleY(1f);
                             }
                         }
                     }
@@ -147,22 +147,22 @@ namespace Modding.Patches
                         if ((this.playerData.health == this.playerData.maxHealth && !this.playerData.equippedCharm_27) || (this.joniBeam && this.playerData.equippedCharm_27))
                         {
                             this.grubberFlyBeam = this.grubberFlyBeamPrefabU.Spawn(this.transform.position);
-                            Extensions.SetScaleY(this.grubberFlyBeam.transform, this.transform.localScale.x);
+                            this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
                             this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 270f);
                             if (this.playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
+                                this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
                             }
                         }
 
                         if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
                         {
                             this.grubberFlyBeam = this.grubberFlyBeamPrefabU_fury.Spawn(this.transform.position);
-                            Extensions.SetScaleY(this.grubberFlyBeam.transform, this.transform.localScale.x);
+                            this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
                             this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 270f);
                             if (this.playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
+                                this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
                             }
                         }
                     }
@@ -177,22 +177,22 @@ namespace Modding.Patches
                         if ((this.playerData.health == this.playerData.maxHealth && !this.playerData.equippedCharm_27) || (this.joniBeam && this.playerData.equippedCharm_27))
                         {
                             this.grubberFlyBeam = this.grubberFlyBeamPrefabD.Spawn(this.transform.position);
-                            Extensions.SetScaleY(this.grubberFlyBeam.transform, this.transform.localScale.x);
+                            this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
                             this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
                             if (this.playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
+                                this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
                             }
                         }
 
                         if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
                         {
                             this.grubberFlyBeam = this.grubberFlyBeamPrefabD_fury.Spawn(this.transform.position);
-                            Extensions.SetScaleY(this.grubberFlyBeam.transform, this.transform.localScale.x);
+                            this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
                             this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
                             if (this.playerData.equippedCharm_13)
                             {
-                                Extensions.SetScaleY(this.grubberFlyBeam.transform, this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
+                                this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
                             }
                         }
                     }

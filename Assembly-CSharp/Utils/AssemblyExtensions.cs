@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Modding
+namespace Modding.Utils
 {
     /// <summary>
-    /// Class containing extensions used by the Modding API for dealing with assemblies.
+    /// Class containing extensions used by the Modding API for interacting with assemblies.
     /// </summary>
     public static class AssemblyExtensions
     {
