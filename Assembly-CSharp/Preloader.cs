@@ -1,4 +1,5 @@
-﻿using System.Collections;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UObject = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
+using Modding.Utils;
 
 namespace Modding;
 
@@ -178,51 +180,22 @@ internal class Preloader : MonoBehaviour
                 {
                     Logger.APILogger.LogFine($"Fetching object \"{objName}\"");
 
-                    // Split object name into root and child names based on '/'
-                    string rootName;
-                    string childName = null;
-
-                    int slashIndex = objName.IndexOf('/');
-                    if (slashIndex == -1)
+                    GameObject obj = null;
+                    try
                     {
-                        rootName = objName;
+                        obj = UnityExtensions.GetGameObjectFromArray(rootObjects, objName);
                     }
-                    else if (slashIndex == 0 || slashIndex == objName.Length - 1)
+                    catch (ArgumentException)
                     {
-                        Logger.APILogger.LogWarn(
-                            $"Invalid preload object name given by mod `{mod.Mod.GetName()}`: \"{objName}\""
-                        );
+                        Logger.APILogger.LogWarn($"Invalid GameObject name {objName}");
                         continue;
                     }
-                    else
-                    {
-                        rootName = objName.Substring(0, slashIndex);
-                        childName = objName.Substring(slashIndex + 1);
-                    }
-
-                    // Get root object
-                    GameObject obj = rootObjects.FirstOrDefault(o => o.name == rootName);
                     if (obj == null)
                     {
                         Logger.APILogger.LogWarn(
                             $"Could not find object \"{objName}\" in scene \"{sceneName}\"," + $" requested by mod `{mod.Mod.GetName()}`"
                         );
                         continue;
-                    }
-
-                    // Get child object
-                    if (childName != null)
-                    {
-                        Transform t = obj.transform.Find(childName);
-                        if (t == null)
-                        {
-                            Logger.APILogger.LogWarn(
-                                $"Could not find object \"{objName}\" in scene \"{sceneName}\"," + $" requested by mod `{mod.Mod.GetName()}`"
-                            );
-                            continue;
-                        }
-
-                        obj = t.gameObject;
                     }
 
                     // Create all sub-dictionaries if necessary (Yes, it's terrible)
