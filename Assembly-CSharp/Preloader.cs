@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -179,7 +180,16 @@ internal class Preloader : MonoBehaviour
                 {
                     Logger.APILogger.LogFine($"Fetching object \"{objName}\"");
 
-                    GameObject obj = UnityExtensions.GetGameObjectFromArray(rootObjects, objName);
+                    GameObject obj = null;
+                    try
+                    {
+                        obj = UnityExtensions.GetGameObjectFromArray(rootObjects, objName);
+                    }
+                    catch (ArgumentException)
+                    {
+                        Logger.APILogger.LogWarn($"Invalid GameObject name {objName}");
+                        continue;
+                    }
                     if (obj == null)
                     {
                         Logger.APILogger.LogWarn(

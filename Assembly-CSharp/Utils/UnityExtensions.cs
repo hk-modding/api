@@ -31,6 +31,7 @@ namespace Modding.Utils
         /// <param name="scene">The scene to search.</param>
         /// <param name="objName">The name of the object in the hierarchy, with '/' separating parent GameObjects from child GameObjects.</param>
         /// <returns>The GameObject if found; null if not.</returns>
+        /// <exception cref="ArgumentException">Thrown if the path to the game object is invalid.</exception>
         public static GameObject FindGameObject(this Scene scene, string objName)
         {
             GameObject[] rootObjects = scene.GetRootGameObjects();
@@ -50,8 +51,7 @@ namespace Modding.Utils
             }
             else if (slashIndex == 0 || slashIndex == objName.Length - 1)
             {
-                Logger.APILogger.LogWarn($"Invalid GameObject name {objName}");
-                return null;
+                throw new ArgumentException("Invalid GameObject path");
             }
             else
             {
@@ -61,21 +61,13 @@ namespace Modding.Utils
 
             // Get root object
             GameObject obj = objects.FirstOrDefault(o => o.name == rootName);
-            if (obj == null)
-            {
-                return null;
-            }
+            if (obj == null) return null;
 
             // Get child object
             if (childName != null)
             {
                 Transform t = obj.transform.Find(childName);
-                if (t == null)
-                {
-                    return null;
-                }
-
-                obj = t.gameObject;
+                return t == null ? null : t.gameObject;
             }
 
             return obj;
