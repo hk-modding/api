@@ -12,14 +12,12 @@ namespace Modding.Patches
     {
         private extern void orig_Awake();
 
-        private static bool StartedModLoading;
-
         private void Awake()
         {
-            if (!StartedModLoading)
+            if (ModLoader.modLoadState == ModLoader.ModLoadState.NotStarted)
             {
                 Logger.APILogger.Log("Main menu loading");
-                StartedModLoading = true;
+                ModLoader.modLoadState = ModLoader.ModLoadState.Started;
 
                 GameObject obj = new GameObject();
                 DontDestroyOnLoad(obj);
@@ -32,7 +30,8 @@ namespace Modding.Patches
             }
             else
             {
-                Logger.APILogger.LogDebug("Already begun mod loading");
+                // Debug log because this is the expected code path
+                Logger.APILogger.LogDebug($"OnScreenDebugInfo: Already begun mod loading (state {ModLoader.modLoadState})");
             }
 
             orig_Awake();

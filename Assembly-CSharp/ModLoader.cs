@@ -23,15 +23,28 @@ namespace Modding
     [PublicAPI]
     internal static class ModLoader
     {
+        [Flags]
+        public enum ModLoadState
+        {
+            NotStarted = 0,
+            Started = 1,
+            Preloaded = 2,
+            Loaded = 4,
+        }
+
+        public static ModLoadState modLoadState = ModLoadState.NotStarted;
+
         /// <summary>
         ///     Checks if the mod loads are done.
         /// </summary>
-        public static bool Loaded;
+        public static bool Loaded => modLoadState.HasFlag(ModLoadState.Loaded);
 
         /// <summary>
         ///     Checks if the mod preloads are done
         /// </summary>
-        public static bool Preloaded;
+        public static bool Preloaded => modLoadState.HasFlag(ModLoadState.Preloaded);
+
+
 
         public static Dictionary<Type, ModInstance> ModInstanceTypeMap { get; private set; } = new();
         public static Dictionary<string, ModInstance> ModInstanceNameMap { get; private set; } = new();
@@ -57,8 +70,8 @@ namespace Modding
         {
             if (Loaded || Preloaded)
             {
-                if (Preloaded) Logger.APILogger.LogDebug("Already preloaded mods");
-                if (Loaded) Logger.APILogger.LogDebug("Already loaded mods");
+                // Not expected
+                Logger.APILogger.LogWarn($"LoadModsInit: Already begun loading mods (state {modLoadState})");
                 UObject.Destroy(coroutineHolder);
                 yield break;
             }
@@ -78,7 +91,7 @@ namespace Modding
 
             if (managed_path is null)
             {
-                Loaded = true;
+                modLoadState |= ModLoadState.Loaded;
 
                 UObject.Destroy(coroutineHolder);
 
@@ -247,7 +260,7 @@ namespace Modding
             Logger.APILogger.Log("Finished loading mods:\n" + modVersionDraw.drawString);
 
             ModHooks.OnFinishedLoadingMods();
-            Loaded = true;
+            modLoadState |= ModLoadState.Loaded;
 
             new ModListMenu().InitMenuCreation();
 
