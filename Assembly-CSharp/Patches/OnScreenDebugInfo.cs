@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using MonoMod;
 using UnityEngine;
 
@@ -12,18 +12,28 @@ namespace Modding.Patches
     {
         private extern void orig_Awake();
 
+        private static bool StartedModLoading;
+
         private void Awake()
         {
-            Logger.APILogger.Log("Main menu loading");
+            if (!StartedModLoading)
+            {
+                Logger.APILogger.Log("Main menu loading");
+                StartedModLoading = true;
 
-            GameObject obj = new GameObject();
-            DontDestroyOnLoad(obj);
+                GameObject obj = new GameObject();
+                DontDestroyOnLoad(obj);
 
-            // Preload reflection
-            new Thread(ReflectionHelper.PreloadCommonTypes).Start();
+                // Preload reflection
+                new Thread(ReflectionHelper.PreloadCommonTypes).Start();
 
-            // NonBouncer does absolutely nothing, which makes it a good dummy to run the loader
-            obj.AddComponent<NonBouncer>().StartCoroutine(ModLoader.LoadModsInit(obj));
+                // NonBouncer does absolutely nothing, which makes it a good dummy to run the loader
+                obj.AddComponent<NonBouncer>().StartCoroutine(ModLoader.LoadModsInit(obj));
+            }
+            else
+            {
+                Logger.APILogger.LogDebug("Already begun mod loading");
+            }
 
             orig_Awake();
         }

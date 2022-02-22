@@ -57,6 +57,8 @@ namespace Modding
         {
             if (Loaded || Preloaded)
             {
+                if (Preloaded) Logger.APILogger.LogDebug("Already preloaded mods");
+                if (Loaded) Logger.APILogger.LogDebug("Already loaded mods");
                 UObject.Destroy(coroutineHolder);
                 yield break;
             }
