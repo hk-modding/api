@@ -2206,7 +2206,7 @@ namespace Modding
             add
             {
                 _finishedLoadingModsHook += value;
-                if (ModLoader.Loaded)
+                if (ModLoader.LoadState.HasFlag(ModLoader.ModLoadState.Loaded))
                 {
                     try
                     {

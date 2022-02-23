@@ -32,18 +32,7 @@ namespace Modding
             Loaded = 4,
         }
 
-        public static ModLoadState modLoadState = ModLoadState.NotStarted;
-
-        /// <summary>
-        ///     Checks if the mod loads are done.
-        /// </summary>
-        public static bool Loaded => modLoadState.HasFlag(ModLoadState.Loaded);
-
-        /// <summary>
-        ///     Checks if the mod preloads are done
-        /// </summary>
-        public static bool Preloaded => modLoadState.HasFlag(ModLoadState.Preloaded);
-
+        public static ModLoadState LoadState = ModLoadState.NotStarted;
 
 
         public static Dictionary<Type, ModInstance> ModInstanceTypeMap { get; private set; } = new();
@@ -68,14 +57,6 @@ namespace Modding
         /// <returns></returns>
         public static IEnumerator LoadModsInit(GameObject coroutineHolder)
         {
-            if (Loaded || Preloaded)
-            {
-                // Not expected
-                Logger.APILogger.LogWarn($"LoadModsInit: Already begun loading mods (state {modLoadState})");
-                UObject.Destroy(coroutineHolder);
-                yield break;
-            }
-
             Logger.APILogger.Log("Starting mod loading");
 
             string managed_path = SystemInfo.operatingSystemFamily switch
@@ -91,7 +72,7 @@ namespace Modding
 
             if (managed_path is null)
             {
-                modLoadState |= ModLoadState.Loaded;
+                LoadState |= ModLoadState.Loaded;
 
                 UObject.Destroy(coroutineHolder);
 
@@ -260,7 +241,7 @@ namespace Modding
             Logger.APILogger.Log("Finished loading mods:\n" + modVersionDraw.drawString);
 
             ModHooks.OnFinishedLoadingMods();
-            modLoadState |= ModLoadState.Loaded;
+            LoadState |= ModLoadState.Loaded;
 
             new ModListMenu().InitMenuCreation();
 

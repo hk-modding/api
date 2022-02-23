@@ -287,7 +287,7 @@ internal class Preloader : MonoBehaviour
         // Reload the main menu to fix the music/shaders
         Logger.APILogger.LogDebug("Preload done, returning to main menu");
 
-        ModLoader.modLoadState |= ModLoader.ModLoadState.Preloaded;
+        ModLoader.LoadState |= ModLoader.ModLoadState.Preloaded;
 
         yield return USceneManager.LoadSceneAsync("Quit_To_Menu");
 
