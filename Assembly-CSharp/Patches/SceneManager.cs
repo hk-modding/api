@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using MonoMod;
@@ -75,7 +75,7 @@ namespace Modding.Patches
             {
                 orig_Start();
             }
-            catch (NullReferenceException) when (!ModLoader.Preloaded)
+            catch (NullReferenceException) when (!ModLoader.LoadState.HasFlag(ModLoader.ModLoadState.Preloaded))
             { }
         }
     }
