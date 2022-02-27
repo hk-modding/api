@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
@@ -202,6 +202,11 @@ namespace Modding
                             Converters = JsonConverterTypes.ConverterTypes
                         }
                     );
+                    if (obj is null)
+                    {
+                        Logger.APILogger.LogError($"Null global settings passed to {GetName()}");
+                        return;
+                    }
                     this.onLoadGlobalSettings(this, obj);
                 }
             }
