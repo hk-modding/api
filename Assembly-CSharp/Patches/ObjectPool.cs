@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MonoMod;
 using UnityEngine;
 
@@ -25,7 +25,7 @@ namespace Modding.Patches
                 GameObject obj = orig_Spawn(prefab, parent, position, rotation);
                 return ModHooks.OnObjectPoolSpawn(obj);
             }
-            catch (NullReferenceException) when (!ModLoader.Preloaded)
+            catch (NullReferenceException) when (!ModLoader.LoadState.HasFlag(ModLoader.ModLoadState.Preloaded))
             {
                 return null;
             }
@@ -38,7 +38,7 @@ namespace Modding.Patches
             {
                 orig_CreatePool(prefab, initialPoolSize);
             }
-            catch (NullReferenceException) when (!ModLoader.Preloaded)
+            catch (NullReferenceException) when (!ModLoader.LoadState.HasFlag(ModLoader.ModLoadState.Preloaded))
             { }
         }
     }
