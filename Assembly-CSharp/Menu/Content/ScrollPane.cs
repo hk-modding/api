@@ -52,8 +52,6 @@ namespace Modding.Menu
             out Scrollbar scroll
         )
         {
-            // Scrollbar
-            content.AddScrollbar(config, out scroll);
 
             // ScrollMask
             var scrollMask = new GameObject("ScrollMask");
@@ -73,7 +71,7 @@ namespace Modding.Menu
             mask.showMaskGraphic = false;
             // Image
             var maskImage = scrollMask.AddComponent<Image>();
-            maskImage.raycastTarget = false;
+            maskImage.raycastTarget = true;
 
             // Scrolling Pane
             var scrollPane = new GameObject("ScrollingPane");
@@ -86,7 +84,10 @@ namespace Modding.Menu
                 new RelVector2(new RelLength(0f, 1f), contentHeight),
                 new AnchoredPosition(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f))
             ).Apply(scrollPaneRt);
-            
+
+            // Scrollbar - this needs to be added after the ScrollMask to be the one to recieve mouse raycast.
+            content.AddScrollbar(config, out scroll);
+
             // allows scrolling using mouse scroll wheel
             var scrollRect = scrollMask.AddComponent<ScrollRect>();
             scrollRect.viewport = scrollMaskRt;
