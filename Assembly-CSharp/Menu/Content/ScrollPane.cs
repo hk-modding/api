@@ -109,7 +109,7 @@ namespace Modding.Menu
                     Inner = content.NavGraph,
                     Scrollbar = scroll,
                     ScrollPaneTransform = scrollPaneRt,
-                    SelectionPadding = config.SelectionPadding ?? (_ => (0, 0))
+                    SelectionPadding = config.SelectionPadding ?? (_ => (-120, 120))
                 }
             ));
 
