@@ -54,7 +54,7 @@ namespace Modding
         internal static void ClearOldModlogs()
         {
             string oldLogDir = Path.Combine(Application.persistentDataPath, "Old ModLogs");
-            Debug.Log($"Deleting modlogs older than {ModHooks.GlobalSettings.ModlogMaxAge} days ago");
+            APILogger.Log($"Deleting modlogs older than {ModHooks.GlobalSettings.ModlogMaxAge} days ago");
             foreach (string fileName in Directory.GetFiles(oldLogDir))
             {
                 if (File.GetCreationTimeUtc(fileName) < DateTime.UtcNow.AddDays(-ModHooks.GlobalSettings.ModlogMaxAge))
