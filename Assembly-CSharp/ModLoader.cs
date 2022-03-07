@@ -80,6 +80,7 @@ namespace Modding
             }
 
             ModHooks.LoadGlobalSettings();
+            Logger.ClearOldModlogs();
 
             Logger.APILogger.LogDebug($"Loading assemblies and constructing mods");
 
