@@ -39,7 +39,7 @@ namespace Modding
 
             foreach (string fileName in Directory.GetFiles(oldLogDir))
             {
-                if (File.GetCreationTimeUtc(fileName) < DateTime.UtcNow.AddDays(-7))
+                if (File.GetCreationTimeUtc(fileName) < DateTime.UtcNow.AddDays(-ModHooks.GlobalSettings.ModlogMaxAge))
                 {
                     File.Delete(fileName);
                 }
