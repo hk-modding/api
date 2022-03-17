@@ -187,33 +187,59 @@ namespace Modding
                     if (!File.Exists(_globalSettingsPath))
                         return;
                     Log("Loading Global Settings");
-                    using FileStream fileStream = File.OpenRead(_globalSettingsPath);
-                    using var reader = new StreamReader(fileStream);
-                    string json = reader.ReadToEnd();
 
-                    var obj = JsonConvert.DeserializeObject(
-                        json,
-                        saveType,
-                        new JsonSerializerSettings
-                        {
-                            ContractResolver = ShouldSerializeContractResolver.Instance,
-                            TypeNameHandling = TypeNameHandling.Auto,
-                            ObjectCreationHandling = ObjectCreationHandling.Replace,
-                            Converters = JsonConverterTypes.ConverterTypes
-                        }
-                    );
-                    if (obj is null)
-                    {
-                        Logger.APILogger.LogError($"Null global settings passed to {GetName()}");
+                    if (TryLoadGlobalSettings(_globalSettingsPath, saveType))
                         return;
+
+                    LogError($"Null global settings passed to {GetName()}");
+
+                    string globalSettingsBackup = _globalSettingsPath + ".bak";
+                    if (!File.Exists(globalSettingsBackup))
+                        return;
+
+                    if (TryLoadGlobalSettings(globalSettingsBackup, saveType))
+                    {
+                        Log("Successfully loaded global settings from backup");
+                        File.Delete(_globalSettingsPath);
+                        File.Copy(globalSettingsBackup, _globalSettingsPath);
                     }
-                    this.onLoadGlobalSettings(this, obj);
+                    LogError("Failed to load global settings from backup");
+
                 }
             }
             catch (Exception e)
             {
                 LogError(e);
             }
+        }
+
+        /// <summary>
+        /// Try to load the global settings from the given path. Returns true if the global settings were successfully loaded.
+        /// </summary>
+        private bool TryLoadGlobalSettings(string path, Type saveType)
+        {
+            using FileStream fileStream = File.OpenRead(_globalSettingsPath);
+            using var reader = new StreamReader(fileStream);
+            string json = reader.ReadToEnd();
+
+            var obj = JsonConvert.DeserializeObject(
+                json,
+                saveType,
+                new JsonSerializerSettings
+                {
+                    ContractResolver = ShouldSerializeContractResolver.Instance,
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    ObjectCreationHandling = ObjectCreationHandling.Replace,
+                    Converters = JsonConverterTypes.ConverterTypes
+                }
+            );
+
+            if (obj is null)
+            {
+                return false;
+            }
+            this.onLoadGlobalSettings(this, obj);
+            return true;
         }
 
         /// <summary>
