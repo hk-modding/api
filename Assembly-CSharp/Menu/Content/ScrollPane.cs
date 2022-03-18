@@ -52,8 +52,6 @@ namespace Modding.Menu
             out Scrollbar scroll
         )
         {
-            // Scrollbar
-            content.AddScrollbar(config, out scroll);
 
             // ScrollMask
             var scrollMask = new GameObject("ScrollMask");
@@ -73,18 +71,34 @@ namespace Modding.Menu
             mask.showMaskGraphic = false;
             // Image
             var maskImage = scrollMask.AddComponent<Image>();
-            maskImage.raycastTarget = false;
+            maskImage.raycastTarget = true;
 
             // Scrolling Pane
             var scrollPane = new GameObject("ScrollingPane");
             GameObject.DontDestroyOnLoad(scrollPane);
             scrollPane.transform.SetParent(scrollMask.transform, false);
+
             // RectTransform
             var scrollPaneRt = scrollPane.AddComponent<RectTransform>();
             RectTransformData.FromSizeAndPos(
                 new RelVector2(new RelLength(0f, 1f), contentHeight),
                 new AnchoredPosition(new Vector2(0.5f, 1f), new Vector2(0.5f, 1f))
             ).Apply(scrollPaneRt);
+
+            // Scrollbar - this needs to be added after the ScrollMask to be the one to recieve mouse raycast.
+            content.AddScrollbar(config, out scroll);
+
+            // allows scrolling using mouse scroll wheel
+            var scrollRect = scrollMask.AddComponent<ScrollRect>();
+            scrollRect.viewport = scrollMaskRt;
+            scrollRect.content = scrollPaneRt;
+            scrollRect.scrollSensitivity = 20;
+            scrollRect.horizontal = false;
+            scrollRect.movementType = ScrollRect.MovementType.Clamped;
+            scrollRect.verticalScrollbar = scroll;
+            // Auto hide if nothing to scroll
+            scrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport; 
+
             // CanvasRenderer
             scrollPane.AddComponent<CanvasRenderer>();
 
@@ -96,7 +110,7 @@ namespace Modding.Menu
                     Inner = content.NavGraph,
                     Scrollbar = scroll,
                     ScrollPaneTransform = scrollPaneRt,
-                    SelectionPadding = config.SelectionPadding ?? (_ => (0, 0))
+                    SelectionPadding = config.SelectionPadding ?? (_ => (-120, 120))
                 }
             ));
 
@@ -128,6 +142,9 @@ namespace Modding.Menu
             out Scrollbar scroll
         )
         {
+            // This method tries to maintain scrollbar structure and function as close to vanilla as possible.
+            // The convoluted object structure was made by taking direct reference of the achievements menu scroll bar.
+
             // Scrollbar
             var scrollbar = new GameObject("Scrollbar");
             GameObject.DontDestroyOnLoad(scrollbar);
@@ -140,7 +157,7 @@ namespace Modding.Menu
             scrollbar.AddComponent<CanvasRenderer>();
             // Scrollbar
             var scrollbarComp = scrollbar.AddComponent<Scrollbar>();
-            scrollbarComp.direction = Scrollbar.Direction.TopToBottom;
+            scrollbarComp.direction = Scrollbar.Direction.BottomToTop;
             scrollbarComp.numberOfSteps = 0;
             scrollbarComp.navigation = config.Navigation;
             scrollbarComp.size = 0.1f;
@@ -156,43 +173,38 @@ namespace Modding.Menu
             // RectTransform
             var slidingAreaRt = slidingArea.AddComponent<RectTransform>();
             slidingAreaRt.sizeDelta = new Vector2(-20f, -20f);
-            slidingAreaRt.pivot = new Vector2(0.5f, 0.5f);
+            slidingAreaRt.pivot = new Vector2(0.5f, 0f);
             slidingAreaRt.anchorMin = new Vector2(0f, 0f);
             slidingAreaRt.anchorMax = new Vector2(1f, 1f);
             slidingAreaRt.anchoredPosition = new Vector2(0f, 0f);
 
-            // WARNING the following two game objects have been described by onlookers as
-            // "disturbing", "akin to something from an HP Lovecraft story", "peepoUnhappy",
-            // "the worst thing I have seen since the previous line of code" and "lmao thats bad"
-            // I do not know what happened with these two rect transforms or the convoluted object structure
-            // but I do not have enough braincells to try and fix it
             // Handle
             var handle = new GameObject("Handle");
             GameObject.DontDestroyOnLoad(handle);
-            handle.transform.SetParent(scrollbar.transform, false);
+            handle.transform.SetParent(slidingArea.transform, false);
             // RectTransform
             var handleRt = handle.AddComponent<RectTransform>();
-            handleRt.sizeDelta = new Vector2(76f, 0f); // normal
-            handleRt.pivot = new Vector2(0.5f, 0.5f); // wtf did you lie to me? you said this was gonna be bad
-            handleRt.anchorMin = new Vector2(0.0f, 0.5f); // this seems normal
-            handleRt.anchorMax = new Vector2(1.0f, 0.6f); // elderC
-            handleRt.anchoredPosition = new Vector2(-1f, 0f); // omegaMaggotPrime
+            handleRt.sizeDelta = new Vector2(76f, 0f);
+            handleRt.pivot = new Vector2(0.5f, 0.5f);
+            handleRt.anchorMin = new Vector2(0.0f, 0f); 
+            handleRt.anchorMax = new Vector2(1.0f, 1f);
+            handleRt.anchoredPosition = new Vector2(-1f, 0f); 
             // CanvasRenderer
             handle.AddComponent<CanvasRenderer>();
             // Post Component Config
             scrollbarComp.handleRect = handleRt;
 
-            // TopFleur // no team cherry this is not in fact a top fleur seeing as your scrollbar is vertical
-            var handleSprite = new GameObject("TopFleur"); // I'm only keeping this cause its funny as hell
+            // TopFleur 
+            var handleSprite = new GameObject("TopFleur"); 
             GameObject.DontDestroyOnLoad(handleSprite);
             handleSprite.transform.SetParent(handle.transform, false);
             // RectTransform
             var handleSpriteRt = handleSprite.AddComponent<RectTransform>();
-            handleSpriteRt.sizeDelta = new Vector2(37.8f, 68.5f); // hmmm
-            handleSpriteRt.pivot = new Vector2(0.5f, 0.6f); // why is it 0.6
-            handleSpriteRt.anchorMin = new Vector2(0.5f, 0.6f); // please tell me
-            handleSpriteRt.anchorMax = new Vector2(0.5f, 0.6f);
-            handleSpriteRt.anchoredPosition = new Vector2(0.8f, 0f); // now its 0.8 wtf
+            handleSpriteRt.sizeDelta = new Vector2(37.8f, 68.5f); 
+            handleSpriteRt.pivot = new Vector2(0.5f, 0.8f);
+            handleSpriteRt.anchorMin = new Vector2(0.5f, 1f);
+            handleSpriteRt.anchorMax = new Vector2(0.5f, 1f);
+            handleSpriteRt.anchoredPosition = new Vector2(0.8f, 0f); 
             handleSpriteRt.localScale = new Vector3(2f, 2f, 1f);
             // CanvasRenderer
             handleSprite.AddComponent<CanvasRenderer>();
