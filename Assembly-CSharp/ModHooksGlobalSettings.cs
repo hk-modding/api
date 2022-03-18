@@ -33,5 +33,11 @@ namespace Modding
         ///     Determines for the preloading how many different scenes should be loaded at once.
         /// </summary>
         public int PreloadBatchSize = 5;
+
+
+        /// <summary>
+        ///     Maximum number of days to preserve modlogs for.
+        /// </summary>
+        public int ModlogMaxAge = 7;
     }
 }

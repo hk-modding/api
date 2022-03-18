@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -37,14 +37,6 @@ namespace Modding
                 Directory.CreateDirectory(oldLogDir);
             }
 
-            foreach (string fileName in Directory.GetFiles(oldLogDir))
-            {
-                if (File.GetCreationTimeUtc(fileName) < DateTime.UtcNow.AddDays(-7))
-                {
-                    File.Delete(fileName);
-                }
-            }
-
             string currLogName = Path.Combine(Application.persistentDataPath, "ModLog.txt");
             if (File.Exists(currLogName))
             {
@@ -57,6 +49,19 @@ namespace Modding
             Writer = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
 
             File.SetCreationTimeUtc(currLogName, DateTime.UtcNow);
+        }
+
+        internal static void ClearOldModlogs()
+        {
+            string oldLogDir = Path.Combine(Application.persistentDataPath, "Old ModLogs");
+            APILogger.Log($"Deleting modlogs older than {ModHooks.GlobalSettings.ModlogMaxAge} days ago");
+            foreach (string fileName in Directory.GetFiles(oldLogDir))
+            {
+                if (File.GetCreationTimeUtc(fileName) < DateTime.UtcNow.AddDays(-ModHooks.GlobalSettings.ModlogMaxAge))
+                {
+                    File.Delete(fileName);
+                }
+            }
         }
 
         internal static void SetLogLevel(LogLevel level)
