@@ -274,6 +274,7 @@ namespace Modding
             {
                 if (mod.Error != null)
                 {
+                    Logger.APILogger.LogWarn($"Not loading mod {mod.Name}: error state {mod.Error}");
                     continue;
                 }
 
