@@ -41,12 +41,14 @@ namespace Modding
 
         private static void AddModInstance(Type ty, ModInstance mod)
         {
-            if (ModInstanceNameMap.ContainsKey(ty.Name))
+            if (ModInstanceNameMap.ContainsKey(mod.Name))
             {
+                Logger.APILogger.LogWarn($"Found multiple mods with name {mod.Name}.");
                 mod.Error = ModErrorState.Duplicate;
-                ModInstanceNameMap[ty.Name].Error = ModErrorState.Duplicate;
+                ModInstanceNameMap[mod.Name].Error = ModErrorState.Duplicate;
                 ModInstanceTypeMap[ty] = mod;
                 ModInstances.Add(mod);
+                return;
             }
 
             ModInstanceTypeMap[ty] = mod;
@@ -155,7 +157,7 @@ namespace Modding
 
                         try
                         {
-                            if (ty.GetConstructor(new Type[0])?.Invoke(new object[0]) is Mod mod)
+                            if (ty.GetConstructor(Type.EmptyTypes)?.Invoke(Array.Empty<object>()) is Mod mod)
                             {
                                 AddModInstance(
                                     ty,
