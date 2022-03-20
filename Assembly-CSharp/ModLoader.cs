@@ -41,6 +41,14 @@ namespace Modding
 
         private static void AddModInstance(Type ty, ModInstance mod)
         {
+            if (ModInstanceNameMap.ContainsKey(ty.Name))
+            {
+                mod.Error = ModErrorState.Duplicate;
+                ModInstanceNameMap[ty.Name].Error = ModErrorState.Duplicate;
+                ModInstanceTypeMap[ty] = mod;
+                ModInstances.Add(mod);
+            }
+
             ModInstanceTypeMap[ty] = mod;
             ModInstanceNameMap[mod.Name] = mod;
             ModInstances.Add(mod);
@@ -211,6 +219,11 @@ namespace Modding
 
             foreach (ModInstance mod in orderedMods)
             {
+                if (mod.Error is not null)
+                {
+                    continue;
+                }
+
                 try
                 {
                     preloadedObjects.TryGetValue(mod, out Dictionary<string, Dictionary<string, GameObject>> preloads);
@@ -339,6 +352,9 @@ namespace Modding
                         case ModErrorState.Construct:
                             builder.AppendLine($"{mod.Name} : Failed to call constructor! Check ModLog.txt");
                             break;
+                        case ModErrorState.Duplicate:
+                            builder.AppendLine($"{mod.Name} : Failed to load! Duplicate mod detected");
+                            break;
                         case ModErrorState.Initialize:
                             builder.AppendLine($"{mod.Name} : Failed to initialize! Check ModLog.txt");
                             break;
@@ -415,6 +431,7 @@ namespace Modding
         public enum ModErrorState
         {
             Construct,
+            Duplicate,
             Initialize,
             Unload
         }
