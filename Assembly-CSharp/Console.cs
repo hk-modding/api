@@ -12,7 +12,10 @@ namespace Modding
         private static GameObject _overlayCanvas;
         private static GameObject _textPanel;
         private static Font _font;
-        private readonly List<string> _messages = new(25);
+        private List<string> _messages;
+        private KeyCode _toggleKey;
+        private int _maxMessageCount;
+        private int _fontSize;
         private bool _enabled = true;
 
         private const int MSG_LENGTH = 80;
@@ -31,15 +34,49 @@ namespace Modding
         [PublicAPI]
         public void Start()
         {
-            foreach (string font in OSFonts)
+            _toggleKey = ModHooks.GlobalSettings.ConsoleSettings.ToggleHotkey;
+            if (_toggleKey == KeyCode.Escape) {
+                Logger.APILogger.LogError($"Esc cannot be used as hotkey for console togging");
+                _toggleKey = ModHooks.GlobalSettings.ConsoleSettings.ToggleHotkey = KeyCode.F10;
+            }
+
+            _maxMessageCount = ModHooks.GlobalSettings.ConsoleSettings.MaxMessageCount;
+            if (_maxMessageCount <= 0)
             {
-                _font = Font.CreateDynamicFontFromOSFont(font, 12);
+                Logger.APILogger.LogError($"Specified max console message count {_maxMessageCount} is invalid");
+                _maxMessageCount = ModHooks.GlobalSettings.ConsoleSettings.MaxMessageCount = 24;
+            }
+            _messages = new List<string>(_maxMessageCount + 1);
 
-                // Found a monospace OS font.
-                if (_font != null)
-                    break;
+            _fontSize = ModHooks.GlobalSettings.ConsoleSettings.FontSize;
+            if (_fontSize <= 0)
+            {
+                Logger.APILogger.LogError($"Specified console font size {_fontSize} is invalid");
+                _fontSize = ModHooks.GlobalSettings.ConsoleSettings.FontSize = 12;
+            }
 
-                Logger.APILogger.Log($"Font {font} not found.");
+
+            string userFont = ModHooks.GlobalSettings.ConsoleSettings.Font;
+            if (!string.IsNullOrEmpty(userFont))
+            {
+                _font = Font.CreateDynamicFontFromOSFont(userFont, _fontSize);
+
+                if (_font == null)
+                    Logger.APILogger.LogError($"Specified font {userFont} not found.");
+            }
+
+            if (_font == null)
+            {
+                foreach (string font in OSFonts)
+                {
+                    _font = Font.CreateDynamicFontFromOSFont(font, _fontSize);
+
+                    // Found a monospace OS font.
+                    if (_font != null)
+                        break;
+
+                    Logger.APILogger.Log($"Font {font} not found.");
+                }
             }
 
             // Fallback
@@ -85,7 +122,7 @@ namespace Modding
         [PublicAPI]
         public void Update()
         {
-            if (!Input.GetKeyDown(KeyCode.F10))
+            if (!Input.GetKeyDown(_toggleKey))
             {
                 return;
             }
@@ -131,7 +168,7 @@ namespace Modding
             foreach (string s in chunks)
                 _messages.Add(color + s + "</color>");
 
-            while (_messages.Count > 24)
+            while (_messages.Count > _maxMessageCount)
             {
                 _messages.RemoveAt(0);
             }
