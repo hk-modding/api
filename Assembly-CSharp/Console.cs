@@ -36,35 +36,7 @@ namespace Modding
         [PublicAPI]
         public void Start()
         {
-            _toggleKey = ModHooks.GlobalSettings.ConsoleSettings.ToggleHotkey;
-            if (_toggleKey == KeyCode.Escape) 
-            {
-                Logger.APILogger.LogError($"Esc cannot be used as hotkey for console togging");
-                _toggleKey = ModHooks.GlobalSettings.ConsoleSettings.ToggleHotkey = KeyCode.F10;
-            }
-
-            _maxMessageCount = ModHooks.GlobalSettings.ConsoleSettings.MaxMessageCount;
-            if (_maxMessageCount <= 0)
-            {
-                Logger.APILogger.LogError($"Specified max console message count {_maxMessageCount} is invalid");
-                _maxMessageCount = ModHooks.GlobalSettings.ConsoleSettings.MaxMessageCount = 24;
-            }
-
-            _fontSize = ModHooks.GlobalSettings.ConsoleSettings.FontSize;
-            if (_fontSize <= 0)
-            {
-                Logger.APILogger.LogError($"Specified console font size {_fontSize} is invalid");
-                _fontSize = ModHooks.GlobalSettings.ConsoleSettings.FontSize = 12;
-            }
-
-            string userFont = ModHooks.GlobalSettings.ConsoleSettings.Font;
-            if (!string.IsNullOrEmpty(userFont))
-            {
-                _font = Font.CreateDynamicFontFromOSFont(userFont, _fontSize);
-
-                if (_font == null)
-                    Logger.APILogger.LogError($"Specified font {userFont} not found.");
-            }
+            LoadSettings();
 
             if (_font == null)
             {
@@ -120,6 +92,48 @@ namespace Modding
             _textPanel.GetComponent<Text>().horizontalOverflow = HorizontalWrapMode.Wrap;
         }
 
+        private void LoadSettings()
+        {
+            InGameConsoleSettings settings = ModHooks.GlobalSettings.ConsoleSettings;
+            
+            _toggleKey = settings.ToggleHotkey;
+            
+            if (_toggleKey == KeyCode.Escape)
+            {
+                Logger.APILogger.LogError("Esc cannot be used as hotkey for console togging");
+                
+                _toggleKey = settings.ToggleHotkey = KeyCode.F10;
+            }
+
+            _maxMessageCount = settings.MaxMessageCount;
+            
+            if (_maxMessageCount <= 0)
+            {
+                Logger.APILogger.LogError($"Specified max console message count {_maxMessageCount} is invalid");
+                
+                _maxMessageCount = settings.MaxMessageCount = 24;
+            }
+
+            _fontSize = settings.FontSize;
+            
+            if (_fontSize <= 0)
+            {
+                Logger.APILogger.LogError($"Specified console font size {_fontSize} is invalid");
+                
+                _fontSize = settings.FontSize = 12;
+            }
+
+            string userFont = settings.Font;
+            
+            if (string.IsNullOrEmpty(userFont)) 
+                return;
+            
+            _font = Font.CreateDynamicFontFromOSFont(userFont, _fontSize);
+
+            if (_font == null)
+                Logger.APILogger.LogError($"Specified font {userFont} not found.");
+        }
+
         [PublicAPI]
         public void Update()
         {
@@ -146,24 +160,15 @@ namespace Modding
 
             if (ModHooks.GlobalSettings.ConsoleSettings.UseLogColors)
             {
-                switch (level)
+                color = level switch
                 {
-                    case LogLevel.Fine:
-                        color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.FineColor}>";
-                        break;
-                    case LogLevel.Info:
-                        color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.InfoColor}>";
-                        break;
-                    case LogLevel.Debug:
-                        color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.DebugColor}>";
-                        break;
-                    case LogLevel.Warn:
-                        color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.WarningColor}>";
-                        break;
-                    case LogLevel.Error:
-                        color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.ErrorColor}>";
-                        break;
-                }
+                    LogLevel.Fine => $"<color={ModHooks.GlobalSettings.ConsoleSettings.FineColor}>",
+                    LogLevel.Info => $"<color={ModHooks.GlobalSettings.ConsoleSettings.InfoColor}>",
+                    LogLevel.Debug => $"<color={ModHooks.GlobalSettings.ConsoleSettings.DebugColor}>",
+                    LogLevel.Warn => $"<color={ModHooks.GlobalSettings.ConsoleSettings.WarningColor}>",
+                    LogLevel.Error => $"<color={ModHooks.GlobalSettings.ConsoleSettings.ErrorColor}>",
+                    _ => color
+                };
             }
 
             foreach (string s in chunks)
