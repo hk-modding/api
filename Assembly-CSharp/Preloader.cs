@@ -26,9 +26,9 @@ internal class Preloader : MonoBehaviour
     private GameObject _loadingBar;
     private RectTransform _loadingBarRect;
 
-    private float _commandedProgress = 0.0f;
-    private float _shownProgress = 0.0f;
-    private float _secondsSinceLastSet = 0.0f;
+    private float _commandedProgress;
+    private float _shownProgress;
+    private float _secondsSinceLastSet;
 
     public IEnumerator Preload(
         Dictionary<string, List<(ModLoader.ModInstance, List<string>)>> toPreload,
@@ -180,7 +180,8 @@ internal class Preloader : MonoBehaviour
                 {
                     Logger.APILogger.LogFine($"Fetching object \"{objName}\"");
 
-                    GameObject obj = null;
+                    GameObject obj;
+                    
                     try
                     {
                         obj = UnityExtensions.GetGameObjectFromArray(rootObjects, objName);
@@ -190,6 +191,7 @@ internal class Preloader : MonoBehaviour
                         Logger.APILogger.LogWarn($"Invalid GameObject name {objName}");
                         continue;
                     }
+                    
                     if (obj == null)
                     {
                         Logger.APILogger.LogWarn(
@@ -220,8 +222,8 @@ internal class Preloader : MonoBehaviour
                     }
 
                     // Create inactive duplicate of requested object
-                    obj = UObject.Instantiate(obj);
-                    UObject.DontDestroyOnLoad(obj);
+                    obj = Instantiate(obj);
+                    DontDestroyOnLoad(obj);
                     obj.SetActive(false);
 
                     // Set object to be passed to mod
@@ -297,15 +299,15 @@ internal class Preloader : MonoBehaviour
         }
 
         // Remove the black screen
-        UObject.Destroy(_loadingBar);
-        UObject.Destroy(_loadingBarBackground);
-        UObject.Destroy(_blanker);
+        Destroy(_loadingBar);
+        Destroy(_loadingBarBackground);
+        Destroy(_blanker);
     }
     
     /// <summary>
     ///     Unmutes all audio from AudioListeners.
     /// </summary>
-    private void UnmuteAllAudio()
+    private static void UnmuteAllAudio()
     {
         AudioListener.pause = false;
     }

@@ -398,7 +398,7 @@ namespace Modding
         {
             try
             {
-                if (mod is ModInstance {Enabled: false, Error: null})
+                if (mod is { Enabled: false, Error: null })
                 {
                     mod.Enabled = true;
                     mod.Mod.Initialize(preloadedObjects);
@@ -417,7 +417,7 @@ namespace Modding
         {
             try
             {
-                if (mod is ModInstance {Mod: ITogglableMod itmod, Enabled: true, Error: null})
+                if (mod is { Mod: ITogglableMod itmod, Enabled: true, Error: null })
                 {
                     mod.Enabled = false;
                     itmod.Unload();

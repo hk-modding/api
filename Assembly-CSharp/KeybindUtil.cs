@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using InControl;
 
 namespace Modding
@@ -16,24 +15,21 @@ namespace Modding
         /// <returns></returns>
         public static InputHandler.KeyOrMouseBinding GetKeyOrMouseBinding(this PlayerAction action)
         {
-            foreach (var src in action.Bindings)
+            foreach (BindingSource src in action.Bindings)
             {
-                InputHandler.KeyOrMouseBinding ret = default;
-                if (src is KeyBindingSource kbs && kbs.Control.IncludeCount == 1)
+                InputHandler.KeyOrMouseBinding ret = src switch
                 {
-                    ret = new InputHandler.KeyOrMouseBinding(
-                        kbs.Control.GetInclude(0)
-                    );
-                }
-                else if (src is MouseBindingSource mbs)
-                {
-                    ret = new InputHandler.KeyOrMouseBinding(mbs.Control);
-                }
+                    KeyBindingSource { Control.IncludeCount: 1 } kbs => new InputHandler.KeyOrMouseBinding(kbs.Control.GetInclude(0)),
+                    MouseBindingSource mbs => new InputHandler.KeyOrMouseBinding(mbs.Control),
+                    _ => default
+                };
+                
                 if (!InputHandler.KeyOrMouseBinding.IsNone(ret))
                 {
                     return ret;
                 }
             }
+            
             return default;
         }
 

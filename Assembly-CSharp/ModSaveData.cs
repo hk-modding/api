@@ -42,6 +42,6 @@ namespace Modding
     internal class ModSavegameData
     {
         public Dictionary<string, string> loadedMods;
-        public Dictionary<string, JToken> modData = new Dictionary<string, JToken>();
+        public Dictionary<string, JToken> modData = new();
     }
 }

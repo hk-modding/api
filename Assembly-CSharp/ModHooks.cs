@@ -33,10 +33,7 @@ namespace Modding
         /// <summary>
         ///     A map of mods to their built menu screens.
         /// </summary>
-        public static ReadOnlyDictionary<IMod, MenuScreen> BuiltModMenuScreens
-        {
-            get => new ReadOnlyDictionary<IMod, MenuScreen>(ModListMenu.ModScreens);
-        }
+        public static ReadOnlyDictionary<IMod, MenuScreen> BuiltModMenuScreens => new(ModListMenu.ModScreens);
 
         /// <summary>
         ///     Dictionary of mods and their version #s
@@ -90,7 +87,7 @@ namespace Modding
         /// <summary>
         /// The global ModHooks settings.
         /// </summary>
-        public static ModHooksGlobalSettings GlobalSettings { get; private set; } = new ModHooksGlobalSettings();
+        public static ModHooksGlobalSettings GlobalSettings { get; private set; } = new();
 
         internal static void LoadGlobalSettings()
         {
@@ -2194,6 +2191,7 @@ namespace Modding
         #endregion
 
         private static event Action _finishedLoadingModsHook;
+        
         /// <summary>
         /// Event invoked when mods have finished loading. If modloading has already finished, subscribers will be invoked immediately.
         /// </summary>
@@ -2202,23 +2200,22 @@ namespace Modding
             add
             {
                 _finishedLoadingModsHook += value;
-                if (ModLoader.LoadState.HasFlag(ModLoader.ModLoadState.Loaded))
+                
+                if (!ModLoader.LoadState.HasFlag(ModLoader.ModLoadState.Loaded)) 
+                    return;
+                
+                try
                 {
-                    try
-                    {
-                        value.Invoke();
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.APILogger.LogError(ex);
-                    }
+                    value.Invoke();
+                }
+                catch (Exception ex)
+                {
+                    Logger.APILogger.LogError(ex);
                 }
             }
-            remove
-            {
-                _finishedLoadingModsHook -= value;
-            }
+            remove => _finishedLoadingModsHook -= value;
         }
+        
         internal static void OnFinishedLoadingMods()
         {
             if (_finishedLoadingModsHook == null)

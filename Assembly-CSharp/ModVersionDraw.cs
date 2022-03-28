@@ -29,8 +29,7 @@ namespace Modding
                 return;
             }
 
-            if (drawString != null && (UIManager.instance.uiState == UIState.MAIN_MENU_HOME ||
-                                       UIManager.instance.uiState == UIState.PAUSED))
+            if (drawString != null && UIManager.instance.uiState is UIState.MAIN_MENU_HOME or UIState.PAUSED)
             {
                 if (style == null)
                 {
@@ -44,8 +43,12 @@ namespace Modding
                 GUI.backgroundColor = Color.white;
                 GUI.contentColor = Color.white;
                 GUI.color = Color.white;
-                GUI.matrix = Matrix4x4.TRS(Vector3.zero, Quaternion.identity,
-                    new Vector3(Screen.width / 1920f, Screen.height / 1080f, 1f));
+                GUI.matrix = Matrix4x4.TRS
+                (
+                    Vector3.zero,
+                    Quaternion.identity,
+                    new Vector3(Screen.width / 1920f, Screen.height / 1080f, 1f)
+                );
                 GUI.Label(new Rect(0f, 0f, 1920f, 1080f), drawString, style);
                 GUI.backgroundColor = backgroundColor;
                 GUI.contentColor = contentColor;
