@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection.Emit;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,11 +11,14 @@ namespace Modding
         private static GameObject _overlayCanvas;
         private static GameObject _textPanel;
         private static Font _font;
-        private List<string> _messages;
-        private KeyCode _toggleKey;
-        private int _maxMessageCount;
-        private int _fontSize;
+        
         private bool _enabled = true;
+        
+        private readonly List<string> _messages = new(25);
+        
+        private KeyCode _toggleKey = KeyCode.F10;
+        private int _maxMessageCount = 25;
+        private int _fontSize = 12;
 
         private const int MSG_LENGTH = 80;
 
@@ -35,7 +37,8 @@ namespace Modding
         public void Start()
         {
             _toggleKey = ModHooks.GlobalSettings.ConsoleSettings.ToggleHotkey;
-            if (_toggleKey == KeyCode.Escape) {
+            if (_toggleKey == KeyCode.Escape) 
+            {
                 Logger.APILogger.LogError($"Esc cannot be used as hotkey for console togging");
                 _toggleKey = ModHooks.GlobalSettings.ConsoleSettings.ToggleHotkey = KeyCode.F10;
             }
@@ -46,7 +49,6 @@ namespace Modding
                 Logger.APILogger.LogError($"Specified max console message count {_maxMessageCount} is invalid");
                 _maxMessageCount = ModHooks.GlobalSettings.ConsoleSettings.MaxMessageCount = 24;
             }
-            _messages = new List<string>(_maxMessageCount + 1);
 
             _fontSize = ModHooks.GlobalSettings.ConsoleSettings.FontSize;
             if (_fontSize <= 0)
@@ -54,7 +56,6 @@ namespace Modding
                 Logger.APILogger.LogError($"Specified console font size {_fontSize} is invalid");
                 _fontSize = ModHooks.GlobalSettings.ConsoleSettings.FontSize = 12;
             }
-
 
             string userFont = ModHooks.GlobalSettings.ConsoleSettings.Font;
             if (!string.IsNullOrEmpty(userFont))
