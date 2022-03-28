@@ -9,7 +9,6 @@ using System.Text;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using UObject = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 using Modding.Utils;
@@ -74,6 +73,16 @@ namespace Modding
         /// <returns></returns>
         public static IEnumerator LoadModsInit(GameObject coroutineHolder)
         {
+            try
+            {
+                Logger.InitializeFileStream();
+            }
+            catch (Exception e)
+            {
+                // We can still log to the console at least, if that's enabled.
+                Logger.APILogger.LogError(e);
+            }
+
             Logger.APILogger.Log("Starting mod loading");
 
             string managed_path = SystemInfo.operatingSystemFamily switch

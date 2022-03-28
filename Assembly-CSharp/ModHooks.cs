@@ -26,8 +26,6 @@ namespace Modding
     {
         private const int _modVersion = 68;
 
-        internal static bool IsInitialized;
-
         private static readonly string SettingsPath = Path.Combine(Application.persistentDataPath, "ModdingApi.GlobalSettings.json");
 
         private static ModHooks _instance;
@@ -87,8 +85,6 @@ namespace Modding
 
             // Save global settings only if mods have finished loading
             FinishedLoadingModsHook += () => ApplicationQuitHook += SaveGlobalSettings;
-
-            IsInitialized = true;
         }
 
         /// <summary>

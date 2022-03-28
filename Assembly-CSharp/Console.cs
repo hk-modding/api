@@ -155,7 +155,7 @@ namespace Modding
         public void AddText(string message, LogLevel level)
         {
             IEnumerable<string> chunks = Chunks(message, MSG_LENGTH);
-
+            
             string color = $"<color={ModHooks.GlobalSettings.ConsoleSettings.DefaultColor}>";
 
             if (ModHooks.GlobalSettings.ConsoleSettings.UseLogColors)

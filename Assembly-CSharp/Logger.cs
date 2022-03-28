@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -17,50 +18,55 @@ namespace Modding
     public static class Logger
     {
         private static readonly object Locker = new();
-        private static readonly StreamWriter Writer;
+        private static StreamWriter Writer;
 
         private static LogLevel _logLevel;
 
+        private static string OldLogDir = Path.Combine(Application.persistentDataPath, "Old ModLogs");
+
         internal static readonly SimpleLogger APILogger = new("API");
 
-        /// <summary>
-        ///     Logger Constructor.  Initializes file to write to.
-        /// </summary>
-        static Logger()
+        internal static void InitializeFileStream()
         {
             Debug.Log("Creating Mod Logger");
+            
             _logLevel = LogLevel.Debug;
 
-            string oldLogDir = Path.Combine(Application.persistentDataPath, "Old ModLogs");
-            if (!Directory.Exists(oldLogDir))
-            {
-                Directory.CreateDirectory(oldLogDir);
-            }
+            Directory.CreateDirectory(OldLogDir);
 
-            string currLogName = Path.Combine(Application.persistentDataPath, "ModLog.txt");
-            if (File.Exists(currLogName))
-            {
-                string oldLogName = "ModLog " + File.GetCreationTimeUtc(currLogName)
-                                        .ToString("MM dd yyyy (HH mm ss)", CultureInfo.InvariantCulture) + ".txt";
-                File.Move(currLogName, Path.Combine(oldLogDir, oldLogName));
-            }
+            string current = Path.Combine(Application.persistentDataPath, "ModLog.txt");
 
-            var fileStream = new FileStream(currLogName, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
-            Writer = new StreamWriter(fileStream, Encoding.UTF8) {AutoFlush = true};
+            BackupLog(current, OldLogDir);
+            
+            var fs = new FileStream(current, FileMode.Create, FileAccess.Write, FileShare.ReadWrite);
+            
+            lock (Locker) 
+                Writer = new StreamWriter(fs, Encoding.UTF8) { AutoFlush = true };
 
-            File.SetCreationTimeUtc(currLogName, DateTime.UtcNow);
+            File.SetCreationTimeUtc(current, DateTime.UtcNow);
+        }
+
+        private static void BackupLog(string path, string dir)
+        {
+            if (!File.Exists(path)) 
+                return;
+            
+            string time = File.GetCreationTimeUtc(path).ToString("MM dd yyyy (HH mm ss)", CultureInfo.InvariantCulture);
+            
+            File.Move(path, Path.Combine(dir, $"ModLog {time}.txt"));
         }
 
         internal static void ClearOldModlogs()
         {
             string oldLogDir = Path.Combine(Application.persistentDataPath, "Old ModLogs");
+            
             APILogger.Log($"Deleting modlogs older than {ModHooks.GlobalSettings.ModlogMaxAge} days ago");
-            foreach (string fileName in Directory.GetFiles(oldLogDir))
+
+            DateTime limit = DateTime.UtcNow.AddDays(-ModHooks.GlobalSettings.ModlogMaxAge);
+            
+            foreach (string file in Directory.GetFiles(oldLogDir).Where(f => File.GetCreationTimeUtc(f) < limit))
             {
-                if (File.GetCreationTimeUtc(fileName) < DateTime.UtcNow.AddDays(-ModHooks.GlobalSettings.ModlogMaxAge))
-                {
-                    File.Delete(fileName);
-                }
+                File.Delete(file);
             }
         }
 
@@ -194,12 +200,9 @@ namespace Modding
         {
             lock (Locker)
             {
-                if (ModHooks.IsInitialized)
-                {
-                    ModHooks.LogConsole(text, level);
-                }
+                ModHooks.LogConsole(text, level);
 
-                Writer.Write(text);
+                Writer?.Write(text);
             }
         }
     }
