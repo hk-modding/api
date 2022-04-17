@@ -128,10 +128,10 @@ namespace Modding.Patches
 
                     if (this.playerData != null)
                     {
-                        this.playerData.playTime += this.sessionPlayTimer;
+                        this.playerData.SetFloat(nameof(PlayerData.playTime), this.playerData.GetFloat(nameof(PlayerData.playTime)) + this.sessionPlayTimer);
                         this.ResetGameTimer();
-                        this.playerData.version = Constants.GAME_VERSION;
-                        this.playerData.profileID = saveSlot;
+                        this.playerData.SetString(nameof(PlayerData.version), Constants.GAME_VERSION);
+                        this.playerData.SetInt(nameof(PlayerData.profileID), saveSlot);
                         this.playerData.CountGameCompletion();
                     }
                     else
