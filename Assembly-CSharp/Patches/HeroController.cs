@@ -59,7 +59,7 @@ namespace Modding.Patches
             }
 
             this.cState.attacking = true;
-            if (this.playerData.equippedCharm_32)
+            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_32)))
             {
                 this.attackDuration = this.ATTACK_DURATION_CH;
             }
@@ -92,9 +92,9 @@ namespace Modding.Patches
                         this.cState.altAttack = false;
                     }
 
-                    if (this.playerData.equippedCharm_35)
+                    if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_35)))
                     {
-                        if ((this.playerData.health == this.playerData.maxHealth && !this.playerData.equippedCharm_27) || (this.joniBeam && this.playerData.equippedCharm_27))
+                        if ((this.playerData.GetInt(nameof(PlayerData.health)) == this.playerData.GetInt(nameof(PlayerData.maxHealth)) && !this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))) || (this.joniBeam && this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))))
                         {
                             if (this.transform.localScale.x < 0f)
                             {
@@ -105,7 +105,7 @@ namespace Modding.Patches
                                 this.grubberFlyBeam = this.grubberFlyBeamPrefabL.Spawn(this.transform.position);
                             }
 
-                            if (this.playerData.equippedCharm_13)
+                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
                             {
                                 this.grubberFlyBeam.transform.SetScaleY(this.MANTIS_CHARM_SCALE);
                             }
@@ -115,7 +115,7 @@ namespace Modding.Patches
                             }
                         }
 
-                        if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
+                        if (this.playerData.GetInt(nameof(PlayerData.health)) == 1 && this.playerData.GetBool(nameof(PlayerData.equippedCharm_6)) && this.playerData.GetInt(nameof(PlayerData.healthBlue)) < 1)
                         {
                             if (this.transform.localScale.x < 0f)
                             {
@@ -126,7 +126,7 @@ namespace Modding.Patches
                                 this.grubberFlyBeam = this.grubberFlyBeamPrefabL_fury.Spawn(this.transform.position);
                             }
 
-                            if (this.playerData.equippedCharm_13)
+                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
                             {
                                 this.grubberFlyBeam.transform.SetScaleY(this.MANTIS_CHARM_SCALE);
                             }
@@ -142,25 +142,25 @@ namespace Modding.Patches
                     this.slashComponent = this.upSlash;
                     this.slashFsm = this.upSlashFsm;
                     this.cState.upAttacking = true;
-                    if (this.playerData.equippedCharm_35)
+                    if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_35)))
                     {
-                        if ((this.playerData.health == this.playerData.maxHealth && !this.playerData.equippedCharm_27) || (this.joniBeam && this.playerData.equippedCharm_27))
+                        if ((this.playerData.GetInt(nameof(PlayerData.health)) == this.playerData.GetInt(nameof(PlayerData.maxHealth)) && !this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))) || (this.joniBeam && this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))))
                         {
                             this.grubberFlyBeam = this.grubberFlyBeamPrefabU.Spawn(this.transform.position);
                             this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
                             this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 270f);
-                            if (this.playerData.equippedCharm_13)
+                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
                             {
                                 this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
                             }
                         }
 
-                        if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
+                        if (this.playerData.GetInt(nameof(PlayerData.health)) == 1 && this.playerData.GetBool(nameof(PlayerData.equippedCharm_6)) && this.playerData.GetInt(nameof(PlayerData.healthBlue)) < 1)
                         {
                             this.grubberFlyBeam = this.grubberFlyBeamPrefabU_fury.Spawn(this.transform.position);
                             this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
                             this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 270f);
-                            if (this.playerData.equippedCharm_13)
+                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
                             {
                                 this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
                             }
@@ -172,25 +172,25 @@ namespace Modding.Patches
                     this.slashComponent = this.downSlash;
                     this.slashFsm = this.downSlashFsm;
                     this.cState.downAttacking = true;
-                    if (this.playerData.equippedCharm_35)
+                    if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_35)))
                     {
-                        if ((this.playerData.health == this.playerData.maxHealth && !this.playerData.equippedCharm_27) || (this.joniBeam && this.playerData.equippedCharm_27))
+                        if ((this.playerData.GetInt(nameof(PlayerData.health)) == this.playerData.GetInt(nameof(PlayerData.maxHealth)) && !this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))) || (this.joniBeam && this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))))
                         {
                             this.grubberFlyBeam = this.grubberFlyBeamPrefabD.Spawn(this.transform.position);
                             this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
                             this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
-                            if (this.playerData.equippedCharm_13)
+                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
                             {
                                 this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
                             }
                         }
 
-                        if (this.playerData.health == 1 && this.playerData.equippedCharm_6 && this.playerData.healthBlue < 1)
+                        if (this.playerData.GetInt(nameof(PlayerData.health)) == 1 && this.playerData.GetBool(nameof(PlayerData.equippedCharm_6)) && this.playerData.GetInt(nameof(PlayerData.healthBlue)) < 1)
                         {
                             this.grubberFlyBeam = this.grubberFlyBeamPrefabD_fury.Spawn(this.transform.position);
                             this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
                             this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
-                            if (this.playerData.equippedCharm_13)
+                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
                             {
                                 this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
                             }
@@ -231,7 +231,7 @@ namespace Modding.Patches
             ModHooks.AfterAttack(attackDir); //MOD API - Added
             if (!this.cState.attacking) return;       //MOD API - Added
             this.slashComponent.StartSlash();
-            if (this.playerData.equippedCharm_38)
+            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_38)))
             {
                 this.fsm_orbitShield.SendEvent("SLASH");
             }
@@ -851,7 +851,7 @@ namespace Modding.Patches
             Vector2 origVector;
 
             float velocity;
-            if (this.playerData.equippedCharm_16 && this.cState.shadowDashing)
+            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_16)) && this.cState.shadowDashing)
             {
                 velocity = this.DASH_SPEED_SHARP;
             }
