@@ -921,7 +921,7 @@ namespace Modding.Patches
         public void CharmUpdate()
         {
             orig_CharmUpdate();
-            ModHooks.OnCharmUpdate();
+            ModHooks.OnCharmUpdate(playerData, this);
             playerData.UpdateBlueHealth();
         }
 

@@ -83,25 +83,25 @@ namespace Modding.Patches
         [MonoModReplace]
         public void SetBool(string boolName, bool value)
         {
-            ModHooks.SetPlayerBool(boolName, value);
+            ModHooks.SetPlayerBool(boolName, value, this);
         }
 
         [MonoModReplace]
         public bool GetBool(string boolName)
         {
-            return ModHooks.GetPlayerBool(boolName);
+            return ModHooks.GetPlayerBool(boolName, this);
         }
 
         [MonoModReplace]
         public int GetInt(string intName)
         {
-            return ModHooks.GetPlayerInt(intName);
+            return ModHooks.GetPlayerInt(intName, this);
         }
 
         [MonoModReplace]
         public void SetInt(string intName, int value)
         {
-            ModHooks.SetPlayerInt(intName, value);
+            ModHooks.SetPlayerInt(intName, value, this);
         }
 
         [MonoModReplace]
@@ -109,7 +109,7 @@ namespace Modding.Patches
         {
             if (ReflectionHelper.GetFieldInfo(typeof(PlayerData), intName) != null)
             {
-                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) + 1);
+                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) + 1, this);
                 return;
             }
 
@@ -121,7 +121,7 @@ namespace Modding.Patches
         {
             if (ReflectionHelper.GetFieldInfo(typeof(PlayerData), intName) != null)
             {
-                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) - 1);
+                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) - 1, this);
             }
         }
 
@@ -130,7 +130,7 @@ namespace Modding.Patches
         {
             if (ReflectionHelper.GetFieldInfo(typeof(PlayerData), intName) != null)
             {
-                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) + amount);
+                ModHooks.SetPlayerInt(intName, this.GetIntInternal(intName) + amount, this);
                 return;
             }
 
@@ -140,49 +140,49 @@ namespace Modding.Patches
         [MonoModReplace]
         public float GetFloat(string floatName)
         {
-            return ModHooks.GetPlayerFloat(floatName);
+            return ModHooks.GetPlayerFloat(floatName, this);
         }
 
         [MonoModReplace]
         public void SetFloat(string floatName, float value)
         {
-            ModHooks.SetPlayerFloat(floatName, value);
+            ModHooks.SetPlayerFloat(floatName, value, this);
         }
 
         [MonoModReplace]
         public string GetString(string stringName)
         {
-            return ModHooks.GetPlayerString(stringName);
+            return ModHooks.GetPlayerString(stringName, this);
         }
 
         [MonoModReplace]
         public void SetString(string stringName, string value)
         {
-            ModHooks.SetPlayerString(stringName, value);
+            ModHooks.SetPlayerString(stringName, value, this);
         }
 
         [MonoModReplace]
         public Vector3 GetVector3(string vector3Name)
         {
-            return ModHooks.GetPlayerVector3(vector3Name);
+            return ModHooks.GetPlayerVector3(vector3Name, this);
         }
 
         [MonoModReplace]
         public void SetVector3(string vector3Name, Vector3 value)
         {
-            ModHooks.SetPlayerVector3(vector3Name, value);
+            ModHooks.SetPlayerVector3(vector3Name, value, this);
         }
 
         [MonoModReplace]
         public T GetVariable<T>(string varName)
         {
-            return ModHooks.GetPlayerVariable<T>(varName);
+            return ModHooks.GetPlayerVariable<T>(varName, this);
         }
 
         [MonoModReplace]
         public void SetVariable<T>(string varName, T value)
         {
-            ModHooks.SetPlayerVariable<T>(varName, value);
+            ModHooks.SetPlayerVariable<T>(varName, value, this);
         }
 
         public extern void orig_TakeHealth(int amount);
