@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil;
@@ -52,7 +53,9 @@ namespace Prepatcher
 
             foreach (TypeDefinition type in module.Types.Where(type => type.HasMethods))
             {
-                foreach (MethodDefinition method in type.Methods)
+                IEnumerable<MethodDefinition> patchableMethods = type.Methods.Concat(type.NestedTypes.SelectMany(type => type.Methods));
+
+                foreach (MethodDefinition method in patchableMethods)
                 {
                     if
                     (
