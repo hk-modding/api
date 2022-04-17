@@ -1,4 +1,4 @@
-﻿using MonoMod;
+using MonoMod;
 using UnityEngine;
 
 // ReSharper disable All
@@ -198,7 +198,7 @@ namespace Modding.Patches
         public void UpdateBlueHealth()
         {
             orig_UpdateBlueHealth();
-            healthBlue += ModHooks.OnBlueHealth();
+            SetInt(nameof(healthBlue), GetInt(nameof(healthBlue)) + ModHooks.OnBlueHealth());
         }
 
         public extern void orig_AddHealth(int amount);
