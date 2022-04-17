@@ -1,4 +1,4 @@
-﻿using MonoMod;
+using MonoMod;
 using UnityEngine;
 
 #pragma warning disable 1591
@@ -18,6 +18,9 @@ namespace Modding.Patches
         [MonoModIgnore]
         private bool controllerPressed;
 
+        [MonoModIgnore]
+        private GameManager gm;
+
         // Reverted cursor behavior
         [MonoModReplace]
         private void OnGUI()
@@ -31,7 +34,7 @@ namespace Modding.Patches
 
             if (!isMenuScene)
             {
-                ModHooks.OnCursor();
+                ModHooks.OnCursor(gm);
                 return;
             }
 

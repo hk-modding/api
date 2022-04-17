@@ -252,7 +252,7 @@ namespace Modding
         /// <summary>
         ///     Called whenever game tries to show cursor
         /// </summary>
-        internal static void OnCursor()
+        internal static void OnCursor(GameManager gm)
         {
             Cursor.lockState = CursorLockMode.None;
 
@@ -262,7 +262,7 @@ namespace Modding
                 return;
             }
 
-            if (GameManager.instance.isPaused)
+            if (gm.isPaused)
             {
                 Cursor.visible = true;
                 return;
@@ -621,7 +621,8 @@ namespace Modding
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="orig">Value to set</param>
-        internal static void SetPlayerBool(string target, bool orig)
+        /// <param name="pd">The PlayerData object</param>
+        internal static void SetPlayerBool(string target, bool orig, Patches.PlayerData pd)
         {
             bool value = orig;
 
@@ -642,7 +643,7 @@ namespace Modding
                 }
             }
 
-            Patches.PlayerData.instance.SetBoolInternal(target, value);
+            pd.SetBoolInternal(target, value);
         }
 
 
@@ -668,9 +669,10 @@ namespace Modding
         ///     Called by the game in PlayerData.GetBool
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal static bool GetPlayerBool(string target)
+        /// <param name="pd">The PlayerData object</param>
+        internal static bool GetPlayerBool(string target, Patches.PlayerData pd)
         {
-            bool result = Patches.PlayerData.instance.GetBoolInternal(target);
+            bool result = pd.GetBoolInternal(target);
 
             if (GetPlayerBoolHook == null)
                 return result;
@@ -724,7 +726,8 @@ namespace Modding
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="orig">Value to set</param>
-        internal static void SetPlayerInt(string target, int orig)
+        /// <param name="pd">The PlayerData object</param>
+        internal static void SetPlayerInt(string target, int orig, Patches.PlayerData pd)
         {
             int value = orig;
 
@@ -745,7 +748,7 @@ namespace Modding
                 }
             }
 
-            Patches.PlayerData.instance.SetIntInternal(target, value);
+            pd.SetIntInternal(target, value);
         }
 
         /// <summary>
@@ -772,9 +775,10 @@ namespace Modding
         ///     Called by the game in PlayerData.GetInt
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal static int GetPlayerInt(string target)
+        /// <param name="pd">The PlayerData object</param>
+        internal static int GetPlayerInt(string target, Patches.PlayerData pd)
         {
-            int result = Patches.PlayerData.instance.GetIntInternal(target);
+            int result = pd.GetIntInternal(target);
 
             if (GetPlayerIntHook == null)
                 return result;
@@ -808,7 +812,8 @@ namespace Modding
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="orig">Value to set</param>
-        internal static void SetPlayerFloat(string target, float orig)
+        /// <param name="pd">The PlayerData object</param>
+        internal static void SetPlayerFloat(string target, float orig, Patches.PlayerData pd)
         {
             float value = orig;
 
@@ -829,7 +834,7 @@ namespace Modding
                 }
             }
 
-            Patches.PlayerData.instance.SetFloatInternal(target, value);
+            pd.SetFloatInternal(target, value);
         }
 
         /// <summary>
@@ -843,9 +848,10 @@ namespace Modding
         ///     Called by the game in PlayerData.GetFloat
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal static float GetPlayerFloat(string target)
+        /// <param name="pd">The PlayerData object</param>
+        internal static float GetPlayerFloat(string target, Patches.PlayerData pd)
         {
-            float result = Patches.PlayerData.instance.GetFloatInternal(target);
+            float result = pd.GetFloatInternal(target);
 
             if (GetPlayerFloatHook == null)
                 return result;
@@ -879,7 +885,8 @@ namespace Modding
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="orig">Value to set</param>
-        internal static void SetPlayerString(string target, string orig)
+        /// <param name="pd">The PlayerData object</param>
+        internal static void SetPlayerString(string target, string orig, Patches.PlayerData pd)
         {
             string value = orig;
 
@@ -900,7 +907,7 @@ namespace Modding
                 }
             }
 
-            Patches.PlayerData.instance.SetStringInternal(target, value);
+            pd.SetStringInternal(target, value);
         }
 
         /// <summary>
@@ -914,9 +921,10 @@ namespace Modding
         ///     Called by the game in PlayerData.GetString
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal static string GetPlayerString(string target)
+        /// <param name="pd">The PlayerData object</param>
+        internal static string GetPlayerString(string target, Patches.PlayerData pd)
         {
-            string value = Patches.PlayerData.instance.GetStringInternal(target);
+            string value = pd.GetStringInternal(target);
 
             if (GetPlayerStringHook == null)
                 return value;
@@ -950,7 +958,8 @@ namespace Modding
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="orig">Value to set</param>
-        internal static void SetPlayerVector3(string target, Vector3 orig)
+        /// <param name="pd">The PlayerData object</param>
+        internal static void SetPlayerVector3(string target, Vector3 orig, Patches.PlayerData pd)
         {
             Vector3 value = orig;
 
@@ -971,7 +980,7 @@ namespace Modding
                 }
             }
 
-            Patches.PlayerData.instance.SetVector3Internal(target, value);
+            pd.SetVector3Internal(target, value);
         }
 
         /// <summary>
@@ -985,9 +994,10 @@ namespace Modding
         ///     Called by the game in PlayerData.GetVector3
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal static Vector3 GetPlayerVector3(string target)
+        /// <param name="pd">The PlayerData object</param>
+        internal static Vector3 GetPlayerVector3(string target, Patches.PlayerData pd)
         {
-            Vector3 res = Patches.PlayerData.instance.GetVector3Internal(target);
+            Vector3 res = pd.GetVector3Internal(target);
 
             if (GetPlayerVector3Hook == null)
                 return res;
@@ -1021,37 +1031,38 @@ namespace Modding
         /// </summary>
         /// <param name="target">Target Field Name</param>
         /// <param name="orig">Value to set</param>
-        internal static void SetPlayerVariable<T>(string target, T orig)
+        /// <param name="pd">The PlayerData object</param>
+        internal static void SetPlayerVariable<T>(string target, T orig, Patches.PlayerData pd)
         {
             Type t = typeof(T);
 
             if (t == typeof(bool))
             {
-                SetPlayerBool(target, (bool)(object)orig);
+                SetPlayerBool(target, (bool)(object)orig, pd);
                 return;
             }
 
             if (t == typeof(int))
             {
-                SetPlayerInt(target, (int)(object)orig);
+                SetPlayerInt(target, (int)(object)orig, pd);
                 return;
             }
 
             if (t == typeof(float))
             {
-                SetPlayerFloat(target, (float)(object)orig);
+                SetPlayerFloat(target, (float)(object)orig, pd);
                 return;
             }
 
             if (t == typeof(string))
             {
-                SetPlayerString(target, (string)(object)orig);
+                SetPlayerString(target, (string)(object)orig, pd);
                 return;
             }
 
             if (t == typeof(Vector3))
             {
-                SetPlayerVector3(target, (Vector3)(object)orig);
+                SetPlayerVector3(target, (Vector3)(object)orig, pd);
                 return;
             }
 
@@ -1074,7 +1085,7 @@ namespace Modding
                 }
             }
 
-            Patches.PlayerData.instance.SetVariableInternal(target, value);
+            pd.SetVariableInternal(target, value);
         }
 
         /// <summary>
@@ -1089,36 +1100,37 @@ namespace Modding
         ///     Called by the game in PlayerData.GetVariable
         /// </summary>
         /// <param name="target">Target Field Name</param>
-        internal static T GetPlayerVariable<T>(string target)
+        /// <param name="pd">The PlayerData object</param>
+        internal static T GetPlayerVariable<T>(string target, Patches.PlayerData pd)
         {
             Type t = typeof(T);
 
             if (t == typeof(bool))
             {
-                return (T)(object)GetPlayerBool(target);
+                return (T)(object)GetPlayerBool(target, pd);
             }
 
             if (t == typeof(int))
             {
-                return (T)(object)GetPlayerInt(target);
+                return (T)(object)GetPlayerInt(target, pd);
             }
 
             if (t == typeof(float))
             {
-                return (T)(object)GetPlayerFloat(target);
+                return (T)(object)GetPlayerFloat(target, pd);
             }
 
             if (t == typeof(string))
             {
-                return (T)(object)GetPlayerString(target);
+                return (T)(object)GetPlayerString(target, pd);
             }
 
             if (t == typeof(Vector3))
             {
-                return (T)(object)GetPlayerVector3(target);
+                return (T)(object)GetPlayerVector3(target, pd);
             }
 
-            T value = Patches.PlayerData.instance.GetVariableInternal<T>(target);
+            T value = pd.GetVariableInternal<T>(target);
 
             if (GetPlayerVariableHook == null)
                 return value;
@@ -1503,7 +1515,7 @@ namespace Modding
         ///     Called after player values for charms have been set
         /// </summary>
         /// <remarks>HeroController.CharmUpdate</remarks>
-        internal static void OnCharmUpdate()
+        internal static void OnCharmUpdate(PlayerData pd, Patches.HeroController hc)
         {
             Logger.APILogger.LogFine("OnCharmUpdate Invoked");
 
@@ -1518,7 +1530,7 @@ namespace Modding
             {
                 try
                 {
-                    toInvoke.Invoke(PlayerData.instance, HeroController.instance);
+                    toInvoke.Invoke(pd, hc);
                 }
                 catch (Exception ex)
                 {
