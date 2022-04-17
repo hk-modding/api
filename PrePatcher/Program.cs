@@ -53,9 +53,7 @@ namespace Prepatcher
 
             foreach (TypeDefinition type in module.Types.Where(type => type.HasMethods))
             {
-                IEnumerable<MethodDefinition> patchableMethods = type.Methods.Concat(type.NestedTypes.SelectMany(type => type.Methods));
-
-                foreach (MethodDefinition method in patchableMethods)
+                foreach (MethodDefinition method in GetMethodsRecursively(type))
                 {
                     if
                     (
@@ -139,6 +137,31 @@ namespace Prepatcher
             module.Write(args[1]);
 
             Console.WriteLine("Changed " + changes + " get/set calls");
+        }
+
+        /// <summary>
+        /// Yields all methods defined on the given type, or a (recursively) nested type within the given type
+        /// </summary>
+        private static IEnumerable<MethodDefinition> GetMethodsRecursively(TypeDefinition type)
+        {
+            if (type.HasMethods)
+            {
+                foreach (MethodDefinition method in type.Methods)
+                {
+                    yield return method;
+                }
+            }
+
+            if (type.HasNestedTypes)
+            {
+                foreach (TypeDefinition nested in type.NestedTypes)
+                {
+                    foreach (MethodDefinition method in GetMethodsRecursively(nested))
+                    {
+                        yield return method;
+                    }
+                }
+            }
         }
 
         private static void SwapStFld
