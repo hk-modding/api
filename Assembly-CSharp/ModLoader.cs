@@ -113,7 +113,7 @@ namespace Modding
             string mods = Path.Combine(managed_path, "Mods");
 
             string[] files = Directory.GetDirectories(mods)
-                .Except(new string[] {Path.Combine(mods, "Disabled")})
+                .Except(new string[] { Path.Combine(mods, "Disabled") })
                 .SelectMany(d => Directory.GetFiles(d, "*.dll"))
                 .ToArray();
 
@@ -223,16 +223,20 @@ namespace Modding
 
             // dict<scene name, list<(mod, list<objectNames>)>
             var toPreload = new Dictionary<string, List<(ModInstance, List<string> objectNames)>>();
+            // dict<scene name, list<(mod, list<objectNames>)>
+            var preloadPrefabs = new Dictionary<string, List<(ModInstance, List<string> objectNames)>>();
+            // dict<mod, dict<real scene name, scene naem in getpreloadobjects>>
+            var sceneNamesMap = new Dictionary<ModInstance, Dictionary<string, string>>();
             // dict<mod, dict<scene, dict<objName, object>>>
             var preloadedObjects = new Dictionary<ModInstance, Dictionary<string, Dictionary<string, GameObject>>>();
 
             Logger.APILogger.Log("Creating mod preloads");
             // Setup dict of scene preloads
-            GetPreloads(orderedMods, scenes, toPreload);
-            if (toPreload.Count > 0)
+            GetPreloads(orderedMods, scenes, toPreload, preloadPrefabs, sceneNamesMap);
+            if (toPreload.Count > 0 || preloadPrefabs.Count > 0)
             {
                 Preloader pld = coroutineHolder.GetOrAddComponent<Preloader>();
-                yield return pld.Preload(toPreload, preloadedObjects);
+                yield return pld.Preload(toPreload, preloadPrefabs, sceneNamesMap, preloadedObjects);
             }
 
             foreach (ModInstance mod in orderedMods)
@@ -284,7 +288,9 @@ namespace Modding
         private static void GetPreloads(
             ModInstance[] orderedMods,
             List<string> scenes,
-            Dictionary<string, List<(ModInstance, List<string> objectNames)>> toPreload
+            Dictionary<string, List<(ModInstance, List<string> objectNames)>> toPreload,
+            Dictionary<string, List<(ModInstance, List<string> objectNames)>> preloadedObjects,
+            Dictionary<ModInstance, Dictionary<string, string>> sceneNamesMap
         )
         {
             foreach (var mod in orderedMods)
@@ -312,12 +318,52 @@ namespace Modding
 
                 // dict<scene, list<objects>>
                 Dictionary<string, List<string>> modPreloads = new();
+                // dict<scene, list<objects>>
+                Dictionary<string, List<string>> prefabPreloads = new();
+
+                if (!sceneNamesMap.TryGetValue(mod, out var sceneNames))
+                {
+                    sceneNames = new();
+                    sceneNamesMap[mod] = sceneNames;
+                }
 
                 foreach ((string scene, string obj) in preloadNames)
                 {
                     if (string.IsNullOrEmpty(scene) || string.IsNullOrEmpty(obj))
                     {
                         Logger.APILogger.LogWarn($"Mod `{mod.Mod.GetName()}` passed null values to preload");
+                        continue;
+                    }
+                    if (scene.StartsWith("sharedassets") || scene.Equals("resources"))
+                    {
+                        var sceneName = scene;
+
+                        if (!sceneName.Equals("resources"))
+                        {
+                            if (!int.TryParse(sceneName.Substring(12), out var sceneId))
+                            {
+                                continue;
+                            }
+                            if (sceneId >= UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings)
+                            {
+                                Logger.APILogger.LogWarn(
+                                    $"Mod `{mod.Mod.GetName()}` attempted preload from non-existent assets file `{scene}.assets`"
+                                );
+                                continue;
+                            }
+                            var origSceneName = sceneName;
+                            sceneName = Path.GetFileNameWithoutExtension(
+                                SceneUtility.GetScenePathByBuildIndex(sceneId)
+                                );
+                            sceneNames.Add(sceneName, origSceneName);
+                        }
+                        if (!prefabPreloads.TryGetValue(sceneName, out List<string> prefabs))
+                        {
+                            prefabs = new List<string>();
+                            prefabPreloads[sceneName] = prefabs;
+                        }
+                        prefabs.Add(obj);
+                        Logger.APILogger.LogFine($"Found object `{scene}.{obj}`");
                         continue;
                     }
 
@@ -350,6 +396,17 @@ namespace Modding
 
                     scenePreloads.Add((mod, objects));
                     toPreload[scene] = scenePreloads;
+                }
+                foreach ((string scene, List<string> objects) in prefabPreloads)
+                {
+                    if (!preloadedObjects.TryGetValue(scene, out var scenePreloads))
+                    {
+                        scenePreloads = new List<(ModInstance, List<string>)>();
+                        preloadedObjects[scene] = scenePreloads;
+                    }
+
+                    scenePreloads.Add((mod, objects));
+                    preloadedObjects[scene] = scenePreloads;
                 }
             }
         }
