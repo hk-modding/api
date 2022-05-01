@@ -219,9 +219,9 @@ internal class Preloader : MonoBehaviour
                 }
                 foreach ((ModLoader.ModInstance mod, List<string> objNames) in sharedObjects)
                 {
-                    Logger.APILogger.LogFine($"Fetching prefabs for mod \"{mod.Mod.GetName()}\"");
-                    sceneName = preloadSceneNameMap[mod][sceneName];
-                    var modScenePreloadedObjects = GetModScenePreloadedObjects(mod, sceneName);
+                    Logger.APILogger.LogFine($"Fetching prefab for mod \"{mod.Mod.GetName()}\"");
+                    var sn = preloadSceneNameMap[mod][sceneName];
+                    var modScenePreloadedObjects = GetModScenePreloadedObjects(mod, sn);
                     foreach (var objName in objNames)
                     {
                         Logger.APILogger.LogFine($"Fetching prefab \"{objName}\"");

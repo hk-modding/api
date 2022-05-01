@@ -289,7 +289,7 @@ namespace Modding
             ModInstance[] orderedMods,
             List<string> scenes,
             Dictionary<string, List<(ModInstance, List<string> objectNames)>> toPreload,
-            Dictionary<string, List<(ModInstance, List<string> objectNames)>> preloadedObjects,
+            Dictionary<string, List<(ModInstance, List<string> objectNames)>> preloadedPrefabs,
             Dictionary<ModInstance, Dictionary<string, string>> sceneNamesMap
         )
         {
@@ -355,7 +355,7 @@ namespace Modding
                             sceneName = Path.GetFileNameWithoutExtension(
                                 SceneUtility.GetScenePathByBuildIndex(sceneId)
                                 );
-                            sceneNames.Add(sceneName, origSceneName);
+                            sceneNames[sceneName] = origSceneName;
                         }
                         if (!prefabPreloads.TryGetValue(sceneName, out List<string> prefabs))
                         {
@@ -363,7 +363,7 @@ namespace Modding
                             prefabPreloads[sceneName] = prefabs;
                         }
                         prefabs.Add(obj);
-                        Logger.APILogger.LogFine($"Found object `{scene}.{obj}`");
+                        Logger.APILogger.LogFine($"Found prefab `{scene}.{obj}`");
                         continue;
                     }
 
@@ -394,19 +394,23 @@ namespace Modding
                         toPreload[scene] = scenePreloads;
                     }
 
+                    Logger.APILogger.LogFine($"`{mod.Name}` preloads {objects.Count} objects in the `{scene}` scene");
+
                     scenePreloads.Add((mod, objects));
                     toPreload[scene] = scenePreloads;
                 }
                 foreach ((string scene, List<string> objects) in prefabPreloads)
                 {
-                    if (!preloadedObjects.TryGetValue(scene, out var scenePreloads))
+                    if (!preloadedPrefabs.TryGetValue(scene, out var scenePreloads))
                     {
                         scenePreloads = new List<(ModInstance, List<string>)>();
-                        preloadedObjects[scene] = scenePreloads;
+                        preloadedPrefabs[scene] = scenePreloads;
                     }
 
+                    Logger.APILogger.LogFine($"`{mod.Name}` mod preloads {objects.Count} prefabs in the `{scene}` scene");
+
                     scenePreloads.Add((mod, objects));
-                    preloadedObjects[scene] = scenePreloads;
+                    preloadedPrefabs[scene] = scenePreloads;
                 }
             }
         }
