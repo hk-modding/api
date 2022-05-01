@@ -137,6 +137,7 @@ internal class Preloader : MonoBehaviour
     /// <param name="progress">The progress that should be displayed. 0.0f - 1.0f</param>
     private void UpdateLoadingBarProgress(float progress)
     {
+        if(_commandedProgress == progress) return;
         _commandedProgress = progress;
         _secondsSinceLastSet = 0.0f;
     }
@@ -154,7 +155,7 @@ internal class Preloader : MonoBehaviour
     {
         List<string> sceneNames = toPreload.Keys.ToList();
         Dictionary<string, int> scenePriority = new();
-        Dictionary<string, float> sceneProgress = new();
+        Dictionary<string, (AsyncOperation load, AsyncOperation unload)> sceneAsyncOperationHolder = new();
         foreach (var v in preloadPrefabs)
         {
             if (!sceneNames.Contains(v.Key)) sceneNames.Add(v.Key);
@@ -162,10 +163,33 @@ internal class Preloader : MonoBehaviour
         foreach (var sceneName in sceneNames)
         {
             int priority = 0;
-            if(toPreload.TryGetValue(sceneName, out var preloadObjs0)) priority += preloadObjs0.Select(x => x.Item2.Count).Sum();
-            if(preloadPrefabs.TryGetValue(sceneName, out var preloadObjs1)) priority += preloadObjs1.Select(x => x.Item2.Count).Sum();
+            if (toPreload.TryGetValue(sceneName, out var preloadObjs0)) priority += preloadObjs0.Select(x => x.Item2.Count).Sum();
+            if (preloadPrefabs.TryGetValue(sceneName, out var preloadObjs1)) priority += preloadObjs1.Select(x => x.Item2.Count).Sum();
             scenePriority[sceneName] = priority;
-            sceneProgress[sceneName] = 0.0f;
+            sceneAsyncOperationHolder[sceneName] = (null, null);
+        }
+
+        Dictionary<string, GameObject> GetModScenePreloadedObjects(ModLoader.ModInstance mod, string sceneName)
+        {
+            if (!preloadedObjects.TryGetValue
+            (
+                mod,
+                out Dictionary<string, Dictionary<string, GameObject>> modPreloadedObjects
+            ))
+            {
+                modPreloadedObjects = new Dictionary<string, Dictionary<string, GameObject>>();
+                preloadedObjects[mod] = modPreloadedObjects;
+            }
+            if (!modPreloadedObjects.TryGetValue
+            (
+                sceneName,
+                out Dictionary<string, GameObject> modScenePreloadedObjects
+            ))
+            {
+                modScenePreloadedObjects = new Dictionary<string, GameObject>();
+                modPreloadedObjects[sceneName] = modScenePreloadedObjects;
+            }
+            return modScenePreloadedObjects;
         }
 
         List<AsyncOperation> preloadOperationQueue = new List<AsyncOperation>(5);
@@ -196,6 +220,8 @@ internal class Preloader : MonoBehaviour
                 foreach ((ModLoader.ModInstance mod, List<string> objNames) in sharedObjects)
                 {
                     Logger.APILogger.LogFine($"Fetching prefabs for mod \"{mod.Mod.GetName()}\"");
+                    sceneName = preloadSceneNameMap[mod][sceneName];
+                    var modScenePreloadedObjects = GetModScenePreloadedObjects(mod, sceneName);
                     foreach (var objName in objNames)
                     {
                         Logger.APILogger.LogFine($"Fetching prefab \"{objName}\"");
@@ -203,29 +229,9 @@ internal class Preloader : MonoBehaviour
                         if (!objectsMap.TryGetValue(objName, out var obj))
                         {
                             Logger.APILogger.LogWarn(
-                                $"Could not find prefab \"{objName}\" in scene \"{sceneName}\"," + $" requested by mod `{mod.Mod.GetName()}`"
+                                $"Could not find prefab \"{objName}\" in scene \"{scene}\"," + $" requested by mod `{mod.Mod.GetName()}`"
                             );
                             continue;
-                        }
-                        // Create all sub-dictionaries if necessary (Yes, it's terrible)
-                        if (!preloadedObjects.TryGetValue
-                            (
-                                mod,
-                                out Dictionary<string, Dictionary<string, GameObject>> modPreloadedObjects
-                            ))
-                        {
-                            modPreloadedObjects = new Dictionary<string, Dictionary<string, GameObject>>();
-                            preloadedObjects[mod] = modPreloadedObjects;
-                        }
-                        sceneName = preloadSceneNameMap[mod][sceneName];
-                        if (!modPreloadedObjects.TryGetValue
-                            (
-                                sceneName,
-                                out Dictionary<string, GameObject> modScenePreloadedObjects
-                            ))
-                        {
-                            modScenePreloadedObjects = new Dictionary<string, GameObject>();
-                            modPreloadedObjects[sceneName] = modScenePreloadedObjects;
                         }
                         modScenePreloadedObjects.Add(objName, obj);
                     }
@@ -238,6 +244,8 @@ internal class Preloader : MonoBehaviour
                 foreach ((ModLoader.ModInstance mod, List<string> objNames) in sceneObjects)
                 {
                     Logger.APILogger.LogFine($"Fetching objects for mod \"{mod.Mod.GetName()}\"");
+
+                    var modScenePreloadedObjects = GetModScenePreloadedObjects(mod, sceneName);
 
                     foreach (string objName in objNames)
                     {
@@ -263,27 +271,6 @@ internal class Preloader : MonoBehaviour
                             continue;
                         }
 
-                        // Create all sub-dictionaries if necessary (Yes, it's terrible)
-                        if (!preloadedObjects.TryGetValue
-                            (
-                                mod,
-                                out Dictionary<string, Dictionary<string, GameObject>> modPreloadedObjects
-                            ))
-                        {
-                            modPreloadedObjects = new Dictionary<string, Dictionary<string, GameObject>>();
-                            preloadedObjects[mod] = modPreloadedObjects;
-                        }
-
-                        if (!modPreloadedObjects.TryGetValue
-                            (
-                                sceneName,
-                                out Dictionary<string, GameObject> modScenePreloadedObjects
-                            ))
-                        {
-                            modScenePreloadedObjects = new Dictionary<string, GameObject>();
-                            modPreloadedObjects[sceneName] = modScenePreloadedObjects;
-                        }
-
                         // Create inactive duplicate of requested object
                         obj = Instantiate(obj);
                         DontDestroyOnLoad(obj);
@@ -300,9 +287,9 @@ internal class Preloader : MonoBehaviour
         {
             Logger.APILogger.LogFine($"Unloading scene \"{sceneName}\"");
             var unloadOperation = USceneManager.UnloadSceneAsync(sceneName);
+            sceneAsyncOperationHolder[sceneName] = (sceneAsyncOperationHolder[sceneName].load, unloadOperation);
             unloadOperation.completed += _ =>
             {
-                sceneProgress[sceneName] = 1.0f;
                 preloadOperationQueue.Remove(unloadOperation);
             };
             preloadOperationQueue.Add(unloadOperation);
@@ -311,12 +298,12 @@ internal class Preloader : MonoBehaviour
         void StartPreloadOperation(string sceneName)
         {
             Logger.APILogger.LogFine($"Loading scene \"{sceneName}\"");
-            sceneProgress[sceneName] = 0.0f;
             var preloadOperation = USceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+            sceneAsyncOperationHolder[sceneName] = (preloadOperation, null);
+
             preloadOperation.priority = scenePriority[sceneName];
             preloadOperation.completed += _ =>
             {
-                sceneProgress[sceneName] = 0.5f;
                 preloadOperationQueue.Remove(preloadOperation);
                 GetPreloadObjectsOperation(sceneName);
                 CleanupPreloadOperation(sceneName);
@@ -325,7 +312,7 @@ internal class Preloader : MonoBehaviour
         }
 
         int i = 0;
-        float sceneProgressAverage = sceneProgress.Values.Average();
+        float sceneProgressAverage = 0;
         while (sceneProgressAverage < 1.0f)
         {
             while (
@@ -335,11 +322,16 @@ internal class Preloader : MonoBehaviour
             )
             {
                 StartPreloadOperation(sceneNames[i++]);
-                UpdateLoadingBarProgress(sceneProgress.Values.Average());
-                sceneProgressAverage = sceneProgress.Values.Average();
+                //UpdateLoadingBarProgress(sceneProgress.Values.Average());
+                //sceneProgressAverage = sceneProgress.Values.Average();
+                //sceneProgressAverage = sceneAsyncHold.Values.Select(x => 
+                //    (x.load?.progress ?? 0) * 0.5f + (x.unload?.progress ?? 0) * 0.5f).Average();
             }
             yield return null;
-            sceneProgressAverage = sceneProgress.Values.Average();
+            //sceneProgressAverage = sceneProgress.Values.Average();
+            sceneProgressAverage = sceneAsyncOperationHolder.Values.Select(x => 
+                (x.load?.progress ?? 0) * 0.5f + (x.unload?.progress ?? 0) * 0.5f).Average();
+            UpdateLoadingBarProgress(sceneProgressAverage);
         }
         if (preloadPrefabs.TryGetValue("resources", out var prefabs))
         {
@@ -359,6 +351,7 @@ internal class Preloader : MonoBehaviour
             foreach ((ModLoader.ModInstance mod, List<string> objNames) in prefabs)
             {
                 Logger.APILogger.LogFine($"Fetching prefabs for mod \"{mod.Mod.GetName()}\"");
+                var modScenePreloadedObjects = GetModScenePreloadedObjects(mod, "resources");
                 foreach (var objName in objNames)
                 {
                     Logger.APILogger.LogFine($"Fetching prefab \"{objName}\"");
@@ -369,25 +362,6 @@ internal class Preloader : MonoBehaviour
                             $"Could not find prefab \"{objName}\" in \"resources.assets\", requested by mod `{mod.Mod.GetName()}`"
                         );
                         continue;
-                    }
-                    // Create all sub-dictionaries if necessary (Yes, it's terrible)
-                    if (!preloadedObjects.TryGetValue
-                        (
-                            mod,
-                            out Dictionary<string, Dictionary<string, GameObject>> modPreloadedObjects
-                        ))
-                    {
-                        modPreloadedObjects = new Dictionary<string, Dictionary<string, GameObject>>();
-                        preloadedObjects[mod] = modPreloadedObjects;
-                    }
-                    if (!modPreloadedObjects.TryGetValue
-                        (
-                            "resources",
-                            out Dictionary<string, GameObject> modScenePreloadedObjects
-                        ))
-                    {
-                        modScenePreloadedObjects = new Dictionary<string, GameObject>();
-                        modPreloadedObjects["resources"] = modScenePreloadedObjects;
                     }
                     modScenePreloadedObjects.Add(objName, obj);
                 }
