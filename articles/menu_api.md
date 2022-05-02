@@ -14,18 +14,18 @@ returns a list of [`MenuEntry`](xref:Modding.IMenuMod.MenuEntry) structs. An exa
 below.
 
 ```cs
-public class MyMod: Mod, IMenuMod
+public class MyMod
 {
     private int optionOne;
     private bool optionTwo;
 
     // The rest of the class... 
 
-    public List<IMenuMod.MenuEntry> GetMenuData(IMenuMod.MenuEntry? toggleButtonEntry)
+    public List<MenuEntry> GetMenuData(MenuEntry? toggleButtonEntry)
     {
-        return new List<IMenuMod.MenuEntry>
+        return new List<MenuEntry>
         {
-            new IMenuMod.MenuEntry {
+            new MenuEntry {
                 Name = "My First Option",
                 Description = "Will be displayed in small text",
                 Values = new string[] {
@@ -37,7 +37,7 @@ public class MyMod: Mod, IMenuMod
                 Saver = opt => this.optionOne = opt,
                 Loader = () => this.optionOne
             },
-            new IMenuMod.MenuEntry {
+            new MenuEntry {
                 Name = "My Second Option",
                 // Nothing will be displayed
                 Description = null,
@@ -45,22 +45,15 @@ public class MyMod: Mod, IMenuMod
                     "Off",
                     "On"
                 },
-                Saver = opt => {
-                    switch (opt) {
-                        case 0:
-                            this.optionTwo = false;
-                            break;
-                        case 1:
-                            this.optionTwo = true;
-                            break;
-                        // This should never be called
-                        default:
-                            throw new InvalidOperationException();
-                    }
+                Saver = opt => this.optionTwo = opt switch {
+                    0 => false,
+                    1 => true,
+                    // This should never be called
+                    _ => throw new InvalidOperationException()
                 },
                 Loader = () => this.optionTwo switch {
                     false => 0,
-                    true => 1
+                    true => 1,
                 }
             }
         };
