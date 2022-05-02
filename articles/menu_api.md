@@ -14,18 +14,18 @@ returns a list of [`MenuEntry`](xref:Modding.IMenuMod.MenuEntry) structs. An exa
 below.
 
 ```cs
-public class MyMod
+public class MyMod: Mod, IMenuMod
 {
     private int optionOne;
     private bool optionTwo;
 
     // The rest of the class... 
 
-    public List<MenuEntry> GetMenuData(MenuEntry? toggleButtonEntry)
+    public List<IMenuMod.MenuEntry> GetMenuData(IMenuMod.MenuEntry? toggleButtonEntry)
     {
-        return new List<MenuEntry>
+        return new List<IMenuMod.MenuEntry>
         {
-            new MenuEntry {
+            new IMenuMod.MenuEntry {
                 Name = "My First Option",
                 Description = "Will be displayed in small text",
                 Values = new string[] {
@@ -37,7 +37,7 @@ public class MyMod
                 Saver = opt => this.optionOne = opt,
                 Loader = () => this.optionOne
             },
-            new MenuEntry {
+            new IMenuMod.MenuEntry {
                 Name = "My Second Option",
                 // Nothing will be displayed
                 Description = null,
