@@ -45,13 +45,20 @@ public class MyMod: Mod, IMenuMod
                     "Off",
                     "On"
                 },
-                Saver = opt => opt switch {
-                    0 => this.optionTwo = false,
-                    1 => this.OptionTwo = true,
-                    // This should never be called
-                    _ => throw new InvalidOperationException()
+                Saver = opt => {
+                    switch (opt) {
+                        case 0:
+                            this.optionTwo = false;
+                            break;
+                        case 1:
+                            this.optionTwo = true;
+                            break;
+                        // This should never be called
+                        default:
+                            throw new InvalidOperationException();
+                    }
                 },
-                Loader = () => this.optionOne switch {
+                Loader = () => this.optionTwo switch {
                     false => 0,
                     true => 1
                 }
