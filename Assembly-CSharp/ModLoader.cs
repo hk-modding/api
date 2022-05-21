@@ -225,7 +225,7 @@ namespace Modding
             var toPreload = new Dictionary<string, List<(ModInstance, List<string> objectNames)>>();
             // dict<scene name, list<(mod, list<objectNames>)>
             var preloadPrefabs = new Dictionary<string, List<(ModInstance, List<string> objectNames)>>();
-            // dict<mod, dict<real scene name, scene naem in getpreloadobjects>>
+            // dict<mod, dict<real scene name, scene name in getpreloadobjects>>
             var sceneNamesMap = new Dictionary<ModInstance, Dictionary<string, string>>();
             // dict<mod, dict<scene, dict<objName, object>>>
             var preloadedObjects = new Dictionary<ModInstance, Dictionary<string, Dictionary<string, GameObject>>>();
@@ -321,11 +321,8 @@ namespace Modding
                 // dict<scene, list<objects>>
                 Dictionary<string, List<string>> prefabPreloads = new();
 
-                if (!sceneNamesMap.TryGetValue(mod, out var sceneNames))
-                {
-                    sceneNames = new();
-                    sceneNamesMap[mod] = sceneNames;
-                }
+                if (!sceneNamesMap.TryGetValue(mod, out var sceneNames)) 
+                    sceneNamesMap[mod] = sceneNames = new Dictionary<string, string>();
 
                 foreach ((string scene, string obj) in preloadNames)
                 {
@@ -341,9 +338,8 @@ namespace Modding
                         if (!sceneName.Equals("resources"))
                         {
                             if (!int.TryParse(sceneName.Substring(12), out var sceneId))
-                            {
                                 continue;
-                            }
+                            
                             if (sceneId >= UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings)
                             {
                                 Logger.APILogger.LogWarn(
@@ -351,18 +347,24 @@ namespace Modding
                                 );
                                 continue;
                             }
-                            var origSceneName = sceneName;
+                            
+                            string origSceneName = sceneName;
+                            
                             sceneName = Path.GetFileNameWithoutExtension(
                                 SceneUtility.GetScenePathByBuildIndex(sceneId)
-                                );
+                            );
+                            
                             sceneNames[sceneName] = origSceneName;
                         }
+                        
                         if (!prefabPreloads.TryGetValue(sceneName, out List<string> prefabs))
                         {
                             prefabs = new List<string>();
                             prefabPreloads[sceneName] = prefabs;
                         }
+                        
                         prefabs.Add(obj);
+                        
                         Logger.APILogger.LogFine($"Found prefab `{scene}.{obj}`");
                         continue;
                     }
@@ -399,6 +401,7 @@ namespace Modding
                     scenePreloads.Add((mod, objects));
                     toPreload[scene] = scenePreloads;
                 }
+                
                 foreach ((string scene, List<string> objects) in prefabPreloads)
                 {
                     if (!preloadedPrefabs.TryGetValue(scene, out var scenePreloads))
@@ -418,7 +421,9 @@ namespace Modding
         private static void UpdateModText()
         {
             StringBuilder builder = new StringBuilder();
+            
             builder.AppendLine("Modding API: " + ModHooks.ModVersion);
+            
             foreach (ModInstance mod in ModInstances)
             {
                 if (mod.Error is not ModErrorState err)
