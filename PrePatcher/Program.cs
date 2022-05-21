@@ -208,11 +208,11 @@ namespace Prepatcher
                 generic.GenericArguments.Add(field.FieldType);
                 callSet = Instruction.Create(OpCodes.Callvirt, generic);
             }
+            
+            il.InsertAfter(instr, callSet);
 
-            instr.OpCode = callSet.OpCode;
-            instr.Operand = callSet.Operand;
-
-            il.InsertBefore(instr, ldstr);
+            instr.OpCode = ldstr.OpCode;
+            instr.Operand = ldstr.Operand;
         }
 
         private static void SwapLdFld
@@ -259,11 +259,11 @@ namespace Prepatcher
                 generic.GenericArguments.Add(field.FieldType);
                 callGet = Instruction.Create(OpCodes.Callvirt, generic);
             }
+            
+            il.InsertAfter(instr, callGet);
 
-            instr.OpCode = callGet.OpCode;
-            instr.Operand = callGet.Operand;
-
-            il.InsertBefore(instr, ldstr);
+            instr.OpCode = ldstr.OpCode;
+            instr.Operand = ldstr.Operand;
         }
 
         private static MethodDefinition GenerateSwappedMethod(TypeDefinition methodParent, MethodReference oldMethod)
