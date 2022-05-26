@@ -8,7 +8,7 @@ namespace ExampleMods
     // to signify that it can be toggled on or off.
     public class SimpleHooks : Mod, ITogglableMod
     {
-        // Store a the currently loaded instance of the mod.
+        // Store the currently loaded instance of the mod.
         public static SimpleHooks LoadedInstance { get; set; }
 
         // Fields and properties to store in the mod instance itself
