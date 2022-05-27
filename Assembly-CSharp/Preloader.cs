@@ -255,7 +255,7 @@ internal class Preloader : MonoBehaviour
                             continue;
                         }
                         
-                        modScenePreloadedObjects.Add(objName, obj);
+                        modScenePreloadedObjects[objName] = obj;
                     }
                 }
             }
@@ -399,7 +399,7 @@ internal class Preloader : MonoBehaviour
                     continue;
                 }
 
-                preloads.Add(objName, obj);
+                preloads[objName] = obj;
             }
         }
 
