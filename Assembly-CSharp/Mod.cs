@@ -126,6 +126,16 @@ namespace Modding
 
         /// <inheritdoc />
         /// <summary>
+        ///     Returns the objects to preload in order for the mod to work.
+        /// </summary>
+        /// <returns>A List of tuples containing asset file name, object name, asset type</returns>
+        public virtual List<(int, string, Type)> GetPreloadAssetsNames()
+        {
+            return null;
+        }
+
+        /// <inheritdoc />
+        /// <summary>
         ///     Called after preloading of all mods.
         /// </summary>
         /// <param name="preloadedObjects">The preloaded objects relevant to this <see cref="Mod" /></param>
@@ -133,6 +143,19 @@ namespace Modding
         {
             // Call the other Initialize to not break older mods
             Initialize();
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        ///     Called after preloading of all mods.
+        /// </summary>
+        /// <param name="preloadedObjects">The preloaded objects relevant to this <see cref="Mod" /></param>
+        /// <param name="preloadedAssets">The preloaded assets relevant to this <see cref="Mod" /></param>
+        public virtual void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects, 
+            Dictionary<int, Dictionary<string, UnityEngine.Object>> preloadedAssets)
+        {
+            // Call the other Initialize to not break older mods
+            Initialize(preloadedObjects);
         }
 
         /// <inheritdoc />

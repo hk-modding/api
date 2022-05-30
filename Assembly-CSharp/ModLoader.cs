@@ -223,20 +223,20 @@ namespace Modding
 
             // dict<scene name, list<(mod, list<objectNames>)>
             var toPreload = new Dictionary<string, List<(ModInstance, List<string> objectNames)>>();
-            // dict<scene name, list<(mod, list<objectNames>)>
-            var preloadPrefabs = new Dictionary<string, List<(ModInstance, List<string> objectNames)>>();
-            // dict<mod, dict<real scene name, scene name in getpreloadobjects>>
-            var sceneNamesMap = new Dictionary<ModInstance, Dictionary<string, string>>();
             // dict<mod, dict<scene, dict<objName, object>>>
             var preloadedObjects = new Dictionary<ModInstance, Dictionary<string, Dictionary<string, GameObject>>>();
+            // dict<scene, dict<type, dict<mod, object>>>
+            var preloadAssets = new Dictionary<int, Dictionary<Type, List<(ModInstance, List<string>)>>>();
+            // dict<mod, dict<scene, dict<objName, object>>>
+            var preloadedAssets = new Dictionary<ModInstance, Dictionary<int, Dictionary<string, UnityEngine.Object>>>();
 
             Logger.APILogger.Log("Creating mod preloads");
             // Setup dict of scene preloads
-            GetPreloads(orderedMods, scenes, toPreload, preloadPrefabs, sceneNamesMap);
-            if (toPreload.Count > 0 || preloadPrefabs.Count > 0)
+            GetPreloads(orderedMods, scenes, toPreload, preloadAssets);
+            if (toPreload.Count > 0 || preloadAssets.Count > 0)
             {
                 Preloader pld = coroutineHolder.GetOrAddComponent<Preloader>();
-                yield return pld.Preload(toPreload, preloadPrefabs, sceneNamesMap, preloadedObjects);
+                yield return pld.Preload(toPreload, preloadedObjects, preloadAssets, preloadedAssets);
             }
 
             foreach (ModInstance mod in orderedMods)
@@ -250,7 +250,8 @@ namespace Modding
                 try
                 {
                     preloadedObjects.TryGetValue(mod, out Dictionary<string, Dictionary<string, GameObject>> preloads);
-                    LoadMod(mod, false, preloads);
+                    preloadedAssets.TryGetValue(mod, out Dictionary<int, Dictionary<string, UnityEngine.Object>> assets);
+                    LoadMod(mod, false, preloads, assets);
                     if (!ModHooks.GlobalSettings.ModEnabledSettings.TryGetValue(mod.Name, out var enabled))
                     {
                         enabled = true;
@@ -289,8 +290,7 @@ namespace Modding
             ModInstance[] orderedMods,
             List<string> scenes,
             Dictionary<string, List<(ModInstance, List<string> objectNames)>> toPreload,
-            Dictionary<string, List<(ModInstance, List<string> objectNames)>> preloadedPrefabs,
-            Dictionary<ModInstance, Dictionary<string, string>> sceneNamesMap
+            Dictionary<int, Dictionary<Type, List<(ModInstance, List<string>)>>> preloadedAssets
         )
         {
             foreach (var mod in orderedMods)
@@ -303,26 +303,65 @@ namespace Modding
                 Logger.APILogger.LogDebug($"Checking preloads for mod \"{mod.Mod.GetName()}\"");
 
                 List<(string, string)> preloadNames = null;
+                List<(int, string, Type)> preloadAssets = null;
                 try
                 {
                     preloadNames = mod.Mod.GetPreloadNames();
+                    preloadAssets = mod.Mod.GetPreloadAssetsNames();
                 }
                 catch (Exception ex)
                 {
                     Logger.APILogger.LogError($"Error getting preload names for mod {mod.Name}\n" + ex);
                 }
-                if (preloadNames == null)
+                if (preloadNames == null && preloadAssets == null)
                 {
                     continue;
                 }
 
+                #region Preload Assets
+                if(preloadAssets != null)
+                {
+                    Dictionary<(int, Type), List<string>> requestPreloadAssets = new();
+                    foreach((int assetFileId, string assetName, Type assetType) in preloadAssets)
+                    {
+                            if (assetFileId >= UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings)
+                            {
+                                Logger.APILogger.LogWarn(
+                                    $"Mod `{mod.Mod.GetName()}` attempted preload from non-existent assets file `sharedassets{assetFileId}.assets`"
+                                );
+                                continue;
+                            }
+                        
+                        if(!requestPreloadAssets.TryGetValue((assetFileId, assetType), out var table))
+                        {
+                            table = new();
+                            requestPreloadAssets.Add((assetFileId, assetType), table);
+                        }
+                        Logger.APILogger.LogFine($"Found asset `{(assetFileId == 0 ? "resources" : "sharedassets" + assetFileId)}.assets:{assetName}({assetType.FullName})`");
+                        table.Add(assetName);
+                    }
+                    foreach(var v in requestPreloadAssets)
+                    {
+                        if(!preloadedAssets.TryGetValue(v.Key.Item1, out var scene))
+                        {
+                            scene = new();
+                            preloadedAssets.Add(v.Key.Item1, scene);
+                        }
+                        if(!scene.TryGetValue(v.Key.Item2, out var table))
+                        {
+                            table = new();
+                            scene.Add(v.Key.Item2, table);
+                        }
+                        table.Add((mod, v.Value));
+                    }
+                }
+                #endregion
+                if(preloadNames == null) continue;
+                #region Preload GameObjects
                 // dict<scene, list<objects>>
                 Dictionary<string, List<string>> modPreloads = new();
                 // dict<scene, list<objects>>
-                Dictionary<string, List<string>> prefabPreloads = new();
-
-                if (!sceneNamesMap.TryGetValue(mod, out var sceneNames)) 
-                    sceneNamesMap[mod] = sceneNames = new Dictionary<string, string>();
+                Dictionary<int, List<string>> prefabPreloads = new();
 
                 foreach ((string scene, string obj) in preloadNames)
                 {
@@ -333,11 +372,11 @@ namespace Modding
                     }
                     if (scene.StartsWith("sharedassets") || scene.Equals("resources"))
                     {
-                        var sceneName = scene;
+                        int sceneId;
 
-                        if (!sceneName.Equals("resources"))
+                        if (!scene.Equals("resources"))
                         {
-                            if (!int.TryParse(sceneName.Substring(12), out var sceneId))
+                            if (!int.TryParse(scene.Substring(12), out sceneId))
                                 continue;
                             
                             if (sceneId >= UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings)
@@ -348,19 +387,16 @@ namespace Modding
                                 continue;
                             }
                             
-                            string origSceneName = sceneName;
-                            
-                            sceneName = Path.GetFileNameWithoutExtension(
-                                SceneUtility.GetScenePathByBuildIndex(sceneId)
-                            );
-                            
-                            sceneNames[sceneName] = origSceneName;
+                        }
+                        else
+                        {
+                            sceneId = 0;
                         }
                         
-                        if (!prefabPreloads.TryGetValue(sceneName, out List<string> prefabs))
+                        if (!prefabPreloads.TryGetValue(sceneId, out List<string> prefabs))
                         {
                             prefabs = new List<string>();
-                            prefabPreloads[sceneName] = prefabs;
+                            prefabPreloads[sceneId] = prefabs;
                         }
                         
                         prefabs.Add(obj);
@@ -402,20 +438,26 @@ namespace Modding
                     toPreload[scene] = scenePreloads;
                 }
                 
-                foreach ((string scene, List<string> objects) in prefabPreloads)
+                foreach ((int scene, List<string> objects) in prefabPreloads)
                 {
-                    if (!preloadedPrefabs.TryGetValue(scene, out var scenePreloads))
+                    if (!preloadedAssets.TryGetValue(scene, out var scenePreloads))
                     {
-                        scenePreloads = new List<(ModInstance, List<string>)>();
-                        preloadedPrefabs[scene] = scenePreloads;
+                        scenePreloads = new();
+                        preloadedAssets[scene] = scenePreloads;
+                    }
+                    if(!scenePreloads.TryGetValue(typeof(GameObject), out var typePreloads))
+                    {
+                        typePreloads = new();
+                        scenePreloads[typeof(GameObject)] = typePreloads;
                     }
 
                     Logger.APILogger.LogFine($"`{mod.Name}` mod preloads {objects.Count} prefabs in the `{scene}` scene");
 
-                    scenePreloads.Add((mod, objects));
-                    preloadedPrefabs[scene] = scenePreloads;
+                    typePreloads.Add((mod, objects.Select(x => "prefab:" + x).ToList()));
                 }
             }
+            #endregion
+
         }
 
         private static void UpdateModText()
@@ -459,7 +501,8 @@ namespace Modding
         (
             ModInstance mod,
             bool updateModText = true,
-            Dictionary<string, Dictionary<string, GameObject>> preloadedObjects = null
+            Dictionary<string, Dictionary<string, GameObject>> preloadedObjects = null,
+            Dictionary<int, Dictionary<string, UnityEngine.Object>> prelaodedAssets = null
         )
         {
             try
@@ -467,7 +510,7 @@ namespace Modding
                 if (mod is { Enabled: false, Error: null })
                 {
                     mod.Enabled = true;
-                    mod.Mod.Initialize(preloadedObjects);
+                    mod.Mod.Initialize(preloadedObjects, prelaodedAssets);
                 }
             }
             catch (Exception e)
