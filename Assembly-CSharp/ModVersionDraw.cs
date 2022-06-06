@@ -12,8 +12,7 @@ namespace Modding
     /// </summary>
     public class ModVersionDraw : MonoBehaviour
     {
-        private static GUIStyle style = GUIStyle.none;
-        private Font font;
+        private static GUIStyle style = new GUIStyle(GUIStyle.none);
 
         /// <summary>
         ///     String to Draw
@@ -25,7 +24,9 @@ namespace Modding
         /// </summary>
         private void Start()
         {
-            font = new GUIStyle(GUI.skin.label).font;
+            style.normal.textColor = Color.white;
+            style.alignment = TextAnchor.UpperLeft;
+            style.padding = new RectOffset(5, 5, 5, 5);
         }
 
         /// <summary>
@@ -40,10 +41,6 @@ namespace Modding
 
             if (drawString != null && UIManager.instance.uiState is UIState.MAIN_MENU_HOME or UIState.PAUSED)
             {
-                style.font = font;
-                style.normal.textColor = Color.white;
-                style.alignment = TextAnchor.UpperLeft;
-                style.padding = new RectOffset(5, 5, 5, 5);
                 GUI.Label(new Rect(0, 0, Screen.width, Screen.height), drawString, style);
             }
         }
