@@ -55,7 +55,7 @@ namespace Modding.Patches
 
         public extern void orig_Awake();
 
-        private Sprite LoadImage() => Assembly.GetExecutingAssembly().LoadEmbeddedSprite("Modding.logo.png");
+        private Sprite LoadImage() => Assembly.GetExecutingAssembly().LoadEmbeddedSprite("Modding.logo.png", pixelsPerUnit: 100f);
 
         public void Awake()
         {

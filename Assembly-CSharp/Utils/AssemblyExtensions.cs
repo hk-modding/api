@@ -29,12 +29,13 @@ namespace Modding.Utils
         }
 
         /// <summary>
-        /// Load an image from the assembly's embedded resources, and return a sprite.
+        /// Load an image from the assembly's embedded resources, and return a Sprite.
         /// </summary>
         /// <param name="asm">The assembly to load from.</param>
         /// <param name="path">The path to the image.</param>
-        /// <returns>A sprite object.</returns>
-        public static Sprite LoadEmbeddedSprite(this Assembly asm, string path)
+        /// <param name="pixelsPerUnit">The pixels per unit. Changing this value will scale the size of the sprite accordingly.</param>
+        /// <returns>A Sprite object.</returns>
+        public static Sprite LoadEmbeddedSprite(this Assembly asm, string path, float pixelsPerUnit = 64f)
         {
             using var stream = asm.GetManifestResourceStream(path);
 
@@ -45,7 +46,7 @@ namespace Modding.Utils
 
             tex.LoadImage(buffer, true);
 
-            return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.one * 0.5f);
+            return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.one * 0.5f, pixelsPerUnit);
         }
     }
 }
