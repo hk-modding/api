@@ -237,14 +237,15 @@ internal class Preloader : MonoBehaviour
                         var obj in assetsgetter(type)
                     )
                     {
+                        if(obj.GetInstanceID() < 0) continue; //The InstanceId of all objects created through code is negative
                         if (obj is GameObject go)
                         {
                             if (go.scene.IsValid() || go.transform.parent != null) continue;
                         }
-                        if (obj is Texture2D tex and
-                            {
-                                isReadable: true
-                            }) continue;
+                        if (obj is Component component)
+                        {
+                            if (component.gameObject.scene.IsValid()) continue;
+                        }
                         if (!allObjects.Contains(obj.name)) continue;
                         Logger.APILogger.LogFine($"Found object {obj.name}({type.FullName})");
                         objectsMap[obj.name] = obj;
@@ -419,7 +420,10 @@ internal class Preloader : MonoBehaviour
         }
 
 
-        PreloadAssets(preloadAssets, preloadedAssets, preloadedObjects, 0, t => Resources.LoadAll("", t));
+        PreloadAssets(preloadAssets, preloadedAssets, preloadedObjects, 0, t => {
+            Resources.LoadAll("", t);
+            return Resources.FindObjectsOfTypeAll(t);
+    });
         //PreloadPrefab(preloadPrefabs, preloadSceneNameMap, preloadedObjects, "resources", () => Resources.LoadAll<GameObject>(""));
 
         UpdateLoadingBarProgress(1.0f);
