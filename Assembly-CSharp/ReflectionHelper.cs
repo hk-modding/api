@@ -169,6 +169,10 @@ namespace Modding
 
             gen.Emit(OpCodes.Ldarg_0);
             gen.Emit(OpCodes.Ldfld, fi);
+
+            if (fi.FieldType.IsValueType && typeof(TField) == typeof(object))
+                gen.Emit(OpCodes.Box, fi.FieldType);
+
             gen.Emit(OpCodes.Ret);
 
             d = dm.Generate().CreateDelegate(typeof(Func<TType, TField>));
@@ -200,6 +204,10 @@ namespace Modding
             ILGenerator gen = dm.GetILGenerator();
 
             gen.Emit(OpCodes.Ldsfld, fi);
+
+            if (fi.FieldType.IsValueType && typeof(TField) == typeof(object))
+                gen.Emit(OpCodes.Box, fi.FieldType);
+
             gen.Emit(OpCodes.Ret);
 
             d = dm.Generate().CreateDelegate(typeof(Func<TField>));
@@ -237,6 +245,9 @@ namespace Modding
 
             gen.Emit(OpCodes.Ldarg_0);
             gen.Emit(OpCodes.Ldarg_1);
+            if (fi.FieldType.IsValueType && typeof(TField) == typeof(object))
+                gen.Emit(OpCodes.Unbox_Any, fi.FieldType);
+
             gen.Emit(OpCodes.Stfld, fi);
             gen.Emit(OpCodes.Ret);
 
@@ -269,6 +280,10 @@ namespace Modding
             ILGenerator gen = dm.GetILGenerator();
 
             gen.Emit(OpCodes.Ldarg_0);
+
+            if (fi.FieldType.IsValueType && typeof(TField) == typeof(object))
+                gen.Emit(OpCodes.Unbox_Any, fi.FieldType);
+
             gen.Emit(OpCodes.Stsfld, fi);
             gen.Emit(OpCodes.Ret);
 
