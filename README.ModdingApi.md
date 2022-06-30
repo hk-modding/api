@@ -13,7 +13,7 @@ Navigate to your Hollow Knight Game Install folder.
 
 Copy everything in this zip file into the game's folder.  When prompted to overwrite files, say yes.
 
-You may also use the [ModInstaller](https://github.com/fifty-six/Modinstaller2/releases/latest).
+You may also use [Scarab](https://github.com/fifty-six/Scarab/releases/latest).
 
 How To Uninstall
 ================
