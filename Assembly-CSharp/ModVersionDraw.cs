@@ -12,12 +12,22 @@ namespace Modding
     /// </summary>
     public class ModVersionDraw : MonoBehaviour
     {
-        private static GUIStyle style;
+        private static GUIStyle style = new GUIStyle(GUIStyle.none);
 
         /// <summary>
         ///     String to Draw
         /// </summary>
         public string drawString;
+
+        /// <summary>
+        ///     Run When GameObject is first active.
+        /// </summary>
+        private void Start()
+        {
+            style.normal.textColor = Color.white;
+            style.alignment = TextAnchor.UpperLeft;
+            style.padding = new RectOffset(5, 5, 5, 5);
+        }
 
         /// <summary>
         ///     Run When Gui is shown.
@@ -31,29 +41,7 @@ namespace Modding
 
             if (drawString != null && UIManager.instance.uiState is UIState.MAIN_MENU_HOME or UIState.PAUSED)
             {
-                if (style == null)
-                {
-                    style = new GUIStyle(GUI.skin.label);
-                }
-
-                Color backgroundColor = GUI.backgroundColor;
-                Color contentColor = GUI.contentColor;
-                Color color = GUI.color;
-                Matrix4x4 matrix = GUI.matrix;
-                GUI.backgroundColor = Color.white;
-                GUI.contentColor = Color.white;
-                GUI.color = Color.white;
-                GUI.matrix = Matrix4x4.TRS
-                (
-                    Vector3.zero,
-                    Quaternion.identity,
-                    new Vector3(Screen.width / 1920f, Screen.height / 1080f, 1f)
-                );
-                GUI.Label(new Rect(0f, 0f, 1920f, 1080f), drawString, style);
-                GUI.backgroundColor = backgroundColor;
-                GUI.contentColor = contentColor;
-                GUI.color = color;
-                GUI.matrix = matrix;
+                GUI.Label(new Rect(0, 0, Screen.width, Screen.height), drawString, style);
             }
         }
     }

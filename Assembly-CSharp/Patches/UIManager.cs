@@ -3,6 +3,7 @@ using MonoMod;
 using System.Collections;
 using System;
 using System.Reflection;
+using Modding.Utils;
 
 // ReSharper disable All
 #pragma warning disable 1591, 0108, 0169, 0649, 0414, CS0626
@@ -54,21 +55,7 @@ namespace Modding.Patches
 
         public extern void orig_Awake();
 
-        private Sprite LoadImage()
-        {
-            var asm = Assembly.GetExecutingAssembly();
-
-            using var stream = asm.GetManifestResourceStream("Modding.logo.png");
-
-            var buffer = new byte[stream.Length];
-            stream.Read(buffer, 0, buffer.Length);
-
-            var tex = new Texture2D(2, 2);
-
-            tex.LoadImage(buffer, true);
-
-            return Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector2.one * 0.5f);
-        }
+        private Sprite LoadImage() => Assembly.GetExecutingAssembly().LoadEmbeddedSprite("Modding.logo.png", pixelsPerUnit: 100f);
 
         public void Awake()
         {
