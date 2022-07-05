@@ -421,7 +421,7 @@ internal class Preloader : MonoBehaviour
 
 
         PreloadAssets(preloadAssets, preloadedAssets, preloadedObjects, 0, t => {
-            Resources.LoadAll("", t);
+            //Resources.LoadAll("", t);
             return Resources.FindObjectsOfTypeAll(t);
     });
         //PreloadPrefab(preloadPrefabs, preloadSceneNameMap, preloadedObjects, "resources", () => Resources.LoadAll<GameObject>(""));
