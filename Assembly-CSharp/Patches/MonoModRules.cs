@@ -33,5 +33,17 @@ namespace MonoMod
             // If the attribute isn't a MonoMod attribute, it's "useful."
             return attribType.Namespace.StartsWith("MonoMod") && attribType.Name.StartsWith("MonoMod") || attribType.Namespace.StartsWith("Modding.Patches");
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="attribType"></param>
+        /// <returns></returns>
+        public static void Patch_DirectRet(ILContext context, CustomAttribute attribType)
+        {
+            context.IL.Body.Instructions.Clear();
+            context.IL.Emit(OpCodes.Ldarg_0);
+            context.IL.Emit(OpCodes.Ret);
+        }
     }
 }

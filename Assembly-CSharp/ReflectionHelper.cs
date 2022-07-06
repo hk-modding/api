@@ -6,6 +6,7 @@ using System.Reflection.Emit;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using MonoMod.Utils;
+using MonoMod;
 
 namespace Modding
 {
@@ -14,18 +15,53 @@ namespace Modding
     /// </summary>
     public static class ReflectionHelper
     {
+        //Defined at https://github.com/Unity-Technologies/mono/blob/70ee4860ab293b5af68991e885419f60aae78716/mono/metadata/class-internals.h#L140-L162
+        [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        private struct MonoClassField
+        {
+            public IntPtr field_type;
+            public IntPtr name;
+            public IntPtr parentType;
+
+            /*
+             * Offset where this field is stored; if it is an instance
+             * field, it's the offset from the start of the object, if
+             * it's static, it's from the start of the memory chunk
+             * allocated for statics for the class.
+             * For special static fields, this is set to -1 during vtable construction.
+            */
+            public int offset;
+        }
         private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, FieldInfo>> Fields = new();
         private static readonly ConcurrentDictionary<FieldInfo, Delegate> FieldGetters = new();
         private static readonly ConcurrentDictionary<FieldInfo, Delegate> FieldSetters = new();
-        
+
         private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, PropertyInfo>> Properties = new();
         private static readonly ConcurrentDictionary<PropertyInfo, Delegate> PropertyGetters = new();
         private static readonly ConcurrentDictionary<PropertyInfo, Delegate> PropertySetters = new();
-        
+
         private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, MethodInfo>> Methods = new();
         private static readonly ConcurrentDictionary<MethodInfo, FastReflectionDelegate> MethodsDelegates = new();
 
         private static bool _preloaded;
+        [Patches.PatchILDirectRet]
+        private static IntPtr ToPointer<TSelf>(TSelf self) => throw new NotImplementedException();
+        [Patches.PatchILDirectRet]
+        private static ref TTo ToRef<TTo>(IntPtr ptr) => throw new NotImplementedException();
+
+        private static ref TTo GetFieldRef<TTo>(object obj, FieldInfo field)
+        {
+            IntPtr objptr = ToPointer(obj);
+            if (field.IsStatic)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                ref MonoClassField monofield = ref ToRef<MonoClassField>(field.FieldHandle.Value);
+                return ref ToRef<TTo>(IntPtr.Add(objptr, monofield.offset + (field.DeclaringType.IsValueType ? IntPtr.Size * 2 /* Skip MonoObject  */: 0)));
+            }
+        }
 
         /// <summary>
         ///     Caches all fields on a type to frontload cost of reflection
@@ -39,7 +75,7 @@ namespace Modding
             {
                 tFields = new ConcurrentDictionary<string, FieldInfo>();
             }
-            
+
             const BindingFlags privStatic = BindingFlags.NonPublic | BindingFlags.Static;
             const BindingFlags all = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
 
@@ -49,7 +85,7 @@ namespace Modding
             MethodInfo getStaticFieldGetter = typeof(ReflectionHelper).GetMethod(nameof(GetStaticFieldGetter), privStatic);
             MethodInfo getInstanceFieldSetter = typeof(ReflectionHelper).GetMethod(nameof(GetInstanceFieldSetter), privStatic);
             MethodInfo getStaticFieldSetter = typeof(ReflectionHelper).GetMethod(nameof(GetStaticFieldSetter), privStatic);
-            
+
             Parallel.ForEach
             (
                 t.GetFields(all),
@@ -60,7 +96,7 @@ namespace Modding
                     // Don't need to preload consts, immutable anyways.
                     if (field.IsLiteral)
                         return;
-                    
+
                     object[] @params = { field };
 
                     // Getters
@@ -70,7 +106,7 @@ namespace Modding
                         getInstanceFieldGetter?.MakeGenericMethod(t, field.FieldType).Invoke(null, @params);
 
                     // Don't get a setter if it's readonly
-                    if (field.IsInitOnly) 
+                    if (field.IsInitOnly)
                         return;
 
                     if (field.IsStatic)
@@ -80,7 +116,7 @@ namespace Modding
                 }
             );
         }
-        
+
         internal static void PreloadCommonTypes()
         {
             if (_preloaded)
@@ -107,7 +143,7 @@ namespace Modding
 
         #region Fields
 
-         /// <summary>
+        /// <summary>
         ///     Gets a field on a type
         /// </summary>
         /// <param name="t">Type</param>
@@ -181,7 +217,7 @@ namespace Modding
 
             return d;
         }
-        
+
         private static Delegate GetStaticFieldGetter<TField>(FieldInfo fi)
         {
             if (FieldGetters.TryGetValue(fi, out Delegate d))
@@ -257,7 +293,7 @@ namespace Modding
 
             return d;
         }
-        
+
         private static Delegate GetStaticFieldSetter<TField>(FieldInfo fi)
         {
             if (FieldSetters.TryGetValue(fi, out Delegate d))
@@ -287,7 +323,7 @@ namespace Modding
             gen.Emit(OpCodes.Stsfld, fi);
             gen.Emit(OpCodes.Ret);
 
-            d =  dm.Generate().CreateDelegate(typeof(Action<TField>));
+            d = dm.Generate().CreateDelegate(typeof(Action<TField>));
 
             FieldSetters[fi] = d;
 
@@ -308,7 +344,10 @@ namespace Modding
         public static TCast GetField<TObject, TField, TCast>(TObject obj, string name, TCast @default = default)
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name);
-
+            if(!(fi?.IsStatic ?? false))
+            {
+                return GetFieldRef<TCast>(obj, fi);
+            }
             return fi == null
                 ? @default
                 : (TCast)(object)((Func<TObject, TField>)GetInstanceFieldGetter<TObject, TField>(fi))(obj);
@@ -326,8 +365,11 @@ namespace Modding
         public static TField GetField<TObject, TField>(TObject obj, string name)
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
-
-            return ((Func<TObject, TField>) GetInstanceFieldGetter<TObject, TField>(fi))(obj);
+            if(!(fi?.IsStatic ?? false))
+            {
+                return GetFieldRef<TField>(obj, fi);
+            }
+            return ((Func<TObject, TField>)GetInstanceFieldGetter<TObject, TField>(fi))(obj);
         }
 
         /// <summary>
@@ -377,6 +419,10 @@ namespace Modding
             {
                 return;
             }
+            if(!fi.IsStatic)
+            {
+                GetFieldRef<TField>(obj, fi) = value;
+            }
 
             ((Action<TObject, TField>)GetInstanceFieldSetter<TObject, TField>(fi))(obj, value);
         }
@@ -393,6 +439,10 @@ namespace Modding
         public static void SetField<TObject, TField>(TObject obj, string name, TField value)
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
+            if(!fi.IsStatic)
+            {
+                GetFieldRef<TField>(obj, fi) = value;
+            }
             ((Action<TObject, TField>)GetInstanceFieldSetter<TObject, TField>(fi))(obj, value);
         }
 
@@ -563,7 +613,7 @@ namespace Modding
             {
                 throw new ArgumentException($"Property doesn't have Get method", nameof(pi));
             }
-            
+
             var dm = new DynamicMethodDefinition
             (
                 "PropertyAccess" + pi.DeclaringType?.Name + pi.Name,
@@ -577,13 +627,13 @@ namespace Modding
             gen.Emit(OpCodes.Call, pi.GetMethod);
             gen.Emit(OpCodes.Ret);
 
-            d =  dm.Generate().CreateDelegate(typeof(Func<TType, TProperty>));
+            d = dm.Generate().CreateDelegate(typeof(Func<TType, TProperty>));
 
             PropertyGetters[pi] = d;
 
             return d;
         }
-        
+
         private static Delegate GetStaticPropertyGetter<TProperty>(PropertyInfo pi)
         {
             if (PropertyGetters.TryGetValue(pi, out Delegate d))
@@ -608,13 +658,13 @@ namespace Modding
             gen.Emit(OpCodes.Call, pi.GetMethod);
             gen.Emit(OpCodes.Ret);
 
-            d =  dm.Generate().CreateDelegate(typeof(Func<TProperty>));
+            d = dm.Generate().CreateDelegate(typeof(Func<TProperty>));
 
             PropertyGetters[pi] = d;
 
             return d;
         }
-        
+
         private static Delegate GetInstancePropertySetter<TType, TProperty>(PropertyInfo pi)
         {
             if (PropertySetters.TryGetValue(pi, out Delegate d))
@@ -641,13 +691,13 @@ namespace Modding
             gen.Emit(OpCodes.Call, pi.SetMethod);
             gen.Emit(OpCodes.Ret);
 
-            d =  dm.Generate().CreateDelegate(typeof(Action<TType, TProperty>));
+            d = dm.Generate().CreateDelegate(typeof(Action<TType, TProperty>));
 
             PropertySetters[pi] = d;
 
             return d;
         }
-        
+
         private static Delegate GetStaticPropertySetter<TProperty>(PropertyInfo pi)
         {
             if (PropertySetters.TryGetValue(pi, out Delegate d))
@@ -706,7 +756,7 @@ namespace Modding
             mi = t.GetMethod
             (
                 method,
-                BindingFlags.NonPublic | BindingFlags.Public | (instance ? BindingFlags.Instance : BindingFlags.Static) 
+                BindingFlags.NonPublic | BindingFlags.Public | (instance ? BindingFlags.Instance : BindingFlags.Static)
             );
 
             if (mi != null)
@@ -716,7 +766,7 @@ namespace Modding
 
             return mi;
         }
-        
+
         private static FastReflectionDelegate GetFastReflectionDelegate(MethodInfo mi)
         {
             if (MethodsDelegates.TryGetValue(mi, out FastReflectionDelegate d))
@@ -729,7 +779,7 @@ namespace Modding
 
             return d;
         }
-        
+
         /// <summary>
         ///     Call an instance method with a return type
         /// </summary>
@@ -743,7 +793,7 @@ namespace Modding
         public static TReturn CallMethod<TObject, TReturn>(TObject obj, string name, params object[] param)
         {
             MethodInfo mi = GetMethodInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Method {name} does not exist!");
-            return (TReturn) GetFastReflectionDelegate(mi).Invoke(obj, param.Length == 0 ? null : param);
+            return (TReturn)GetFastReflectionDelegate(mi).Invoke(obj, param.Length == 0 ? null : param);
         }
 
         /// <summary>
@@ -771,7 +821,7 @@ namespace Modding
         /// <returns>The specified return type</returns>
         [PublicAPI]
         public static TReturn CallMethod<TType, TReturn>(string name, params object[] param) => CallMethod<TReturn>(typeof(TType), name, param);
-        
+
         /// <summary>
         ///     Call a static method without a return type
         /// </summary>
@@ -794,7 +844,7 @@ namespace Modding
         public static TReturn CallMethod<TReturn>(Type type, string name, params object[] param)
         {
             MethodInfo mi = GetMethodInfo(type, name, false) ?? throw new MissingFieldException($"Method {name} does not exist!");
-            return (TReturn) GetFastReflectionDelegate(mi).Invoke(null, param.Length == 0 ? null : param);
+            return (TReturn)GetFastReflectionDelegate(mi).Invoke(null, param.Length == 0 ? null : param);
         }
 
         /// <summary>
