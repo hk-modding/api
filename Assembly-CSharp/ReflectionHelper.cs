@@ -6,7 +6,7 @@ using System.Reflection.Emit;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using MonoMod.Utils;
-using MonoMod;
+using Unity.Collections.LowLevel.Unsafe;
 
 namespace Modding
 {
@@ -44,22 +44,22 @@ namespace Modding
         private static readonly ConcurrentDictionary<MethodInfo, FastReflectionDelegate> MethodsDelegates = new();
 
         private static bool _preloaded;
-        [Patches.PatchILDirectRet]
-        private static IntPtr ToPointer<TSelf>(TSelf self) => throw new NotImplementedException();
-        [Patches.PatchILDirectRet]
-        private static ref TTo ToRef<TTo>(IntPtr ptr) => throw new NotImplementedException();
+        [Patches.PatchRHAddOffsetAttribute]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private unsafe static ref TTo AddOffset<TSelf, TTo>(TSelf self, int offset) => throw new NotImplementedException();
 
-        private static ref TTo GetFieldRef<TTo>(object obj, FieldInfo field)
+        private static unsafe ref TTo GetFieldRef<TTo>(object obj, FieldInfo field)
         {
-            IntPtr objptr = ToPointer(obj);
             if (field.IsStatic)
             {
                 throw new NotImplementedException();
             }
             else
             {
-                ref MonoClassField monofield = ref ToRef<MonoClassField>(field.FieldHandle.Value);
-                return ref ToRef<TTo>(IntPtr.Add(objptr, monofield.offset + (field.DeclaringType.IsValueType ? IntPtr.Size * 2 /* Skip MonoObject  */: 0)));
+                MonoClassField* monofield = (MonoClassField*)field.FieldHandle.Value;
+                //Defined at https://github.com/Unity-Technologies/mono/blob/70ee4860ab293b5af68991e885419f60aae78716/mono/metadata/class-internals.h#L295
+                bool isValueType = ((*(byte*)((byte*)monofield->parentType + sizeof(void*) * 3 + 2 + 1 + 4) >> 2) & 1) > 0;
+                return ref AddOffset<object, TTo>(obj, monofield->offset + (isValueType ? sizeof(void*) * 2 /* Skip MonoObject  */: 0));
             }
         }
 
@@ -344,7 +344,7 @@ namespace Modding
         public static TCast GetField<TObject, TField, TCast>(TObject obj, string name, TCast @default = default)
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name);
-            if(!(fi?.IsStatic ?? false))
+            if (!(fi?.IsStatic ?? false))
             {
                 return GetFieldRef<TCast>(obj, fi);
             }
@@ -365,7 +365,7 @@ namespace Modding
         public static TField GetField<TObject, TField>(TObject obj, string name)
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
-            if(!(fi?.IsStatic ?? false))
+            if (!(fi?.IsStatic ?? false))
             {
                 return GetFieldRef<TField>(obj, fi);
             }
@@ -419,9 +419,10 @@ namespace Modding
             {
                 return;
             }
-            if(!fi.IsStatic)
+            if (!fi.IsStatic)
             {
                 GetFieldRef<TField>(obj, fi) = value;
+                return;
             }
 
             ((Action<TObject, TField>)GetInstanceFieldSetter<TObject, TField>(fi))(obj, value);
@@ -439,9 +440,10 @@ namespace Modding
         public static void SetField<TObject, TField>(TObject obj, string name, TField value)
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
-            if(!fi.IsStatic)
+            if (!fi.IsStatic)
             {
                 GetFieldRef<TField>(obj, fi) = value;
+                return;
             }
             ((Action<TObject, TField>)GetInstanceFieldSetter<TObject, TField>(fi))(obj, value);
         }
