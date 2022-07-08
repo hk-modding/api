@@ -46,9 +46,26 @@ namespace Modding
         private static bool _preloaded;
         [Patches.PatchRHAddOffsetAttribute]
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        private unsafe static ref TTo AddOffset<TSelf, TTo>(TSelf self, int offset) => throw new NotImplementedException();
-
-        private static unsafe ref TTo GetFieldRef<TTo>(object obj, FieldInfo field)
+        private unsafe static ref TTo AddOffset<TSelf, TTo>(TSelf self, int offset)  where TSelf : class => throw new NotImplementedException();
+        [Patches.PatchRHAddOffsetAttribute]
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private unsafe static ref TTo AddOffset<TSelf, TTo>(ref TSelf self, int offset)  where TSelf : struct => throw new NotImplementedException();
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        private unsafe static bool IsValueType(IntPtr kclass) => ((*(byte*)((byte*)kclass + sizeof(void*) * 3 + 2 + 1 + 4) >> 2) & 1) > 0;
+        private static unsafe ref TTo GetFieldRef<TSelf, TTo>(TSelf obj, FieldInfo field) where TSelf : class
+        {
+            if (field.IsStatic)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                MonoClassField* monofield = (MonoClassField*)field.FieldHandle.Value;
+                //Defined at https://github.com/Unity-Technologies/mono/blob/70ee4860ab293b5af68991e885419f60aae78716/mono/metadata/class-internals.h#L295
+                return ref AddOffset<TSelf, TTo>(obj, monofield->offset + (IsValueType(monofield->parentType) ? sizeof(void*) * 2 /* Skip MonoObject  */: 0));
+            }
+        }
+        private static unsafe ref TTo GetFieldRef<TSelf, TTo>(ref TSelf obj, FieldInfo field) where TSelf : struct
         {
             if (field.IsStatic)
             {
@@ -59,7 +76,7 @@ namespace Modding
                 MonoClassField* monofield = (MonoClassField*)field.FieldHandle.Value;
                 //Defined at https://github.com/Unity-Technologies/mono/blob/70ee4860ab293b5af68991e885419f60aae78716/mono/metadata/class-internals.h#L295
                 bool isValueType = ((*(byte*)((byte*)monofield->parentType + sizeof(void*) * 3 + 2 + 1 + 4) >> 2) & 1) > 0;
-                return ref AddOffset<object, TTo>(obj, monofield->offset + (isValueType ? sizeof(void*) * 2 /* Skip MonoObject  */: 0));
+                return ref AddOffset<TSelf, TTo>(ref obj, monofield->offset);
             }
         }
 
@@ -341,12 +358,12 @@ namespace Modding
         /// <typeparam name="TCast">Type of return.</typeparam>
         /// <returns>The value of a field on an object/type</returns>
         [PublicAPI]
-        public static TCast GetField<TObject, TField, TCast>(TObject obj, string name, TCast @default = default)
+        public static unsafe TCast GetField<TObject, TField, TCast>(TObject obj, string name, TCast @default = default)
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name);
-            if (!(fi?.IsStatic ?? false))
+            if (!(fi?.IsStatic ?? false) && (!fi.FieldType.IsValueType || typeof(TObject)!= typeof(object)))
             {
-                return GetFieldRef<TCast>(obj, fi);
+                return (TCast)(object)GetFieldRef<object, TField>(obj, fi);
             }
             return fi == null
                 ? @default
@@ -365,9 +382,9 @@ namespace Modding
         public static TField GetField<TObject, TField>(TObject obj, string name)
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
-            if (!(fi?.IsStatic ?? false))
+            if (!(fi?.IsStatic ?? false) && (!fi.FieldType.IsValueType || typeof(TObject)!= typeof(object)))
             {
-                return GetFieldRef<TField>(obj, fi);
+                return GetFieldRef<object, TField>(obj, fi);
             }
             return ((Func<TObject, TField>)GetInstanceFieldGetter<TObject, TField>(fi))(obj);
         }
@@ -411,7 +428,7 @@ namespace Modding
         /// <typeparam name="TField">Type of field</typeparam>
         /// <typeparam name="TObject">Type of object being passed in</typeparam>
         [PublicAPI]
-        public static void SetFieldSafe<TObject, TField>(TObject obj, string name, TField value)
+        public static void SetFieldSafe<TObject, TField>(TObject obj, string name, TField value) where TObject : class //Assignment to struct is meaningless
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name);
 
@@ -419,9 +436,9 @@ namespace Modding
             {
                 return;
             }
-            if (!fi.IsStatic)
+            if (!(fi?.IsStatic ?? false) && (!fi.FieldType.IsValueType || typeof(TObject)!= typeof(object)))
             {
-                GetFieldRef<TField>(obj, fi) = value;
+                GetFieldRef<TObject, TField>(obj, fi) = value;
                 return;
             }
 
@@ -437,12 +454,58 @@ namespace Modding
         /// <typeparam name="TField">Type of field</typeparam>
         /// <typeparam name="TObject">Type of object being passed in</typeparam>
         [PublicAPI]
-        public static void SetField<TObject, TField>(TObject obj, string name, TField value)
+        public static unsafe void SetFieldSafe<TObject, TField>(ref TObject obj, string name, TField value) where TObject : struct
+        {
+            FieldInfo fi = GetFieldInfo(typeof(TObject), name);
+
+            if (fi == null)
+            {
+                return;
+            }
+            if (!(fi?.IsStatic ?? false) && (!fi.FieldType.IsValueType || typeof(TObject)!= typeof(object)))
+            {
+                GetFieldRef<TObject, TField>(ref obj, fi) = value;
+                return;
+            }
+
+            ((Action<TObject, TField>)GetInstanceFieldSetter<TObject, TField>(fi))(obj, value);
+        }
+
+        /// <summary>
+        ///     Set a field on an object using a string.
+        /// </summary>
+        /// <param name="obj">Object/Object of type which the field is on</param>
+        /// <param name="name">Name of the field</param>
+        /// <param name="value">Value to set the field to</param>
+        /// <typeparam name="TField">Type of field</typeparam>
+        /// <typeparam name="TObject">Type of object being passed in</typeparam>
+        [PublicAPI]
+        public static void SetField<TObject, TField>(TObject obj, string name, TField value) where TObject : class //Assignment to struct is meaningless
         {
             FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
-            if (!fi.IsStatic)
+            if (!(fi?.IsStatic ?? false) && (!fi.FieldType.IsValueType || typeof(TObject)!= typeof(object)))
             {
-                GetFieldRef<TField>(obj, fi) = value;
+                GetFieldRef<TObject, TField>(obj, fi) = value;
+                return;
+            }
+            ((Action<TObject, TField>)GetInstanceFieldSetter<TObject, TField>(fi))(obj, value);
+        }
+
+        /// <summary>
+        ///     Set a field on an object using a string.
+        /// </summary>
+        /// <param name="obj">Object/Object of type which the field is on</param>
+        /// <param name="name">Name of the field</param>
+        /// <param name="value">Value to set the field to</param>
+        /// <typeparam name="TField">Type of field</typeparam>
+        /// <typeparam name="TObject">Type of object being passed in</typeparam>
+        [PublicAPI]
+        public static unsafe void SetField<TObject, TField>(ref TObject obj, string name, TField value) where TObject : struct
+        {
+            FieldInfo fi = GetFieldInfo(typeof(TObject), name) ?? throw new MissingFieldException($"Field {name} does not exist!");
+            if (!(fi?.IsStatic ?? false) && (!fi.FieldType.IsValueType || typeof(TObject)!= typeof(object)))
+            {
+                GetFieldRef<TObject, TField>(ref obj, fi) = value;
                 return;
             }
             ((Action<TObject, TField>)GetInstanceFieldSetter<TObject, TField>(fi))(obj, value);
