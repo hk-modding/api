@@ -467,7 +467,8 @@ namespace Modding
             }
             else
             {
-                GetFieldRef<TObject, TField>(obj, fi) = value;
+                if(typeof(TField) != ObjectType || !IsValueType(fi.FieldType)) GetFieldRef<TObject, TField>(obj, fi) = value;
+                else ((Action<TObject, TField>)GetInstanceFieldSetter<TObject, TField>(fi))(obj, value);
             }
         }
 
@@ -489,7 +490,7 @@ namespace Modding
             }
             else
             {
-                if(typeof(TField) != ObjectType) GetFieldRef<TObject, TField>(ref obj, fi) = value;
+                if(typeof(TField) != ObjectType || !IsValueType(fi.FieldType)) GetFieldRef<TObject, TField>(ref obj, fi) = value;
             }
         }
 
