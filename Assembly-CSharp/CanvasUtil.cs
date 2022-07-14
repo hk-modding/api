@@ -321,6 +321,7 @@ namespace Modding
             Image img = panel.AddComponent<Image>();
             img.sprite = sprite;
             img.preserveAspect = true;
+            img.useSpriteMesh = true;
             return panel;
         }
 
