@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -87,6 +87,7 @@ namespace Modding
                 if (f != null && f.name == fontName)
                 {
                     Fonts.Add(fontName, f);
+                    break;
                 }
             }
 
