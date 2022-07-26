@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using JetBrains.Annotations;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -33,21 +32,6 @@ namespace MonoMod
         {
             // If the attribute isn't a MonoMod attribute, it's "useful."
             return attribType.Namespace.StartsWith("MonoMod") && attribType.Name.StartsWith("MonoMod") || attribType.Namespace.StartsWith("Modding.Patches");
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="attribType"></param>
-        /// <returns></returns>
-        public static void Patch_RH_AddOffset(ILContext context, CustomAttribute attribType)
-        {
-            context.IL.Body.Instructions.Clear();
-            context.IL.Emit(OpCodes.Ldarg_0);
-            context.IL.Emit(OpCodes.Call, typeof(IntPtr).GetMethods().First(x => x.Name == "op_Explicit" && x.ReturnType == typeof(void*)));
-            context.IL.Emit(OpCodes.Ldarg_1);
-            context.IL.Emit(OpCodes.Add);
-            context.IL.Emit(OpCodes.Ret);
         }
     }
 }
