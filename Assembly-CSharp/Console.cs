@@ -83,7 +83,7 @@ namespace Modding
             (
                 background,
                 string.Join(string.Empty, _messages.ToArray()),
-                12,
+                _fontSize,
                 TextAnchor.LowerLeft,
                 new CanvasUtil.RectData(new Vector2(-5, -5), Vector2.zero, Vector2.zero, Vector2.one),
                 _font
