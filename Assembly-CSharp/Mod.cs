@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
@@ -123,6 +124,12 @@ namespace Modding
         {
             return null;
         }
+
+        /// <summary>
+        /// A list of requested scenes to be preloaded and actions to execute on loading of those scenes
+        /// </summary>
+        /// <returns>List of tuples containg scene names and the respective actions.</returns>
+        public virtual (string, Func<IEnumerator>)[] PreloadSceneHooks() => Array.Empty<(string, Func<IEnumerator>)>();
 
         /// <inheritdoc />
         /// <summary>

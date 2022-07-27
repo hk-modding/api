@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Modding
@@ -20,6 +22,12 @@ namespace Modding
         /// </summary>
         /// <returns>A List of tuples containing scene name, object name</returns>
         List<(string, string)> GetPreloadNames();
+        
+        /// <summary>
+        /// A list of requested scenes to be preloaded and actions to execute on loading of those scenes
+        /// </summary>
+        /// <returns>List of tuples containg scene names and the respective actions.</returns>
+        (string, Func<IEnumerator>)[] PreloadSceneHooks();
 
         /// <summary>
         ///     Called after preloading of all mods.
