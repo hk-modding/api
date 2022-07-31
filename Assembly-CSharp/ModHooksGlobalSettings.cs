@@ -25,7 +25,7 @@ namespace Modding
         public bool ShortLoggingLevel;
 
         /// <summary>
-        ///     Determines if the logs should have a timestamp attached to each line of loggin.
+        ///     Determines if the logs should have a timestamp attached to each line of logging.
         /// </summary>
         public bool IncludeTimestamps;
 
