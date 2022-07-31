@@ -97,7 +97,7 @@ namespace Modding
             if (_logLevel > level) 
                 return;
             
-            string timeText = "[" + DateTime.Now.ToUniversalTime().ToString("s") + "]:"; // uses ISO 8601
+            string timeText = "[" + DateTime.Now.ToUniversalTime().ToString("HH:mm:ss") + "]:"; // uses ISO 8601
             string levelText = _shortLoggingLevel ? $"[{LogLevelExt.ToShortString(level).ToUpper()}]:" : $"[{level.ToString().ToUpper()}]:";
             string prefixText = _includeTimestamps ? timeText + levelText : levelText;
             
