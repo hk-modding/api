@@ -114,6 +114,8 @@ namespace Modding
                 {
                     GlobalSettings = de;
                     Logger.SetLogLevel(GlobalSettings.LoggingLevel);
+                    Logger.SetUseShortLogLevel(GlobalSettings.ShortLoggingLevel);
+                    Logger.SetIncludeTimestampt(GlobalSettings.IncludeTimestamps);
                 }
             }
             catch (Exception e)

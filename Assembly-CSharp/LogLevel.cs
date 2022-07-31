@@ -39,4 +39,28 @@ namespace Modding
         [UsedImplicitly]
         Off
     }
+
+    /// <summary>
+    ///     Methods for the logging level enum
+    /// </summary>
+    public static class LogLevelExt
+    {
+        /// <summary>
+        ///     Converts the logging level enum into a short string.
+        /// </summary>
+        /// <param name="level">The logging level</param>
+        /// <returns>A 1 character string of the value of the enum</returns>
+        public static string ToShortString(LogLevel level)
+        {
+            return level switch
+            {
+                LogLevel.Fine => "F",
+                LogLevel.Debug => "D",
+                LogLevel.Info => "I",
+                LogLevel.Warn => "W",
+                LogLevel.Error => "E",
+                _ => ""
+            };
+        }
+    }
 }
