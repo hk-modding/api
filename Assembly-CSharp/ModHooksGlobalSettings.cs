@@ -20,6 +20,16 @@ namespace Modding
         public LogLevel LoggingLevel = LogLevel.Info;
 
         /// <summary>
+        ///     Determines if the logs should have a short log level instead of the full name.
+        /// </summary>
+        public bool ShortLoggingLevel;
+
+        /// <summary>
+        ///     Determines if the logs should have a timestamp attached to each line of logging.
+        /// </summary>
+        public bool IncludeTimestamps;
+
+        /// <summary>
         ///     All settings related to the the in game console
         /// </summary>
         public InGameConsoleSettings ConsoleSettings = new();

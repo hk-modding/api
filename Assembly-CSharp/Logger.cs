@@ -21,6 +21,8 @@ namespace Modding
         private static StreamWriter Writer;
 
         private static LogLevel _logLevel;
+        private static bool _shortLoggingLevel;
+        private static bool _includeTimestamps;
 
         private static string OldLogDir = Path.Combine(Application.persistentDataPath, "Old ModLogs");
 
@@ -75,6 +77,16 @@ namespace Modding
             _logLevel = level;
         }
 
+        internal static void SetUseShortLogLevel(bool value)
+        {
+            _shortLoggingLevel = value;
+        }
+
+        internal static void SetIncludeTimestampt(bool value)
+        {
+            _includeTimestamps = value;
+        }
+
         /// <summary>
         ///     Checks to ensure that the logger level is currently high enough for this message, if it is, write it.
         /// </summary>
@@ -85,9 +97,11 @@ namespace Modding
             if (_logLevel > level) 
                 return;
             
-            string levelText = $"[{level.ToString().ToUpper()}]:";
+            string timeText = "[" + DateTime.Now.ToUniversalTime().ToString("HH:mm:ss") + "]:"; // uses ISO 8601
+            string levelText = _shortLoggingLevel ? $"[{LogLevelExt.ToShortString(level).ToUpper()}]:" : $"[{level.ToString().ToUpper()}]:";
+            string prefixText = _includeTimestamps ? timeText + levelText : levelText;
             
-            WriteToFile(levelText + message.Replace("\n", "\n" + levelText) + Environment.NewLine, level);
+            WriteToFile(prefixText + String.Join(Environment.NewLine + prefixText, message.Split('\n')) + Environment.NewLine, level);
         }
 
         /// <summary>
