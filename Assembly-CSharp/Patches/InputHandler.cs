@@ -29,6 +29,7 @@ namespace Modding.Patches
             if (isTitleScreenScene)
             {
                 Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
                 return;
             }
 
@@ -41,6 +42,7 @@ namespace Modding.Patches
             if (controllerPressed)
             {
                 Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
                 return;
             }
 

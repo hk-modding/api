@@ -271,6 +271,8 @@ namespace Modding
             }
 
             Cursor.visible = false;
+
+            Cursor.lockState = CursorLockMode.Locked;
         }
 
 
