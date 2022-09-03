@@ -99,10 +99,24 @@ namespace Modding
 
             Log("Initializing");
 
-            _globalSettingsPath ??= Path.Combine(Application.persistentDataPath, $"{GetType().Name}.GlobalSettings.json");
+            _globalSettingsPath ??= GetGlobalSettingsPath();
 
             LoadGlobalSettings();
             HookSaveMethods();
+        }
+
+        private string GetGlobalSettingsPath()
+        {
+            string globalSettingsFileName = $"{GetType().Name}.GlobalSettings.json";
+
+            string location = GetType().Assembly.Location;
+            string directory = Path.GetDirectoryName(location);
+            string globalSettingsOverride = Path.Combine(directory, globalSettingsFileName);
+
+            if (File.Exists(globalSettingsOverride))
+                return globalSettingsOverride;
+
+            return Path.Combine(Application.persistentDataPath, globalSettingsFileName);
         }
 
         /// <inheritdoc />
