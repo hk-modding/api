@@ -114,8 +114,11 @@ namespace Modding
             string globalSettingsOverride = Path.Combine(directory, globalSettingsFileName);
 
             if (File.Exists(globalSettingsOverride))
+            {
+                Log("Overriding Global Settings path with Mod directory");
                 return globalSettingsOverride;
-
+            }
+            
             return Path.Combine(Application.persistentDataPath, globalSettingsFileName);
         }
 
