@@ -66,6 +66,11 @@ namespace Modding.Patches
             borders.Add(gameObject);
 
             ModHooks.OnDrawBlackBorders(borders);
+            
+            foreach (var border in borders)
+            {
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(border, base.gameObject.scene);
+            }
         }
 
         private extern void orig_Start();
