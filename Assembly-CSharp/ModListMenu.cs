@@ -7,9 +7,31 @@ using UnityEngine.UI;
 using static Modding.ModLoader;
 using Patch = Modding.Patches;
 using Lang = Language.Language;
+using System.Reflection;
 
 namespace Modding
 {
+    /// <summary>
+    /// Add this attribute to a mod class which implements IMenuMod or ICustomMenuMod to 
+    /// change the string of the button that jumps to the mod's menu.
+    /// 
+    /// The default is {mod.GetName()} or {mod.GetName()} Options, depending on
+    /// whether the mod is IToggleable with toggle button inside menu or not.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ModMenuButtonLabelAttribute : Attribute
+    {
+        /// <summary>
+        /// The text to display on the mod menu button.
+        /// </summary>
+        public string Label { get; set; }
+
+        /// <summary>
+        /// Construct an instance of the ModMenuButtonLabelAttribute class.
+        /// </summary>
+        public ModMenuButtonLabelAttribute(string label) => Label = label;
+    }
+
     internal class ModListMenu
     {
         private MenuScreen screen;
@@ -144,7 +166,7 @@ namespace Modding
                                                 {
                                                     Style = MenuButtonStyle.VanillaStyle,
                                                     CancelAction = _ => this.ApplyChanges(),
-                                                    Label = toggleDels == null ? $"{modInst.Name} {Lang.Get("MAIN_OPTIONS", "MainMenu")}" : modInst.Name,
+                                                    Label = GetModMenuButtonLabel(modInst),
                                                     SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
                                                         .UIGoToDynamicMenu(menu),
                                                     Proceed = true,
@@ -173,7 +195,7 @@ namespace Modding
                                                 {
                                                     Style = MenuButtonStyle.VanillaStyle,
                                                     CancelAction = _ => this.ApplyChanges(),
-                                                    Label = toggleDels == null ? $"{modInst.Name} {Lang.Get("MAIN_OPTIONS", "MainMenu")}" : modInst.Name,
+                                                    Label = GetModMenuButtonLabel(modInst),
                                                     SubmitAction = _ => ((Patch.UIManager)UIManager.instance)
                                                         .UIGoToDynamicMenu(menu),
                                                     Proceed = true,
@@ -288,5 +310,17 @@ namespace Modding
         private void GoToModListMenu(object _) => GoToModListMenu();
         private void GoToModListMenu() => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen);
 
+        private static string GetModMenuButtonLabel(ModInstance modInst)
+        {
+            if (modInst.GetType().GetCustomAttribute<ModMenuButtonLabelAttribute>() is ModMenuButtonLabelAttribute a)
+                return a.Label;
+
+            if ((modInst.Mod is ICustomMenuMod { ToggleButtonInsideMenu: true }
+                || modInst.Mod is IMenuMod { ToggleButtonInsideMenu: true })
+                && modInst.Mod is ITogglableMod)
+                return modInst.Name;
+                
+            return $"{modInst.Name} {Lang.Get("MAIN_OPTIONS", "MainMenu")}";
+        }
     }
 }
