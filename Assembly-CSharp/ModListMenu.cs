@@ -312,12 +312,12 @@ namespace Modding
 
         private static string GetModMenuButtonLabel(ModInstance modInst)
         {
-            if (modInst.GetType().GetCustomAttribute<ModMenuButtonLabelAttribute>() is ModMenuButtonLabelAttribute a)
+            if (modInst.Mod.GetType().GetCustomAttribute<ModMenuButtonLabelAttribute>() is ModMenuButtonLabelAttribute a)
                 return a.Label;
 
-            if ((modInst.Mod is ICustomMenuMod { ToggleButtonInsideMenu: true }
-                || modInst.Mod is IMenuMod { ToggleButtonInsideMenu: true })
-                && modInst.Mod is ITogglableMod)
+            if (modInst.Mod is ITogglableMod &&
+                (modInst.Mod is ICustomMenuMod { ToggleButtonInsideMenu: true }
+                || modInst.Mod is IMenuMod { ToggleButtonInsideMenu: true }))
                 return modInst.Name;
                 
             return $"{modInst.Name} {Lang.Get("MAIN_OPTIONS", "MainMenu")}";
