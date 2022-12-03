@@ -183,6 +183,13 @@ namespace Modding
         /// </summary>
         public virtual void Initialize() { }
 
+        /// <summary>
+        ///     If this mod defines a menu via the <see cref="IMenuMod"/> or <see cref="ICustomMenuMod"/> interfaces, override this method to 
+        ///     change the text of the button to jump to this mod's menu.
+        /// </summary>
+        /// <returns></returns>
+        public virtual string GetMenuButtonText() => $"{GetName()} {Language.Language.Get("MAIN_OPTIONS", "MainMenu")}";
+
         private void HookSaveMethods()
         {
             ModHooks.ApplicationQuitHook += SaveGlobalSettings;
