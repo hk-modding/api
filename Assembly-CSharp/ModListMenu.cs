@@ -7,7 +7,6 @@ using UnityEngine.UI;
 using static Modding.ModLoader;
 using Patch = Modding.Patches;
 using Lang = Language.Language;
-using System.Reflection;
 
 namespace Modding
 {
@@ -288,5 +287,6 @@ namespace Modding
 
         private void GoToModListMenu(object _) => GoToModListMenu();
         private void GoToModListMenu() => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(this.screen);
+
     }
 }
