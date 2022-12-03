@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -46,5 +46,11 @@ namespace Modding
         /// </summary>
         /// <returns></returns>
         int LoadPriority();
+
+        /// <summary>
+        ///     Returns the text that should be displayed on the mod menu button, if there is one.
+        /// </summary>
+        /// <returns></returns>
+        string GetMenuButtonText();
     }
 }
