@@ -161,6 +161,8 @@ namespace Modding
             foreach (Assembly asm in asms)
             {
                 Logger.APILogger.LogDebug($"Loading mods in assembly `{asm.FullName}`");
+                
+                bool foundMod = false;
 
                 try
                 {
@@ -168,6 +170,8 @@ namespace Modding
                     {
                         if (!ty.IsClass || ty.IsAbstract || !ty.IsSubclassOf(typeof(Mod)))
                             continue;
+
+                        foundMod = true;
 
                         Logger.APILogger.LogDebug($"Constructing mod `{ty.FullName}`");
 
@@ -208,6 +212,9 @@ namespace Modding
                 {
                     Logger.APILogger.LogError(e);
                 }
+
+                if (!foundMod)
+                    Logger.APILogger.Log($"No mods found in loaded assembly {asm.FullName}");
             }
 
             var scenes = new List<string>();
