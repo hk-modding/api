@@ -158,7 +158,7 @@ namespace Modding
                                         }
                                         catch (Exception e)
                                         {
-                                            Logger.APILogger.LogError(e);
+                                            Logger.APILogger.LogError($"Error creating menu for {nameof(IMenuMod)} {modInst.Name}\n" + e);
                                         }
                                     }
                                     else if (modInst.Mod is ICustomMenuMod icmmod)
@@ -187,7 +187,7 @@ namespace Modding
                                         }
                                         catch (Exception e)
                                         {
-                                            Logger.APILogger.LogError(e);
+                                            Logger.APILogger.LogError($"Error creating menu for {nameof(ICustomMenuMod)} {modInst.Name}\n" + e);
                                         }
                                     }
                                 }
