@@ -214,7 +214,10 @@ namespace Modding
                 }
 
                 if (!foundMod)
-                    Logger.APILogger.Log($"No mods found in loaded assembly {asm.FullName}");
+                {
+                    AssemblyName info = asm.GetName();
+                    Logger.APILogger.Log($"Assembly {info.Name} ({info.Version}) loaded with 0 mods");
+                }
             }
 
             var scenes = new List<string>();
