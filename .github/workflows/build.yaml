@@ -6,13 +6,13 @@ jobs:
   build-win:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Vanilla
       run: |
         wget https://files.catbox.moe/i4sdl6.zip -O Vanilla.zip
         unzip Vanilla.zip -d Vanilla
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
     - name: Setup ms-build
       run: sudo apt-get install -y nuget mono-devel mono-xbuild
     - name: Restore dependencies
@@ -24,7 +24,7 @@ jobs:
       run: |
         dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
     - name: Upload Windows Binary
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ModdingApiWin
         path: ./OutputFinal/
@@ -32,13 +32,13 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Vanilla
       run: |
         wget https://files.catbox.moe/j85bvb.zip -O Vanilla.zip
         unzip Vanilla.zip -d Vanilla
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
     - name: Setup ms-build
       run: sudo apt-get install -y nuget mono-devel mono-xbuild
     - name: Restore dependencies
@@ -50,7 +50,7 @@ jobs:
       run: |
         dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
     - name: Upload Linux Binary
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ModdingApiLinux
         path: ./OutputFinal/
@@ -58,13 +58,13 @@ jobs:
   build-mac:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup Vanilla
       run: |
         wget https://files.catbox.moe/j8fyro.zip -O Vanilla.zip
         unzip Vanilla.zip -d Vanilla
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
     - name: Setup ms-build
       run: sudo apt-get install -y nuget mono-devel mono-xbuild
     - name: Restore dependencies
@@ -76,7 +76,7 @@ jobs:
       run: |
         dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
     - name: Upload Mac Binary
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ModdingApiMac
         path: ./OutputFinal/
@@ -87,7 +87,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags')
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           path: ./artifacts
       - name: Zip
