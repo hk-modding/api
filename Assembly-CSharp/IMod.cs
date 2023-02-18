@@ -56,7 +56,7 @@ namespace Modding
 
     internal static class IModExtensions
     {
-        public static string GetVersionSafe(this IMod Mod)
+        public static string GetVersionSafe(this IMod Mod, string returnOnError)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace Modding
             catch (Exception ex)
             {
                 Logger.APILogger.LogError(ex);
-                return "ERROR";
+                return returnOnError;
             }
         }
     }

@@ -396,7 +396,7 @@ namespace Modding
             {
                 if (mod.Error is not ModErrorState err)
                 {
-                    if (mod.Enabled) builder.AppendLine($"{mod.Name} : {mod.Mod.GetVersionSafe()}");
+                    if (mod.Enabled) builder.AppendLine($"{mod.Name} : {mod.Mod.GetVersionSafe(returnOnError: "ERROR")}");
                 }
                 else
                 {
