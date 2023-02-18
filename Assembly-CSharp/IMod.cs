@@ -56,15 +56,15 @@ namespace Modding
 
     internal static class IModExtensions
     {
-        public static string GetVersionSafe(this IMod Mod, string returnOnError)
+        public static string GetVersionSafe(this IMod mod, string returnOnError)
         {
             try
             {
-                return Mod.GetVersion();
+                return mod.GetVersion();
             }
             catch (Exception ex)
             {
-                Logger.APILogger.LogError($"Error determining version for {Mod.GetName()}\n" + ex);
+                Logger.APILogger.LogError($"Error determining version for {mod.GetName()}\n" + ex);
                 return returnOnError;
             }
         }
