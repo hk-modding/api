@@ -64,7 +64,7 @@ namespace Modding
             }
             catch (Exception ex)
             {
-                Logger.APILogger.LogError(ex);
+                Logger.APILogger.LogError($"Error determining version for {Mod.GetName()}\n" + ex);
                 return returnOnError;
             }
         }
