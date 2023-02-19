@@ -101,7 +101,18 @@ namespace Modding
             string levelText = _shortLoggingLevel ? $"[{LogLevelExt.ToShortString(level).ToUpper()}]:" : $"[{level.ToString().ToUpper()}]:";
             string prefixText = _includeTimestamps ? timeText + levelText : levelText;
             
-            WriteToFile(prefixText + String.Join(Environment.NewLine + prefixText, message.Split('\n')) + Environment.NewLine, level);
+            WriteToFile(ExpandLines(prefixText, message), level);
+        }
+
+        /// <summary>
+        /// Returns a copy of <paramref name="message"/> with the string <paramref name="prefixText"/> prepended to each line.
+        /// </summary>
+        /// <param name="prefixText">The prefix text.</param>
+        /// <param name="message">The message.</param>
+        private static string ExpandLines(string prefixText, string message)
+        {
+            string[] lines = message.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+            return prefixText + string.Join(Environment.NewLine + prefixText, lines) + Environment.NewLine;
         }
 
         /// <summary>
