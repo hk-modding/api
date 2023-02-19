@@ -53,4 +53,20 @@ namespace Modding
         /// <returns></returns>
         string GetMenuButtonText();
     }
+
+    internal static class IModExtensions
+    {
+        public static string GetVersionSafe(this IMod mod, string returnOnError)
+        {
+            try
+            {
+                return mod.GetVersion();
+            }
+            catch (Exception ex)
+            {
+                Logger.APILogger.LogError($"Error determining version for {mod.GetName()}\n" + ex);
+                return returnOnError;
+            }
+        }
+    }
 }

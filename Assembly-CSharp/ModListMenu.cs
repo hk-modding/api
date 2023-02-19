@@ -103,7 +103,7 @@ namespace Modding
                                                         Style = HorizontalOptionStyle.VanillaStyle,
                                                         Description = new DescriptionInfo
                                                         {
-                                                            Text = $"v{modInst.Mod.GetVersion()}"
+                                                            Text = $"v{modInst.Mod.GetVersionSafe(returnOnError: "???")}"
                                                         }
                                                     },
                                                     out var opt
@@ -150,7 +150,7 @@ namespace Modding
                                                     Proceed = true,
                                                     Description = new DescriptionInfo
                                                     {
-                                                        Text = $"v{modInst.Mod.GetVersion()}"
+                                                        Text = $"v{modInst.Mod.GetVersionSafe(returnOnError: "???")}"
                                                     }
                                                 }
                                             );
@@ -179,7 +179,7 @@ namespace Modding
                                                     Proceed = true,
                                                     Description = new DescriptionInfo
                                                     {
-                                                        Text = $"v{modInst.Mod.GetVersion()}"
+                                                        Text = $"v{modInst.Mod.GetVersionSafe(returnOnError: "???")}"
                                                     }
                                                 }
                                             );
