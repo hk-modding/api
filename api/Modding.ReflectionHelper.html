@@ -1,0 +1,1573 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class ReflectionHelper
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class ReflectionHelper
+   ">
+    <meta name="generator" content="docfx 2.59.4.0">
+    
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Modding.ReflectionHelper">
+  
+  
+  <h1 id="Modding_ReflectionHelper" data-uid="Modding.ReflectionHelper" class="text-break">Class ReflectionHelper
+  </h1>
+  <div class="markdown level0 summary"><p>A class to aid in reflection while caching it.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">ReflectionHelper</span></div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Modding.html">Modding</a></h6>
+  <h6><strong>Assembly</strong>: Assembly-CSharp.mm.dll</h6>
+  <h5 id="Modding_ReflectionHelper_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class ReflectionHelper : object</code></pre>
+  </div>
+  <h3 id="methods">Methods
+  </h3>
+  
+  
+  <a id="Modding_ReflectionHelper_CallMethod_" data-uid="Modding.ReflectionHelper.CallMethod*"></a>
+  <h4 id="Modding_ReflectionHelper_CallMethod_Type_System_String_System_Object___" data-uid="Modding.ReflectionHelper.CallMethod(Type,System.String,System.Object[])">CallMethod(Type, String, Object[])</h4>
+  <div class="markdown level1 summary"><p>Call a static method without a return type (for static classes)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void CallMethod(Type type, string name, params object[] param)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>Static Type which static method resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the method</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span>[]</td>
+        <td><span class="parametername">param</span></td>
+        <td><p>The paramters that need to be passed into the method.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_CallMethod_" data-uid="Modding.ReflectionHelper.CallMethod*"></a>
+  <h4 id="Modding_ReflectionHelper_CallMethod__1___0_System_String_System_Object___" data-uid="Modding.ReflectionHelper.CallMethod``1(``0,System.String,System.Object[])">CallMethod&lt;TObject&gt;(TObject, String, Object[])</h4>
+  <div class="markdown level1 summary"><p>Call an instance method without a return type</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void CallMethod&lt;TObject&gt;(TObject obj, string name, params object[] param)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TObject</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>Object of type which the method is on</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the method</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span>[]</td>
+        <td><span class="parametername">param</span></td>
+        <td><p>The paramters that need to be passed into the method.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TObject</span></td>
+        <td><p>Type of object being passed in</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_CallMethod_" data-uid="Modding.ReflectionHelper.CallMethod*"></a>
+  <h4 id="Modding_ReflectionHelper_CallMethod__1_System_String_System_Object___" data-uid="Modding.ReflectionHelper.CallMethod``1(System.String,System.Object[])">CallMethod&lt;TType&gt;(String, Object[])</h4>
+  <div class="markdown level1 summary"><p>Call a static method without a return type</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void CallMethod&lt;TType&gt;(string name, params object[] param)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the method</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span>[]</td>
+        <td><span class="parametername">param</span></td>
+        <td><p>The paramters that need to be passed into the method.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TType</span></td>
+        <td><p>The Type which static method resides upon</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_CallMethod_" data-uid="Modding.ReflectionHelper.CallMethod*"></a>
+  <h4 id="Modding_ReflectionHelper_CallMethod__1_Type_System_String_System_Object___" data-uid="Modding.ReflectionHelper.CallMethod``1(Type,System.String,System.Object[])">CallMethod&lt;TReturn&gt;(Type, String, Object[])</h4>
+  <div class="markdown level1 summary"><p>Call a static method with a return type (for static classes)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TReturn CallMethod&lt;TReturn&gt;(Type type, string name, params object[] param)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>Static Type which static method resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the method</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span>[]</td>
+        <td><span class="parametername">param</span></td>
+        <td><p>The paramters that need to be passed into the method.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TReturn</span></td>
+        <td><p>The specified return type</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TReturn</span></td>
+        <td><p>The return type of the method</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_CallMethod_" data-uid="Modding.ReflectionHelper.CallMethod*"></a>
+  <h4 id="Modding_ReflectionHelper_CallMethod__2___0_System_String_System_Object___" data-uid="Modding.ReflectionHelper.CallMethod``2(``0,System.String,System.Object[])">CallMethod&lt;TObject, TReturn&gt;(TObject, String, Object[])</h4>
+  <div class="markdown level1 summary"><p>Call an instance method with a return type</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TReturn CallMethod&lt;TObject, TReturn&gt;(TObject obj, string name, params object[] param)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TObject</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>Object of type which the method is on</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the method</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span>[]</td>
+        <td><span class="parametername">param</span></td>
+        <td><p>The paramters that need to be passed into the method.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TReturn</span></td>
+        <td><p>The specified return type</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TObject</span></td>
+        <td><p>Type of object being passed in</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TReturn</span></td>
+        <td><p>The return type of the method</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_CallMethod_" data-uid="Modding.ReflectionHelper.CallMethod*"></a>
+  <h4 id="Modding_ReflectionHelper_CallMethod__2_System_String_System_Object___" data-uid="Modding.ReflectionHelper.CallMethod``2(System.String,System.Object[])">CallMethod&lt;TType, TReturn&gt;(String, Object[])</h4>
+  <div class="markdown level1 summary"><p>Call a static method with a return type</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TReturn CallMethod&lt;TType, TReturn&gt;(string name, params object[] param)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the method</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Object</span>[]</td>
+        <td><span class="parametername">param</span></td>
+        <td><p>The paramters that need to be passed into the method.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TReturn</span></td>
+        <td><p>The specified return type</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TType</span></td>
+        <td><p>The Type which static method resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TReturn</span></td>
+        <td><p>The return type of the method</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_GetField_" data-uid="Modding.ReflectionHelper.GetField*"></a>
+  <h4 id="Modding_ReflectionHelper_GetField__1_Type_System_String_" data-uid="Modding.ReflectionHelper.GetField``1(Type,System.String)">GetField&lt;TField&gt;(Type, String)</h4>
+  <div class="markdown level1 summary"><p>Get a static field on an type using a string. (for static classes)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TField GetField&lt;TField&gt;(Type type, string name)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>Static Type which static field resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the field</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TField</span></td>
+        <td><p>The value of a field on an object/type</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TField</span></td>
+        <td><p>Type of field</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_GetField_" data-uid="Modding.ReflectionHelper.GetField*"></a>
+  <h4 id="Modding_ReflectionHelper_GetField__2___0_System_String_" data-uid="Modding.ReflectionHelper.GetField``2(``0,System.String)">GetField&lt;TObject, TField&gt;(TObject, String)</h4>
+  <div class="markdown level1 summary"><p>Get a field on an object using a string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TField GetField&lt;TObject, TField&gt;(TObject obj, string name)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TObject</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>Object/Object of type which the field is on</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the field</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TField</span></td>
+        <td><p>The value of a field on an object/type</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TObject</span></td>
+        <td><p>Type of object being passed in</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TField</span></td>
+        <td><p>Type of field</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_GetField_" data-uid="Modding.ReflectionHelper.GetField*"></a>
+  <h4 id="Modding_ReflectionHelper_GetField__2_System_String_" data-uid="Modding.ReflectionHelper.GetField``2(System.String)">GetField&lt;TType, TField&gt;(String)</h4>
+  <div class="markdown level1 summary"><p>Get a static field on an type using a string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TField GetField&lt;TType, TField&gt;(string name)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the field</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TField</span></td>
+        <td><p>The value of a field on an object/type</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TType</span></td>
+        <td><p>Type which static field resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TField</span></td>
+        <td><p>Type of field</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_GetField_" data-uid="Modding.ReflectionHelper.GetField*"></a>
+  <h4 id="Modding_ReflectionHelper_GetField__3___0_System_String___2_" data-uid="Modding.ReflectionHelper.GetField``3(``0,System.String,``2)">GetField&lt;TObject, TField, TCast&gt;(TObject, String, TCast)</h4>
+  <div class="markdown level1 summary"><p>Get a field on an object using a string. Cast to TCast before returning and if field doesn't exist return default.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TCast GetField&lt;TObject, TField, TCast&gt;(TObject obj, string name, TCast default = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TObject</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>Object/Object of type which the field is on</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the field</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">TCast</span></td>
+        <td><span class="parametername">default</span></td>
+        <td><p>Default return</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TCast</span></td>
+        <td><p>The value of a field on an object/type</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TObject</span></td>
+        <td><p>Type of object being passed in</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TField</span></td>
+        <td><p>Type of field</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TCast</span></td>
+        <td><p>Type of return.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_GetFieldInfo_" data-uid="Modding.ReflectionHelper.GetFieldInfo*"></a>
+  <h4 id="Modding_ReflectionHelper_GetFieldInfo_Type_System_String_System_Boolean_" data-uid="Modding.ReflectionHelper.GetFieldInfo(Type,System.String,System.Boolean)">GetFieldInfo(Type, String, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Gets a field on a type</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static FieldInfo GetFieldInfo(Type t, string field, bool instance = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Type</span></td>
+        <td><span class="parametername">t</span></td>
+        <td><p>Type</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">field</span></td>
+        <td><p>Field name</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">instance</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">FieldInfo</span></td>
+        <td><p>FieldInfo for field or null if field does not exist.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_GetMethodInfo_" data-uid="Modding.ReflectionHelper.GetMethodInfo*"></a>
+  <h4 id="Modding_ReflectionHelper_GetMethodInfo_Type_System_String_System_Boolean_" data-uid="Modding.ReflectionHelper.GetMethodInfo(Type,System.String,System.Boolean)">GetMethodInfo(Type, String, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Gets a method on a type</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static MethodInfo GetMethodInfo(Type t, string method, bool instance = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Type</span></td>
+        <td><span class="parametername">t</span></td>
+        <td><p>Type</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">method</span></td>
+        <td><p>Method name</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">instance</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">MethodInfo</span></td>
+        <td><p>MethodInfo for method or null if method does not exist.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_GetProperty_" data-uid="Modding.ReflectionHelper.GetProperty*"></a>
+  <h4 id="Modding_ReflectionHelper_GetProperty__1_Type_System_String_" data-uid="Modding.ReflectionHelper.GetProperty``1(Type,System.String)">GetProperty&lt;TProperty&gt;(Type, String)</h4>
+  <div class="markdown level1 summary"><p>Get a static property on an type using a string. (for static classes)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TProperty GetProperty&lt;TProperty&gt;(Type type, string name)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>Static Type which static property resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the property</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TProperty</span></td>
+        <td><p>The value of a property on an object/type</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TProperty</span></td>
+        <td><p>Type of property</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_GetProperty_" data-uid="Modding.ReflectionHelper.GetProperty*"></a>
+  <h4 id="Modding_ReflectionHelper_GetProperty__2___0_System_String_" data-uid="Modding.ReflectionHelper.GetProperty``2(``0,System.String)">GetProperty&lt;TObject, TProperty&gt;(TObject, String)</h4>
+  <div class="markdown level1 summary"><p>Get a property on an object using a string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TProperty GetProperty&lt;TObject, TProperty&gt;(TObject obj, string name)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TObject</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>Object/Object of type which the property is on</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the property</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TProperty</span></td>
+        <td><p>The value of a property on an object/type</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TObject</span></td>
+        <td><p>Type of object being passed in</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TProperty</span></td>
+        <td><p>Type of property</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_GetProperty_" data-uid="Modding.ReflectionHelper.GetProperty*"></a>
+  <h4 id="Modding_ReflectionHelper_GetProperty__2_System_String_" data-uid="Modding.ReflectionHelper.GetProperty``2(System.String)">GetProperty&lt;TType, TProperty&gt;(String)</h4>
+  <div class="markdown level1 summary"><p>Get a static property on an type using a string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TProperty GetProperty&lt;TType, TProperty&gt;(string name)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the property</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TProperty</span></td>
+        <td><p>The value of a property on an object/type</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TType</span></td>
+        <td><p>Type which static property resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TProperty</span></td>
+        <td><p>Type of property</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_GetPropertyInfo_" data-uid="Modding.ReflectionHelper.GetPropertyInfo*"></a>
+  <h4 id="Modding_ReflectionHelper_GetPropertyInfo_Type_System_String_System_Boolean_" data-uid="Modding.ReflectionHelper.GetPropertyInfo(Type,System.String,System.Boolean)">GetPropertyInfo(Type, String, Boolean)</h4>
+  <div class="markdown level1 summary"><p>Gets a property on a type</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static PropertyInfo GetPropertyInfo(Type t, string property, bool instance = true)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Type</span></td>
+        <td><span class="parametername">t</span></td>
+        <td><p>Type</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">property</span></td>
+        <td><p>Property name</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Boolean</span></td>
+        <td><span class="parametername">instance</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">PropertyInfo</span></td>
+        <td><p>PropertyInfo for property or null if property does not exist.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_SetField_" data-uid="Modding.ReflectionHelper.SetField*"></a>
+  <h4 id="Modding_ReflectionHelper_SetField__1_Type_System_String___0_" data-uid="Modding.ReflectionHelper.SetField``1(Type,System.String,``0)">SetField&lt;TField&gt;(Type, String, TField)</h4>
+  <div class="markdown level1 summary"><p>Set a static field on an type using a string. (for static classes)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetField&lt;TField&gt;(Type type, string name, TField value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>Static Type which static field resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the field</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">TField</span></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>Value to set the field to</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TField</span></td>
+        <td><p>Type of field</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_SetField_" data-uid="Modding.ReflectionHelper.SetField*"></a>
+  <h4 id="Modding_ReflectionHelper_SetField__2___0_System_String___1_" data-uid="Modding.ReflectionHelper.SetField``2(``0,System.String,``1)">SetField&lt;TObject, TField&gt;(TObject, String, TField)</h4>
+  <div class="markdown level1 summary"><p>Set a field on an object using a string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetField&lt;TObject, TField&gt;(TObject obj, string name, TField value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TObject</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>Object/Object of type which the field is on</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the field</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">TField</span></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>Value to set the field to</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TObject</span></td>
+        <td><p>Type of object being passed in</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TField</span></td>
+        <td><p>Type of field</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_SetField_" data-uid="Modding.ReflectionHelper.SetField*"></a>
+  <h4 id="Modding_ReflectionHelper_SetField__2_System_String___1_" data-uid="Modding.ReflectionHelper.SetField``2(System.String,``1)">SetField&lt;TType, TField&gt;(String, TField)</h4>
+  <div class="markdown level1 summary"><p>Set a static field on an type using a string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetField&lt;TType, TField&gt;(string name, TField value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the field</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">TField</span></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>Value to set the field to</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TType</span></td>
+        <td><p>Type which static field resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TField</span></td>
+        <td><p>Type of field</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_SetFieldSafe_" data-uid="Modding.ReflectionHelper.SetFieldSafe*"></a>
+  <h4 id="Modding_ReflectionHelper_SetFieldSafe__2___0_System_String___1_" data-uid="Modding.ReflectionHelper.SetFieldSafe``2(``0,System.String,``1)">SetFieldSafe&lt;TObject, TField&gt;(TObject, String, TField)</h4>
+  <div class="markdown level1 summary"><p>Set a field on an object using a string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetFieldSafe&lt;TObject, TField&gt;(TObject obj, string name, TField value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TObject</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>Object/Object of type which the field is on</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the field</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">TField</span></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>Value to set the field to</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TObject</span></td>
+        <td><p>Type of object being passed in</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TField</span></td>
+        <td><p>Type of field</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_SetProperty_" data-uid="Modding.ReflectionHelper.SetProperty*"></a>
+  <h4 id="Modding_ReflectionHelper_SetProperty__1_Type_System_String___0_" data-uid="Modding.ReflectionHelper.SetProperty``1(Type,System.String,``0)">SetProperty&lt;TProperty&gt;(Type, String, TProperty)</h4>
+  <div class="markdown level1 summary"><p>Set a static property on an type using a string. (for static classes)</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetProperty&lt;TProperty&gt;(Type type, string name, TProperty value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">Type</span></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>Static Type which static property resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the property</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">TProperty</span></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>Value to set the property to</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TProperty</span></td>
+        <td><p>Type of property</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_SetProperty_" data-uid="Modding.ReflectionHelper.SetProperty*"></a>
+  <h4 id="Modding_ReflectionHelper_SetProperty__2___0_System_String___1_" data-uid="Modding.ReflectionHelper.SetProperty``2(``0,System.String,``1)">SetProperty&lt;TObject, TProperty&gt;(TObject, String, TProperty)</h4>
+  <div class="markdown level1 summary"><p>Set a property on an object using a string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetProperty&lt;TObject, TProperty&gt;(TObject obj, string name, TProperty value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TObject</span></td>
+        <td><span class="parametername">obj</span></td>
+        <td><p>Object/Object of type which the property is on</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the property</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">TProperty</span></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>Value to set the property to</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TObject</span></td>
+        <td><p>Type of object being passed in</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TProperty</span></td>
+        <td><p>Type of property</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  
+  
+  <a id="Modding_ReflectionHelper_SetProperty_" data-uid="Modding.ReflectionHelper.SetProperty*"></a>
+  <h4 id="Modding_ReflectionHelper_SetProperty__2_System_String___1_" data-uid="Modding.ReflectionHelper.SetProperty``2(System.String,``1)">SetProperty&lt;TType, TProperty&gt;(String, TProperty)</h4>
+  <div class="markdown level1 summary"><p>Set a static property on an type using a string.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void SetProperty&lt;TType, TProperty&gt;(string name, TProperty value)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>Name of the property</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">TProperty</span></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>Value to set the property to</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TType</span></td>
+        <td><p>Type which static property resides upon</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TProperty</span></td>
+        <td><p>Type of property</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>
