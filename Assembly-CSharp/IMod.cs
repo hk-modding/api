@@ -30,6 +30,14 @@ namespace Modding
         (string, Func<IEnumerator>)[] PreloadSceneHooks();
 
         /// <summary>
+        /// This function will be invoked on each gameObject preloaded through the <see cref="GetPreloadNames"/> system.
+        /// </summary>
+        /// <param name="go">The preloaded gameObject.</param>
+        /// <param name="sceneName">The scene the gameObject was preloaded from.</param>
+        void InvokeOnGameObjectPreloaded(GameObject go, string sceneName);
+
+
+        /// <summary>
         ///     Called after preloading of all mods.
         /// </summary>
         /// <param name="preloadedObjects">The preloaded objects relevant to this <see cref="Mod" /></param>
