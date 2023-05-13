@@ -34,7 +34,8 @@ namespace Modding
         /// </summary>
         /// <param name="go">The preloaded gameObject.</param>
         /// <param name="sceneName">The scene the gameObject was preloaded from.</param>
-        void InvokeOnGameObjectPreloaded(GameObject go, string sceneName);
+        /// <param name="goName">The path to the preloaded gameObject.</param>
+        void InvokeOnGameObjectPreloaded(GameObject go, string sceneName, string goName);
 
 
         /// <summary>

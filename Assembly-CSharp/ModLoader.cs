@@ -251,9 +251,9 @@ namespace Modding
 
             foreach ((string sceneName, Dictionary<string, GameObject> goMap) in preloadedObjects.Values.SelectMany(x => x))
             {
-                foreach (GameObject go in goMap.Values)
+                foreach ((string goName, GameObject go) in goMap)
                 {
-                    OnPreloadedObject(go, sceneName);
+                    OnPreloadedObject(go, sceneName, goName);
                 }
             }
 
@@ -474,14 +474,14 @@ namespace Modding
             if (updateModText) UpdateModText();
         }
 
-        public static void OnPreloadedObject(GameObject go, string sceneName)
+        public static void OnPreloadedObject(GameObject go, string sceneName, string goName)
         {
             foreach (ModInstance modInstance in ModInstances)
             {
                 if (modInstance.Error is not null)
                     continue;
 
-                modInstance.Mod.InvokeOnGameObjectPreloaded(go, sceneName);
+                modInstance.Mod.InvokeOnGameObjectPreloaded(go, sceneName, goName);
             }
         }
 
