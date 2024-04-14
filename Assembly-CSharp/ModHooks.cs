@@ -25,7 +25,7 @@ namespace Modding
     public class ModHooks
     {
         // Make sure this is in sync with `/moddingapi.version`.
-        private const int _modVersion = 75;
+        private const int _modVersion = 76;
 
         private static readonly string SettingsPath = Path.Combine(Application.persistentDataPath, "ModdingApi.GlobalSettings.json");
 
