@@ -179,3 +179,8 @@ resharper_web_config_wrong_module_highlighting = warning
 indent_style = space
 indent_size = 4
 tab_width = 4
+
+[*.{yaml,yml}]
+indent_size = 2
+tab_width = 2
+indent_style = space

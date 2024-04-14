@@ -1,119 +1,109 @@
 name: build
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
-  build-win:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [windows, macos, linux]
+        archive-ref: [main]
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup Vanilla
-      run: |
-        wget https://files.catbox.moe/i4sdl6.zip -O Vanilla.zip
-        unzip Vanilla.zip -d Vanilla
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-    - name: Setup ms-build
-      run: sudo apt-get install -y nuget mono-devel mono-xbuild
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build PrePatcher
-      run: |
-        dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
-    - name: Build Assembly-CSharp (Windows)
-      run: |
-        dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
-    - name: Upload Windows Binary
-      uses: actions/upload-artifact@v3
-      with:
-        name: ModdingApiWin
-        path: ./OutputFinal/
-
-  build-linux:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup Vanilla
-      run: |
-        wget https://files.catbox.moe/j85bvb.zip -O Vanilla.zip
-        unzip Vanilla.zip -d Vanilla
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-    - name: Setup ms-build
-      run: sudo apt-get install -y nuget mono-devel mono-xbuild
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build PrePatcher
-      run: |
-        dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
-    - name: Build Assembly-CSharp
-      run: |
-        dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
-    - name: Upload Linux Binary
-      uses: actions/upload-artifact@v3
-      with:
-        name: ModdingApiLinux
-        path: ./OutputFinal/
-
-  build-mac:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup Vanilla
-      run: |
-        wget https://files.catbox.moe/j8fyro.zip -O Vanilla.zip
-        unzip Vanilla.zip -d Vanilla
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-    - name: Setup ms-build
-      run: sudo apt-get install -y nuget mono-devel mono-xbuild
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build PrePatcher
-      run: |
-        dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
-    - name: Build Assembly-CSharp
-      run: |
-        dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
-    - name: Upload Mac Binary
-      uses: actions/upload-artifact@v3
-      with:
-        name: ModdingApiMac
-        path: ./OutputFinal/
-
+      - uses: actions/checkout@v4
+      
+      - name: Read Versions
+        run: |
+          HKV=$(cat ./hollowknight.version)
+          echo "HK_VERSION=$HKV" >> $GITHUB_ENV
+      
+      - name: Checkout Binaries
+        uses: actions/checkout@v4
+        with:
+          repository: hk-modding/hk-binary-archives
+          ref: ${{ matrix.archive-ref }}
+          ssh-key: ${{ secrets.BINARY_ARCHIVE_DEPLOY_KEY }}
+          sparse-checkout: |
+            ${{ env.HK_VERSION }}/managed.${{ matrix.platform }}.tar.gz
+          sparse-checkout-cone-mode: false
+          path: ./hk-binary-archives
+      
+      - name: Unpack Archive
+        run: |
+          mkdir Vanilla
+          cd ./Vanilla
+          tar -xzf ../hk-binary-archives/${{ env.HK_VERSION }}/managed.${{ matrix.platform }}.tar.gz
+      
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.0.x
+      - name: Setup MSBuild
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y nuget mono-devel mono-xbuild
+      - name: Restore Dependencies
+        run: |
+          dotnet restore
+      - name: Build PrePatcher
+        run: |
+          dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
+      - name: Build Assembly-CSharp
+        run: |
+          dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
+      - name: Upload Binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: build.${{ matrix.platform }}
+          path: ./OutputFinal/
+  
   release:
-    needs: [build-win, build-linux, build-mac]
+    needs: [build]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags')
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
+      - uses: actions/checkout@v4
+        
+      - name: Read Versions
+        run: |
+          HKV=$(cat ./hollowknight.version)
+          echo "HK_VERSION=$HKV" >> $GITHUB_ENV
+          
+          APIV=$(cat ./moddingapi.version)
+          echo "API_VERSION=$APIV" >> $GITHUB_ENV
+        
+      - uses: actions/download-artifact@v4
         with:
           path: ./artifacts
-      - name: Zip
+      - name: Zip Artifacts
         run: |
-            zip -jr ModdingApiWin.zip ./artifacts/ModdingApiWin/*
-            zip -jr ModdingApiLinux.zip ./artifacts/ModdingApiLinux/*
-            zip -jr ModdingApiMac.zip ./artifacts/ModdingApiMac/*
-      - name: Generate release info
-        run: |
-            echo "# Checksums" > ChangeLog.txt ;
-            echo "* Linux:" >> ChangeLog.txt ;
-            echo -n "    * " >> ChangeLog.txt ;
-            sha256sum -b ModdingApiLinux.zip | cut -d " " -f 1 >> ChangeLog.txt ;
-            echo "* Mac:" >> ChangeLog.txt ;
-            echo -n "    * " >> ChangeLog.txt ;
-            sha256sum -b ModdingApiMac.zip | cut -d " " -f 1 >> ChangeLog.txt ;
-            echo "* Windows:" >> ChangeLog.txt ;
-            echo -n "    * " >> ChangeLog.txt ;
-            sha256sum -b ModdingApiWin.zip | cut -d " " -f 1 >> ChangeLog.txt ;
-            echo "# Changelog" >> ChangeLog.txt ;
-            echo "${{ github.event.head_commit.message }}" >> ChangeLog.txt ;
-      - name: Create release if a new tag is pushed
-        uses: softprops/action-gh-release@v1
+            zip -jr moddingapi.${{ env.API_VERSION }}.windows.zip ./artifacts/build.windows/*
+            zip -jr moddingapi.${{ env.API_VERSION }}.macos.zip ./artifacts/build.macos/*
+            zip -jr moddingapi.${{ env.API_VERSION }}.linux.zip ./artifacts/build.linux/*
+      
+      - uses: actions/setup-node@v4
         with:
-          body_path: ChangeLog.txt
+          node-version: '20.x'
+      - name: Install Node Dependencies
+        run: |
+          npm install handlebars
+      - name: Create Release Notes
+        id: create-relnotes
+        uses: actions/github-script@v7
+        env:
+          CHANGELOG: ${{ github.event.head_commit.message }}
+        with:
+          result-encoding: string
+          script: |
+            const script = require("./.github/workflows/create_relnotes.js");
+            return await script();
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.create-relnotes.outputs.result }}
           files: |
-            ./ModdingApiWin.zip
-            ./ModdingApiLinux.zip
-            ./ModdingApiMac.zip
+            ./moddingapi.${{ env.API_VERSION }}.windows.zip
+            ./moddingapi.${{ env.API_VERSION }}.macos.zip
+            ./moddingapi.${{ env.API_VERSION }}.linux.zip
