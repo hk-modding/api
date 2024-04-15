@@ -1,0 +1,21 @@
+name: pr
+
+on: [ pull_request_target ]
+
+permissions: read-all
+
+jobs:
+  pr-build:
+    # Builds the pull request. This uses a workaround to lets pull requests build against
+    # the private repository, despite not having access. The binary archive deploy key is read only,
+    # and the permissions for the build script are all read-only, so this should not lead to any
+    # real vulnerability. It is not really a problem if the data in the archive repository is
+    # "leaked", we just want to keep it private out of principle.
+    uses: ./.github/workflows/build.yaml
+    permissions: read-all
+    secrets:
+      BINARY_ARCHIVE_DEPLOY_KEY: ${{ secrets.BINARY_ARCHIVE_DEPLOY_KEY }}
+    with:
+      ref: ${{ github.event.pull_request.head.sha }}
+      upload-artifact: false
+  

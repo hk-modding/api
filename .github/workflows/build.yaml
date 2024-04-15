@@ -1,8 +1,20 @@
 name: build
 
 on:
-  push:
-  pull_request:
+  workflow_call:
+    secrets:
+      BINARY_ARCHIVE_DEPLOY_KEY:
+        description: Deploy key to read from the binary archive repository.
+        required: true
+    inputs:
+      ref:
+        description: The ref to checkout.
+        required: true
+        type: string
+      upload-artifact:
+        description: Whether artifacts should be uploaded.
+        default: false
+        type: boolean
 
 jobs:
   build:
@@ -13,6 +25,9 @@ jobs:
         archive-ref: [main]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
       
       - name: Read Versions
         run: |
@@ -29,6 +44,7 @@ jobs:
             ${{ env.HK_VERSION }}/managed.${{ matrix.platform }}.tar.gz
           sparse-checkout-cone-mode: false
           path: ./hk-binary-archives
+          persist-credentials: false
       
       - name: Unpack Archive
         run: |
@@ -53,57 +69,8 @@ jobs:
         run: |
           dotnet build Assembly-CSharp -p:SolutionDir=$PWD -p:Configuration=Release
       - name: Upload Binary
+        if: inputs.upload-artifact
         uses: actions/upload-artifact@v4
         with:
           name: build.${{ matrix.platform }}
           path: ./OutputFinal/
-  
-  release:
-    needs: [build]
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags')
-    steps:
-      - uses: actions/checkout@v4
-        
-      - name: Read Versions
-        run: |
-          HKV=$(cat ./hollowknight.version)
-          echo "HK_VERSION=$HKV" >> $GITHUB_ENV
-          
-          APIV=$(cat ./moddingapi.version)
-          echo "API_VERSION=$APIV" >> $GITHUB_ENV
-        
-      - uses: actions/download-artifact@v4
-        with:
-          path: ./artifacts
-      - name: Zip Artifacts
-        run: |
-            zip -jr moddingapi.${{ env.API_VERSION }}.windows.zip ./artifacts/build.windows/*
-            zip -jr moddingapi.${{ env.API_VERSION }}.macos.zip ./artifacts/build.macos/*
-            zip -jr moddingapi.${{ env.API_VERSION }}.linux.zip ./artifacts/build.linux/*
-      
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-      - name: Install Node Dependencies
-        run: |
-          npm install handlebars
-      - name: Create Release Notes
-        id: create-relnotes
-        uses: actions/github-script@v7
-        env:
-          CHANGELOG: ${{ github.event.head_commit.message }}
-        with:
-          result-encoding: string
-          script: |
-            const script = require("./.github/workflows/create_relnotes.js");
-            return await script();
-      
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          body: ${{ steps.create-relnotes.outputs.result }}
-          files: |
-            ./moddingapi.${{ env.API_VERSION }}.windows.zip
-            ./moddingapi.${{ env.API_VERSION }}.macos.zip
-            ./moddingapi.${{ env.API_VERSION }}.linux.zip
