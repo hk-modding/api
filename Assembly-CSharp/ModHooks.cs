@@ -1179,7 +1179,7 @@ namespace Modding
             {
                 try
                 {
-                    result = toInvoke.Invoke();
+                    result += toInvoke.Invoke();
                 }
                 catch (Exception ex)
                 {
