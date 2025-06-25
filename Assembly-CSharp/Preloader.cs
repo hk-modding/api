@@ -31,7 +31,6 @@ internal class Preloader : MonoBehaviour
 
     private float _commandedProgress;
     private float _shownProgress;
-    private float _secondsSinceLastSet;
 
     public IEnumerator Preload
     (
@@ -69,10 +68,13 @@ internal class Preloader : MonoBehaviour
         UnmuteAllAudio();
     }
 
+    private static float ExpDecay(float a, float b, float decay) => b + (a - b) * Mathf.Exp(-decay * Time.deltaTime);
+
     public void Update()
     {
-        _secondsSinceLastSet += Time.unscaledDeltaTime;
-        _shownProgress = Mathf.Lerp(_shownProgress, _commandedProgress, _secondsSinceLastSet / 10.0f);
+        // https://youtu.be/LSNQuFEDOyQ?si=GmrFzX94CRqDdVqO&t=2976
+        const float decay = 16;
+        _shownProgress = ExpDecay(_shownProgress, _commandedProgress, decay);
     }
 
     public void LateUpdate()
@@ -161,11 +163,7 @@ internal class Preloader : MonoBehaviour
     /// <param name="progress">The progress that should be displayed. 0.0f - 1.0f</param>
     private void UpdateLoadingBarProgress(float progress)
     {
-        if (Mathf.Abs(_commandedProgress - progress) < float.Epsilon) 
-            return;
-        
         _commandedProgress = progress;
-        _secondsSinceLastSet = 0.0f;
     }
 
     
