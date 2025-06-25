@@ -81,6 +81,19 @@
         
         <!-- Copy the dependencies for the API and hooks for mods -->
         <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutputDir)" />
+        
+        <PropertyGroup>
+            <NativeLibPrefix Condition="'$(RuntimeIdentifier)' == 'win-x64'" />
+            <NativeLibExtension Condition="'$(RuntimeIdentifier)' == 'win-x64'">.dll</NativeLibExtension>
+            <NativeLibPrefix Condition=" '$(RuntimeIdentifier)' == 'linux-x64'">lib</NativeLibPrefix>
+            <NativeLibExtension Condition=" '$(RuntimeIdentifier)' == 'linux-x64'">.so</NativeLibExtension>
+            <NativeLibPrefix Condition=" '$(RuntimeIdentifier)' == 'osx-x64'">lib</NativeLibPrefix>
+            <NativeLibExtension Condition=" '$(RuntimeIdentifier)' == 'osx-x64'">.dylib</NativeLibExtension>
+        </PropertyGroup>
+
+        <Warning Condition="'$(RuntimeIdentifier)' == ''" Text="Runtime identifier unknown, pass `--runtime win-x64` to include native dependencies" />
+        <!-- on .NET 5 and up, msbuild can automatically copy the relevant files from /runtimes/$RID/native/library.{dll,so,dylib}. Unfortunately, we're on net472 -->
+        <Copy Condition="'$(RuntimeIdentifier)' != ''" SourceFiles="$(Pkgunityscenerepacker)/runtimes/$(RuntimeIdentifier)/native/$(NativeLibPrefix)unityscenerepacker$(NativeLibExtension)" DestinationFolder="$(OutputDir)" />
     </Target>
     
     <Target Name="CopyOutputAfterFinal" AfterTargets="OutputFinal" Condition="'$(CopyDir)' != ''">
@@ -111,6 +124,8 @@
         <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="21.4.29.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
+        
+        <PackageReference Include="unityscenerepacker" Version="0.0.2" GeneratePathProperty="true" />
     </ItemGroup>
     
     <ItemGroup>
@@ -146,6 +161,9 @@
         </Reference>
         <Reference Include="UnityEngine.AnimationModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <HintPath>../Vanilla/UnityEngine.AnimationModule.dll</HintPath>
+        </Reference>
+        <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+            <HintPath>../Vanilla/UnityEngine.AssetBundleModule.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <HintPath>../Vanilla/UnityEngine.AudioModule.dll</HintPath>

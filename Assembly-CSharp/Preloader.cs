@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UObject = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 using Modding.Utils;
+using Newtonsoft.Json;
 
 namespace Modding;
 
@@ -160,8 +161,32 @@ internal class Preloader : MonoBehaviour
         Dictionary<string, List<(ModLoader.ModInstance Mod, List<string> Preloads)>> toPreload,
         IDictionary<ModLoader.ModInstance, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects,
         Dictionary<string, List<Func<IEnumerator>>> sceneHooks
-    )
-    {
+    ) {
+        const string PreloadBundleName = "hk_api_repack";
+        AssetBundle repackBundle = null;
+        Logger.APILogger.Log($"Using: {ModHooks.GlobalSettings.PreloadUsingSceneRepack}");
+        if (ModHooks.GlobalSettings.PreloadUsingSceneRepack) {
+            string preloadJson = JsonConvert.SerializeObject(toPreload.ToDictionary(
+                                                                 k => k.Key,
+                                                                 v => v.Value.SelectMany(x => x.Preloads).Distinct()));
+            byte[] bundleData = null;
+            RepackStats repackStats;
+            Task task = Task.Run(() => {
+                try {
+                    (bundleData, repackStats) = UnitySceneRepacker.Repack(PreloadBundleName, Application.dataPath, preloadJson, UnitySceneRepacker.Mode.SceneBundle);
+                    Logger.APILogger.Log($"Repacked {toPreload.Count} preload scenes from {repackStats.objectsBefore} to {repackStats.objectsAfter} objects ({bundleData.Length / 1024f / 1024f:F2}MB)");
+                } catch (Exception e) {
+                    Logger.APILogger.LogError($"Error trying to repack preloads into assetbundle: {e}");
+                }
+            });
+            yield return new WaitUntil(() => task.IsCompleted);
+            if (bundleData != null) {
+                repackBundle = AssetBundle.LoadFromMemory(bundleData);
+            }
+        }
+        
+        string scenePrefix = repackBundle != null ? $"{PreloadBundleName}_" : "";
+        
         List<string> sceneNames = toPreload.Keys.Union(sceneHooks.Keys).ToList();
         Dictionary<string, int> scenePriority = new();
         Dictionary<string, (AsyncOperation load, AsyncOperation unload)> sceneAsyncOperationHolder = new();
@@ -201,12 +226,11 @@ internal class Preloader : MonoBehaviour
             return modScenePreloadedObjects;
         }
 
-        var preloadOperationQueue = new List<AsyncOperation>(5);
+        var preloadOperationQueue = new List<AsyncOperation>(ModHooks.GlobalSettings.PreloadBatchSize);
 
         IEnumerator GetPreloadObjectsOperation(string sceneName)
         {
-            Scene scene = USceneManager.GetSceneByName(sceneName);
-            
+            Scene scene = USceneManager.GetSceneByName(scenePrefix + sceneName);
             GameObject[] rootObjects = scene.GetRootGameObjects();
             
             foreach (var go in rootObjects)
@@ -268,7 +292,7 @@ internal class Preloader : MonoBehaviour
         {
             Logger.APILogger.LogFine($"Unloading scene \"{sceneName}\"");
             
-            AsyncOperation unloadOp = USceneManager.UnloadSceneAsync(sceneName);
+            AsyncOperation unloadOp = USceneManager.UnloadSceneAsync(scenePrefix + sceneName);
             
             sceneAsyncOperationHolder[sceneName] = (sceneAsyncOperationHolder[sceneName].load, unloadOp);
             
@@ -290,7 +314,7 @@ internal class Preloader : MonoBehaviour
             
             Logger.APILogger.LogFine($"Loading scene \"{sceneName}\"");
 
-            AsyncOperation loadOp = USceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+            AsyncOperation loadOp = USceneManager.LoadSceneAsync(scenePrefix + sceneName, LoadSceneMode.Additive);
 
             StartCoroutine(DoLoad(loadOp));
             
@@ -325,6 +349,8 @@ internal class Preloader : MonoBehaviour
             
             UpdateLoadingBarProgress(sceneProgressAverage);
         }
+        
+        repackBundle?.Unload(true);
 
         UpdateLoadingBarProgress(1.0f);
     }

@@ -44,6 +44,11 @@ namespace Modding
         /// </summary>
         public int PreloadBatchSize = 5;
 
+        /// <summary>
+        ///     - `false`: Load the entire scene unmodified into memory
+        ///     - `true`: Preprocess the scenes by filtering to only the objects we care about.
+        /// </summary>
+        public bool PreloadUsingSceneRepack = true;
 
         /// <summary>
         ///     Maximum number of days to preserve modlogs for.
