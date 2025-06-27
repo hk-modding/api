@@ -48,7 +48,7 @@ namespace Modding
         ///     - `false`: Load the entire scene unmodified into memory
         ///     - `true`: Preprocess the scenes by filtering to only the objects we care about.
         /// </summary>
-        public bool PreloadUsingSceneRepack = true;
+        public string PreloadMode = "full-scene";
 
         /// <summary>
         ///     Maximum number of days to preserve modlogs for.
