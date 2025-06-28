@@ -100,7 +100,7 @@ namespace Modding.Menu
                     {
                         ApplySetting = (_, i) => entry.Saver(i),
                         RefreshSetting = (s, _) => s.optionList.SetOptionTo(entry.Loader()),
-                        CancelAction = _ => ((Patch.UIManager)UIManager.instance).GoToDynamicMenu(returnScreen),
+                        CancelAction = _ => ((Patch.UIManager)UIManager.instance).UIGoToDynamicMenu(returnScreen),
                         Description = string.IsNullOrEmpty(entry.Description) ? null : new DescriptionInfo
                         {
                             Text = entry.Description
