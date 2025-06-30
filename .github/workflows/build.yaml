@@ -51,6 +51,14 @@ jobs:
           mkdir Vanilla
           cd ./Vanilla
           tar -xzf ../hk-binary-archives/${{ env.HK_VERSION }}/managed.${{ matrix.platform }}.tar.gz
+
+      - name: Set RID
+        run: |
+          case "${{ matrix.platform }}" in
+            windows) echo "RID=win-x64" >> $GITHUB_ENV ;;
+            linux) echo "RID=linux-x64" >> $GITHUB_ENV ;;
+            macos) echo "RID=osx-x64" >> $GITHUB_ENV ;;
+          esac
       
       - uses: actions/setup-dotnet@v4
         with:
@@ -67,7 +75,7 @@ jobs:
           dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
       - name: Build Assembly-CSharp
         run: |
-          dotnet build Assembly-CSharp -p:Configuration=Release
+          dotnet build Assembly-CSharp --runtime $RID -p:Configuration=Release
       - name: Upload Binary
         if: inputs.upload-artifact
         uses: actions/upload-artifact@v4
