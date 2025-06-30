@@ -58,7 +58,7 @@ jobs:
       - name: Setup MSBuild
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y mono-devel mono-xbuild
+          sudo apt-get install -y mono-devel
       - name: Restore Dependencies
         run: |
           dotnet restore
