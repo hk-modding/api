@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Files Include="$(SolutionDir)Vanilla/*" />
+        <Files Include="../Vanilla/*" />
 
         <BuildDir Include="$(TargetDir)" />
         
@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <OutputDir>$(SolutionDir)/OutputFinal</OutputDir>
+        <OutputDir>../OutputFinal</OutputDir>
         <!-- todo macOS -->
         <GamePath Condition="'$(OS)' == 'Windows_NT'">C:/Program Files (x86)/Steam/steamapps/common/Hollow Knight</GamePath>
         <GamePath Condition="'$(OS)' != 'Windows_NT'">$(HOME)/.local/share/Steam/steamapps/common/Hollow Knight</GamePath>
@@ -41,7 +41,7 @@
 
         <Copy SkipUnchangedFiles="true" SourceFiles="@(Files)" DestinationFolder="@(BuildDir)" />
 
-        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(SolutionDir)/PrePatcher/Output/PrePatcher.exe&quot; Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
+        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(MSBuildProjectDirectory)/../PrePatcher/Output/PrePatcher.exe&quot; Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
         <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)Assembly-CSharp-patched.dll" DestinationFiles="$(TargetDir)Assembly-CSharp.dll" />
 
         <Delete Condition="Exists('MONOMODDED_Assembly-CSharp.dll')" Files="MONOMODDED_Assembly-CSharp.dll" />
@@ -53,16 +53,16 @@
     </Target>
 
     <Target Name="SetupExamples" AfterTargets="PostBuildEvent" Condition="'$(SetupExamples)' == 'true'">
-        <RemoveDir Directories="$(SolutionDir)/Examples/HollowKnightManaged/" />
-        <MakeDir Directories="$(SolutionDir)/Examples/HollowKnightManaged/" />
+        <RemoveDir Directories="../Examples/HollowKnightManaged/" />
+        <MakeDir Directories="../Examples/HollowKnightManaged/" />
         <!-- Copy the vanilla files. -->
-        <Copy SourceFiles="@(Files)" DestinationFolder="$(SolutionDir)/Examples/HollowKnightManaged/" />
+        <Copy SourceFiles="@(Files)" DestinationFolder="../Examples/HollowKnightManaged/" />
         <!-- Copy the API and the documentation -->
-        <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(SolutionDir)/Examples/HollowKnightManaged/Assembly-CSharp.dll" />
-        <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(SolutionDir)/Examples/HollowKnightManaged/Assembly-CSharp.xml" />
+        <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="../Examples/HollowKnightManaged/Assembly-CSharp.dll" />
+        <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="../Examples/HollowKnightManaged/Assembly-CSharp.xml" />
         
         <!-- Copy the dependencies for the API and hooks for mods -->
-        <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(SolutionDir)/Examples/HollowKnightManaged/" />
+        <Copy SourceFiles="@(Dependencies)" DestinationFolder="../Examples/HollowKnightManaged/" />
     </Target>
     
     <Target Name="OutputFinal" AfterTargets="PostBuild">
@@ -73,9 +73,9 @@
         <MakeDir Directories="$(OutputDir)/" />
 
         <!-- Copy the API, the documentation, the overridden mscorlib, and the README. -->
-        <Copy SourceFiles="$(SolutionDir)/README.ModdingApi.md" DestinationFiles="$(OutputDir)/README.md" />
-        <Copy SourceFiles="$(SolutionDir)/override/mscorlib.dll" DestinationFiles="$(OutputDir)/mscorlib.dll" />
-        <Copy SourceFiles="$(SolutionDir)/override/mscorlib.xml" DestinationFiles="$(OutputDir)/mscorlib.xml" />
+        <Copy SourceFiles="../README.ModdingApi.md" DestinationFiles="$(OutputDir)/README.md" />
+        <Copy SourceFiles="../override/mscorlib.dll" DestinationFiles="$(OutputDir)/mscorlib.dll" />
+        <Copy SourceFiles="../override/mscorlib.xml" DestinationFiles="$(OutputDir)/mscorlib.xml" />
         <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(OutputDir)/Assembly-CSharp.dll" />
         <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(OutputDir)/Assembly-CSharp.xml" />
         
