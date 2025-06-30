@@ -28,12 +28,12 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
           persist-credentials: false
-      
+
       - name: Read Versions
         run: |
           HKV=$(cat ./hollowknight.version)
           echo "HK_VERSION=$HKV" >> $GITHUB_ENV
-      
+
       - name: Checkout Binaries
         uses: actions/checkout@v4
         with:
@@ -45,20 +45,13 @@ jobs:
           sparse-checkout-cone-mode: false
           path: ./hk-binary-archives
           persist-credentials: false
-      
+
       - name: Unpack Archive
         run: |
           mkdir Vanilla
           cd ./Vanilla
           tar -xzf ../hk-binary-archives/${{ env.HK_VERSION }}/managed.${{ matrix.platform }}.tar.gz
-      
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 6.0.x
-      - name: Setup MSBuild
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y nuget mono-devel mono-xbuild
+
       - name: Restore Dependencies
         run: |
           dotnet restore
