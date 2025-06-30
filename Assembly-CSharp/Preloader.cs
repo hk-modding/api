@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,6 +28,7 @@ internal class Preloader : MonoBehaviour
         Dictionary<string, List<Func<IEnumerator>>> sceneHooks
     )
     {
+        var stopwatch = Stopwatch.StartNew();
         MuteAllAudio();
 
         Logger.APILogger.Log($"Preloading using mode {ModHooks.GlobalSettings.PreloadMode}");
@@ -48,6 +50,7 @@ internal class Preloader : MonoBehaviour
         yield return CleanUpPreloading();
 
         UnmuteAllAudio();
+        Logger.APILogger.LogError($"Finished preloading in {stopwatch.ElapsedMilliseconds/1000:F2}s");
     }
 
     /// <summary>
