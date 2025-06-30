@@ -30,7 +30,7 @@
         <!-- todo macOS -->
         <GamePath Condition="'$(OS)' == 'Windows_NT'">C:/Program Files (x86)/Steam/steamapps/common/Hollow Knight</GamePath>
         <GamePath Condition="'$(OS)' != 'Windows_NT'">$(HOME)/.local/share/Steam/steamapps/common/Hollow Knight</GamePath>
-        <CopyDir>$(GamePath)/hollow_knight_Data/Managed</CopyDir>
+        <CopyDir>$(GamePath)/hollow_knight_Data/Managed</CopyDir> 
         
         <Mono Condition="$(OS) == WINDOWS_NT" />
         <Mono Condition="$(OS) != WINDOWS_NT">mono</Mono>
