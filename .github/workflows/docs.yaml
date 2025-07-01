@@ -15,23 +15,10 @@ jobs:
         with:
           ref: docs
           path: docs
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - name: Build docs
+        uses: nunit/docfx-action@v3.4.2
         with:
-          dotnet-version: 6.0.x
-      - name: Setup MSBuild
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y mono-devel
-      - name: Download DocFX
-        working-directory: docs
-        run: |
-          wget https://github.com/dotnet/docfx/releases/download/v2.59.4/docfx.zip -O docfx.zip
-          unzip docfx.zip -d docfx
-      - name: Build Documentation
-        working-directory: docs
-        run: |
-          mono docfx/docfx.exe 
+          args: docs/docfx.json
       - name: Publish
         uses: peaceiris/actions-gh-pages@v4
         with:
