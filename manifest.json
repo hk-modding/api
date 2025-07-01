@@ -1,0 +1,1110 @@
+{
+  "source_base_path": "/github/workspace/docs",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.CanvasUtil.RectData.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.CanvasUtil.RectData.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.CanvasUtil.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.CanvasUtil.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Converters.IMappablePlayerActions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Converters.IMappablePlayerActions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Converters.JsonConverter-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Converters.JsonConverter-1.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Converters.PlayerActionSetConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Converters.PlayerActionSetConverter.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Converters.Vector2Converter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Converters.Vector2Converter.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Converters.Vector3Converter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Converters.Vector3Converter.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Converters.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Converters.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.DeconstructUtil.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.DeconstructUtil.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.AfterTakeDamageHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.AfterTakeDamageHandler.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.CharmUpdateHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.CharmUpdateHandler.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.GetBoolProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.GetBoolProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.GetFloatProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.GetFloatProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.GetIntProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.GetIntProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.GetStringProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.GetStringProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.GetVariableProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.GetVariableProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.GetVector3Proxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.GetVector3Proxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.HitInstanceHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.HitInstanceHandler.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.LanguageGetProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.LanguageGetProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.OnEnableEnemyHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.OnEnableEnemyHandler.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.OnReceiveDeathEventHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.OnReceiveDeathEventHandler.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.RecordKillForJournalHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.RecordKillForJournalHandler.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.SetBoolProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.SetBoolProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.SetFloatProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.SetFloatProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.SetIntProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.SetIntProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.SetStringProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.SetStringProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.SetVariableProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.SetVariableProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.SetVector3Proxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.SetVector3Proxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.SlashHitHandler.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.SlashHitHandler.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.TakeDamageProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.TakeDamageProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.TakeHealthProxy.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.TakeHealthProxy.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Delegates.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Delegates.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.ICustomMenuMod.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.ICustomMenuMod.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.IGlobalSettings-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.IGlobalSettings-1.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.ILocalSettings-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.ILocalSettings-1.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.ILogger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.ILogger.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.IMenuMod.MenuEntry.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.IMenuMod.MenuEntry.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.IMenuMod.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.IMenuMod.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.IMod.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.IMod.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.ITogglableMod.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.ITogglableMod.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.InGameConsoleSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.InGameConsoleSettings.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.JsonConverterTypes.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.JsonConverterTypes.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.KeybindUtil.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.KeybindUtil.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.LogLevel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.LogLevel.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.LogLevelExt.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.LogLevelExt.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Loggable.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Loggable.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Logger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Logger.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.AnchoredPosition.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.AnchoredPosition.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.ChainedNavGraph.ChainDir.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.ChainedNavGraph.ChainDir.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.ChainedNavGraph.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.ChainedNavGraph.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Components.AutoSelector.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Components.AutoSelector.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Components.ScrollPaneSelector.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Components.ScrollPaneSelector.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Components.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Components.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.ButtonBindConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.ButtonBindConfig.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.DescriptionInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.DescriptionInfo.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.DescriptionStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.DescriptionStyle.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.HorizontalOptionConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.HorizontalOptionConfig.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.HorizontalOptionStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.HorizontalOptionStyle.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.KeybindConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.KeybindConfig.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.KeybindStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.KeybindStyle.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.MenuButtonConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.MenuButtonConfig.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.MenuButtonStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.MenuButtonStyle.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.MenuTitleStyle.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.MenuTitleStyle.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.ScrollbarConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.ScrollbarConfig.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.TextPanelConfig.TextFont.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.TextPanelConfig.TextFont.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.TextPanelConfig.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.TextPanelConfig.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.Config.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.Config.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.ContentArea.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.ContentArea.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.EnumeratorLayout.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.EnumeratorLayout.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.GridNavGraph.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.GridNavGraph.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.HorizontalOptionContent.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.HorizontalOptionContent.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.IContentLayout.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.IContentLayout.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.INavigationGraph.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.INavigationGraph.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.KeybindContent.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.KeybindContent.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.MenuBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.MenuBuilder.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.MenuButtonContent.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.MenuButtonContent.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.MenuResources.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.MenuResources.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.MenuUtils.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.MenuUtils.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.NullContentLayout.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.NullContentLayout.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.NullNavigationGraph.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.NullNavigationGraph.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.RectTransformData.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.RectTransformData.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.RegularGridLayout.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.RegularGridLayout.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.RelLength.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.RelLength.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.RelVector2.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.RelVector2.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.ScrollPaneContent.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.ScrollPaneContent.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.SingleContentLayout.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.SingleContentLayout.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.StaticContent.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.StaticContent.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Menu.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Menu.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Mod.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Mod.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.ModHooks.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.ModHooks.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.ModHooksGlobalSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.ModHooksGlobalSettings.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.ModToggleDelegates.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.ModToggleDelegates.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.ModVersionDraw.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.ModVersionDraw.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.ReflectionHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.ReflectionHelper.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.SimpleLogger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.SimpleLogger.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Utils.AssemblyExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Utils.AssemblyExtensions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Utils.UnityExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Utils.UnityExtensions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.Utils.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.Utils.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/Modding.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/Modding.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html"
+        },
+        ".json": {
+          "relative_path": "api/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/charms.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/charms.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/intro.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/intro.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/logs.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/logs.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/menu_api.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/menu_api.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "articles/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "articles/toc.html"
+        },
+        ".json": {
+          "relative_path": "articles/toc.json"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "img/menu_example.png",
+      "output": {
+        "resource": {
+          "relative_path": "img/menu_example.png"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        },
+        ".json": {
+          "relative_path": "toc.json"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
