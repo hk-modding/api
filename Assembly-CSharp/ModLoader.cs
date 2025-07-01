@@ -249,6 +249,14 @@ namespace Modding
                 yield return pld.Preload(toPreload, preloadedObjects, sceneHooks);
             }
 
+            foreach ((string sceneName, Dictionary<string, GameObject> goMap) in preloadedObjects.Values.SelectMany(x => x))
+            {
+                foreach ((string goName, GameObject go) in goMap)
+                {
+                    OnPreloadedObject(go, sceneName, goName);
+                }
+            }
+
             foreach (ModInstance mod in orderedMods)
             {
                 if (mod.Error is not null)
@@ -464,6 +472,17 @@ namespace Modding
             }
 
             if (updateModText) UpdateModText();
+        }
+
+        public static void OnPreloadedObject(GameObject go, string sceneName, string goName)
+        {
+            foreach (ModInstance modInstance in ModInstances)
+            {
+                if (modInstance.Error is not null)
+                    continue;
+
+                modInstance.Mod.InvokeOnGameObjectPreloaded(go, sceneName, goName);
+            }
         }
 
         // Essentially the state of a loaded **mod**. The assembly has nothing to do directly with mods.

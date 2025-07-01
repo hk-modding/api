@@ -118,7 +118,7 @@ namespace Modding
                 Log("Overriding Global Settings path with Mod directory");
                 return globalSettingsOverride;
             }
-            
+
             return Path.Combine(Application.persistentDataPath, globalSettingsFileName);
         }
 
@@ -147,6 +147,14 @@ namespace Modding
         /// </summary>
         /// <returns>List of tuples containg scene names and the respective actions.</returns>
         public virtual (string, Func<IEnumerator>)[] PreloadSceneHooks() => Array.Empty<(string, Func<IEnumerator>)>();
+
+        /// <summary>
+        /// This function will be invoked on each gameObject preloaded through the <see cref="GetPreloadNames"/> system.
+        /// </summary>
+        /// <param name="go">The preloaded gameObject.</param>
+        /// <param name="sceneName">The scene the gameObject was preloaded from.</param>
+        /// <param name="goName">The path to the preloaded gameObject.</param>
+        public virtual void InvokeOnGameObjectPreloaded(GameObject go, string sceneName, string goName) { }
 
         /// <inheritdoc />
         /// <summary>
