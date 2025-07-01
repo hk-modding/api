@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -33,13 +32,13 @@ internal class Preloader : MonoBehaviour
 
         Logger.APILogger.Log($"Preloading using mode {ModHooks.GlobalSettings.PreloadMode}");
         switch (ModHooks.GlobalSettings.PreloadMode) {
-            case "full-scene":
+            case PreloadMode.FullScene:
                 yield return DoPreloadClassic(toPreload, preloadedObjects, sceneHooks, false);
                 break;
-            case "repack-scene":
+            case PreloadMode.RepackScene:
                 yield return DoPreloadClassic(toPreload, preloadedObjects, sceneHooks, true);
                 break;
-            case "repack-assets":
+            case PreloadMode.RepackAssets:
                 yield return DoPreloadAssetbundle(toPreload, preloadedObjects);
                 break;
             default:
