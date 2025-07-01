@@ -7,6 +7,10 @@ on:
 jobs:
   docfx:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [windows]
+        archive-ref: [main]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -15,6 +19,28 @@ jobs:
         with:
           ref: docs
           path: docs
+
+      - name: Read Versions
+        run: |
+          HKV=$(cat ./hollowknight.version)
+          echo "HK_VERSION=$HKV" >> $GITHUB_ENV
+      - name: Checkout Binaries
+        uses: actions/checkout@v4
+        with:
+          repository: hk-modding/hk-binary-archives
+          ref: ${{ matrix.archive-ref }}
+          ssh-key: ${{ secrets.BINARY_ARCHIVE_DEPLOY_KEY }}
+          sparse-checkout: |
+            ${{ env.HK_VERSION }}/managed.${{ matrix.platform }}.tar.gz
+          sparse-checkout-cone-mode: false
+          path: ./hk-binary-archives
+          persist-credentials: false
+      - name: Unpack Archive
+        run: |
+          mkdir Vanilla
+          cd ./Vanilla
+          tar -xzf ../hk-binary-archives/${{ env.HK_VERSION }}/managed.${{ matrix.platform }}.tar.gz
+
       - name: Build docs
         uses: nunit/docfx-action@v3.4.2
         with:
