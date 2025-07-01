@@ -30,6 +30,8 @@ internal class Preloader : MonoBehaviour
         var stopwatch = Stopwatch.StartNew();
         MuteAllAudio();
 
+        bool usesSceneHooks = sceneHooks.Sum(kvp => kvp.Value.Count) > 0;
+
         Logger.APILogger.Log($"Preloading using mode {ModHooks.GlobalSettings.PreloadMode}");
         switch (ModHooks.GlobalSettings.PreloadMode) {
             case PreloadMode.FullScene:
@@ -39,6 +41,12 @@ internal class Preloader : MonoBehaviour
                 yield return DoPreloadClassic(toPreload, preloadedObjects, sceneHooks, true);
                 break;
             case PreloadMode.RepackAssets:
+                if (usesSceneHooks) {
+                    Logger.APILogger.LogWarn($"Some mods ({string.Join(", ", sceneHooks.Keys)}) use scene hooks, falling back to \"RepackScene\" preload mode");
+                    yield return DoPreloadClassic(toPreload, preloadedObjects, sceneHooks, true);
+                    break;
+                }
+                
                 yield return DoPreloadAssetbundle(toPreload, preloadedObjects);
                 break;
             default:
