@@ -1,34 +1,25 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UObject = UnityEngine.Object;
 using USceneManager = UnityEngine.SceneManagement.SceneManager;
 using Modding.Utils;
+using Newtonsoft.Json;
 
 namespace Modding;
 
 internal class Preloader : MonoBehaviour
 {
-    private const int CanvasResolutionWidth = 1920;
-    private const int CanvasResolutionHeight = 1080;
-    private const int LoadingBarBackgroundWidth = 1000;
-    private const int LoadingBarBackgroundHeight = 100;
-    private const int LoadingBarMargin = 12;
-    private const int LoadingBarWidth = LoadingBarBackgroundWidth - 2 * LoadingBarMargin;
-    private const int LoadingBarHeight = LoadingBarBackgroundHeight - 2 * LoadingBarMargin;
+    private ProgressBar progressBar;
 
-    private GameObject _blanker;
-    private GameObject _loadingBarBackground;
-    private GameObject _loadingBar;
-    private RectTransform _loadingBarRect;
-
-    private float _commandedProgress;
-    private float _shownProgress;
-    private float _secondsSinceLastSet;
+    private void Start() {
+        progressBar = gameObject.AddComponent<ProgressBar>();
+    }
 
     public IEnumerator Preload
     (
@@ -37,131 +28,236 @@ internal class Preloader : MonoBehaviour
         Dictionary<string, List<Func<IEnumerator>>> sceneHooks
     )
     {
+        var stopwatch = Stopwatch.StartNew();
         MuteAllAudio();
 
-        CreateBlanker();
-
-        CreateLoadingBarBackground();
-
-        CreateLoadingBar();
-
-        yield return DoPreload(toPreload, preloadedObjects, sceneHooks);
-
+        Logger.APILogger.Log($"Preloading using mode {ModHooks.GlobalSettings.PreloadMode}");
+        switch (ModHooks.GlobalSettings.PreloadMode) {
+            case "full-scene":
+                yield return DoPreloadClassic(toPreload, preloadedObjects, sceneHooks, false);
+                break;
+            case "repack-scene":
+                yield return DoPreloadClassic(toPreload, preloadedObjects, sceneHooks, true);
+                break;
+            case "repack-assets":
+                yield return DoPreloadAssetbundle(toPreload, preloadedObjects);
+                break;
+            default:
+                Logger.APILogger.LogError($"Unknown preload mode {ModHooks.GlobalSettings.PreloadMode}. Expected one of: full-scene, repack-scene, repack-assets");
+                break;
+        }
+        
         yield return CleanUpPreloading();
 
         UnmuteAllAudio();
-    }
-
-    public void Update()
-    {
-        _secondsSinceLastSet += Time.unscaledDeltaTime;
-        _shownProgress = Mathf.Lerp(_shownProgress, _commandedProgress, _secondsSinceLastSet / 10.0f);
-    }
-
-    public void LateUpdate()
-    {
-        _loadingBarRect.sizeDelta = new Vector2(
-            _shownProgress * LoadingBarWidth,
-            _loadingBarRect.sizeDelta.y
-        );
+        Logger.APILogger.LogError($"Finished preloading in {stopwatch.ElapsedMilliseconds/1000:F2}s");
     }
 
     /// <summary>
     ///     Mutes all audio from AudioListeners.
     /// </summary>
     private static void MuteAllAudio() => AudioListener.pause = true;
-
-    /// <summary>
-    ///     Creates the canvas used to show the loading progress.
-    ///     It is centered on the screen.
-    /// </summary>
-    private void CreateBlanker()
-    {
-        _blanker = CanvasUtil.CreateCanvas(RenderMode.ScreenSpaceOverlay, new Vector2(CanvasResolutionWidth, CanvasResolutionHeight));
+    
+    private IEnumerator DoPreloadAssetbundle
+    (
+        Dictionary<string, List<(ModLoader.ModInstance Mod, List<string> Preloads)>> toPreload,
+        IDictionary<ModLoader.ModInstance, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects
+    ) {
+        const string PreloadBundleName = "mapi_preload_assetbundle";
         
-        DontDestroyOnLoad(_blanker);
+        string preloadJson = JsonConvert.SerializeObject(toPreload.ToDictionary(
+                                                             k => k.Key,
+                                                             v => v.Value.SelectMany(x => x.Preloads).Distinct() ));
+        byte[] bundleData = null;
+        try {
+            (bundleData, RepackStats repackStats) = UnitySceneRepacker.Repack(PreloadBundleName, Application.dataPath, preloadJson, UnitySceneRepacker.Mode.AssetBundle);
+            Logger.APILogger.Log($"Repacked {toPreload.Count} preload scenes from {repackStats.objectsBefore} to {repackStats.objectsAfter} objects ({bundleData.Length / 1024f / 1024f:F2}MB)");
+        } catch (Exception e) {
+            Logger.APILogger.LogError($"Error trying to repack preloads into assetbundle: {e}");
+        }
+        AssetBundleCreateRequest op = AssetBundle.LoadFromMemoryAsync(bundleData);
 
-        GameObject panel = CanvasUtil.CreateImagePanel
-        (
-            _blanker,
-            CanvasUtil.NullSprite(new byte[] { 0x00, 0x00, 0x00, 0xFF }),
-            new CanvasUtil.RectData(Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one)
-        );
+        if (op == null) {
+            progressBar.Progress = 1;
+            yield break;
+        }
 
-        panel
-            .GetComponent<Image>()
-            .preserveAspect = false;
+        yield return op;
+        var bundle = op.assetBundle;
+
+        var queue = new HashSet<AssetBundleRequest>();
+
+        foreach (var (sceneName, sceneToPreload) in toPreload) {
+            foreach (var (mod, toPreloadPaths) in sceneToPreload) {
+                if (!preloadedObjects.TryGetValue(mod, out var modPreloads)) {
+                    modPreloads = new Dictionary<string, Dictionary<string, GameObject>>();
+                    preloadedObjects[mod] = modPreloads;
+                }
+                if (!modPreloads.TryGetValue(sceneName, out var modScenePreloads)) {
+                    modScenePreloads = new Dictionary<string, GameObject>();
+                    modPreloads[sceneName] = modScenePreloads;
+                }
+                
+                foreach (string path in toPreloadPaths) {
+                    if (modScenePreloads.ContainsKey(path)) continue;
+                            
+                    string assetName = $"{sceneName}/{path}.prefab";
+                    AssetBundleRequest request = bundle.LoadAssetAsync<GameObject>(assetName);
+                    request.completed += _ => {
+                        queue.Remove(request);
+                        
+                        var go = (GameObject) request.asset;
+                        if (!go) {
+                            Logger.APILogger.LogError($"    could not load '{assetName}'");
+                            return;
+                        }
+                        if (modScenePreloads.ContainsKey(path)) {
+                            Logger.APILogger.LogWarn($"Duplicate preload by {mod.Name}: '{path}' in '{sceneName}'");
+                        } else {
+                            modScenePreloads.Add(path, go);
+                        }
+                    };
+                    queue.Add(request);
+                }
+            }
+        }
+        int total = queue.Count;
+
+        while (queue.Count > 0) {
+            float progress = (total - queue.Count) / (float)total;
+            progressBar.Progress = progress;
+            yield return null;
+        }
     }
+    
 
-    /// <summary>
-    ///     Creates the background of the loading bar.
-    ///     It is centered in the canvas.
-    /// </summary>
-    private void CreateLoadingBarBackground()
-    {
-        _loadingBarBackground = CanvasUtil.CreateImagePanel
-        (
-            _blanker,
-            CanvasUtil.NullSprite(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF }),
-            new CanvasUtil.RectData
-            (
-                new Vector2(LoadingBarBackgroundWidth, LoadingBarBackgroundHeight),
-                Vector2.zero,
-                new Vector2(0.5f, 0.5f),
-                new Vector2(0.5f, 0.5f)
-            )
-        );
+    /*private IEnumerator DoPreloadAssetbundleSeparate
+    (
+        Dictionary<string, List<(ModLoader.ModInstance Mod, List<string> Preloads)>> toPreload,
+        IDictionary<ModLoader.ModInstance, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects,
+        Dictionary<string, List<Func<IEnumerator>>> sceneHooks
+    ) {
+        const string basePath = "/home/jakob/dev/unity/unity-scene-repacker/out-separate";
         
-        _loadingBarBackground.GetComponent<Image>().preserveAspect = false;
-    }
 
-    /// <summary>
-    ///     Creates the loading bar with an initial width of 0.
-    ///     It is centered in the canvas.
-    /// </summary>
-    private void CreateLoadingBar()
-    {
-        _loadingBar = CanvasUtil.CreateImagePanel
-        (
-            _blanker,
-            CanvasUtil.NullSprite(new byte[] { 0x99, 0x99, 0x99, 0xFF }),
-            new CanvasUtil.RectData
-            (
-                new Vector2(0, LoadingBarHeight),
-                Vector2.zero,
-                new Vector2(0.5f, 0.5f),
-                new Vector2(0.5f, 0.5f)
-            )
-        );
-        
-        _loadingBar.GetComponent<Image>().preserveAspect = false;
-        _loadingBarRect = _loadingBar.GetComponent<RectTransform>();
-    }
+        List<string> sceneNames = toPreload.Keys.ToList();
 
-    /// <summary>
-    ///     Updates the progress of the loading bar to the given progress.
-    /// </summary>
-    /// <param name="progress">The progress that should be displayed. 0.0f - 1.0f</param>
-    private void UpdateLoadingBarProgress(float progress)
-    {
-        if (Mathf.Abs(_commandedProgress - progress) < float.Epsilon) 
-            return;
+
+        var preloadOperationQueue = new List<AssetBundleCreateRequest>();
+        var allOperations = new List<AssetBundleCreateRequest>();
         
-        _commandedProgress = progress;
-        _secondsSinceLastSet = 0.0f;
-    }
+        float sceneProgressAverage = 0;
+        int i = 0;
+        Logger.APILogger.Log("starting");
+        while (sceneProgressAverage < 1.0f || i < sceneNames.Count) {
+            while (preloadOperationQueue.Count < 20 && i < sceneNames.Count) {
+                string sceneName = sceneNames[i++];
+                
+                string bundlePath = basePath + $"/{sceneName}.bundle";
+                if (File.Exists(bundlePath)) {
+
+                    int priority = 0;
+                    
+                    if (toPreload.TryGetValue(sceneName, out var requests)) 
+                        priority += requests.Select(x => x.Preloads.Count).Sum();
+                    
+                    AssetBundleCreateRequest op = AssetBundle.LoadFromFileAsync(bundlePath);
+                    op.priority = priority;
+                    preloadOperationQueue.Add(op);
+                    allOperations.Add(op);
+
+                    StartCoroutine(HandleBundle(sceneName, toPreload[sceneName], op));
+                } else {
+                    Logger.APILogger.LogWarn($"Not Found: {bundlePath}");
+                }
+            }
+            
+            yield return null;
+
+            // sceneProgressAverage = allOperations.Average(op => op.progress);
+            sceneProgressAverage =  i / (float) sceneNames.Count;
+            UpdateLoadingBarProgress(sceneProgressAverage);
+        }
+        Logger.APILogger.Log($"Preload completed {i}");
+        
+        yield break;
+
+        IEnumerator HandleBundle(string sceneName, List<(ModLoader.ModInstance, List<string>)> toPreloadScene, AssetBundleCreateRequest op) {
+            float bundleLoadStart = TimingDumper.Current;
+            yield return op;
+            TimingDumper.Record(bundleLoadStart, "LoadBundle", sceneName);
+
+            float objectLoadStart = TimingDumper.Current;
+            Logger.APILogger.Log($"Scene: {sceneName}");
+            foreach (var (mod, modPreloadPaths) in toPreloadScene) {
+                Logger.APILogger.Log($" {mod.Name}");
+                
+                if (!preloadedObjects.TryGetValue(mod, out var modPreloads)) {
+                    modPreloads = new Dictionary<string, Dictionary<string, GameObject>>();
+                    preloadedObjects[mod] = modPreloads;
+                }
+                if (!modPreloads.TryGetValue(sceneName, out var modScenePreloads)) {
+                    modScenePreloads = new Dictionary<string, GameObject>();
+                    modPreloads[sceneName] = modScenePreloads;
+                }
+
+                foreach (string path in modPreloadPaths) {
+                    if (modScenePreloads.ContainsKey(path)) continue;
+                    
+                    Object go = op.assetBundle.LoadAsset($"{path}.prefab");
+                    if (!go) {
+                        Logger.APILogger.LogError($"    could not load '{path}'");
+                        continue;
+                    }
+                    Logger.APILogger.Log($"    {path}");
+                    modScenePreloads.Add(path, (GameObject) go);
+
+                }
+            }
+            
+            // op.assetBundle.Unload(false);
+            
+            TimingDumper.Record(objectLoadStart, "LoadObjects", sceneName);
+
+            preloadOperationQueue.Remove(op);
+        }
+    }*/
 
     /// <summary>
     ///     This is the actual preloading process.
     /// </summary>
     /// <returns></returns>
-    private IEnumerator DoPreload
+    private IEnumerator DoPreloadClassic
     (
         Dictionary<string, List<(ModLoader.ModInstance Mod, List<string> Preloads)>> toPreload,
         IDictionary<ModLoader.ModInstance, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects,
-        Dictionary<string, List<Func<IEnumerator>>> sceneHooks
-    )
-    {
+        Dictionary<string, List<Func<IEnumerator>>> sceneHooks,
+        bool useRepack
+    ) {
+        const string PreloadBundleName = "hk_api_repack";
+        AssetBundle repackBundle = null;
+        if (useRepack) {
+            string preloadJson = JsonConvert.SerializeObject(toPreload.ToDictionary(
+                                                                 k => k.Key,
+                                                                 v => v.Value.SelectMany(x => x.Preloads).Distinct()));
+            byte[] bundleData = null;
+            Task task = Task.Run(() => {
+                try {
+                    RepackStats repackStats = default;
+                    (bundleData, repackStats) = UnitySceneRepacker.Repack(PreloadBundleName, Application.dataPath, preloadJson, UnitySceneRepacker.Mode.SceneBundle);
+                    Logger.APILogger.Log($"Repacked {toPreload.Count} preload scenes from {repackStats.objectsBefore} to {repackStats.objectsAfter} objects ({bundleData.Length / 1024f / 1024f:F2}MB");
+                } catch (Exception e) {
+                    Logger.APILogger.LogError($"Error trying to repack preloads into assetbundle: {e}");
+                }
+            });
+            yield return new WaitUntil(() => task.IsCompleted);
+            if (bundleData != null) {
+                repackBundle = AssetBundle.LoadFromMemory(bundleData);
+            }
+        }
+        
+        string scenePrefix = repackBundle != null ? $"{PreloadBundleName}_" : "";
+        
         List<string> sceneNames = toPreload.Keys.Union(sceneHooks.Keys).ToList();
         Dictionary<string, int> scenePriority = new();
         Dictionary<string, (AsyncOperation load, AsyncOperation unload)> sceneAsyncOperationHolder = new();
@@ -201,12 +297,11 @@ internal class Preloader : MonoBehaviour
             return modScenePreloadedObjects;
         }
 
-        var preloadOperationQueue = new List<AsyncOperation>(5);
+        var preloadOperationQueue = new List<AsyncOperation>(ModHooks.GlobalSettings.PreloadBatchSize);
 
         IEnumerator GetPreloadObjectsOperation(string sceneName)
         {
-            Scene scene = USceneManager.GetSceneByName(sceneName);
-            
+            Scene scene = USceneManager.GetSceneByName(scenePrefix + sceneName);
             GameObject[] rootObjects = scene.GetRootGameObjects();
             
             foreach (var go in rootObjects)
@@ -267,8 +362,8 @@ internal class Preloader : MonoBehaviour
         void CleanupPreloadOperation(string sceneName)
         {
             Logger.APILogger.LogFine($"Unloading scene \"{sceneName}\"");
-            
-            AsyncOperation unloadOp = USceneManager.UnloadSceneAsync(sceneName);
+
+            AsyncOperation unloadOp = USceneManager.UnloadSceneAsync(scenePrefix + sceneName);
             
             sceneAsyncOperationHolder[sceneName] = (sceneAsyncOperationHolder[sceneName].load, unloadOp);
             
@@ -279,18 +374,9 @@ internal class Preloader : MonoBehaviour
 
         void StartPreloadOperation(string sceneName)
         {
-            IEnumerator DoLoad(AsyncOperation load)
-            {
-                yield return load;
-                
-                preloadOperationQueue.Remove(load);
-                yield return GetPreloadObjectsOperation(sceneName);
-                CleanupPreloadOperation(sceneName);
-            }
-            
             Logger.APILogger.LogFine($"Loading scene \"{sceneName}\"");
 
-            AsyncOperation loadOp = USceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+            AsyncOperation loadOp = USceneManager.LoadSceneAsync(scenePrefix + sceneName, LoadSceneMode.Additive);
 
             StartCoroutine(DoLoad(loadOp));
             
@@ -299,6 +385,17 @@ internal class Preloader : MonoBehaviour
             loadOp.priority = scenePriority[sceneName];
             
             preloadOperationQueue.Add(loadOp);
+            
+            return;
+            
+            IEnumerator DoLoad(AsyncOperation load)
+            {
+                yield return load;
+                
+                preloadOperationQueue.Remove(load);
+                yield return GetPreloadObjectsOperation(sceneName);
+                CleanupPreloadOperation(sceneName);
+            }
         }
 
         int i = 0;
@@ -323,10 +420,12 @@ internal class Preloader : MonoBehaviour
                                    .Select(x => (x.load?.progress ?? 0) * 0.5f + (x.unload?.progress ?? 0) * 0.5f)
                                    .Average();
             
-            UpdateLoadingBarProgress(sceneProgressAverage);
+            progressBar.Progress = sceneProgressAverage;
         }
+        
+        repackBundle?.Unload(true);
 
-        UpdateLoadingBarProgress(1.0f);
+        progressBar.Progress = 1;
     }
 
     /// <summary>
@@ -347,10 +446,7 @@ internal class Preloader : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        // Remove the black screen
-        Destroy(_loadingBar);
-        Destroy(_loadingBarBackground);
-        Destroy(_blanker);
+        Destroy(progressBar);
     }
 
     /// <summary>

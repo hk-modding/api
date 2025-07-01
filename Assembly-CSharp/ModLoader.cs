@@ -158,8 +158,7 @@ namespace Modding
                 }
             }
 
-            foreach (Assembly asm in asms)
-            {
+            foreach (Assembly asm in asms) {
                 Logger.APILogger.LogDebug($"Loading mods in assembly `{asm.FullName}`");
                 
                 bool foundMod = false;
