@@ -9,16 +9,17 @@ internal struct RepackStats {
     public int objectsAfter;
 }
 
-internal class UnitySceneRepackerException(string message) : Exception(message);
+internal class UnitySceneRepackerException : Exception {
+    public UnitySceneRepackerException(string message) : base(message) { }
+}
 
 internal static class UnitySceneRepacker {
-
     public enum Mode {
         SceneBundle,
         AssetBundle,
     }
 
-    
+
     public static (byte[], RepackStats) Repack(string bundleName, string gamePath, string preloadsJson, Mode mode) {
         export(
             bundleName,
@@ -28,7 +29,7 @@ internal static class UnitySceneRepacker {
             out int bundleSize,
             out IntPtr bundleData,
             out RepackStats stats,
-            (byte) mode
+            (byte)mode
         );
 
         if (errorPtr != IntPtr.Zero) {
@@ -69,7 +70,7 @@ internal static class UnitySceneRepacker {
 
     private static byte[] PtrToByteArrayAndFree(int size, IntPtr ptr) {
         if (ptr == IntPtr.Zero || size == 0)
-            return [];
+            return new byte[] { };
 
         byte[] managedArray = new byte[size];
         Marshal.Copy(ptr, managedArray, 0, size);
