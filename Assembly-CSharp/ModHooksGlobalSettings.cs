@@ -70,7 +70,7 @@ namespace Modding
         ///     Determines the strategy used for preloading game objects.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public PreloadMode PreloadMode = PreloadMode.FullScene;
+        public PreloadMode PreloadMode = PreloadMode.RepackAssets;
 
         /// <summary>
         ///     Maximum number of days to preserve modlogs for.
