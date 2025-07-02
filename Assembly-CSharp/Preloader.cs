@@ -70,7 +70,7 @@ internal class Preloader : MonoBehaviour
         Dictionary<string, List<(ModLoader.ModInstance Mod, List<string> Preloads)>> toPreload,
         IDictionary<ModLoader.ModInstance, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects
     ) {
-        const string PreloadBundleName = "mapi_preload_assetbundle";
+        const string PreloadBundleName = "modding_api_asset_bundle";
         
         string preloadJson = JsonConvert.SerializeObject(toPreload.ToDictionary(
                                                              k => k.Key,
@@ -146,7 +146,8 @@ internal class Preloader : MonoBehaviour
         IDictionary<ModLoader.ModInstance, Dictionary<string, Dictionary<string, GameObject>>> preloadedObjects,
         Dictionary<string, List<Func<IEnumerator>>> sceneHooks
     ) {
-        const string PreloadBundleName = "hk_api_repack";
+        const string PreloadBundleName = "modding_api_scene_bundle";
+        
         string preloadJson = JsonConvert.SerializeObject(
             toPreload.ToDictionary(k => k.Key, v => v.Value.SelectMany(x => x.Preloads).Distinct())
         );
