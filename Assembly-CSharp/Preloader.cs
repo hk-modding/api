@@ -42,7 +42,7 @@ internal class Preloader : MonoBehaviour
                 break;
             case PreloadMode.RepackAssets:
                 if (usesSceneHooks) {
-                    Logger.APILogger.LogWarn($"Some mods ({string.Join(", ", sceneHooks.Keys)}) use scene hooks, falling back to \"RepackScene\" preload mode");
+                    Logger.APILogger.LogWarn($"Some mods ({string.Join(", ", sceneHooks.Keys)}) use scene hooks, falling back to \"{nameof(PreloadMode.RepackScene)}\" preload mode");
                     yield return DoPreloadRepackedScenes(toPreload, preloadedObjects, sceneHooks);
                     break;
                 }
