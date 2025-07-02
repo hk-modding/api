@@ -250,9 +250,8 @@ internal class Preloader : MonoBehaviour
             byte[] bundleData = null;
             Task task = Task.Run(() => {
                 try {
-                    RepackStats repackStats = default;
-                    (bundleData, repackStats) = UnitySceneRepacker.Repack(PreloadBundleName, Application.dataPath, preloadJson, UnitySceneRepacker.Mode.SceneBundle);
-                    Logger.APILogger.Log($"Repacked {toPreload.Count} preload scenes from {repackStats.objectsBefore} to {repackStats.objectsAfter} objects ({bundleData.Length / 1024f / 1024f:F2}MB");
+                    (bundleData, RepackStats repackStats) = UnitySceneRepacker.Repack(PreloadBundleName, Application.dataPath, preloadJson, UnitySceneRepacker.Mode.SceneBundle);
+                    Logger.APILogger.Log($"Repacked {toPreload.Count} preload scenes from {repackStats.objectsBefore} to {repackStats.objectsAfter} objects ({bundleData.Length / 1024f / 1024f:F2}MB)");
                 } catch (Exception e) {
                     Logger.APILogger.LogError($"Error trying to repack preloads into assetbundle: {e}");
                 }
