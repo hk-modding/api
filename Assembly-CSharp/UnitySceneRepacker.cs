@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Modding;
@@ -19,8 +21,9 @@ internal static class UnitySceneRepacker {
         AssetBundle,
     }
 
-
     public static (byte[], RepackStats) Repack(string bundleName, string gamePath, string preloadsJson, Mode mode) {
+        byte[] monobehaviourDump = GetEmbeddedTypetreeDump();
+        
         export(
             bundleName,
             gamePath,
@@ -29,6 +32,8 @@ internal static class UnitySceneRepacker {
             out int bundleSize,
             out IntPtr bundleData,
             out RepackStats stats,
+            monobehaviourDump,
+            monobehaviourDump.Length,
             (byte)mode
         );
 
@@ -51,6 +56,8 @@ internal static class UnitySceneRepacker {
         out int bundleSize,
         out IntPtr bundleData,
         out RepackStats repackStats,
+        byte[] monobehaviourTypetreeExport,
+        int monobehaviourTypetreeExportLen,
         byte mode
         );
 
@@ -76,5 +83,13 @@ internal static class UnitySceneRepacker {
         Marshal.Copy(ptr, managedArray, 0, size);
         free_array(size, ptr);
         return managedArray;
+    }
+    
+    private static byte[] GetEmbeddedTypetreeDump() {
+        Assembly assembly = typeof(UnitySceneRepacker).Assembly;
+        using Stream stream = assembly.GetManifestResourceStream("Modding.monobehaviour-typetree-dump.lz4")!;
+        using var memoryStream = new MemoryStream();
+        stream.CopyTo(memoryStream);
+        return memoryStream.ToArray();
     }
 }

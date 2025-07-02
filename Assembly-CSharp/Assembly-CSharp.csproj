@@ -125,7 +125,7 @@
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
         
-        <PackageReference Include="unityscenerepacker" Version="0.0.2" GeneratePathProperty="true" />
+        <PackageReference Include="unityscenerepacker" Version="0.2.0" GeneratePathProperty="true" />
     </ItemGroup>
     
     <ItemGroup>
@@ -136,6 +136,8 @@
     
     <ItemGroup>
         <EmbeddedResource Include="logo.png"/>
+        <!-- generated using https://github.com/jakobhellermann/unity-scene-repacker/blob/main/examples/export_monobehaviour_typetrees.rs -->
+        <EmbeddedResource Include="monobehaviour-typetree-dump.lz4" />
     </ItemGroup>
 
     <ItemGroup>
