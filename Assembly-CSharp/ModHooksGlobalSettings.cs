@@ -1,9 +1,31 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Modding
 {
+
+    /// <summary>
+    ///     Strategy preloading game objects
+    /// </summary>
+    [PublicAPI]
+    public enum PreloadMode
+    {
+        /// <summary>
+        ///     Load the entire scene unmodified into memory
+        /// </summary>
+        FullScene,
+        /// <summary>
+        ///     Preprocess the scenes into an assetbundle, containing filtered versions of the originals
+        /// </summary>
+        RepackScene,
+        /// <summary>
+        ///     Preprocess the scenes into an assetbundle that contains individual game object assets
+        /// </summary>
+        RepackAssets,
+    }
+
     /// <summary>
     ///     Class to hold GlobalSettings for the Modding API
     /// </summary>
@@ -44,6 +66,11 @@ namespace Modding
         /// </summary>
         public int PreloadBatchSize = 5;
 
+        /// <summary>
+        ///     Determines the strategy used for preloading game objects.
+        /// </summary>
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PreloadMode PreloadMode = PreloadMode.RepackAssets;
 
         /// <summary>
         ///     Maximum number of days to preserve modlogs for.
