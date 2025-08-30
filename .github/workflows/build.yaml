@@ -53,8 +53,6 @@ jobs:
           tar -xzf ../hk-binary-archives/${{ env.HK_VERSION }}/managed.${{ matrix.platform }}.tar.gz
       
       - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 6.0.x
       - name: Setup MSBuild
         run: |
           sudo apt-get update -y
