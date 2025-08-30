@@ -18,8 +18,10 @@ using Mono.Cecil.Cil;
 
 namespace Modding
 {
-    internal class ModLoaderObject: MonoBehaviour {
-        private void Update() {
+    internal class ModLoaderObject: MonoBehaviour
+    {
+        private void Update()
+        {
             ModLoader.HandleHotReloadEvents();
         }
     }
@@ -128,7 +130,8 @@ namespace Modding
                                 .SelectMany(d => Directory.GetFiles(d, "*.dll"))
                                 .ToArray();
             hotReloadAssemblyResolver = new DefaultAssemblyResolver();
-            foreach (string modDirectory in modDirectories) {
+            foreach (string modDirectory in modDirectories)
+            {
                 hotReloadAssemblyResolver.AddSearchDirectory(modDirectory);
             }
             
@@ -206,7 +209,8 @@ namespace Modding
 
             UpdateModText();
             
-            if (ModHooks.GlobalSettings.EnableHotReload) {
+            if (ModHooks.GlobalSettings.EnableHotReload)
+            {
                 StartFileSystemWatcher(mods);
             }
 
@@ -219,13 +223,16 @@ namespace Modding
             new ModListMenu().InitMenuCreation();
         }
 
-        private static List<ModInstance> InstantiateMods(Assembly asm) {
+        private static List<ModInstance> InstantiateMods(Assembly asm)
+        {
             bool foundMod = false;
 
             List<ModInstance> modInstances = [];
 
-            try {
-                foreach (Type ty in asm.GetTypesSafely()) {
+            try
+            {
+                foreach (Type ty in asm.GetTypesSafely())
+                {
                     if (!ty.IsClass || ty.IsAbstract || !ty.IsSubclassOf(typeof(Mod)))
                         continue;
 
@@ -233,8 +240,10 @@ namespace Modding
 
                     Logger.APILogger.LogDebug($"Constructing mod `{ty.FullName}`");
 
-                    try {
-                        if (ty.GetConstructor(Type.EmptyTypes)?.Invoke([]) is Mod mod) {
+                    try
+                    {
+                        if (ty.GetConstructor(Type.EmptyTypes)?.Invoke([]) is Mod mod)
+                        {
                             var instance = new ModInstance {
                                 Mod = mod,
                                 Enabled = false,
@@ -244,7 +253,8 @@ namespace Modding
                             modInstances.Add(instance);
                             TryAddModInstance(ty, instance);
                         }
-                    } catch (Exception e) {
+                    } catch (Exception e)
+                    {
                         Logger.APILogger.LogError(e);
                         var instance = new ModInstance {
                             Mod = null,
@@ -256,11 +266,13 @@ namespace Modding
                         TryAddModInstance(ty, instance);
                     }
                 }
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 Logger.APILogger.LogError(e);
             }
 
-            if (!foundMod) {
+            if (!foundMod)
+            {
                 AssemblyName info = asm.GetName();
                 Logger.APILogger.Log($"Assembly {info.Name} ({info.Version}) loaded with 0 mods");
             }
@@ -268,14 +280,15 @@ namespace Modding
             return modInstances;
         }
 
-        private static List<(string, Assembly)> GetModAssemblies(string[] files) {
+        private static List<(string, Assembly)> GetModAssemblies(string[] files)
+        {
             Logger.APILogger.LogDebug(string.Join(",\n", files));
 
             Assembly Resolve(object sender, ResolveEventArgs args)
             {
                 var asm_name = new AssemblyName(args.Name);
 
-                if (files.FirstOrDefault(x => x.EndsWith($"{asm_name.Name}.dll")) is string path)
+                if (files.FirstOrDefault(x => x.EndsWith($"{asm_name.Name}.dll")) is {} path)
                     return Assembly.LoadFrom(path);
 
                 return null;
@@ -314,10 +327,13 @@ namespace Modding
         
         private static ConcurrentQueue<FileSystemEventArgs> hotReloadEvents = new();
 
-        internal static void HandleHotReloadEvents() {
-            while (hotReloadEvents.TryDequeue(out var e)) {
+        internal static void HandleHotReloadEvents()
+        {
+            while (hotReloadEvents.TryDequeue(out var e))
+            {
                 Logger.APILogger.LogDebug($"Got file system event {e.ChangeType} at {e.FullPath}");
-                switch (e.ChangeType) {
+                switch (e.ChangeType)
+                {
                     case WatcherChangeTypes.Created:
                         Logger.APILogger.Log($"Loading mods from {e.FullPath}");
                         HotLoadModAssembly(e.FullPath);
@@ -344,8 +360,10 @@ namespace Modding
             }
         }
 
-        private static void StartFileSystemWatcher(string mods) {
-            var fileSystemWatcher = new FileSystemWatcher(mods) {
+        private static void StartFileSystemWatcher(string mods)
+        {
+            var fileSystemWatcher = new FileSystemWatcher(mods)
+            {
                 IncludeSubdirectories = true,
             };
             fileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName;
@@ -357,11 +375,15 @@ namespace Modding
             fileSystemWatcher.EnableRaisingEvents = true;
         }
 
-        private static void HotUnloadModAssembly(string assemblyPath) {
+        private static void HotUnloadModAssembly(string assemblyPath)
+        {
             try {
-                if (ModInstancesByAssembly.TryGetValue(assemblyPath, out List<ModInstance> assemblyMods)) {
-                    foreach (ModInstance mod in assemblyMods) {
-                        if (mod.Mod is not ITogglableMod) {
+                if (ModInstancesByAssembly.TryGetValue(assemblyPath, out List<ModInstance> assemblyMods))
+                {
+                    foreach (ModInstance mod in assemblyMods)
+                    {
+                        if (mod.Mod is not ITogglableMod)
+                        {
                             Logger.APILogger.LogError("Hot reloaded mod contains non-togglable mods");
                             return;
                         }
@@ -374,35 +396,42 @@ namespace Modding
                 } else {
                     Logger.APILogger.LogWarn($"No mods loaded for changed assembly '{assemblyPath}'");
                 }
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 Logger.APILogger.LogError($"Error trying to unload mods in {assemblyPath}:\n{e}");
             }
         }
 
-        private static void HotLoadModAssembly(string assemblyPath) {
-            if (ModInstancesByAssembly.TryGetValue(assemblyPath, out _)) {
+        private static void HotLoadModAssembly(string assemblyPath)
+        {
+            if (ModInstancesByAssembly.TryGetValue(assemblyPath, out _))
+            {
                 Logger.APILogger.LogError($"Did not hot reload mods because they old ones were still loaded {assemblyPath}");
                 return;
             }
             
             try {
                 // Renames sometimes emit [Changed, Created, Deleted]
-                if (!File.Exists(assemblyPath)) {
+                if (!File.Exists(assemblyPath))
+                {
                     return;
                 }
                 var assembly = LoadHotReloadDll(assemblyPath);
                 List<ModInstance> newAssemblyMods = InstantiateMods(assembly);
                 ModInstancesByAssembly[assemblyPath] = newAssemblyMods;
-                foreach (var mod in newAssemblyMods) {
+                foreach (var mod in newAssemblyMods)
+                {
                     LoadMod(mod, preloadedObjects: null); // TODO preloadedObjects
                 }
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 Logger.APILogger.LogError($"Error trying to load mods in {assemblyPath}:\n{e}");
             }
         }
             
 
-        private static List<(string, Assembly)> GetHotReloadModAssemblies(string hotReloadMods) {
+        private static List<(string, Assembly)> GetHotReloadModAssemblies(string hotReloadMods)
+        {
             string[] files = Directory.GetDirectories(hotReloadMods)
                                       .Except([Path.Combine(hotReloadMods, "Disabled")])
                                       .SelectMany(d => Directory.GetFiles(d, "*.dll"))
@@ -410,22 +439,26 @@ namespace Modding
             Logger.APILogger.LogDebug("Hot reload: " + string.Join(",\n", files));
 
             List<(string, Assembly)> asms = new();
-            foreach (string path in files) {
+            foreach (string path in files)
+            {
                 asms.Add((path, Assembly.LoadFrom(path)));
             }
 
             return asms;
         }
 
-        public class MemorySymbolWriterProvider : ISymbolWriterProvider {
+        public class MemorySymbolWriterProvider : ISymbolWriterProvider
+        {
             public MemoryStream stream = new();
-            public ISymbolWriter GetSymbolWriter(ModuleDefinition module, string fileName) {
+            public ISymbolWriter GetSymbolWriter(ModuleDefinition module, string fileName)
+            {
                 return module.SymbolReader.GetWriterProvider().GetSymbolWriter(module, stream);
             }
             public ISymbolWriter GetSymbolWriter(ModuleDefinition module, Stream symbolStream) => throw new NotImplementedException();
         }
 
-        private static Assembly LoadHotReloadDll(string path) {
+        private static Assembly LoadHotReloadDll(string path)
+        {
             using var dll = AssemblyDefinition.ReadAssembly(path, new ReaderParameters {
                 AssemblyResolver = hotReloadAssemblyResolver,
                 ReadSymbols = true,
