@@ -324,6 +324,8 @@ namespace Modding
 
             return asms;
         }
+
+        #region Hot Reloading
         
         private static ConcurrentQueue<FileSystemEventArgs> hotReloadEvents = new();
 
@@ -474,7 +476,8 @@ namespace Modding
             byte[] symbols = symbolWriter.stream.ToArray();
             return Assembly.Load(ms.ToArray(), symbols);
         }
-
+        
+        #endregion
 
         private static void GetPreloads
         (
