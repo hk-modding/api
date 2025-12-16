@@ -668,7 +668,7 @@ namespace Modding.Patches
                     if (this.cState.wallSliding)
                     {
                         this.cState.wallSliding = false;
-                        this.vibrationCtrl.StopWallSlide();
+                        ReflectionHelper.GetField<HeroController, HeroVibrationController>("vibrationCtrl").StopWallSlide();
                     }
 
                     if (this.cState.touchingWall)
