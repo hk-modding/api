@@ -528,6 +528,7 @@ namespace Modding.Patches
         [MonoModIgnore]
         public event HeroController.TakeDamageEvent OnTakenDamage;
 
+        // todo: fixme: this had changes in the method, check if more shit changed
         [MonoModReplace]
         public void TakeDamage(GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
         {
@@ -667,7 +668,7 @@ namespace Modding.Patches
                     if (this.cState.wallSliding)
                     {
                         this.cState.wallSliding = false;
-                        this.wallSlideVibrationPlayer.Stop();
+                        this.vibrationCtrl.StopWallSlide();
                     }
 
                     if (this.cState.touchingWall)

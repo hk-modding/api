@@ -8,6 +8,7 @@ using MonoMod;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Encryption = TeamCherry.SharedUtils.Encryption;
 
 // ReSharper disable all
 #pragma warning disable 1591, 649, 414, 169, CS0108, CS0626
