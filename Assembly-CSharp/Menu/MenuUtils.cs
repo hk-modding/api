@@ -8,7 +8,7 @@ using Modding.Menu.Config;
 using UnityEngine;
 using UnityEngine.UI;
 using Patch = Modding.Patches;
-using Lang = TeamCherry.Localization.Language;
+using Lang = Language.Language;
 
 
 namespace Modding.Menu

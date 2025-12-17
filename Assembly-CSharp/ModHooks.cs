@@ -225,9 +225,7 @@ namespace Modding
         /// <remarks>N/A</remarks>
         internal static string LanguageGet(string key, string sheet)
         {
-            // todo: fixme: yea i think you know what would need fixing
-            // string res = Patches.Language.GetInternal(key, sheet);
-            string res = TeamCherry.Localization.Language.Get(key, sheet);
+            string res = Language.Language.GetInternal(key, sheet);
 
             if (LanguageGetHook == null)
                 return res;

@@ -10,7 +10,6 @@ using UnityEngine.SceneManagement;
 using MonoMod.Utils;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using Language = TeamCherry.Localization;
 
 // ReSharper disable file UnusedMember.Global
 
