@@ -197,9 +197,7 @@ namespace Modding.Patches
                             text = JsonUtility.ToJson(obj);
                         }
 
-                        bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
-
-                        if (flag)
+                        if (this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected)
                         {
                             string graph = Encryption.Encrypt(text);
                             BinaryFormatter binaryFormatter = new BinaryFormatter();
@@ -579,12 +577,12 @@ namespace Modding.Patches
             AsyncOperation loadop = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(destScene, LoadSceneMode.Additive);
             loadop.allowSceneActivation = true;
             yield return loadop;
-            yield return UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(exitingScene);
+            UnityEngine.SceneManagement.SceneManager.UnloadScene(exitingScene);
             ModHooks.OnSceneChanged(destScene);
             this.RefreshTilemapInfo(destScene);
             if (this.IsUnloadAssetsRequired(exitingScene, destScene))
             {
-                Debug.LogFormat(this, "Unloading assets due to zone transition", new object[0]);
+                Debug.LogFormat(this, "Unloading assets due to zone transition", Array.Empty<object>());
                 yield return Resources.UnloadUnusedAssets();
             }
 
@@ -629,48 +627,46 @@ namespace Modding.Patches
         [MonoModIgnore]
         public extern void SetTimeScale(float timescale);
 
+        [MonoModIgnore]
+        private extern void SetPausedState(bool value);
+
         // code has been copied from PauseGameToggle
         public IEnumerator PauseToggleDynamicMenu(MenuScreen screen, bool allowUnpause = false)
         {
-            if (!this.TimeSlowed)
+            if (this.TimeSlowed)
             {
-                if (!this.playerData.GetBool(nameof(PlayerData.disablePause)) && this.gameState == GlobalEnums.GameState.PLAYING)
+                yield break;
+            }
+            if (!this.playerData.GetBool(nameof(PlayerData.disablePause)) && this.gameState == GlobalEnums.GameState.PLAYING)
+            {
+                this.isPaused = true;
+                this.ui.SetState(GlobalEnums.UIState.PAUSED);
+                this.SetPausedState(true);
+                this.SetState(GlobalEnums.GameState.PAUSED);
+                if (HeroController.instance != null)
                 {
-                    this.gameCams.StopCameraShake();
-                    this.inputHandler.PreventPause();
-                    this.inputHandler.StopUIInput();
-                    this.actorSnapshotPaused.TransitionTo(0f);
-                    this.isPaused = true;
-                    this.SetState(GlobalEnums.GameState.PAUSED);
-                    this.ui.AudioGoToPauseMenu(0.2f);
-                    this.ui.UIPauseToDynamicMenu(screen);
-                    if (HeroController.instance != null)
-                    {
-                        HeroController.instance.Pause();
-                    }
-                    this.gameCams.MoveMenuToHUDCamera();
-                    this.SetTimeScale(0f);
-                    yield return new WaitForSecondsRealtime(0.8f);
-                    this.inputHandler.AllowPause();
+                    HeroController.instance.Pause();
                 }
-                else if (allowUnpause && this.gameState == GlobalEnums.GameState.PAUSED)
+                this.gameCams.MoveMenuToHUDCamera();
+                this.inputHandler.PreventPause();
+                this.inputHandler.StopUIInput();
+                yield return new WaitForSecondsRealtime(0.3f);
+                this.inputHandler.AllowPause();
+            }
+            else if (allowUnpause && this.gameState == GlobalEnums.GameState.PAUSED)
+            {
+                this.isPaused = false;
+                this.inputHandler.PreventPause();
+                this.ui.SetState(GlobalEnums.UIState.PLAYING);
+                this.SetPausedState(false);
+                this.SetState(GlobalEnums.GameState.PLAYING);
+                if (HeroController.instance != null)
                 {
-                    this.gameCams.ResumeCameraShake();
-                    this.inputHandler.PreventPause();
-                    this.actorSnapshotUnpaused.TransitionTo(0f);
-                    this.isPaused = false;
-                    this.ui.AudioGoToGameplay(0.2f);
-                    this.ui.SetState( GlobalEnums.UIState.PLAYING);
-                    this.SetState( GlobalEnums.GameState.PLAYING);
-                    if (HeroController.instance != null)
-                    {
-                        HeroController.instance.UnPause();
-                    }
-                    MenuButtonList.ClearAllLastSelected();
-                    this.SetTimeScale(1f);
-                    yield return new WaitForSecondsRealtime(0.8f);
-                    this.inputHandler.AllowPause();
+                    HeroController.instance.UnPause();
                 }
+                MenuButtonList.ClearAllLastSelected();
+                yield return new WaitForSecondsRealtime(0.3f);
+                this.inputHandler.AllowPause();
             }
             yield break;
         }
