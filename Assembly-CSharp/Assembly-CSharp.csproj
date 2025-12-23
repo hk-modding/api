@@ -10,6 +10,7 @@
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <RestorePackagesPath>packages</RestorePackagesPath>
         <LangVersion>latest</LangVersion>
+        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,7 +18,6 @@
 
         <BuildDir Include="$(TargetDir)" />
         
-        <Dependencies Include="$(TargetDir)Newtonsoft.Json.dll" />
         <Dependencies Include="$(TargetDir)MMHOOK_Assembly-CSharp.dll" />
         <Dependencies Include="$(TargetDir)MMHOOK_PlayMaker.dll" />
         <Dependencies Include="$(TargetDir)MonoMod.Utils.dll" />
@@ -72,10 +72,8 @@
         <!-- Make the output directory -->
         <MakeDir Directories="$(OutputDir)/" />
 
-        <!-- Copy the API, the documentation, the overridden mscorlib, and the README. -->
+        <!-- Copy the API, the documentation, and the README. -->
         <Copy SourceFiles="../README.ModdingApi.md" DestinationFiles="$(OutputDir)/README.md" />
-        <Copy SourceFiles="../override/mscorlib.dll" DestinationFiles="$(OutputDir)/mscorlib.dll" />
-        <Copy SourceFiles="../override/mscorlib.xml" DestinationFiles="$(OutputDir)/mscorlib.xml" />
         <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(OutputDir)/Assembly-CSharp.dll" />
         <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(OutputDir)/Assembly-CSharp.xml" />
         
@@ -141,25 +139,16 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-            <HintPath>../Vanilla/Assembly-CSharp.dll</HintPath>
-            <SpecificVersion>False</SpecificVersion>
-        </Reference>
-        <Reference Include="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <HintPath>..\override\mscorlib.dll</HintPath>
-        </Reference>
-        <Reference Include="netstandard, Version=2.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
-          <HintPath>../Vanilla/netstandard.dll</HintPath>
-        </Reference>
-        <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>../JsonNet/Newtonsoft.Json.dll</HintPath>
-        </Reference>
-        <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-            <HintPath>../Vanilla/PlayMaker.dll</HintPath>
-            <SpecificVersion>False</SpecificVersion>
-        </Reference>
+        <Reference Include="../Vanilla/Assembly-CSharp.dll"/>
+        <Reference Include="../Vanilla/mscorlib.dll"/>
+        <!--<Reference Include="../override/mscorlib.dll"/>-->
+        <Reference Include="../Vanilla/netstandard.dll"/>
+        <Reference Include="../Vanilla/Newtonsoft.Json.dll"/>
+        <Reference Include="../Vanilla/PlayMaker.dll"/>
         <Reference Include="../Vanilla/UnityEngine.dll"/>
         <Reference Include="../Vanilla/UnityEngine.*.dll"/>
         <Reference Include="../Vanilla/TeamCherry.*.dll"/>
+        <Reference Include="../Vanilla/System.dll"/>
+        <Reference Include="../Vanilla/System.*.dll"/>
     </ItemGroup>
 </Project>
