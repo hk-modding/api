@@ -11,7 +11,6 @@ namespace Modding.Patches
         [MonoModReplace]
         public override void OnEnter()
         {
-            base.OnEnter();
             HitInstance hit = new HitInstance
             {
                 Source = base.Owner,
