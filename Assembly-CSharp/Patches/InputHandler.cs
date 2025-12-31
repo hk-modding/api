@@ -21,9 +21,6 @@ namespace Modding.Patches
         [MonoModIgnore]
         private GameManager gm;
 
-        [MonoModIgnore]
-        private extern void SetCursorVisible(bool value);
-
         // Reverted cursor behavior
         [MonoModReplace]
         private void OnGUI()
