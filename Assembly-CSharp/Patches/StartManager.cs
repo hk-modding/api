@@ -15,15 +15,16 @@ namespace Modding.Patches
     [MonoModPatch("global::StartManager")]
     public class StartManager : global::StartManager
     {
+        private bool startedPreloading = false;
+
         private extern void orig_Awake();
 
         private void Awake()
         {
-            orig_Awake();
-
             if (ModLoader.LoadState == ModLoader.ModLoadState.NotStarted)
             {
                 Logger.APILogger.Log("Main menu loading");
+                startedPreloading = true;
                 ModLoader.LoadState = ModLoader.ModLoadState.Started;
 
                 GameObject obj = new GameObject();
@@ -40,6 +41,8 @@ namespace Modding.Patches
                 // Debug log because this is the expected code path
                 Logger.APILogger.LogDebug($"StartManager: Already begun mod loading (state {ModLoader.LoadState})");
             }
+
+            orig_Awake();
         }
 
         [MonoModIgnore]
@@ -60,11 +63,17 @@ namespace Modding.Patches
         [MonoModIgnore]
         private extern IEnumerator LanguageSettingDone();
 
+        [MonoModReplace]
         private IEnumerator Start()
         {
             this.controllerImage.sprite = this.GetControllerSpriteForPlatform(this.platform);
-            AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Menu_Title");
-            loadOperation.allowSceneActivation = false;
+
+            AsyncOperation loadOperation = null;
+            if (!startedPreloading)
+            {
+                loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Menu_Title");
+                loadOperation.allowSceneActivation = false;
+            }
             Platform.Current.SetSceneLoadState(true, false);
             bool showLanguageSelect = !this.CheckIsLanguageSet();
             if (showLanguageSelect && Platform.Current.ShowLanguageSelect)
@@ -135,8 +144,11 @@ namespace Modding.Patches
                 Debug.LogFormat("Finished waiting for PlayerPrefs load.", Array.Empty<object>());
             }
             Platform.Current.SetSceneLoadState(true, true);
-            loadOperation.allowSceneActivation = true;
-            yield return loadOperation;
+            if (!startedPreloading)
+            {
+                loadOperation.allowSceneActivation = true;
+                yield return loadOperation;
+            }
             yield break;
         }
     }
