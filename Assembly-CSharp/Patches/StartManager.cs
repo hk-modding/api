@@ -16,6 +16,7 @@ namespace Modding.Patches
     public class StartManager : global::StartManager
     {
         private bool startedPreloading = false;
+        private MonoBehaviour modLoaderObj = null;
 
         private extern void orig_Awake();
 
@@ -34,7 +35,7 @@ namespace Modding.Patches
                 new Thread(ReflectionHelper.PreloadCommonTypes).Start();
 
                 // NonBouncer does absolutely nothing, which makes it a good dummy to run the loader
-                obj.AddComponent<NonBouncer>().StartCoroutine(ModLoader.LoadModsInit(obj));
+                modLoaderObj = obj.AddComponent<NonBouncer>();
             }
             else
             {
@@ -148,6 +149,10 @@ namespace Modding.Patches
             {
                 loadOperation.allowSceneActivation = true;
                 yield return loadOperation;
+            }
+            else
+            {
+                modLoaderObj.StartCoroutine(ModLoader.LoadModsInit(modLoaderObj.gameObject));
             }
             yield break;
         }
