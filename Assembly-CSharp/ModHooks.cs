@@ -61,10 +61,10 @@ namespace Modding
             {
                 string[] versionNums = Constants.GAME_VERSION.Split('.');
 
-                gameVersion.major = Convert.ToInt32(versionNums[0]);
-                gameVersion.minor = Convert.ToInt32(versionNums[1]);
-                gameVersion.revision = Convert.ToInt32(versionNums[2]);
-                gameVersion.package = Convert.ToInt32(versionNums[3]);
+                gameVersion.major = versionNums.Length > 0 ? Convert.ToInt32(versionNums[0]) : 0;
+                gameVersion.minor = versionNums.Length > 1 ? Convert.ToInt32(versionNums[1]) : 0;
+                gameVersion.revision = versionNums.Length > 2 ? Convert.ToInt32(versionNums[2]) : 0;
+                gameVersion.package = versionNums.Length > 3 ? Convert.ToInt32(versionNums[3]) : 0;
             }
             catch (Exception e)
             {
@@ -225,7 +225,7 @@ namespace Modding
         /// <remarks>N/A</remarks>
         internal static string LanguageGet(string key, string sheet)
         {
-            string res = Patches.Language.GetInternal(key, sheet);
+            string res = Language.Language.GetInternal(key, sheet);
 
             if (LanguageGetHook == null)
                 return res;

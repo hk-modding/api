@@ -218,17 +218,16 @@ namespace Modding.Patches
         [MonoModReplace]
         public void SoulGain()
         {
-            int mpcharge = this.playerData.GetInt("MPCharge");
             int num;
-            if (mpcharge < this.playerData.GetInt("maxMP"))
+            if (this.playerData.GetInt(nameof(PlayerData.MPCharge)) < this.playerData.GetInt(nameof(PlayerData.maxMP)))
             {
                 num = 11;
-                if (this.playerData.GetBool("equippedCharm_20"))
+                if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_20)))
                 {
                     num += 3;
                 }
 
-                if (this.playerData.GetBool("equippedCharm_21"))
+                if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_21)))
                 {
                     num += 8;
                 }
@@ -236,22 +235,22 @@ namespace Modding.Patches
             else
             {
                 num = 6;
-                if (this.playerData.GetBool("equippedCharm_20"))
+                if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_20)))
                 {
                     num += 2;
                 }
 
-                if (this.playerData.GetBool("equippedCharm_21"))
+                if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_21)))
                 {
                     num += 6;
                 }
             }
 
-            int mpreserve = this.playerData.GetInt("MPReserve");
+            int mpreserve = this.playerData.GetInt(nameof(PlayerData.MPReserve));
             num = Modding.ModHooks.OnSoulGain(num);
             this.playerData.AddMPCharge(num);
             GameCameras.instance.soulOrbFSM.SendEvent("MP GAIN");
-            if (this.playerData.GetInt("MPReserve") != mpreserve)
+            if (this.playerData.GetInt(nameof(PlayerData.MPReserve)) != mpreserve)
             {
                 this.gm.soulVessel_fsm.SendEvent("MP RESERVE UP");
             }
@@ -446,8 +445,7 @@ namespace Modding.Patches
                     && this.dashQueueSteps <= this.DASH_QUEUE_STEPS
                     && this.CanDash()
                     && this.dashQueuing
-                    && !ModHooks.OnDashPressed()
-                    && this.CanDash())
+                    && !ModHooks.OnDashPressed())
                 {
                     this.HeroDash();
                 }
@@ -499,6 +497,9 @@ namespace Modding.Patches
         [MonoModIgnore]
         public event HeroController.TakeDamageEvent OnTakenDamage;
 
+        [MonoModIgnore]
+        private HeroVibrationController vibrationCtrl;
+
         [MonoModReplace]
         public void TakeDamage(GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
         {
@@ -545,7 +546,7 @@ namespace Modding.Patches
                         mixer.StopAllEmissionsWithTag("heroAction");
                     }
 
-                    bool flag = false;
+                    bool carefreeShouldStopDamage = false;
                     if (this.carefreeShieldEquipped && hazardType == 1)
                     {
                         if (this.hitsSinceShielded > 7)
@@ -558,58 +559,58 @@ namespace Modding.Patches
                             case 1:
                                 if ((float) UnityEngine.Random.Range(1, 100) <= 10f)
                                 {
-                                    flag = true;
+                                    carefreeShouldStopDamage = true;
                                 }
 
                                 break;
                             case 2:
                                 if ((float) UnityEngine.Random.Range(1, 100) <= 20f)
                                 {
-                                    flag = true;
+                                    carefreeShouldStopDamage = true;
                                 }
 
                                 break;
                             case 3:
                                 if ((float) UnityEngine.Random.Range(1, 100) <= 30f)
                                 {
-                                    flag = true;
+                                    carefreeShouldStopDamage = true;
                                 }
 
                                 break;
                             case 4:
                                 if ((float) UnityEngine.Random.Range(1, 100) <= 50f)
                                 {
-                                    flag = true;
+                                    carefreeShouldStopDamage = true;
                                 }
 
                                 break;
                             case 5:
                                 if ((float) UnityEngine.Random.Range(1, 100) <= 70f)
                                 {
-                                    flag = true;
+                                    carefreeShouldStopDamage = true;
                                 }
 
                                 break;
                             case 6:
                                 if ((float) UnityEngine.Random.Range(1, 100) <= 80f)
                                 {
-                                    flag = true;
+                                    carefreeShouldStopDamage = true;
                                 }
 
                                 break;
                             case 7:
                                 if ((float) UnityEngine.Random.Range(1, 100) <= 90f)
                                 {
-                                    flag = true;
+                                    carefreeShouldStopDamage = true;
                                 }
 
                                 break;
                             default:
-                                flag = false;
+                                carefreeShouldStopDamage = false;
                                 break;
                         }
 
-                        if (flag)
+                        if (carefreeShouldStopDamage)
                         {
                             this.hitsSinceShielded = 0;
                             this.carefreeShield.SetActive(true);
@@ -622,7 +623,7 @@ namespace Modding.Patches
                         }
                     }
 
-                    if (this.playerData.GetBool("equippedCharm_5") && this.playerData.GetInt("blockerHits") > 0 && hazardType == 1 && this.cState.focusing && !flag)
+                    if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_5)) && this.playerData.GetInt(nameof(PlayerData.blockerHits)) > 0 && hazardType == 1 && this.cState.focusing && !carefreeShouldStopDamage)
                     {
                         this.proxyFSM.SendEvent("HeroCtrl-TookBlockerHit");
                         this.audioSource.PlayOneShot(this.blockerImpact, 1f);
@@ -638,7 +639,7 @@ namespace Modding.Patches
                     if (this.cState.wallSliding)
                     {
                         this.cState.wallSliding = false;
-                        this.wallSlideVibrationPlayer.Stop();
+                        this.vibrationCtrl.StopWallSlide();
                     }
 
                     if (this.cState.touchingWall)
@@ -654,24 +655,24 @@ namespace Modding.Patches
                     if (this.cState.bouncing)
                     {
                         this.CancelBounce();
-                        this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
+                        this.rb2d.linearVelocity = new Vector2(this.rb2d.linearVelocity.x, 0f);
                     }
 
                     if (this.cState.shroomBouncing)
                     {
                         this.CancelBounce();
-                        this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
+                        this.rb2d.linearVelocity = new Vector2(this.rb2d.linearVelocity.x, 0f);
                     }
 
-                    if (!flag)
+                    if (!carefreeShouldStopDamage)
                     {
                         this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
                     }
 
                     damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
-                    if (!this.takeNoDamage && !this.playerData.GetBool("invinciTest"))
+                    if (!this.takeNoDamage && !this.playerData.GetBool(nameof(PlayerData.invinciTest)))
                     {
-                        if (this.playerData.GetBool("overcharmed"))
+                        if (this.playerData.GetBool(nameof(PlayerData.overcharmed)))
                         {
                             this.playerData.TakeHealth(damageAmount * 2);
                         }
@@ -681,9 +682,9 @@ namespace Modding.Patches
                         }
                     }
 
-                    if (this.playerData.GetBool("equippedCharm_3") && damageAmount > 0)
+                    if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_3)) && damageAmount > 0)
                     {
-                        if (this.playerData.GetBool("equippedCharm_35"))
+                        if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_35)))
                         {
                             this.AddMPCharge(this.GRUB_SOUL_MP_COMBO);
                         }
@@ -709,32 +710,35 @@ namespace Modding.Patches
                         this.OnTakenDamage();
                     }
 
-                    if (this.playerData.GetInt("health") == 0)
+                    if (this.playerData.GetInt(nameof(PlayerData.health)) == 0)
                     {
                         base.StartCoroutine(this.Die());
+                        return;
                     }
                     else if (hazardType == 2)
                     {
-                        base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, (!(go != null)) ? 0f : go.transform.rotation.z));
+                        base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, (go != null) ? go.transform.rotation.z : 0f));
+                        return;
                     }
                     else if (hazardType == 3)
                     {
                         base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
+                        return;
                     }
                     else if (hazardType == 4)
                     {
                         Debug.Log("Lava death");
+                        return;
                     }
                     else if (hazardType == 5)
                     {
                         base.StartCoroutine(this.DieFromHazard(HazardType.PIT, 0f));
+                        return;
                     }
-                    else
-                    {
-                        base.StartCoroutine(this.StartRecoil(damageSide, spawnDamageEffect, damageAmount));
-                    }
+                    base.StartCoroutine(this.StartRecoil(damageSide, spawnDamageEffect, damageAmount));
+                    return;
                 }
-                else if (this.cState.invulnerable && !this.cState.hazardDeath && !this.playerData.GetBool("isInvincible"))
+                else if (this.cState.invulnerable && !this.cState.hazardDeath && !this.playerData.GetBool(nameof(PlayerData.isInvincible)))
                 {
                     if (hazardType == 2)
                     {
@@ -745,29 +749,27 @@ namespace Modding.Patches
                         }
 
                         this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-                        if (this.playerData.GetInt("health") == 0)
+                        if (this.playerData.GetInt(nameof(PlayerData.health)) == 0)
                         {
                             base.StartCoroutine(this.Die());
+                            return;
                         }
-                        else
-                        {
-                            this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
-                            base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, (!(go != null)) ? 0f : go.transform.rotation.z));
-                        }
+                        this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT, false);
+                        base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, (go != null) ? go.transform.rotation.z : 0f));
+                        return;
                     }
                     else if (hazardType == 3)
                     {
                         damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
                         this.playerData.TakeHealth(damageAmount);
                         this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-                        if (this.playerData.GetInt("health") == 0)
+                        if (this.playerData.GetInt(nameof(PlayerData.health)) == 0)
                         {
                             base.StartCoroutine(this.Die());
+                            return;
                         }
-                        else
-                        {
-                            base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
-                        }
+                        base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
+                        return;
                     }
                     else if (hazardType == 4)
                     {
@@ -842,7 +844,7 @@ namespace Modding.Patches
                     origVector = new Vector2
                     (
                         velocity,
-                        (!this.cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY
+                        this.cState.onGround ? BUMP_VELOCITY : BUMP_VELOCITY_DASH
                     );
                 }
                 else
@@ -855,7 +857,7 @@ namespace Modding.Patches
                 origVector = new Vector2
                 (
                     -velocity,
-                    (!this.cState.onGround) ? BUMP_VELOCITY_DASH : BUMP_VELOCITY
+                    this.cState.onGround ? BUMP_VELOCITY : BUMP_VELOCITY_DASH
                 );
             }
             else
@@ -879,7 +881,7 @@ namespace Modding.Patches
             Vector2 vector = OrigDashVector();
             vector = ModHooks.DashVelocityChange(vector);
 
-            rb2d.velocity = vector;
+            rb2d.linearVelocity = vector;
             dash_timer += Time.deltaTime;
         }
 
