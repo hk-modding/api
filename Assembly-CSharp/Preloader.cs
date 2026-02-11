@@ -195,7 +195,10 @@ internal class Preloader : MonoBehaviour
                         }
                         else
                         {
-                            modScenePreloads.Add(path, go);
+                            var modGo = Instantiate(go);
+                            DontDestroyOnLoad(modGo);
+                            modGo.SetActive(false);
+                            modScenePreloads.Add(path, modGo);
                         }
                     };
                     queue.Add(request);
