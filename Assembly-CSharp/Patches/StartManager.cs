@@ -87,7 +87,7 @@ namespace Modding.Patches
 
                 yield return base.StartCoroutine(this.LanguageSettingDone());
             }
-            TeamCherry.Localization.LanguageCode currentLanguage = Language.Language.CurrentLanguage();
+            TeamCherry.Localization.LanguageCode currentLanguage = (TeamCherry.Localization.LanguageCode) Language.Language.CurrentLanguage();
             while (!Platform.Current.IsSharedDataMounted)
             {
                 yield return null;
