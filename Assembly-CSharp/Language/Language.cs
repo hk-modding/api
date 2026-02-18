@@ -4,7 +4,6 @@ using System.Reflection;
 using UObject = UnityEngine.Object;
 using USystemLanguage = UnityEngine.SystemLanguage;
 
-
 namespace Language;
 
 // for backwards compatibility
