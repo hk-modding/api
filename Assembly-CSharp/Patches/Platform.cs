@@ -1,4 +1,5 @@
-﻿using MonoMod;
+﻿using System;
+using MonoMod;
 
 // ReSharper disable all
 #pragma warning disable 1591, 108, 114
@@ -8,6 +9,12 @@ namespace Modding.Patches
     [MonoModPatch("global::Platform")]
     public abstract class Platform : global::Platform
     {
+        [Obsolete("Please update your mod to the new HK version and use `RoamingSharedData` instead")]
+        public ISharedData EncryptedSharedData
+        {
+            get { return RoamingSharedData; }
+        }
+
         public static bool IsSaveSlotIndexValid(int slotIndex) => true;
 
         // ReSharper disable once UnusedMember.Global
