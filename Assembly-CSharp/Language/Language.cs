@@ -24,7 +24,7 @@ public static class Language
     public static bool HasSheet(string sheet) => COMPAT_HasSheet(sheet);
     public static LanguageCode LanguageNameToCode(USystemLanguage name) => (LanguageCode) COMPAT_LanguageNameToCode(name);
     public static string GetInternal(string key, string sheetTitle) => COMPAT_Get(key, sheetTitle);
-    [MonoMod.MonoModLinkFrom("TeamCherry.Localization.Language", "System.String Get(System.String,System.String)")]
+    [MonoMod.MonoModLinkFrom("System.String TeamCherry.Localization.Language::Get(System.String,System.String)")]
     public static string Get(string key, string sheetTitle) => Modding.ModHooks.LanguageGet(key, sheetTitle);
 
     // Keep these below the `[MonoMod.MonoModLinkFrom("TeamCherry.Localization.Language")]`, as the reverse order would cause a cyclic loop of methods calling themselves
