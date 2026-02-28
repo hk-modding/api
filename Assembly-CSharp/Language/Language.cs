@@ -27,6 +27,10 @@ public static class Language
     [MonoMod.MonoModLinkFrom("System.String TeamCherry.Localization.Language::Get(System.String,System.String)")]
     public static string Get(string key, string sheetTitle) => Modding.ModHooks.LanguageGet(key, sheetTitle);
 
+    private static void DoSwitch(LanguageCode newLang) => COMPAT_DoSwitch((TeamCherry.Localization.LanguageCode) newLang);
+    private static bool HasLanguageFile(string lang, string sheetTitle) => COMPAT_HasLanguageFile(lang, sheetTitle);
+    private static string GetLanguageFileContents(string sheetTitle) => COMPAT_GetLanguageFileContents(sheetTitle);
+
     // Keep these below the `[MonoMod.MonoModLinkFrom("TeamCherry.Localization.Language")]`, as the reverse order would cause a cyclic loop of methods calling themselves
     // thanks to MonoMod resolving these links top-down
     // which would make a `LinkTo(TCLL)->LinkFrom(TCLL)` into a fully recursive function ⟳
@@ -75,4 +79,13 @@ public static class Language
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "TeamCherry.Localization.LanguageCode LanguageNameToCode(UnityEngine.SystemLanguage)")]
     [MonoMod.MonoModRemove]
     private static extern TeamCherry.Localization.LanguageCode COMPAT_LanguageNameToCode(USystemLanguage name);
+    [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Void DoSwitch(TeamCherry.Localization.LanguageCode)")]
+    [MonoMod.MonoModRemove]
+    private static extern TeamCherry.Localization.LanguageCode COMPAT_DoSwitch(TeamCherry.Localization.LanguageCode name);
+    [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Boolean HasLanguageFile(System.String,System.String)")]
+    [MonoMod.MonoModRemove]
+    private static extern bool COMPAT_HasLanguageFile(string lang, string sheetTitle);
+    [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.String GetLanguageFileContents(System.String)")]
+    [MonoMod.MonoModRemove]
+    private static extern string COMPAT_GetLanguageFileContents(string sheetTitle);
 }
