@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-// for backwards compatibility
+// for backwards compatibility, done by hand in PostPatcher
 [assembly:TypeForwardedTo(typeof(tk2dAnimatedSprite))]
 [assembly:TypeForwardedTo(typeof(tk2dAssetPlatform))]
 [assembly:TypeForwardedTo(typeof(tk2dBaseSprite))]
