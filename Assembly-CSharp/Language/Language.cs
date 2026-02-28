@@ -7,14 +7,13 @@ using USystemLanguage = UnityEngine.SystemLanguage;
 namespace Language;
 
 // for backwards compatibility
-[MonoMod.MonoModLinkFrom("TeamCherry.Localization.Language")]
 public static class Language
 {
     public static void LoadLanguage() => COMPAT_LoadLanguage();
     public static void LoadAvailableLanguages() => COMPAT_LoadAvailableLanguages();
     public static string[] GetLanguages() => COMPAT_GetLanguages();
     public static bool SwitchLanguage(string langCode) => COMPAT_SwitchLanguage(langCode);
-    public static bool SwitchLanguage(TeamCherry.Localization.LanguageCode code) => COMPAT_SwitchLanguage(code);
+    public static bool SwitchLanguage(LanguageCode code) => COMPAT_SwitchLanguage((TeamCherry.Localization.LanguageCode) code);
     public static UObject GetAsset(string name) => COMPAT_GetAsset(name);
     public static LanguageCode CurrentLanguage() => (LanguageCode) COMPAT_CurrentLanguage();
     public static string Get(string key) => COMPAT_Get(key);
@@ -25,6 +24,7 @@ public static class Language
     public static bool HasSheet(string sheet) => COMPAT_HasSheet(sheet);
     public static LanguageCode LanguageNameToCode(USystemLanguage name) => (LanguageCode) COMPAT_LanguageNameToCode(name);
     public static string GetInternal(string key, string sheetTitle) => COMPAT_Get(key, sheetTitle);
+    [MonoMod.MonoModLinkFrom("TeamCherry.Localization.Language", "System.String Get(System.String,System.String)")]
     public static string Get(string key, string sheetTitle) => Modding.ModHooks.LanguageGet(key, sheetTitle);
 
     // Keep these below the `[MonoMod.MonoModLinkFrom("TeamCherry.Localization.Language")]`, as the reverse order would cause a cyclic loop of methods calling themselves
