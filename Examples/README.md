@@ -1,7 +1,7 @@
 # Examples
 This directory contains many example mods to show the common uses of the modding api.
 These mods are intended to give beginners a look at how to start to develop mods using this api,
-although proficient knowlege of C# is fairly required.  
+although proficient knowledge of C# is fairly required.  
 
 ## Setup
 These projects can be built without any additional configuration.
