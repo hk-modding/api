@@ -10,7 +10,7 @@ namespace Modding.Patches
     public class HasComponent : global::HutongGames.PlayMaker.Actions.HasComponent
     {
         [MonoModIgnore]
-        [Attributes.RemoveMethodCall
+        [Attributes.RemoveMethodCallAttribute
             (
                 "HutongGames.PlayMaker.ReflectionUtils",
                 "GetGlobalType"
