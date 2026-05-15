@@ -1,5 +1,4 @@
-﻿using Mono.Cecil;
-using Mono.Cecil.Cil;
+﻿using Mono.Cecil.Cil;
 using MonoMod;
 using MonoMod.Cil;
 
@@ -13,27 +12,19 @@ namespace Modding.Patches
     public class EnemyDeathEffects : global::EnemyDeathEffects
     {
         [MonoModIgnore]
-        [Attributes.RawIlPatch
-        (
-            $"Modding.Patches.{nameof(EnemyDeathEffectsIlPatches)}, Assembly-CSharp.mm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
-            nameof(EnemyDeathEffectsIlPatches.RecieveDeathEvent_IL)
-        )]
-        public extern void RecieveDeathEvent(float? attackDirection, bool resetDeathEvent = false, bool spellBurn = false, bool isWatery = false);
+        [Attributes.RawIlPatch(nameof(IlPatches.RecieveDeathEvent))]
+        extern public void RecieveDeathEvent(float? attackDirection, bool resetDeathEvent = false, bool spellBurn = false, bool isWatery = false);
 
         [MonoModIgnore]
-        [Attributes.RawIlPatch
-        (
-            $"Modding.Patches.{nameof(EnemyDeathEffectsIlPatches)}, Assembly-CSharp.mm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
-            nameof(EnemyDeathEffectsIlPatches.RecordKillForJournal_IL)
-        )]
-        private extern void RecordKillForJournal();
+        [Attributes.RawIlPatch(nameof(IlPatches.RecordKillForJournal))]
+        extern public static void RecordKillForJournal(string playerDataName);
     }
 
     [MonoModIgnore]
-    public static class EnemyDeathEffectsIlPatches
+    public static partial class IlPatches
     {
         [MonoModIgnore]
-        public static void RecieveDeathEvent_IL(ILContext il)
+        public static void RecieveDeathEvent(ILContext il)
         {
             // add a `ModHooks.OnRecieveDeathEvent(this, didFire, ref attackDirection, ref resetDeathEvent, ref spellBurn, ref isWatery);` at the start of the method
             ILCursor cursor = new ILCursor(il);
@@ -48,11 +39,11 @@ namespace Modding.Patches
             cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[1]); // resetDeathEvent
             cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[2]); // spellBurn
             cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[3]); // isWatery
-            cursor.Emit(OpCodes.Call, ReflectionHelper.GetMethodInfo(typeof(ModHooks), "OnRecieveDeathEvent", false));
+            cursor.Emit(OpCodes.Call, ReflectionHelper.GetMethodInfo(typeof(global::Modding.ModHooks), "OnRecieveDeathEvent", false));
         }
 
         [MonoModIgnore]
-        public static void RecordKillForJournal_IL(ILContext il)
+        public static void RecordKillForJournal(ILContext il)
         {
             // add a `ModHooks.OnRecordKillForJournal(this, this.playerDataName, $"killed{this.playerDataName}", $"kills{this.playerDataName}", $"newData{this.playerDataName}");` at the start of the method
             ILCursor cursor = new ILCursor(il);
@@ -66,7 +57,7 @@ namespace Modding.Patches
             cursor.Emit(OpCodes.Ldloc_1);                                                                                         // killed text
             cursor.Emit(OpCodes.Ldloc_2);                                                                                         // kills text
             cursor.Emit(OpCodes.Ldloc_3);                                                                                         // newData text
-            cursor.Emit(OpCodes.Call, ReflectionHelper.GetMethodInfo(typeof(ModHooks), "OnRecordKillForJournal", false));
+            cursor.Emit(OpCodes.Call, ReflectionHelper.GetMethodInfo(typeof(global::Modding.ModHooks), "OnRecordKillForJournal", false));
         }
     }
 }

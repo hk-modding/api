@@ -36,56 +36,56 @@ public static class Language
     // which would make a `LinkTo(TCLL)->LinkFrom(TCLL)` into a fully recursive function ⟳
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Void LoadLanguage()")]
     [MonoMod.MonoModRemove]
-    private static extern void COMPAT_LoadLanguage();
+    extern private static void COMPAT_LoadLanguage();
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Void LoadAvailableLanguages()")]
     [MonoMod.MonoModRemove]
-    private static extern void COMPAT_LoadAvailableLanguages();
+    extern private static void COMPAT_LoadAvailableLanguages();
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.String[] GetLanguages()")]
     [MonoMod.MonoModRemove]
-    private static extern string[] COMPAT_GetLanguages();
+    extern private static string[] COMPAT_GetLanguages();
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Boolean SwitchLanguage(System.String)")]
     [MonoMod.MonoModRemove]
-    private static extern bool COMPAT_SwitchLanguage(string langCode);
+    extern private static bool COMPAT_SwitchLanguage(string langCode);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Boolean SwitchLanguage(TeamCherry.Localization.LanguageCode)")]
     [MonoMod.MonoModRemove]
-    private static extern bool COMPAT_SwitchLanguage(TeamCherry.Localization.LanguageCode code);
+    extern private static bool COMPAT_SwitchLanguage(TeamCherry.Localization.LanguageCode code);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "UnityEngine.Object GetAsset(System.String)")]
     [MonoMod.MonoModRemove]
-    private static extern UObject COMPAT_GetAsset(string name);
+    extern private static UObject COMPAT_GetAsset(string name);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "TeamCherry.Localization.LanguageCode CurrentLanguage()")]
     [MonoMod.MonoModRemove]
-    private static extern TeamCherry.Localization.LanguageCode COMPAT_CurrentLanguage();
+    extern private static TeamCherry.Localization.LanguageCode COMPAT_CurrentLanguage();
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.String Get(System.String)")]
     [MonoMod.MonoModRemove]
-    private static extern string COMPAT_Get(string key);
+    extern private static string COMPAT_Get(string key);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.String Get(System.String,System.String)")]
     [MonoMod.MonoModRemove]
-    private static extern string COMPAT_Get(string key, string sheetTitle);
+    extern private static string COMPAT_Get(string key, string sheetTitle);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Collections.Generic.IEnumerable`1<System.String> GetSheets()")]
     [MonoMod.MonoModRemove]
-    private static extern IEnumerable<string> COMPAT_GetSheets();
+    extern private static IEnumerable<string> COMPAT_GetSheets();
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Collections.Generic.IEnumerable`1<System.String> GetKeys(System.String)")]
     [MonoMod.MonoModRemove]
-    private static extern IEnumerable<string> COMPAT_GetKeys(string sheetTitle);
+    extern private static IEnumerable<string> COMPAT_GetKeys(string sheetTitle);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Boolean Has(System.String)")]
     [MonoMod.MonoModRemove]
-    private static extern bool COMPAT_Has(string key);
+    extern private static bool COMPAT_Has(string key);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Boolean Has(System.String,System.String)")]
     [MonoMod.MonoModRemove]
-    private static extern bool COMPAT_Has(string key, string sheet);
+    extern private static bool COMPAT_Has(string key, string sheet);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Boolean HasSheet(System.String)")]
     [MonoMod.MonoModRemove]
-    private static extern bool COMPAT_HasSheet(string sheet);
+    extern private static bool COMPAT_HasSheet(string sheet);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "TeamCherry.Localization.LanguageCode LanguageNameToCode(UnityEngine.SystemLanguage)")]
     [MonoMod.MonoModRemove]
-    private static extern TeamCherry.Localization.LanguageCode COMPAT_LanguageNameToCode(USystemLanguage name);
+    extern private static TeamCherry.Localization.LanguageCode COMPAT_LanguageNameToCode(USystemLanguage name);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Void DoSwitch(TeamCherry.Localization.LanguageCode)")]
     [MonoMod.MonoModRemove]
-    private static extern TeamCherry.Localization.LanguageCode COMPAT_DoSwitch(TeamCherry.Localization.LanguageCode name);
+    extern private static void COMPAT_DoSwitch(TeamCherry.Localization.LanguageCode name);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.Boolean HasLanguageFile(System.String,System.String)")]
     [MonoMod.MonoModRemove]
-    private static extern bool COMPAT_HasLanguageFile(string lang, string sheetTitle);
+    extern private static bool COMPAT_HasLanguageFile(string lang, string sheetTitle);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.String GetLanguageFileContents(System.String)")]
     [MonoMod.MonoModRemove]
-    private static extern string COMPAT_GetLanguageFileContents(string sheetTitle);
+    extern private static string COMPAT_GetLanguageFileContents(string sheetTitle);
 }
