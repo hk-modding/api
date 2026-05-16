@@ -12,15 +12,15 @@ namespace Modding.Patches.Attributes
     /// MonoMod attribute for patching a method directly with IL
     /// </summary>
     [UsedImplicitly]
-    [MonoModCustomAttribute("IEnumeratorIlPatch")]
-    public class IEnumeratorIlPatchAttribute : Attribute
+    [MonoModCustomAttribute("RawIlPatch")]
+    public class RawIlPatch : Attribute
     {
         /// <inheritdoc />
         /// <summary>
         /// Patches a method directly with IL
         /// </summary>
         /// <param name="patcherMethod">Method name that does the IL patch</param>
-        public IEnumeratorIlPatchAttribute(string patcherMethod) { }
+        public RawIlPatch(string patcherMethod) { }
     }
 }
 
@@ -34,12 +34,8 @@ namespace MonoMod
         /// <param name="method">Method to be patched</param>
         /// <param name="attrib">Attribute</param>
         [UsedImplicitly]
-        public static void IEnumeratorIlPatch(MethodDefinition method, CustomAttribute attrib)
+        public static void RawIlPatch(MethodDefinition method, CustomAttribute attrib)
         {
-            // var attr = method.GetCustomAttribute<IteratorStateMachineAttribute>();
-            // System.Console.WriteLine($"method.Attributes={method.Attributes}");
-            // System.Console.WriteLine($"method.HasCustomAttributes={method.HasCustomAttributes}");
-            // System.Console.WriteLine($"method.CustomAttributes={method.CustomAttributes}");
             var context = new ILContext(method);
 
             string patcherTypeName = $"Modding.Patches.{nameof(Modding.Patches.IlPatches)}, Assembly-CSharp.mm";

@@ -15,7 +15,7 @@ namespace Modding.Patches.Attributes
     /// </summary>
     [UsedImplicitly]
     [MonoModCustomAttribute("RemoveMethodCall")]
-    public class RemoveMethodCallAttribute : Attribute
+    public class RemoveMethodCall : Attribute
     {
         /// <inheritdoc />
         /// <summary>
@@ -23,7 +23,7 @@ namespace Modding.Patches.Attributes
         /// </summary>
         /// <param name="type">Type full name</param>
         /// <param name="method">Method name</param>
-        public RemoveMethodCallAttribute(string type, string method) {}
+        public RemoveMethodCall(string type, string method) {}
     }
 }
 
