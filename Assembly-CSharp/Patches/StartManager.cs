@@ -4,6 +4,7 @@ using System.Threading;
 using MonoMod;
 using UnityEngine;
 using UObject = UnityEngine.Object;
+using Lang = Language.Language;
 
 // ReSharper disable All
 #pragma warning disable 1591, CS0649
@@ -87,7 +88,7 @@ namespace Modding.Patches
 
                 yield return base.StartCoroutine(this.LanguageSettingDone());
             }
-            TeamCherry.Localization.LanguageCode currentLanguage = (TeamCherry.Localization.LanguageCode) Language.Language.CurrentLanguage();
+            TeamCherry.Localization.LanguageCode currentLanguage = (TeamCherry.Localization.LanguageCode) Lang.CurrentLanguage();
             while (!Platform.Current.IsSharedDataMounted)
             {
                 yield return null;
@@ -104,7 +105,7 @@ namespace Modding.Patches
             }
             if (flag)
             {
-                Language.Language.LoadLanguage();
+                Lang.LoadLanguage();
                 ChangeFontByLanguage[] array = UObject.FindObjectsByType<ChangeFontByLanguage>(FindObjectsSortMode.None);
                 for (int i = 0; i < array.Length; i++)
                 {

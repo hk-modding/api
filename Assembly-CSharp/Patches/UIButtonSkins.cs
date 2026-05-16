@@ -16,7 +16,8 @@ namespace Modding.Patches
         private extern ButtonSkin GetButtonSkinFor(string buttonName);
         [MonoModIgnore]
         private extern ButtonSkin orig_GetButtonSkinFor(InputControlType inputControlType);
-        
+
+        [MonoModIgnore]
         private InputHandler ih;
 
         public extern void orig_RefreshKeyMappings();

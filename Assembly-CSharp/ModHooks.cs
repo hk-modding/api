@@ -12,6 +12,7 @@ using UnityEngine;
 using System.Linq;
 using Modding.Delegates;
 using Object = UnityEngine.Object;
+using Lang = Language.Language;
 
 // ReSharper disable PossibleInvalidCastExceptionInForeachLoop
 // ReSharper disable SuggestVarOrType_SimpleTypes
@@ -225,7 +226,7 @@ namespace Modding
         /// <remarks>N/A</remarks>
         internal static string LanguageGet(string key, string sheet)
         {
-            string res = Language.Language.GetInternal(key, sheet);
+            string res = Lang.GetInternal(key, sheet);
 
             if (LanguageGetHook == null)
                 return res;

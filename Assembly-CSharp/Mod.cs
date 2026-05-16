@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using MonoMod.Utils;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Lang = Language.Language;
 
 // ReSharper disable file UnusedMember.Global
 
@@ -188,7 +189,7 @@ namespace Modding
         ///     change the text of the button to jump to this mod's menu.
         /// </summary>
         /// <returns></returns>
-        public virtual string GetMenuButtonText() => $"{GetName()} {Language.Language.Get("MAIN_OPTIONS", "MainMenu")}";
+        public virtual string GetMenuButtonText() => $"{GetName()} {Lang.Get("MAIN_OPTIONS", "MainMenu")}";
 
         private void HookSaveMethods()
         {

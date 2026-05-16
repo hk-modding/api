@@ -15,9 +15,11 @@ namespace Modding.Patches
             get { return RoamingSharedData; }
         }
 
+        [MonoModReplace]
         public static bool IsSaveSlotIndexValid(int slotIndex) => true;
 
         // ReSharper disable once UnusedMember.Global
+        [MonoModReplace]
         protected string GetSaveSlotFileName(int slotIndex, SaveSlotFileNameUsage usage)
         {
             string text = slotIndex == 0 ? "user.dat" : $"user{slotIndex}.dat";

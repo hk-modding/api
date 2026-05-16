@@ -70,7 +70,8 @@ namespace Modding.Patches
             NativeInput,
             XInput,
             MFi,
-            // peepoHappy
+
+            // Added for the dynamic menu API
             CustomSetting
         }
     }

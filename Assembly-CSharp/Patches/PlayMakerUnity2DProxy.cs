@@ -9,6 +9,7 @@ namespace Modding.Patches
     [MonoModPatch("global::PlayMakerUnity2DProxy")]
     public class PlayMakerUnity2DProxy : global::PlayMakerUnity2DProxy
     {
+        [MonoModReplace]
         public void Start()
         {
             if (!PlayMakerUnity2d.isAvailable())
