@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using Mono.Cecil;
@@ -36,11 +37,12 @@ namespace MonoMod
         [UsedImplicitly]
         public static void IEnumeratorIlPatch(MethodDefinition method, CustomAttribute attrib)
         {
-            // var attr = method.GetCustomAttribute<IteratorStateMachineAttribute>();
-            // System.Console.WriteLine($"method.Attributes={method.Attributes}");
-            // System.Console.WriteLine($"method.HasCustomAttributes={method.HasCustomAttributes}");
-            // System.Console.WriteLine($"method.CustomAttributes={method.CustomAttributes}");
-            var context = new ILContext(method);
+            CustomAttribute iteratorAttribute = method.CustomAttributes.First
+                (x => x.AttributeType.FullName == "System.Runtime.CompilerServices.IteratorStateMachineAttribute");
+            TypeReference stateMachineTypeRef = (TypeReference)iteratorAttribute.ConstructorArguments[0].Value;
+            TypeDefinition stateMachineTypeDef = stateMachineTypeRef.Resolve();
+            MethodDefinition stateMachineMoveNext = stateMachineTypeDef.Methods.First(m => m.Name == "MoveNext");
+            var context = new ILContext(stateMachineMoveNext);
 
             string patcherTypeName = $"Modding.Patches.{nameof(Modding.Patches.IlPatches)}, Assembly-CSharp.mm";
             string patcherMethodName = (string)attrib.ConstructorArguments[0].Value;
@@ -55,7 +57,7 @@ namespace MonoMod
             if (patcherMethod is null)
                 throw new InvalidOperationException("Couldn't find patcher method!");
 
-            patcherMethod.Invoke(null, new[] { context });
+            patcherMethod.Invoke(null, [context, stateMachineTypeDef]);
         }
     }
 }

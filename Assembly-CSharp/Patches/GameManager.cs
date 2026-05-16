@@ -1,10 +1,14 @@
+using Mono.Cecil.Cil;
+using MonoMod;
+using MonoMod.Cil;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using MonoMod;
+using Mono.Cecil;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,55 +22,54 @@ namespace Modding.Patches
     [MonoModPatch("global::GameManager")]
     public class GameManager : global::GameManager
     {
-        public extern void orig_OnApplicationQuit();
+        private static string ModdedSavePath(int slot) => Path.Combine(
+            Application.persistentDataPath,
+            $"user{slot}.modded.json"
+        );
 
-        public void OnApplicationQuit()
+        private UIManager _uiInstance;
+
+        public UIManager ui
         {
-            orig_OnApplicationQuit();
-            ModHooks.OnApplicationQuit();
+            get
+            {
+                if (_uiInstance == null) _uiInstance = (UIManager)UIManager.instance;
+                return _uiInstance;
+            }
+            private set => _uiInstance = value;
         }
 
-        public extern void orig_LoadScene(string destScene);
+        private ModSavegameData moddedData;
 
-        public void LoadScene(string destScene)
-        {
-            destScene = ModHooks.BeforeSceneLoad(destScene);
+        [MonoModIgnore]
+        [Attributes.RawIlPatch(nameof(IlPatches.OnApplicationQuit))]
+        extern private void OnApplicationQuit();
 
-            orig_LoadScene(destScene);
+        [MonoModIgnore]
+        [Attributes.RawIlPatch(nameof(IlPatches.LoadScene))]
+        extern public void LoadScene(string destScene);
 
-            ModHooks.OnSceneChanged(destScene);
-        }
+        [MonoModIgnore]
+        [Attributes.RawIlPatch(nameof(IlPatches.ClearSaveFile))]
+        extern public void ClearSaveFile(int saveSlot, Action<bool> callback);
 
-        public extern void orig_BeginSceneTransition(GameManager.SceneLoadInfo info);
+        [MonoModIgnore]
+        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.PlayerDead))]
+        extern public IEnumerator PlayerDead(float waitTime);
 
+        [MonoModIgnore]
+        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.LoadSceneAdditive))]
+        extern public IEnumerator LoadSceneAdditive(string destScene);
+
+        // il patch just dies trying to resolve types for no reason?
+        public extern void orig_BeginSceneTransition(global::GameManager.SceneLoadInfo info);
         public void BeginSceneTransition(GameManager.SceneLoadInfo info)
         {
             info.SceneName = ModHooks.BeforeSceneLoad(info.SceneName);
-
             orig_BeginSceneTransition(info);
         }
 
-        public extern void orig_ClearSaveFile(int saveSlot, Action<bool> callback);
-
-        public void ClearSaveFile(int saveSlot, Action<bool> callback)
-        {
-            ModHooks.OnSavegameClear(saveSlot);
-            orig_ClearSaveFile(saveSlot, callback);
-            ModHooks.OnAfterSaveGameClear(saveSlot);
-        }
-
-        public extern IEnumerator orig_PlayerDead(float waitTime);
-
-        public IEnumerator PlayerDead(float waitTime)
-        {
-            ModHooks.OnBeforePlayerDead();
-            yield return orig_PlayerDead(waitTime);
-            ModHooks.OnAfterPlayerDead();
-        }
-
-        #region SaveGame
-
-        private ModSavegameData moddedData;
+        #region SaveGame & LoadGame
 
         [MonoModIgnore]
         private GameCameras gameCams;
@@ -91,23 +94,6 @@ namespace Modding.Patches
 
         [MonoModIgnore]
         private extern void HideSaveIcon();
-
-        private static string ModdedSavePath(int slot) => Path.Combine(
-            Application.persistentDataPath,
-            $"user{slot}.modded.json"
-        );
-
-        private UIManager _uiInstance;
-
-        public UIManager ui
-        {
-            get
-            {
-                if (_uiInstance == null) _uiInstance = (UIManager)UIManager.instance;
-                return _uiInstance;
-            }
-            private set => _uiInstance = value;
-        }
 
         [MonoModReplace]
         public void SaveGame(int saveSlot, Action<bool> callback)
@@ -180,12 +166,17 @@ namespace Modding.Patches
 
                         try
                         {
-                            text = JsonConvert.SerializeObject(obj, Formatting.Indented, new JsonSerializerSettings()
-                            {
-                                ContractResolver = ShouldSerializeContractResolver.Instance,
-                                TypeNameHandling = TypeNameHandling.Auto,
-                                Converters = JsonConverterTypes.ConverterTypes
-                            });
+                            text = JsonConvert.SerializeObject
+                            (
+                                obj,
+                                Formatting.Indented,
+                                new JsonSerializerSettings()
+                                {
+                                    ContractResolver = ShouldSerializeContractResolver.Instance,
+                                    TypeNameHandling = TypeNameHandling.Auto,
+                                    Converters = JsonConverterTypes.ConverterTypes
+                                }
+                            );
                         }
                         catch (Exception e)
                         {
@@ -209,7 +200,7 @@ namespace Modding.Patches
                             (
                                 saveSlot,
                                 binary,
-                                delegate (bool didSave)
+                                delegate(bool didSave)
                                 {
                                     this.HideSaveIcon();
                                     callback(didSave);
@@ -222,7 +213,7 @@ namespace Modding.Patches
                             (
                                 saveSlot,
                                 Encoding.UTF8.GetBytes(text),
-                                delegate (bool didSave)
+                                delegate(bool didSave)
                                 {
                                     this.HideSaveIcon();
                                     if (callback != null)
@@ -264,30 +255,6 @@ namespace Modding.Patches
             }
         }
 
-        #endregion
-
-        public extern void orig_SetupSceneRefs(bool refreshTilemapInfo);
-
-        public void SetupSceneRefs(bool refreshTilemapInfo)
-        {
-            orig_SetupSceneRefs(refreshTilemapInfo);
-
-
-            if (IsGameplayScene())
-            {
-                GameObject go = GameCameras.instance.soulOrbFSM.gameObject.transform.Find("SoulOrb_fill").gameObject;
-                GameObject liquid = go.transform.Find("Liquid").gameObject;
-                tk2dSpriteAnimator tk2dsa = liquid.GetComponent<tk2dSpriteAnimator>();
-                tk2dsa.GetClipByName("Fill").fps = 15 * 1.05f;
-                tk2dsa.GetClipByName("Idle").fps = 10 * 1.05f;
-                tk2dsa.GetClipByName("Shrink").fps = 15 * 1.05f;
-                tk2dsa.GetClipByName("Drain").fps = 30 * 1.05f;
-            }
-
-        }
-
-        #region LoadGame
-
         [MonoModReplace]
         public void LoadGame(int saveSlot, Action<bool> callback)
         {
@@ -317,7 +284,8 @@ namespace Modding.Patches
                     using FileStream fileStream = File.OpenRead(path);
                     using var reader = new StreamReader(fileStream);
                     string json = reader.ReadToEnd();
-                    this.moddedData = JsonConvert.DeserializeObject<ModSavegameData>(
+                    this.moddedData = JsonConvert.DeserializeObject<ModSavegameData>
+                    (
                         json,
                         new JsonSerializerSettings()
                         {
@@ -343,12 +311,13 @@ namespace Modding.Patches
                 Logger.APILogger.LogError(e);
                 this.moddedData = new ModSavegameData();
             }
+
             ModHooks.OnLoadLocalSettings(this.moddedData);
 
             Platform.Current.ReadSaveSlot
             (
                 saveSlot,
-                delegate (byte[] fileBytes)
+                delegate(byte[] fileBytes)
                 {
                     bool obj;
                     try
@@ -371,13 +340,17 @@ namespace Modding.Patches
 
                         try
                         {
-                            saveGameData = JsonConvert.DeserializeObject<SaveGameData>(json, new JsonSerializerSettings()
-                            {
-                                ContractResolver = ShouldSerializeContractResolver.Instance,
-                                TypeNameHandling = TypeNameHandling.Auto,
-                                ObjectCreationHandling = ObjectCreationHandling.Replace,
-                                Converters = JsonConverterTypes.ConverterTypes
-                            });
+                            saveGameData = JsonConvert.DeserializeObject<SaveGameData>
+                            (
+                                json,
+                                new JsonSerializerSettings()
+                                {
+                                    ContractResolver = ShouldSerializeContractResolver.Instance,
+                                    TypeNameHandling = TypeNameHandling.Auto,
+                                    ObjectCreationHandling = ObjectCreationHandling.Replace,
+                                    Converters = JsonConverterTypes.ConverterTypes
+                                }
+                            );
                         }
                         catch (Exception e)
                         {
@@ -423,6 +396,25 @@ namespace Modding.Patches
 
         #endregion
 
+        extern public void orig_SetupSceneRefs(bool refreshTilemapInfo);
+
+        public void SetupSceneRefs(bool refreshTilemapInfo)
+        {
+            orig_SetupSceneRefs(refreshTilemapInfo);
+
+
+            if (IsGameplayScene())
+            {
+                GameObject go = GameCameras.instance.soulOrbFSM.gameObject.transform.Find("SoulOrb_fill").gameObject;
+                GameObject liquid = go.transform.Find("Liquid").gameObject;
+                tk2dSpriteAnimator tk2dsa = liquid.GetComponent<tk2dSpriteAnimator>();
+                tk2dsa.GetClipByName("Fill").fps = 15 * 1.05f;
+                tk2dsa.GetClipByName("Idle").fps = 10 * 1.05f;
+                tk2dsa.GetClipByName("Shrink").fps = 15 * 1.05f;
+                tk2dsa.GetClipByName("Drain").fps = 30 * 1.05f;
+            }
+        }
+
         #region GetSaveStatsForSlot
 
         [MonoModReplace]
@@ -449,7 +441,7 @@ namespace Modding.Patches
             Platform.Current.ReadSaveSlot
             (
                 saveSlot,
-                delegate (byte[] fileBytes)
+                delegate(byte[] fileBytes)
                 {
                     if (fileBytes == null)
                     {
@@ -480,13 +472,17 @@ namespace Modding.Patches
                         SaveGameData saveGameData;
                         try
                         {
-                            saveGameData = JsonConvert.DeserializeObject<SaveGameData>(json, new JsonSerializerSettings()
-                            {
-                                ContractResolver = ShouldSerializeContractResolver.Instance,
-                                TypeNameHandling = TypeNameHandling.Auto,
-                                ObjectCreationHandling = ObjectCreationHandling.Replace,
-                                Converters = JsonConverterTypes.ConverterTypes
-                            });
+                            saveGameData = JsonConvert.DeserializeObject<SaveGameData>
+                            (
+                                json,
+                                new JsonSerializerSettings()
+                                {
+                                    ContractResolver = ShouldSerializeContractResolver.Instance,
+                                    TypeNameHandling = TypeNameHandling.Auto,
+                                    ObjectCreationHandling = ObjectCreationHandling.Replace,
+                                    Converters = JsonConverterTypes.ConverterTypes
+                                }
+                            );
                         }
                         catch (Exception)
                         {
@@ -540,63 +536,6 @@ namespace Modding.Patches
 
         #endregion
 
-        #region LoadSceneAdditive
-
-        [MonoModIgnore]
-        private bool tilemapDirty;
-
-        [MonoModIgnore]
-        private bool waitForManualLevelStart;
-
-        [MonoModIgnore]
-        public event GameManager.DestroyPooledObjects DestroyPersonalPools;
-
-        [MonoModIgnore]
-        public event GameManager.UnloadLevel UnloadingLevel;
-
-        [MonoModReplace]
-        public IEnumerator LoadSceneAdditive(string destScene)
-        {
-            Debug.Log("Loading " + destScene);
-            destScene = ModHooks.BeforeSceneLoad(destScene);
-            this.tilemapDirty = true;
-            this.startedOnThisScene = false;
-            this.nextSceneName = destScene;
-            this.waitForManualLevelStart = true;
-            if (this.DestroyPersonalPools != null)
-            {
-                this.DestroyPersonalPools();
-            }
-
-            if (this.UnloadingLevel != null)
-            {
-                this.UnloadingLevel();
-            }
-
-            string exitingScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-            AsyncOperation loadop = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(destScene, LoadSceneMode.Additive);
-            loadop.allowSceneActivation = true;
-            yield return loadop;
-            UnityEngine.SceneManagement.SceneManager.UnloadScene(exitingScene);
-            ModHooks.OnSceneChanged(destScene);
-            this.RefreshTilemapInfo(destScene);
-            if (this.IsUnloadAssetsRequired(exitingScene, destScene))
-            {
-                Debug.LogFormat(this, "Unloading assets due to zone transition", Array.Empty<object>());
-                yield return Resources.UnloadUnusedAssets();
-            }
-
-            GCManager.Collect();
-            this.SetupSceneRefs(true);
-            this.BeginScene();
-            this.OnNextLevelReady();
-            this.waitForManualLevelStart = false;
-            Debug.Log("Done Loading " + destScene);
-            yield break;
-        }
-
-        #endregion
-
         #region LoadFirstScene
 
         [MonoModReplace]
@@ -624,6 +563,7 @@ namespace Modding.Patches
         #endregion
 
         #region PauseToDynamicMenu
+
         [MonoModIgnore]
         public extern void SetTimeScale(float timescale);
 
@@ -637,6 +577,7 @@ namespace Modding.Patches
             {
                 yield break;
             }
+
             if (!this.playerData.GetBool(nameof(PlayerData.disablePause)) && this.gameState == GlobalEnums.GameState.PLAYING)
             {
                 this.isPaused = true;
@@ -647,6 +588,7 @@ namespace Modding.Patches
                 {
                     HeroController.instance.Pause();
                 }
+
                 this.gameCams.MoveMenuToHUDCamera();
                 this.inputHandler.PreventPause();
                 this.inputHandler.StopUIInput();
@@ -664,12 +606,15 @@ namespace Modding.Patches
                 {
                     HeroController.instance.UnPause();
                 }
+
                 MenuButtonList.ClearAllLastSelected();
                 yield return new WaitForSecondsRealtime(0.3f);
                 this.inputHandler.AllowPause();
             }
+
             yield break;
         }
+
         #endregion
 
         [MonoModIgnore]
@@ -681,10 +626,115 @@ namespace Modding.Patches
          * Example use case: Start a co-routine that checks for an non null
          * sceneLoad then hooks up a callback to the "Finish" delegate to do something when the game has completed loading a scene.
          */
-        [MonoModIgnore]
+        // [MonoModIgnore]
         public SceneLoad SceneLoad
         {
             get { return sceneLoad; }
+        }
+    }
+
+    public static partial class IlPatches
+    {
+        [MonoModIgnore]
+        public static void OnApplicationQuit(ILContext il)
+        {
+            // add a `ModHooks.OnApplicationQuit();` at the end of the method
+            ILCursor cursor = new ILCursor(il);
+
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
+            cursor.MoveAfterLabels();
+            cursor.EmitDelegate(global::Modding.ModHooks.OnApplicationQuit);
+        }
+
+        [MonoModIgnore]
+        public static void LoadScene(ILContext il)
+        {
+            // add a `destScene = ModHooks.BeforeSceneLoad(destScene);` at the start and a `ModHooks.OnSceneChanged(destScene);` at the end of the method
+            ILCursor cursor = new ILCursor(il).Goto(0);
+
+            // Insert a call to your custom method
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate(global::Modding.ModHooks.BeforeSceneLoad);
+            cursor.Emit(OpCodes.Starg, 1);
+
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
+            cursor.MoveAfterLabels();
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate(global::Modding.ModHooks.OnSceneChanged);
+        }
+
+        [MonoModIgnore]
+        public static void ClearSaveFile(ILContext il)
+        {
+            // add a `ModHooks.OnSavegameClear(saveSlot);` at the start and a `ModHooks.OnAfterSaveGameClear(saveSlot);` at the end of the method
+            ILCursor cursor = new ILCursor(il).Goto(0);
+
+            // Insert a call to your custom method
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate(global::Modding.ModHooks.OnSavegameClear);
+
+            // this goes just before both `ret`s
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
+            cursor.MoveAfterLabels();
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate(global::Modding.ModHooks.OnAfterSaveGameClear);
+
+            // skip over the return
+            cursor.GotoNext();
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
+            cursor.MoveAfterLabels();
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate(global::Modding.ModHooks.OnAfterSaveGameClear);
+        }
+
+        [MonoModIgnore]
+        public static void PlayerDead(ILContext il, TypeDefinition stateMachineTypeDef)
+        {
+            // add a `ModHooks.OnSavegameClear(saveSlot);` at the start and a `ModHooks.OnAfterSaveGameClear(saveSlot);` at the end of the method
+            ILCursor cursor = new ILCursor(il);
+
+            // Insert a call to your custom method
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdloc(1), x => x.MatchCallOrCallvirt(typeof(global::GameManager), "get_cameraCtrl"));
+            cursor.EmitDelegate(global::Modding.ModHooks.OnBeforePlayerDead);
+
+            // this goes just before all the `ret`s
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdcI4(0), x => x.MatchRet());
+            cursor.MoveAfterLabels();
+            cursor.EmitDelegate(global::Modding.ModHooks.OnAfterPlayerDead);
+        }
+
+        [MonoModIgnore]
+        public static void LoadSceneAdditive(ILContext il, TypeDefinition stateMachineTypeDef)
+        {
+            // add a `destScene = ModHooks.BeforeSceneLoad(destScene);` at the start and a `ModHooks.OnSceneChanged(destScene);` in the middle of the method
+            ILCursor cursor = new ILCursor(il);
+
+            // Insert a call to your custom method
+            cursor.GotoNext
+            (
+                MoveType.AfterLabel,
+                x => x.MatchLdloc(1),
+                x => x.MatchLdcI4(1),
+                x => x.MatchStfld<global::GameManager>("tilemapDirty")
+            );
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, stateMachineTypeDef.Fields.First(f => f.Name == "destScene"));
+            cursor.EmitDelegate(global::Modding.ModHooks.BeforeSceneLoad);
+            cursor.Emit(OpCodes.Stfld, stateMachineTypeDef.Fields.First(f => f.Name == "destScene"));
+
+            // somewhere before `this.RefreshTilemapInfo(destScene);`
+            cursor.GotoNext
+            (
+                MoveType.AfterLabel,
+                x => x.MatchLdloc(1),
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld(out _), // destScene field of statemachine type
+                x => x.MatchCallOrCallvirt(typeof(global::GameManager), "RefreshTilemapInfo")
+            );
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, stateMachineTypeDef.Fields.First(f => f.Name == "destScene"));
+            cursor.EmitDelegate(global::Modding.ModHooks.OnSceneChanged);
         }
     }
 }
