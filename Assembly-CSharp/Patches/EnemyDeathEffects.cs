@@ -39,7 +39,7 @@ namespace Modding.Patches
             cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[1]); // resetDeathEvent
             cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[2]); // spellBurn
             cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[3]); // isWatery
-            cursor.Emit(OpCodes.Call, ReflectionHelper.GetMethodInfo(typeof(global::Modding.ModHooks), "OnRecieveDeathEvent", false));
+            cursor.EmitDelegate(global::Modding.ModHooks.OnRecieveDeathEvent);
         }
 
         [MonoModIgnore]
@@ -57,7 +57,7 @@ namespace Modding.Patches
             cursor.Emit(OpCodes.Ldloc_1);                                                                                         // killed text
             cursor.Emit(OpCodes.Ldloc_2);                                                                                         // kills text
             cursor.Emit(OpCodes.Ldloc_3);                                                                                         // newData text
-            cursor.Emit(OpCodes.Call, ReflectionHelper.GetMethodInfo(typeof(global::Modding.ModHooks), "OnRecordKillForJournal", false));
+            cursor.EmitDelegate(global::Modding.ModHooks.OnRecordKillForJournal);
         }
     }
 }
