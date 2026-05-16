@@ -22,10 +22,12 @@ namespace Modding.Patches
     [MonoModPatch("global::GameManager")]
     public class GameManager : global::GameManager
     {
-        private static string ModdedSavePath(int slot) => Path.Combine(
-            Application.persistentDataPath,
-            $"user{slot}.modded.json"
-        );
+        private static string ModdedSavePath(int slot) =>
+            Path.Combine
+            (
+                Application.persistentDataPath,
+                $"user{slot}.modded.json"
+            );
 
         private UIManager _uiInstance;
 
@@ -63,6 +65,7 @@ namespace Modding.Patches
 
         // il patch just dies trying to resolve types for no reason?
         public extern void orig_BeginSceneTransition(global::GameManager.SceneLoadInfo info);
+
         public void BeginSceneTransition(GameManager.SceneLoadInfo info)
         {
             info.SceneName = ModHooks.BeforeSceneLoad(info.SceneName);
@@ -135,13 +138,15 @@ namespace Modding.Patches
                         {
                             this.moddedData = new ModSavegameData();
                         }
+
                         ModHooks.OnSaveLocalSettings(this.moddedData);
 
                         // save modded data
                         try
                         {
                             var path = ModdedSavePath(saveSlot);
-                            string modded = JsonConvert.SerializeObject(
+                            string modded = JsonConvert.SerializeObject
+                            (
                                 this.moddedData,
                                 Formatting.Indented,
                                 new JsonSerializerSettings
@@ -642,8 +647,10 @@ namespace Modding.Patches
             ILCursor cursor = new ILCursor(il);
 
             cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
-            cursor.MoveAfterLabels();
+            cursor.Next.OpCode = OpCodes.Nop; // apparently afterlabel doesn't work as wanted
+            cursor.GotoNext();                // apparently afterlabel doesn't work as wanted
             cursor.EmitDelegate(global::Modding.ModHooks.OnApplicationQuit);
+            cursor.Emit(OpCodes.Ret); // apparently afterlabel doesn't work as wanted
         }
 
         [MonoModIgnore]
@@ -658,9 +665,11 @@ namespace Modding.Patches
             cursor.Emit(OpCodes.Starg, 1);
 
             cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
-            cursor.MoveAfterLabels();
+            cursor.Next.OpCode = OpCodes.Nop; // apparently afterlabel doesn't work as wanted
+            cursor.GotoNext();                // apparently afterlabel doesn't work as wanted
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.EmitDelegate(global::Modding.ModHooks.OnSceneChanged);
+            cursor.Emit(OpCodes.Ret); // apparently afterlabel doesn't work as wanted
         }
 
         [MonoModIgnore]
@@ -675,16 +684,20 @@ namespace Modding.Patches
 
             // this goes just before both `ret`s
             cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
-            cursor.MoveAfterLabels();
+            cursor.Next.OpCode = OpCodes.Nop; // apparently afterlabel doesn't work as wanted
+            cursor.GotoNext();                // apparently afterlabel doesn't work as wanted
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.EmitDelegate(global::Modding.ModHooks.OnAfterSaveGameClear);
+            cursor.Emit(OpCodes.Ret); // apparently afterlabel doesn't work as wanted
 
             // skip over the return
             cursor.GotoNext();
             cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
-            cursor.MoveAfterLabels();
+            cursor.Next.OpCode = OpCodes.Nop; // apparently afterlabel doesn't work as wanted
+            cursor.GotoNext();                // apparently afterlabel doesn't work as wanted
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.EmitDelegate(global::Modding.ModHooks.OnAfterSaveGameClear);
+            cursor.Emit(OpCodes.Ret); // apparently afterlabel doesn't work as wanted
         }
 
         [MonoModIgnore]
@@ -695,12 +708,17 @@ namespace Modding.Patches
 
             // Insert a call to your custom method
             cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdloc(1), x => x.MatchCallOrCallvirt(typeof(global::GameManager), "get_cameraCtrl"));
+            cursor.Next.OpCode = OpCodes.Nop; // apparently afterlabel doesn't work as wanted
+            cursor.GotoNext();                // apparently afterlabel doesn't work as wanted
             cursor.EmitDelegate(global::Modding.ModHooks.OnBeforePlayerDead);
+            cursor.Emit(OpCodes.Ldloc_1); // apparently afterlabel doesn't work as wanted
 
             // this goes just before all the `ret`s
             cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdcI4(0), x => x.MatchRet());
-            cursor.MoveAfterLabels();
+            cursor.Next.OpCode = OpCodes.Nop; // apparently afterlabel doesn't work as wanted
+            cursor.GotoNext();                // apparently afterlabel doesn't work as wanted
             cursor.EmitDelegate(global::Modding.ModHooks.OnAfterPlayerDead);
+            cursor.Emit(OpCodes.Ldc_I4_0); // apparently afterlabel doesn't work as wanted
         }
 
         [MonoModIgnore]
@@ -717,11 +735,14 @@ namespace Modding.Patches
                 x => x.MatchLdcI4(1),
                 x => x.MatchStfld<global::GameManager>("tilemapDirty")
             );
+            cursor.Next.OpCode = OpCodes.Nop; // apparently afterlabel doesn't work as wanted
+            cursor.GotoNext();                // apparently afterlabel doesn't work as wanted
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.Emit(OpCodes.Ldfld, stateMachineTypeDef.Fields.First(f => f.Name == "destScene"));
             cursor.EmitDelegate(global::Modding.ModHooks.BeforeSceneLoad);
             cursor.Emit(OpCodes.Stfld, stateMachineTypeDef.Fields.First(f => f.Name == "destScene"));
+            cursor.Emit(OpCodes.Ldloc_1); // apparently afterlabel doesn't work as wanted
 
             // somewhere before `this.RefreshTilemapInfo(destScene);`
             cursor.GotoNext
@@ -732,9 +753,12 @@ namespace Modding.Patches
                 x => x.MatchLdfld(out _), // destScene field of statemachine type
                 x => x.MatchCallOrCallvirt(typeof(global::GameManager), "RefreshTilemapInfo")
             );
+            cursor.Next.OpCode = OpCodes.Nop; // apparently afterlabel doesn't work as wanted
+            cursor.GotoNext();                // apparently afterlabel doesn't work as wanted
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.Emit(OpCodes.Ldfld, stateMachineTypeDef.Fields.First(f => f.Name == "destScene"));
             cursor.EmitDelegate(global::Modding.ModHooks.OnSceneChanged);
+            cursor.Emit(OpCodes.Ldloc_1); // apparently afterlabel doesn't work as wanted
         }
     }
 }
