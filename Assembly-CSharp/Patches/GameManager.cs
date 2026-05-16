@@ -63,6 +63,14 @@ namespace Modding.Patches
         [Attributes.IEnumeratorIlPatch(nameof(IlPatches.LoadSceneAdditive))]
         extern public IEnumerator LoadSceneAdditive(string destScene);
 
+        [MonoModIgnore]
+        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.LoadFirstScene))]
+        extern public IEnumerator LoadFirstScene();
+
+        [MonoModIgnore]
+        [Attributes.RawIlPatch(nameof(IlPatches.OnWillActivateFirstLevel))]
+        extern public void OnWillActivateFirstLevel();
+
         // il patch just dies trying to resolve types for no reason?
         public extern void orig_BeginSceneTransition(global::GameManager.SceneLoadInfo info);
 
@@ -402,12 +410,9 @@ namespace Modding.Patches
         #endregion
 
         extern public void orig_SetupSceneRefs(bool refreshTilemapInfo);
-
         public void SetupSceneRefs(bool refreshTilemapInfo)
         {
             orig_SetupSceneRefs(refreshTilemapInfo);
-
-
             if (IsGameplayScene())
             {
                 GameObject go = GameCameras.instance.soulOrbFSM.gameObject.transform.Find("SoulOrb_fill").gameObject;
@@ -420,152 +425,88 @@ namespace Modding.Patches
             }
         }
 
-        #region GetSaveStatsForSlot
-
         [MonoModReplace]
         public void GetSaveStatsForSlot(int saveSlot, Action<global::SaveStats> callback)
         {
             if (!Platform.IsSaveSlotIndexValid(saveSlot))
             {
-                Debug.LogErrorFormat
-                (
-                    "Cannot get save stats for invalid slot {0}",
-                    new object[]
-                    {
-                        saveSlot
-                    }
-                );
+                Debug.LogErrorFormat("Cannot get save stats for invalid slot {0}", new object[] { saveSlot });
                 if (callback != null)
                 {
                     CoreLoop.InvokeNext(delegate { callback(null); });
                 }
-
                 return;
             }
-
-            Platform.Current.ReadSaveSlot
-            (
-                saveSlot,
-                delegate(byte[] fileBytes)
+            Platform.Current.ReadSaveSlot(saveSlot, delegate(byte[] fileBytes)
+            {
+                if (fileBytes == null)
                 {
-                    if (fileBytes == null)
+                    if (callback != null)
                     {
-                        if (callback != null)
-                        {
-                            CoreLoop.InvokeNext(delegate { callback(null); });
-                        }
-
-                        return;
+                        CoreLoop.InvokeNext(delegate { callback(null); });
                     }
-
+                    return;
+                }
+                try
+                {
+                    bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
+                    string json;
+                    if (flag)
+                    {
+                        BinaryFormatter binaryFormatter = new BinaryFormatter();
+                        MemoryStream serializationStream = new MemoryStream(fileBytes);
+                        string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
+                        json = Encryption.Decrypt(encryptedString);
+                    }
+                    else
+                    {
+                        json = Encoding.UTF8.GetString(fileBytes);
+                    }
+                    SaveGameData saveGameData;
                     try
                     {
-                        bool flag = this.gameConfig.useSaveEncryption && !Platform.Current.IsFileSystemProtected;
-                        string json;
-                        if (flag)
+                        saveGameData = JsonConvert.DeserializeObject<SaveGameData>(json, new JsonSerializerSettings()
                         {
-                            BinaryFormatter binaryFormatter = new BinaryFormatter();
-                            MemoryStream serializationStream = new MemoryStream(fileBytes);
-                            string encryptedString = (string)binaryFormatter.Deserialize(serializationStream);
-                            json = Encryption.Decrypt(encryptedString);
-                        }
-                        else
-                        {
-                            json = Encoding.UTF8.GetString(fileBytes);
-                        }
-
-                        SaveGameData saveGameData;
-                        try
-                        {
-                            saveGameData = JsonConvert.DeserializeObject<SaveGameData>
-                            (
-                                json,
-                                new JsonSerializerSettings()
-                                {
-                                    ContractResolver = ShouldSerializeContractResolver.Instance,
-                                    TypeNameHandling = TypeNameHandling.Auto,
-                                    ObjectCreationHandling = ObjectCreationHandling.Replace,
-                                    Converters = JsonConverterTypes.ConverterTypes
-                                }
-                            );
-                        }
-                        catch (Exception)
-                        {
-                            // Not a huge deal, this happens on saves with mod data which haven't been converted yet.
-                            Logger.APILogger.LogWarn($"Failed to get save stats for slot {saveSlot} using Json.NET, falling back");
-
-                            saveGameData = JsonUtility.FromJson<SaveGameData>(json);
-                        }
-
-                        global::PlayerData playerData = saveGameData.playerData;
-                        SaveStats saveStats = new SaveStats
-                        (
-                            playerData.GetInt(nameof(PlayerData.maxHealthBase)),
-                            playerData.GetInt(nameof(PlayerData.geo)),
-                            playerData.GetVariable<GlobalEnums.MapZone>(nameof(PlayerData.mapZone)),
-                            playerData.GetFloat(nameof(PlayerData.playTime)),
-                            playerData.GetInt(nameof(PlayerData.MPReserveMax)),
-                            playerData.GetInt(nameof(PlayerData.permadeathMode)),
-                            playerData.GetBool(nameof(PlayerData.bossRushMode)),
-                            playerData.GetFloat(nameof(PlayerData.completionPercentage)),
-                            playerData.GetBool(nameof(PlayerData.unlockedCompletionRate))
-                        );
-                        if (callback != null)
-                        {
-                            CoreLoop.InvokeNext(delegate { callback(saveStats); });
-                        }
+                            ContractResolver = ShouldSerializeContractResolver.Instance,
+                            TypeNameHandling = TypeNameHandling.Auto,
+                            ObjectCreationHandling = ObjectCreationHandling.Replace,
+                            Converters = JsonConverterTypes.ConverterTypes
+                        });
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        Debug.LogError
-                        (
-                            string.Concat
-                            (
-                                new object[]
-                                {
-                                    "Error while loading save file for slot ",
-                                    saveSlot,
-                                    " Exception: ",
-                                    ex
-                                }
-                            )
-                        );
-                        if (callback != null)
-                        {
-                            CoreLoop.InvokeNext(delegate { callback(null); });
-                        }
+                        // Not a huge deal, this happens on saves with mod data which haven't been converted yet.
+                        Logger.APILogger.LogWarn($"Failed to get save stats for slot {saveSlot} using Json.NET, falling back");
+                        saveGameData = JsonUtility.FromJson<SaveGameData>(json);
+                    }
+                    global::PlayerData playerData = saveGameData.playerData;
+                    SaveStats saveStats = new SaveStats
+                    (
+                        playerData.GetInt(nameof(PlayerData.maxHealthBase)),
+                        playerData.GetInt(nameof(PlayerData.geo)),
+                        playerData.GetVariable<GlobalEnums.MapZone>(nameof(PlayerData.mapZone)),
+                        playerData.GetFloat(nameof(PlayerData.playTime)),
+                        playerData.GetInt(nameof(PlayerData.MPReserveMax)),
+                        playerData.GetInt(nameof(PlayerData.permadeathMode)),
+                        playerData.GetBool(nameof(PlayerData.bossRushMode)),
+                        playerData.GetFloat(nameof(PlayerData.completionPercentage)),
+                        playerData.GetBool(nameof(PlayerData.unlockedCompletionRate))
+                    );
+                    if (callback != null)
+                    {
+                        CoreLoop.InvokeNext(delegate { callback(saveStats); });
                     }
                 }
-            );
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error while loading save file for slot {saveSlot} Exception: {ex}");
+                    if (callback != null)
+                    {
+                        CoreLoop.InvokeNext(delegate { callback(null); });
+                    }
+                }
+            });
         }
-
-        #endregion
-
-        #region LoadFirstScene
-
-        [MonoModReplace]
-        public IEnumerator LoadFirstScene()
-        {
-            yield return new WaitForEndOfFrame();
-            this.OnWillActivateFirstLevel();
-            this.LoadScene("Tutorial_01");
-            ModHooks.OnNewGame();
-            yield break;
-        }
-
-        #endregion
-
-        #region OnWillActivateFirstLevel
-
-        public extern void orig_OnWillActivateFirstLevel();
-
-        public void OnWillActivateFirstLevel()
-        {
-            orig_OnWillActivateFirstLevel();
-            ModHooks.OnNewGame();
-        }
-
-        #endregion
 
         #region PauseToDynamicMenu
 
@@ -759,6 +700,35 @@ namespace Modding.Patches
             cursor.Emit(OpCodes.Ldfld, stateMachineTypeDef.Fields.First(f => f.Name == "destScene"));
             cursor.EmitDelegate(global::Modding.ModHooks.OnSceneChanged);
             cursor.Emit(OpCodes.Ldloc_1); // apparently afterlabel doesn't work as wanted
+        }
+
+        [MonoModIgnore]
+        public static void LoadFirstScene(ILContext il, TypeDefinition stateMachineTypeDef)
+        {
+            // add a `ModHooks.OnNewGame();` at the end of the method
+            ILCursor cursor = new ILCursor(il);
+
+            // Insert a call to your custom method
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdloc(1));
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdcI4(0), x => x.MatchRet());
+            cursor.Next.OpCode = OpCodes.Nop; // apparently afterlabel doesn't work as wanted
+            cursor.GotoNext();                // apparently afterlabel doesn't work as wanted
+            cursor.EmitDelegate(global::Modding.ModHooks.OnNewGame);
+            cursor.Emit(OpCodes.Ldc_I4_0); // apparently afterlabel doesn't work as wanted
+        }
+
+        [MonoModIgnore]
+        public static void OnWillActivateFirstLevel(ILContext il)
+        {
+            // add a `ModHooks.OnNewGame();` at the end of the method
+            ILCursor cursor = new ILCursor(il);
+
+            // Insert a call to your custom method
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
+            cursor.Next.OpCode = OpCodes.Nop; // apparently afterlabel doesn't work as wanted
+            cursor.GotoNext();                // apparently afterlabel doesn't work as wanted
+            cursor.EmitDelegate(global::Modding.ModHooks.OnNewGame);
+            cursor.Emit(OpCodes.Ret); // apparently afterlabel doesn't work as wanted
         }
     }
 }
