@@ -21,6 +21,7 @@ namespace Modding.Patches
         [MonoModIgnore]
         private GameManager gm;
 
+        // todo: make IL hook: add lockstate none before each ret
         // Reverted cursor behavior
         [MonoModReplace]
         private void OnGUI()

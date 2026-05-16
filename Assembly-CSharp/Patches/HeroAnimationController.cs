@@ -20,10 +20,11 @@ namespace Modding.Patches
         [MonoModIgnore]
         private extern void UpdateAnimation();
 
+        // todo: make IL hook: remove betaEnd pd check
         [MonoModReplace]
         private void Update()
         {
-            if (this.controlEnabled)
+            if (this.controlEnabled && !waitingToEnter)
             {
                 this.UpdateAnimation();
             }

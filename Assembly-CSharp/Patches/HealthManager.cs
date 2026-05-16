@@ -11,7 +11,8 @@ namespace Modding.Patches
     {
         [MonoModIgnore]
         public bool isDead;
-        
+
+        // todo: make IL hook: add ModHooks before isDead check
         ///This may be used by mods to find new enemies. Check this isDead flag to see if they're already dead
         [MonoModReplace]
         protected IEnumerator CheckPersistence()
