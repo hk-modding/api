@@ -579,10 +579,6 @@ namespace Modding.Patches
         }
     }
 
-    // todo: apparently MoveType.AfterLabel doesn't work as wanted, so it works as a MoveType.Before, and we can just make:
-    // 1. the next instruction a OpCodes.Nop
-    // 2. put our stuff after the OpCodes.Nop
-    // 3. emit what we changed to a OpCodes.Nop
     public static partial class IlPatches
     {
         [MonoModIgnore]
@@ -591,11 +587,8 @@ namespace Modding.Patches
             // add a `ModHooks.OnApplicationQuit();` at the end of the method
             ILCursor cursor = new ILCursor(il);
 
-            cursor.GotoNext(MoveType.Before, x => x.MatchRet());
-            cursor.Next.OpCode = OpCodes.Nop;
-            cursor.GotoNext();
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
             cursor.EmitDelegate(global::Modding.ModHooks.OnApplicationQuit);
-            cursor.Emit(OpCodes.Ret);
         }
 
         [MonoModIgnore]
@@ -609,12 +602,9 @@ namespace Modding.Patches
             cursor.EmitDelegate(global::Modding.ModHooks.BeforeSceneLoad);
             cursor.Emit(OpCodes.Starg, 1);
 
-            cursor.GotoNext(MoveType.Before, x => x.MatchRet());
-            cursor.Next.OpCode = OpCodes.Nop;
-            cursor.GotoNext();
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.EmitDelegate(global::Modding.ModHooks.OnSceneChanged);
-            cursor.Emit(OpCodes.Ret);
         }
 
         [MonoModIgnore]
@@ -628,21 +618,15 @@ namespace Modding.Patches
             cursor.EmitDelegate(global::Modding.ModHooks.OnSavegameClear);
 
             // this goes just before both `ret`s
-            cursor.GotoNext(MoveType.Before, x => x.MatchRet());
-            cursor.Next.OpCode = OpCodes.Nop;
-            cursor.GotoNext();
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.EmitDelegate(global::Modding.ModHooks.OnAfterSaveGameClear);
-            cursor.Emit(OpCodes.Ret);
 
             // skip over the return
             cursor.GotoNext();
-            cursor.GotoNext(MoveType.Before, x => x.MatchRet());
-            cursor.Next.OpCode = OpCodes.Nop;
-            cursor.GotoNext();
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.EmitDelegate(global::Modding.ModHooks.OnAfterSaveGameClear);
-            cursor.Emit(OpCodes.Ret);
         }
 
         [MonoModIgnore]
@@ -652,18 +636,12 @@ namespace Modding.Patches
             ILCursor cursor = new ILCursor(il);
 
             // Insert a call to your custom method
-            cursor.GotoNext(MoveType.Before, x => x.MatchLdloc(1), x => x.MatchCallOrCallvirt(typeof(global::GameManager), "get_cameraCtrl"));
-            cursor.Next.OpCode = OpCodes.Nop;
-            cursor.GotoNext();
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdloc(1), x => x.MatchCallOrCallvirt(typeof(global::GameManager), "get_cameraCtrl"));
             cursor.EmitDelegate(global::Modding.ModHooks.OnBeforePlayerDead);
-            cursor.Emit(OpCodes.Ldloc_1);
 
             // this goes just before all the `ret`s
-            cursor.GotoNext(MoveType.Before, x => x.MatchLdcI4(0), x => x.MatchRet());
-            cursor.Next.OpCode = OpCodes.Nop;
-            cursor.GotoNext();
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdcI4(0), x => x.MatchRet());
             cursor.EmitDelegate(global::Modding.ModHooks.OnAfterPlayerDead);
-            cursor.Emit(OpCodes.Ldc_I4_0);
         }
 
         [MonoModIgnore]
@@ -675,35 +653,29 @@ namespace Modding.Patches
             // Insert a call to your custom method
             cursor.GotoNext
             (
-                MoveType.Before,
+                MoveType.AfterLabel,
                 x => x.MatchLdloc(1),
                 x => x.MatchLdcI4(1),
                 x => x.MatchStfld<global::GameManager>("tilemapDirty")
             );
-            cursor.Next.OpCode = OpCodes.Nop;
-            cursor.GotoNext();
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.Emit(OpCodes.Ldfld, stateMachineTypeDef.Fields.First(f => f.Name == "destScene"));
             cursor.EmitDelegate(global::Modding.ModHooks.BeforeSceneLoad);
             cursor.Emit(OpCodes.Stfld, stateMachineTypeDef.Fields.First(f => f.Name == "destScene"));
-            cursor.Emit(OpCodes.Ldloc_1);
 
             // somewhere before `this.RefreshTilemapInfo(destScene);`
             cursor.GotoNext
             (
-                MoveType.Before,
+                MoveType.AfterLabel,
                 x => x.MatchLdloc(1),
                 x => x.MatchLdarg(0),
                 x => x.MatchLdfld(out _), // destScene field of statemachine type
                 x => x.MatchCallOrCallvirt(typeof(global::GameManager), "RefreshTilemapInfo")
             );
-            cursor.Next.OpCode = OpCodes.Nop;
-            cursor.GotoNext();
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.Emit(OpCodes.Ldfld, stateMachineTypeDef.Fields.First(f => f.Name == "destScene"));
             cursor.EmitDelegate(global::Modding.ModHooks.OnSceneChanged);
-            cursor.Emit(OpCodes.Ldloc_1);
         }
 
         [MonoModIgnore]
@@ -713,12 +685,9 @@ namespace Modding.Patches
             ILCursor cursor = new ILCursor(il);
 
             // Insert a call to your custom method
-            cursor.GotoNext(MoveType.Before, x => x.MatchLdloc(1));
-            cursor.GotoNext(MoveType.Before, x => x.MatchLdcI4(0), x => x.MatchRet());
-            cursor.Next.OpCode = OpCodes.Nop;
-            cursor.GotoNext();
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdloc(1));
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdcI4(0), x => x.MatchRet());
             cursor.EmitDelegate(global::Modding.ModHooks.OnNewGame);
-            cursor.Emit(OpCodes.Ldc_I4_0);
         }
 
         [MonoModIgnore]
@@ -728,11 +697,8 @@ namespace Modding.Patches
             ILCursor cursor = new ILCursor(il);
 
             // Insert a call to your custom method
-            cursor.GotoNext(MoveType.Before, x => x.MatchRet());
-            cursor.Next.OpCode = OpCodes.Nop;
-            cursor.GotoNext();
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
             cursor.EmitDelegate(global::Modding.ModHooks.OnNewGame);
-            cursor.Emit(OpCodes.Ret);
         }
     }
 }

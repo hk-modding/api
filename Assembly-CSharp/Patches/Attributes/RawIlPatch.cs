@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using Mono.Cecil;
 using MonoMod;
 using MonoMod.Cil;
+using MonoMod.Utils;
 
 namespace Modding.Patches.Attributes
 {
@@ -51,7 +52,7 @@ namespace MonoMod
             if (patcherMethod is null)
                 throw new InvalidOperationException("Couldn't find patcher method!");
 
-            patcherMethod.Invoke(null, new[] { context });
+            context.Invoke(patcherMethod.CreateDelegate<ILContext.Manipulator>());
         }
     }
 }

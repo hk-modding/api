@@ -29,7 +29,7 @@ namespace Modding.Patches
             // add a `ModHooks.OnRecieveDeathEvent(this, didFire, ref attackDirection, ref resetDeathEvent, ref spellBurn, ref isWatery);` at the start of the method
             ILCursor cursor = new ILCursor(il);
 
-            cursor.GotoNext(MoveType.Before, x => x.MatchLdarg(0));
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdarg(0));
 
             // Insert a call to your custom method
             cursor.Emit(OpCodes.Ldarg_0);
@@ -48,7 +48,7 @@ namespace Modding.Patches
             // add a `ModHooks.OnRecordKillForJournal(this, this.playerDataName, $"killed{this.playerDataName}", $"kills{this.playerDataName}", $"newData{this.playerDataName}");` at the start of the method
             ILCursor cursor = new ILCursor(il);
 
-            cursor.GotoNext(MoveType.Before, x => x.MatchLdcI4(0));
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdcI4(0));
 
             // Insert a call to your custom method
             cursor.Emit(OpCodes.Ldarg_0);                                                                                         // this
