@@ -9,6 +9,7 @@ namespace Modding.Patches
     [MonoModPatch("global::NailSlash")]
     public class NailSlash : global::NailSlash
     {
+        // todo: make IL hook: seems trivial enough?
         private extern void orig_OnTriggerEnter2D(Collider2D otherCollider);
 
         private void OnTriggerEnter2D(Collider2D otherCollider)

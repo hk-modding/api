@@ -26,6 +26,7 @@ namespace Modding.Patches
         [MonoModIgnore]
         private GameManager gm;
 
+        // todo: make IL hook: seems trivial enough?
         //Added checks for null and an attempt to fix any missing references
         // [MonoModReplace]
         private void Update()
@@ -54,6 +55,7 @@ namespace Modding.Patches
         [MonoModIgnore]
         private Transform borderDown;
 
+        // todo: make IL hook: seems trivial enough?
         // [MonoModIgnore]
         private extern void orig_OnCameraAspectChanged(float aspect);
 

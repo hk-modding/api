@@ -18,6 +18,7 @@ namespace Modding.Patches
         [MonoModReplace]
         public static bool IsSaveSlotIndexValid(int slotIndex) => true;
 
+        // todo: this is the exact same as vanilla???
         // ReSharper disable once UnusedMember.Global
         [MonoModReplace]
         protected string GetSaveSlotFileName(int slotIndex, SaveSlotFileNameUsage usage)

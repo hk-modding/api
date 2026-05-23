@@ -9,6 +9,7 @@ namespace Modding.Patches
     [MonoModPatch("global::PlayMakerUnity2DProxy")]
     public class PlayMakerUnity2DProxy : global::PlayMakerUnity2DProxy
     {
+        // todo: make IL hook: seems trivial enough?
         [MonoModReplace]
         public void Start()
         {

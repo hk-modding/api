@@ -228,6 +228,7 @@ namespace Modding.Patches
             TakeHealthInternal(amount);
         }
 
+        // todo: make IL hook: seems trivial enough?
         public extern void orig_UpdateBlueHealth();
 
         public void UpdateBlueHealth()
@@ -236,6 +237,7 @@ namespace Modding.Patches
             SetInt(nameof(healthBlue), GetInt(nameof(healthBlue)) + ModHooks.OnBlueHealth());
         }
 
+        // todo: make IL hook: seems trivial enough?
         public extern void orig_AddHealth(int amount);
 
         public void AddHealth(int amount)

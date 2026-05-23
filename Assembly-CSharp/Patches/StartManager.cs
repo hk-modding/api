@@ -65,6 +65,7 @@ namespace Modding.Patches
         [MonoModIgnore]
         private extern IEnumerator LanguageSettingDone();
 
+        // todo: make IL hook: seems trivial enough?
         [MonoModReplace]
         private IEnumerator Start()
         {

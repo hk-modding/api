@@ -618,15 +618,12 @@ namespace Modding.Patches
             cursor.EmitDelegate(global::Modding.ModHooks.OnSavegameClear);
 
             // this goes just before both `ret`s
-            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
-            cursor.Emit(OpCodes.Ldarg_1);
-            cursor.EmitDelegate(global::Modding.ModHooks.OnAfterSaveGameClear);
-
-            // skip over the return
-            cursor.GotoNext();
-            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchRet());
-            cursor.Emit(OpCodes.Ldarg_1);
-            cursor.EmitDelegate(global::Modding.ModHooks.OnAfterSaveGameClear);
+            while (cursor.TryGotoNext(MoveType.AfterLabel, x => x.MatchRet()))
+            {
+                cursor.Emit(OpCodes.Ldarg_1);
+                cursor.EmitDelegate(global::Modding.ModHooks.OnAfterSaveGameClear);
+                cursor.GotoNext();
+            }
         }
 
         [MonoModIgnore]
