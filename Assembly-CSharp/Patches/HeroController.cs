@@ -38,12 +38,17 @@ namespace Modding.Patches
         extern private void Update();
 
         [MonoModIgnore]
-        [Attributes.RawIlPatch(nameof(IlPatches.HeroController_CharmUpdate))]
-        extern public void CharmUpdate();
-
-        [MonoModIgnore]
         [Attributes.RawIlPatch(nameof(IlPatches.HeroController_DoAttack))]
         extern private void DoAttack();
+
+        // il patch just dies trying to resolve types for no reason?
+        public extern void orig_CharmUpdate();
+        public void CharmUpdate()
+        {
+            orig_CharmUpdate();
+            ModHooks.OnCharmUpdate(playerData, this);
+            playerData.UpdateBlueHealth();
+        }
 
         #region Dash()
 
@@ -55,6 +60,7 @@ namespace Modding.Patches
         [MonoModIgnore]
         private float BUMP_VELOCITY_DASH;
 
+        [MonoModAdded]
         private Vector2 OrigDashVector()
         {
             Vector2 origVector;
@@ -286,26 +292,6 @@ namespace Modding.Patches
             ILCursor cursor = new ILCursor(il).Goto(0);
 
             cursor.EmitDelegate(global::Modding.ModHooks.OnHeroUpdate);
-        }
-
-        [MonoModIgnore]
-        public static void HeroController_CharmUpdate(ILContext il)
-        {
-            // add a `ModHooks.OnCharmUpdate(playerData, this); playerData.UpdateBlueHealth();` at the end
-            ILCursor cursor = new ILCursor(il);
-
-            cursor.GotoNext
-            (
-                MoveType.AfterLabel,
-                x => x.MatchRet()
-            );
-            cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::HeroController), nameof(global::HeroController.playerData)));
-            cursor.Emit(OpCodes.Ldarg_0);
-            cursor.EmitDelegate(global::Modding.ModHooks.OnCharmUpdate);
-            cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::HeroController), nameof(global::HeroController.playerData)));
-            cursor.Emit(OpCodes.Callvirt, ReflectionHelper.GetMethodInfo(typeof(global::PlayerData), nameof(global::PlayerData.UpdateBlueHealth), true));
         }
 
         [MonoModIgnore]
