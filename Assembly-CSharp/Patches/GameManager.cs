@@ -44,31 +44,31 @@ namespace Modding.Patches
         private ModSavegameData moddedData;
 
         [MonoModIgnore]
-        [Attributes.RawIlPatch(nameof(IlPatches.OnApplicationQuit))]
+        [Attributes.RawIlPatch(nameof(IlPatches.GameManager_OnApplicationQuit))]
         extern private void OnApplicationQuit();
 
         [MonoModIgnore]
-        [Attributes.RawIlPatch(nameof(IlPatches.LoadScene))]
+        [Attributes.RawIlPatch(nameof(IlPatches.GameManager_LoadScene))]
         extern public void LoadScene(string destScene);
 
         [MonoModIgnore]
-        [Attributes.RawIlPatch(nameof(IlPatches.ClearSaveFile))]
+        [Attributes.RawIlPatch(nameof(IlPatches.GameManager_ClearSaveFile))]
         extern public void ClearSaveFile(int saveSlot, Action<bool> callback);
 
         [MonoModIgnore]
-        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.PlayerDead))]
+        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.GameManager_PlayerDead))]
         extern public IEnumerator PlayerDead(float waitTime);
 
         [MonoModIgnore]
-        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.LoadSceneAdditive))]
+        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.GameManager_LoadSceneAdditive))]
         extern public IEnumerator LoadSceneAdditive(string destScene);
 
         [MonoModIgnore]
-        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.LoadFirstScene))]
+        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.GameManager_LoadFirstScene))]
         extern public IEnumerator LoadFirstScene();
 
         [MonoModIgnore]
-        [Attributes.RawIlPatch(nameof(IlPatches.OnWillActivateFirstLevel))]
+        [Attributes.RawIlPatch(nameof(IlPatches.GameManager_OnWillActivateFirstLevel))]
         extern public void OnWillActivateFirstLevel();
 
         // il patch just dies trying to resolve types for no reason?
@@ -582,7 +582,7 @@ namespace Modding.Patches
     public static partial class IlPatches
     {
         [MonoModIgnore]
-        public static void OnApplicationQuit(ILContext il)
+        public static void GameManager_OnApplicationQuit(ILContext il)
         {
             // add a `ModHooks.OnApplicationQuit();` at the end of the method
             ILCursor cursor = new ILCursor(il);
@@ -592,7 +592,7 @@ namespace Modding.Patches
         }
 
         [MonoModIgnore]
-        public static void LoadScene(ILContext il)
+        public static void GameManager_LoadScene(ILContext il)
         {
             // add a `destScene = ModHooks.BeforeSceneLoad(destScene);` at the start and a `ModHooks.OnSceneChanged(destScene);` at the end of the method
             ILCursor cursor = new ILCursor(il).Goto(0);
@@ -608,7 +608,7 @@ namespace Modding.Patches
         }
 
         [MonoModIgnore]
-        public static void ClearSaveFile(ILContext il)
+        public static void GameManager_ClearSaveFile(ILContext il)
         {
             // add a `ModHooks.OnSavegameClear(saveSlot);` at the start and a `ModHooks.OnAfterSaveGameClear(saveSlot);` at the end of the method
             ILCursor cursor = new ILCursor(il).Goto(0);
@@ -627,7 +627,7 @@ namespace Modding.Patches
         }
 
         [MonoModIgnore]
-        public static void PlayerDead(ILContext il, TypeDefinition stateMachineTypeDef)
+        public static void GameManager_PlayerDead(ILContext il, TypeDefinition stateMachineTypeDef)
         {
             // add a `ModHooks.OnSavegameClear(saveSlot);` at the start and a `ModHooks.OnAfterSaveGameClear(saveSlot);` at the end of the method
             ILCursor cursor = new ILCursor(il);
@@ -642,7 +642,7 @@ namespace Modding.Patches
         }
 
         [MonoModIgnore]
-        public static void LoadSceneAdditive(ILContext il, TypeDefinition stateMachineTypeDef)
+        public static void GameManager_LoadSceneAdditive(ILContext il, TypeDefinition stateMachineTypeDef)
         {
             // add a `destScene = ModHooks.BeforeSceneLoad(destScene);` at the start and a `ModHooks.OnSceneChanged(destScene);` in the middle of the method
             ILCursor cursor = new ILCursor(il);
@@ -676,7 +676,7 @@ namespace Modding.Patches
         }
 
         [MonoModIgnore]
-        public static void LoadFirstScene(ILContext il, TypeDefinition stateMachineTypeDef)
+        public static void GameManager_LoadFirstScene(ILContext il, TypeDefinition stateMachineTypeDef)
         {
             // add a `ModHooks.OnNewGame();` at the end of the method
             ILCursor cursor = new ILCursor(il);
@@ -688,7 +688,7 @@ namespace Modding.Patches
         }
 
         [MonoModIgnore]
-        public static void OnWillActivateFirstLevel(ILContext il)
+        public static void GameManager_OnWillActivateFirstLevel(ILContext il)
         {
             // add a `ModHooks.OnNewGame();` at the end of the method
             ILCursor cursor = new ILCursor(il);

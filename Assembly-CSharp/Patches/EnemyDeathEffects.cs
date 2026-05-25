@@ -12,11 +12,11 @@ namespace Modding.Patches
     public class EnemyDeathEffects : global::EnemyDeathEffects
     {
         [MonoModIgnore]
-        [Attributes.RawIlPatch(nameof(IlPatches.RecieveDeathEvent))]
+        [Attributes.RawIlPatch(nameof(IlPatches.EnemyDeathEffects_RecieveDeathEvent))]
         extern public void RecieveDeathEvent(float? attackDirection, bool resetDeathEvent = false, bool spellBurn = false, bool isWatery = false);
 
         [MonoModIgnore]
-        [Attributes.RawIlPatch(nameof(IlPatches.RecordKillForJournal))]
+        [Attributes.RawIlPatch(nameof(IlPatches.EnemyDeathEffects_RecordKillForJournal))]
         extern public static void RecordKillForJournal(string playerDataName);
     }
 
@@ -24,7 +24,7 @@ namespace Modding.Patches
     public static partial class IlPatches
     {
         [MonoModIgnore]
-        public static void RecieveDeathEvent(ILContext il)
+        public static void EnemyDeathEffects_RecieveDeathEvent(ILContext il)
         {
             // add a `ModHooks.OnRecieveDeathEvent(this, didFire, ref attackDirection, ref resetDeathEvent, ref spellBurn, ref isWatery);` at the start of the method
             ILCursor cursor = new ILCursor(il);
@@ -43,7 +43,7 @@ namespace Modding.Patches
         }
 
         [MonoModIgnore]
-        public static void RecordKillForJournal(ILContext il)
+        public static void EnemyDeathEffects_RecordKillForJournal(ILContext il)
         {
             // add a `ModHooks.OnRecordKillForJournal(this, this.playerDataName, $"killed{this.playerDataName}", $"kills{this.playerDataName}", $"newData{this.playerDataName}");` at the start of the method
             ILCursor cursor = new ILCursor(il);

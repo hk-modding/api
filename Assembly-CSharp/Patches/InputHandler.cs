@@ -12,14 +12,14 @@ namespace Modding.Patches
     public class InputHandler : global::InputHandler
     {
         [MonoModIgnore]
-        [Attributes.RawIlPatch(nameof(IlPatches.OnGUI))]
+        [Attributes.RawIlPatch(nameof(IlPatches.InputHandler_OnGUI))]
         extern private void OnGUI();
     }
 
     public static partial class IlPatches
     {
         [MonoModIgnore]
-        public static void OnGUI(ILContext il)
+        public static void InputHandler_OnGUI(ILContext il)
         {
             // add a `Cursor.lockState = CursorLockMode.None;` before every (4) `ret`
             ILCursor cursor = new ILCursor(il);

@@ -13,14 +13,14 @@ namespace Modding.Patches
     public class HealthManager : global::HealthManager
     {
         [MonoModIgnore]
-        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.CheckPersistence))]
+        [Attributes.IEnumeratorIlPatch(nameof(IlPatches.HealthManager_CheckPersistence))]
         extern protected IEnumerator CheckPersistence();
     }
 
     public static partial class IlPatches
     {
         [MonoModIgnore]
-        public static void CheckPersistence(ILContext il, TypeDefinition stateMachineTypeDef)
+        public static void HealthManager_CheckPersistence(ILContext il, TypeDefinition stateMachineTypeDef)
         {
             // add a `isDead = ModHooks.OnEnableEnemy( gameObject, isDead );` before the `this.isDead` check
             ILCursor cursor = new ILCursor(il);

@@ -1,6 +1,8 @@
 using System.Collections;
 using GlobalEnums;
+using Mono.Cecil.Cil;
 using MonoMod;
+using MonoMod.Cil;
 using UnityEngine;
 
 // ReSharper disable All
@@ -11,835 +13,51 @@ namespace Modding.Patches
     [MonoModPatch("global::HeroController")]
     public class HeroController : global::HeroController
     {
-        #region Attack()
+        [MonoModIgnore]
+        [Attributes.RawIlPatch(nameof(IlPatches.HeroController_Attack))]
+        extern private void Attack(AttackDirection attackDir);
 
         [MonoModIgnore]
-        private float attackDuration;
+        [Attributes.RawIlPatch(nameof(IlPatches.HeroController_SoulGain))]
+        extern public void SoulGain();
 
         [MonoModIgnore]
-        private PlayMakerFSM slashFsm;
+        [Attributes.RawIlPatch(nameof(IlPatches.HeroController_LookForQueueInput))]
+        extern private void LookForQueueInput();
 
         [MonoModIgnore]
-        private float altAttackTime;
+        [Attributes.RawIlPatch(nameof(IlPatches.HeroController_TakeDamage))]
+        extern public void TakeDamage(GameObject go, CollisionSide damageSide, int damageAmount, int hazardType);
 
         [MonoModIgnore]
-        private bool wallSlashing;
+        [Attributes.RawIlPatch(nameof(IlPatches.HeroController_StartMPDrain))]
+        extern public void StartMPDrain(float time);
 
         [MonoModIgnore]
-        private GameObject grubberFlyBeam;
+        [Attributes.RawIlPatch(nameof(IlPatches.HeroController_Update))]
+        extern private void Update();
 
         [MonoModIgnore]
-        private float MANTIS_CHARM_SCALE = 1.35f;
+        [Attributes.RawIlPatch(nameof(IlPatches.HeroController_CharmUpdate))]
+        extern public void CharmUpdate();
 
         [MonoModIgnore]
-        private bool joniBeam;
-
-        [MonoModIgnore]
-        public NailSlash wallSlash;
-
-        [MonoModIgnore]
-        public NailSlash normalSlash;
-
-        [MonoModIgnore]
-        public NailSlash alternateSlash;
-
-        [MonoModIgnore]
-        public NailSlash upSlash;
-
-        [MonoModIgnore]
-        public NailSlash downSlash;
-
-        [MonoModReplace]
-        public void Attack(AttackDirection attackDir)
-        {
-            ModHooks.OnAttack(attackDir); //MOD API ADDED
-            if (Time.timeSinceLevelLoad - this.altAttackTime > this.ALT_ATTACK_RESET)
-                this.cState.altAttack = false;
-            this.cState.attacking = true;
-            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_32)))
-                this.attackDuration = this.ATTACK_DURATION_CH;
-            else
-                this.attackDuration = this.ATTACK_DURATION;
-            if (this.cState.wallSliding)
-            {
-                this.wallSlashing = true;
-                this.slashComponent = this.wallSlash;
-                this.slashFsm = this.wallSlashFsm;
-                if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_35)))
-                {
-                    if ((this.playerData.GetInt(nameof(PlayerData.health)) == this.playerData.GetInt(nameof(PlayerData.CurrentMaxHealth)) && !this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))) || (this.joniBeam && this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))))
-                    {
-                        if (this.transform.localScale.x > 0f)
-                        {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabR.Spawn(this.transform.position);
-                        }
-                        else
-                        {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabL.Spawn(this.transform.position);
-                        }
-                        if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
-                        {
-                            this.grubberFlyBeam.transform.SetScaleY(this.MANTIS_CHARM_SCALE);
-                        }
-                        else
-                        {
-                            this.grubberFlyBeam.transform.SetScaleY(1f);
-                        }
-                    }
-                    if (this.playerData.GetInt(nameof(PlayerData.health)) == 1 && this.playerData.GetBool(nameof(PlayerData.equippedCharm_6)) && this.playerData.GetInt(nameof(PlayerData.healthBlue)) < 1)
-                    {
-                        if (this.transform.localScale.x > 0f)
-                        {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabR_fury.Spawn(this.transform.position);
-                        }
-                        else
-                        {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabL_fury.Spawn(this.transform.position);
-                        }
-                        if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
-                        {
-                            this.grubberFlyBeam.transform.SetScaleY(this.MANTIS_CHARM_SCALE);
-                        }
-                        else
-                        {
-                            this.grubberFlyBeam.transform.SetScaleY(1f);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                this.wallSlashing = false;
-                if (attackDir == AttackDirection.normal)
-                {
-                    if (!this.cState.altAttack)
-                    {
-                        this.slashComponent = this.normalSlash;
-                        this.slashFsm = this.normalSlashFsm;
-                        this.cState.altAttack = true;
-                    }
-                    else
-                    {
-                        this.slashComponent = this.alternateSlash;
-                        this.slashFsm = this.alternateSlashFsm;
-                        this.cState.altAttack = false;
-                    }
-                    if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_35)))
-                    {
-                        if ((this.playerData.GetInt(nameof(PlayerData.health)) >= this.playerData.GetInt(nameof(PlayerData.maxHealth)) && !this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))) || (this.joniBeam && this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))))
-                        {
-                            if (this.transform.localScale.x < 0f)
-                                this.grubberFlyBeam = this.grubberFlyBeamPrefabR.Spawn(this.transform.position);
-                            else
-                                this.grubberFlyBeam = this.grubberFlyBeamPrefabL.Spawn(this.transform.position);
-                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
-                                this.grubberFlyBeam.transform.SetScaleY(this.MANTIS_CHARM_SCALE);
-                            else
-                                this.grubberFlyBeam.transform.SetScaleY(1f);
-                        }
-                        if (this.playerData.GetInt(nameof(PlayerData.health)) == 1 && this.playerData.GetBool(nameof(PlayerData.equippedCharm_6)) && this.playerData.GetInt(nameof(PlayerData.healthBlue)) < 1)
-                        {
-                            if (this.transform.localScale.x < 0f)
-                                this.grubberFlyBeam = this.grubberFlyBeamPrefabR_fury.Spawn(this.transform.position);
-                            else
-                                this.grubberFlyBeam = this.grubberFlyBeamPrefabL_fury.Spawn(this.transform.position);
-                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
-                                this.grubberFlyBeam.transform.SetScaleY(this.MANTIS_CHARM_SCALE);
-                            else
-                                this.grubberFlyBeam.transform.SetScaleY(1f);
-                        }
-                    }
-                }
-                else if (attackDir == AttackDirection.upward)
-                {
-                    this.slashComponent = this.upSlash;
-                    this.slashFsm = this.upSlashFsm;
-                    this.cState.upAttacking = true;
-                    if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_35)))
-                    {
-                        if ((this.playerData.GetInt(nameof(PlayerData.health)) >= this.playerData.GetInt(nameof(PlayerData.maxHealth)) && !this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))) || (this.joniBeam && this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))))
-                        {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabU.Spawn(this.transform.position);
-                            this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
-                            this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 270f);
-                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
-                                this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
-                        }
-                        if (this.playerData.GetInt(nameof(PlayerData.health)) == 1 && this.playerData.GetBool(nameof(PlayerData.equippedCharm_6)) && this.playerData.GetInt(nameof(PlayerData.healthBlue)) < 1)
-                        {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabU_fury.Spawn(this.transform.position);
-                            this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
-                            this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 270f);
-                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
-                                this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
-                        }
-                    }
-                }
-                else if (attackDir == AttackDirection.downward)
-                {
-                    this.slashComponent = this.downSlash;
-                    this.slashFsm = this.downSlashFsm;
-                    this.cState.downAttacking = true;
-                    if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_35)))
-                    {
-                        if ((this.playerData.GetInt(nameof(PlayerData.health)) >= this.playerData.GetInt(nameof(PlayerData.maxHealth)) && !this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))) || (this.joniBeam && this.playerData.GetBool(nameof(PlayerData.equippedCharm_27))))
-                        {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabD.Spawn(this.transform.position);
-                            this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
-                            this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
-                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
-                                this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
-                        }
-                        if (this.playerData.GetInt(nameof(PlayerData.health)) == 1 && this.playerData.GetBool(nameof(PlayerData.equippedCharm_6)) && this.playerData.GetInt(nameof(PlayerData.healthBlue)) < 1)
-                        {
-                            this.grubberFlyBeam = this.grubberFlyBeamPrefabD_fury.Spawn(this.transform.position);
-                            this.grubberFlyBeam.transform.SetScaleY(this.transform.localScale.x);
-                            this.grubberFlyBeam.transform.localEulerAngles = new Vector3(0f, 0f, 90f);
-                            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_13)))
-                                this.grubberFlyBeam.transform.SetScaleY(this.grubberFlyBeam.transform.localScale.y * this.MANTIS_CHARM_SCALE);
-                        }
-                    }
-                }
-            }
-            if (this.cState.wallSliding)
-            {
-                if (this.cState.facingRight)
-                    this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 180f;
-                else
-                    this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 0f;
-            }
-            else if (attackDir == AttackDirection.normal && this.cState.facingRight)
-                this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 0f;
-            else if (attackDir == AttackDirection.normal && !this.cState.facingRight)
-                this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 180f;
-            else if (attackDir == AttackDirection.upward)
-                this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 90f;
-            else if (attackDir == AttackDirection.downward)
-                this.slashFsm.FsmVariables.GetFsmFloat("direction").Value = 270f;
-            this.altAttackTime = Time.timeSinceLevelLoad;
-            ModHooks.AfterAttack(attackDir); //MOD API - Added
-            if (!this.cState.attacking) return; //MOD API - Added
-            this.slashComponent.StartSlash();
-            if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_38)))
-                this.fsm_orbitShield.SendEvent("SLASH");
-        }
-
-        #endregion
-
-        #region SoulGain
-
-        [MonoModIgnore]
-        private GameManager gm;
-
-        [MonoModReplace]
-        public void SoulGain()
-        {
-            int num;
-            if (this.playerData.GetInt(nameof(PlayerData.MPCharge)) < this.playerData.GetInt(nameof(PlayerData.maxMP)))
-            {
-                num = 11;
-                if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_20)))
-                {
-                    num += 3;
-                }
-
-                if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_21)))
-                {
-                    num += 8;
-                }
-            }
-            else
-            {
-                num = 6;
-                if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_20)))
-                {
-                    num += 2;
-                }
-
-                if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_21)))
-                {
-                    num += 6;
-                }
-            }
-
-            int mpreserve = this.playerData.GetInt(nameof(PlayerData.MPReserve));
-            num = Modding.ModHooks.OnSoulGain(num);
-            this.playerData.AddMPCharge(num);
-            GameCameras.instance.soulOrbFSM.SendEvent("MP GAIN");
-            if (this.playerData.GetInt(nameof(PlayerData.MPReserve)) != mpreserve)
-            {
-                this.gm.soulVessel_fsm.SendEvent("MP RESERVE UP");
-            }
-        }
-
-        #endregion
-
-        #region LookForQueueInput
-
-        [MonoModIgnore]
-        private bool isGameplayScene;
-
-        [MonoModIgnore]
-        private InputHandler inputHandler;
-
-        [MonoModIgnore]
-        private extern bool CanWallJump();
-
-        [MonoModIgnore]
-        private extern bool CanJump();
-
-        [MonoModIgnore]
-        private extern bool CanDoubleJump();
-
-        [MonoModIgnore]
-        private extern bool CanInfiniteAirJump();
-
-        [MonoModIgnore]
-        private extern bool CanDash();
-
-        [MonoModIgnore]
-        private extern bool CanAttack();
-
-        [MonoModIgnore]
-        private extern void DoWallJump();
-
-        [MonoModIgnore]
-        private extern void HeroJump();
-
-        [MonoModIgnore]
-        private extern void DoDoubleJump();
-
-        [MonoModIgnore]
-        private extern void CancelJump();
-
-        [MonoModIgnore]
-        private extern void ResetLook();
-
-        [MonoModIgnore]
-        private extern void HeroDash();
-
-        [MonoModIgnore]
-        private extern bool CanSwim();
-
-        [MonoModIgnore]
-        private extern void SetState(ActorStates newState);
-
-        [MonoModIgnore]
-        private HeroAudioController audioCtrl;
-
-        [MonoModIgnore]
-        private int jumpQueueSteps;
-
-        [MonoModIgnore]
-        private int doubleJumpQueueSteps;
-
-        [MonoModIgnore]
-        private bool doubleJumpQueuing;
-
-        [MonoModIgnore]
-        private int jumpReleaseQueueSteps;
-
-        [MonoModIgnore]
-        private bool jumpReleaseQueuing;
-
-        [MonoModIgnore]
-        private bool jumpQueuing;
-
-        [MonoModIgnore]
-        private int dashQueueSteps;
-
-        [MonoModIgnore]
-        private bool dashQueuing;
-
-        [MonoModIgnore]
-        private int attackQueueSteps;
-
-        [MonoModIgnore]
-        private bool attackQueuing;
-
-        [MonoModIgnore]
-        private int JUMP_QUEUE_STEPS = 2;
-
-        [MonoModIgnore]
-        private int DOUBLE_JUMP_QUEUE_STEPS = 10;
-
-        [MonoModIgnore]
-        private int ATTACK_QUEUE_STEPS = 5;
-
-
-        [MonoModReplace]
-        private void LookForQueueInput()
-        {
-            if (this.acceptingInput && !this.gm.isPaused && this.isGameplayScene)
-            {
-                if (this.inputHandler.inputActions.jump.WasPressed)
-                {
-                    if (this.CanWallJump())
-                    {
-                        this.DoWallJump();
-                    }
-                    else if (this.CanJump())
-                    {
-                        this.HeroJump();
-                    }
-                    else if (this.CanDoubleJump())
-                    {
-                        this.DoDoubleJump();
-                    }
-                    else if (this.CanInfiniteAirJump())
-                    {
-                        this.CancelJump();
-                        this.audioCtrl.PlaySound(HeroSounds.JUMP);
-                        this.ResetLook();
-                        this.cState.jumping = true;
-                    }
-                    else
-                    {
-                        this.jumpQueueSteps = 0;
-                        this.jumpQueuing = true;
-                        this.doubleJumpQueueSteps = 0;
-                        this.doubleJumpQueuing = true;
-                    }
-                }
-
-                if (this.inputHandler.inputActions.dash.WasPressed && !ModHooks.OnDashPressed())
-                {
-                    if (this.CanDash())
-                    {
-                        this.HeroDash();
-                    }
-                    else
-                    {
-                        this.dashQueueSteps = 0;
-                        this.dashQueuing = true;
-                    }
-                }
-
-                if (this.inputHandler.inputActions.attack.WasPressed)
-                {
-                    if (this.CanAttack())
-                    {
-                        this.DoAttack();
-                    }
-                    else
-                    {
-                        this.attackQueueSteps = 0;
-                        this.attackQueuing = true;
-                    }
-                }
-
-                if (this.inputHandler.inputActions.jump.IsPressed)
-                {
-                    if (this.jumpQueueSteps <= this.JUMP_QUEUE_STEPS && this.CanJump() && this.jumpQueuing)
-                    {
-                        this.HeroJump();
-                    }
-                    else if (this.doubleJumpQueueSteps <= this.DOUBLE_JUMP_QUEUE_STEPS && this.CanDoubleJump() && this.doubleJumpQueuing)
-                    {
-                        if (this.cState.onGround)
-                        {
-                            this.HeroJump();
-                        }
-                        else
-                        {
-                            this.DoDoubleJump();
-                        }
-                    }
-
-                    if (this.CanSwim())
-                    {
-                        if (this.hero_state != ActorStates.airborne)
-                        {
-                            this.SetState(ActorStates.airborne);
-                        }
-
-                        this.cState.swimming = true;
-                    }
-                }
-
-                if (this.inputHandler.inputActions.dash.IsPressed
-                    && this.dashQueueSteps <= this.DASH_QUEUE_STEPS
-                    && this.CanDash()
-                    && this.dashQueuing
-                    && !ModHooks.OnDashPressed())
-                {
-                    this.HeroDash();
-                }
-
-                if (this.inputHandler.inputActions.attack.IsPressed && this.attackQueueSteps <= this.ATTACK_QUEUE_STEPS && this.CanAttack() && this.attackQueuing)
-                {
-                    this.DoAttack();
-                }
-            }
-        }
-
-        #endregion
-
-        #region TakeDamage
-
-        [MonoModIgnore]
-        private int hitsSinceShielded;
-
-        [MonoModIgnore]
-        private extern bool CanTakeDamage();
-
-        [MonoModIgnore]
-        private AudioSource audioSource;
-
-        [MonoModIgnore]
-        private extern void CancelAttack();
-
-        [MonoModIgnore]
-        private extern void CancelBounce();
-
-        [MonoModIgnore]
-        private extern void CancelRecoilHorizontal();
-
-        [MonoModIgnore]
-        private bool takeNoDamage;
-
-        [MonoModIgnore]
-        private float nailChargeTimer;
-
-        [MonoModIgnore]
-        private extern IEnumerator Die();
-
-        [MonoModIgnore]
-        private extern IEnumerator DieFromHazard(HazardType hazardType, float angle);
-
-        [MonoModIgnore]
-        private extern IEnumerator StartRecoil(CollisionSide impactSide, bool spawnDamageEffect, int damageAmount);
-
-        [MonoModIgnore]
-        public event HeroController.TakeDamageEvent OnTakenDamage;
-
-        [MonoModIgnore]
-        private HeroVibrationController vibrationCtrl;
-
-        [MonoModReplace]
-        public void TakeDamage(GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
-        {
-            damageAmount = ModHooks.OnTakeDamage(ref hazardType, damageAmount);
-            bool spawnDamageEffect = true;
-            if (damageAmount > 0)
-            {
-                if (BossSceneController.IsBossScene)
-                {
-                    int bossLevel = BossSceneController.Instance.BossLevel;
-                    if (bossLevel != 1)
-                    {
-                        if (bossLevel == 2)
-                        {
-                            damageAmount = 9999;
-                        }
-                    }
-                    else
-                    {
-                        damageAmount *= 2;
-                    }
-                }
-
-                if (this.CanTakeDamage())
-                {
-                    if (this.damageMode == DamageMode.HAZARD_ONLY && hazardType == 1)
-                    {
-                        return;
-                    }
-
-                    if (this.cState.shadowDashing && hazardType == 1)
-                    {
-                        return;
-                    }
-
-                    if (this.parryInvulnTimer > 0f && hazardType == 1)
-                    {
-                        return;
-                    }
-
-                    VibrationMixer mixer = VibrationManager.GetMixer();
-                    if (mixer != null)
-                    {
-                        mixer.StopAllEmissionsWithTag("heroAction");
-                    }
-
-                    bool carefreeShouldStopDamage = false;
-                    if (this.carefreeShieldEquipped && hazardType == 1)
-                    {
-                        if (this.hitsSinceShielded > 7)
-                        {
-                            this.hitsSinceShielded = 7;
-                        }
-
-                        switch (this.hitsSinceShielded)
-                        {
-                            case 1:
-                                if ((float) UnityEngine.Random.Range(1, 100) <= 10f)
-                                {
-                                    carefreeShouldStopDamage = true;
-                                }
-
-                                break;
-                            case 2:
-                                if ((float) UnityEngine.Random.Range(1, 100) <= 20f)
-                                {
-                                    carefreeShouldStopDamage = true;
-                                }
-
-                                break;
-                            case 3:
-                                if ((float) UnityEngine.Random.Range(1, 100) <= 30f)
-                                {
-                                    carefreeShouldStopDamage = true;
-                                }
-
-                                break;
-                            case 4:
-                                if ((float) UnityEngine.Random.Range(1, 100) <= 50f)
-                                {
-                                    carefreeShouldStopDamage = true;
-                                }
-
-                                break;
-                            case 5:
-                                if ((float) UnityEngine.Random.Range(1, 100) <= 70f)
-                                {
-                                    carefreeShouldStopDamage = true;
-                                }
-
-                                break;
-                            case 6:
-                                if ((float) UnityEngine.Random.Range(1, 100) <= 80f)
-                                {
-                                    carefreeShouldStopDamage = true;
-                                }
-
-                                break;
-                            case 7:
-                                if ((float) UnityEngine.Random.Range(1, 100) <= 90f)
-                                {
-                                    carefreeShouldStopDamage = true;
-                                }
-
-                                break;
-                            default:
-                                carefreeShouldStopDamage = false;
-                                break;
-                        }
-
-                        if (carefreeShouldStopDamage)
-                        {
-                            this.hitsSinceShielded = 0;
-                            this.carefreeShield.SetActive(true);
-                            damageAmount = 0;
-                            spawnDamageEffect = false;
-                        }
-                        else
-                        {
-                            this.hitsSinceShielded++;
-                        }
-                    }
-
-                    if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_5)) && this.playerData.GetInt(nameof(PlayerData.blockerHits)) > 0 && hazardType == 1 && this.cState.focusing && !carefreeShouldStopDamage)
-                    {
-                        this.proxyFSM.SendEvent("HeroCtrl-TookBlockerHit");
-                        this.audioSource.PlayOneShot(this.blockerImpact, 1f);
-                        spawnDamageEffect = false;
-                        damageAmount = 0;
-                    }
-                    else
-                    {
-                        this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-                    }
-
-                    this.CancelAttack();
-                    if (this.cState.wallSliding)
-                    {
-                        this.cState.wallSliding = false;
-                        this.vibrationCtrl.StopWallSlide();
-                    }
-
-                    if (this.cState.touchingWall)
-                    {
-                        this.cState.touchingWall = false;
-                    }
-
-                    if (this.cState.recoilingLeft || this.cState.recoilingRight)
-                    {
-                        this.CancelRecoilHorizontal();
-                    }
-
-                    if (this.cState.bouncing)
-                    {
-                        this.CancelBounce();
-                        this.rb2d.linearVelocity = new Vector2(this.rb2d.linearVelocity.x, 0f);
-                    }
-
-                    if (this.cState.shroomBouncing)
-                    {
-                        this.CancelBounce();
-                        this.rb2d.linearVelocity = new Vector2(this.rb2d.linearVelocity.x, 0f);
-                    }
-
-                    if (!carefreeShouldStopDamage)
-                    {
-                        this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT);
-                    }
-
-                    damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
-                    if (!this.takeNoDamage && !this.playerData.GetBool(nameof(PlayerData.invinciTest)))
-                    {
-                        if (this.playerData.GetBool(nameof(PlayerData.overcharmed)))
-                        {
-                            this.playerData.TakeHealth(damageAmount * 2);
-                        }
-                        else
-                        {
-                            this.playerData.TakeHealth(damageAmount);
-                        }
-                    }
-
-                    if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_3)) && damageAmount > 0)
-                    {
-                        if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_35)))
-                        {
-                            this.AddMPCharge(this.GRUB_SOUL_MP_COMBO);
-                        }
-                        else
-                        {
-                            this.AddMPCharge(this.GRUB_SOUL_MP);
-                        }
-                    }
-
-                    if (this.joniBeam && damageAmount > 0)
-                    {
-                        this.joniBeam = false;
-                    }
-
-                    if (this.cState.nailCharging || this.nailChargeTimer != 0f)
-                    {
-                        this.cState.nailCharging = false;
-                        this.nailChargeTimer = 0f;
-                    }
-
-                    if (damageAmount > 0 && this.OnTakenDamage != null)
-                    {
-                        this.OnTakenDamage();
-                    }
-
-                    if (this.playerData.GetInt(nameof(PlayerData.health)) == 0)
-                    {
-                        base.StartCoroutine(this.Die());
-                        return;
-                    }
-                    else if (hazardType == 2)
-                    {
-                        base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, (!(go != null)) ? 0f : go.transform.rotation.z));
-                        return;
-                    }
-                    else if (hazardType == 3)
-                    {
-                        base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
-                        return;
-                    }
-                    else if (hazardType == 4)
-                    {
-                        Debug.Log("Lava death");
-                        return;
-                    }
-                    else if (hazardType == 5)
-                    {
-                        base.StartCoroutine(this.DieFromHazard(HazardType.PIT, 0f));
-                        return;
-                    }
-                    base.StartCoroutine(this.StartRecoil(damageSide, spawnDamageEffect, damageAmount));
-                    return;
-                }
-                else if (this.cState.invulnerable && !this.cState.hazardDeath && !this.playerData.GetBool(nameof(PlayerData.isInvincible)))
-                {
-                    if (hazardType == 2)
-                    {
-                        if (!this.takeNoDamage)
-                        {
-                            damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
-                            this.playerData.TakeHealth(damageAmount);
-                        }
-
-                        this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-                        if (this.playerData.GetInt("health") == 0)
-                        {
-                            base.StartCoroutine(this.Die());
-                        }
-                        else
-                        {
-                            this.audioCtrl.PlaySound(HeroSounds.TAKE_HIT, false);
-                            base.StartCoroutine(this.DieFromHazard(HazardType.SPIKES, (go != null) ? go.transform.rotation.z : 0f));
-                        }
-                    }
-                    else if (hazardType == 3)
-                    {
-                        damageAmount = ModHooks.AfterTakeDamage(hazardType, damageAmount);
-                        this.playerData.TakeHealth(damageAmount);
-                        this.proxyFSM.SendEvent("HeroCtrl-HeroDamaged");
-                        if (this.playerData.GetInt(nameof(PlayerData.health)) == 0)
-                        {
-                            base.StartCoroutine(this.Die());
-                            return;
-                        }
-                        base.StartCoroutine(this.DieFromHazard(HazardType.ACID, 0f));
-                        return;
-                    }
-                    else if (hazardType == 4)
-                    {
-                        Debug.Log("Lava damage");
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        [MonoModIgnore]
-        private NailSlash slashComponent;
-
-        [MonoModIgnore]
-        private float focusMP_amount;
-
-        private void orig_StartMPDrain(float time) { }
-
-        public void StartMPDrain(float time)
-        {
-            orig_StartMPDrain(time);
-            focusMP_amount *= ModHooks.OnFocusCost();
-        }
-
-        private void orig_Update() { }
-
-        private void Update()
-        {
-            ModHooks.OnHeroUpdate();
-            orig_Update();
-        }
-
+        [Attributes.RawIlPatch(nameof(IlPatches.HeroController_DoAttack))]
+        extern private void DoAttack();
 
         #region Dash()
 
-        [MonoModIgnore]
-        private float dash_timer;
-
-        [MonoModIgnore]
-        private extern void FinishedDashing();
-
-        [MonoModIgnore]
-        private Rigidbody2D rb2d;
-
         // This is the original dash vector calculating code used by the game
         // It is used to set the input dash velocity vector for the DashVectorHook
+        [MonoModIgnore]
+        private float BUMP_VELOCITY;
+
+        [MonoModIgnore]
+        private float BUMP_VELOCITY_DASH;
+
         private Vector2 OrigDashVector()
         {
-            const float BUMP_VELOCITY = 4f;
-            const float BUMP_VELOCITY_DASH = 5f;
             Vector2 origVector;
-
             float velocity;
             if (this.playerData.GetBool(nameof(PlayerData.equippedCharm_16)) && this.cState.shadowDashing)
             {
@@ -858,11 +76,7 @@ namespace Modding.Patches
             {
                 if (this.CheckForBump(CollisionSide.right))
                 {
-                    origVector = new Vector2
-                    (
-                        velocity,
-                        this.cState.onGround ? BUMP_VELOCITY : BUMP_VELOCITY_DASH
-                    );
+                    origVector = new Vector2(velocity, this.cState.onGround ? BUMP_VELOCITY : BUMP_VELOCITY_DASH);
                 }
                 else
                 {
@@ -871,20 +85,25 @@ namespace Modding.Patches
             }
             else if (this.CheckForBump(CollisionSide.left))
             {
-                origVector = new Vector2
-                (
-                    -velocity,
-                    this.cState.onGround ? BUMP_VELOCITY : BUMP_VELOCITY_DASH
-                );
+                origVector = new Vector2(-velocity, this.cState.onGround ? BUMP_VELOCITY : BUMP_VELOCITY_DASH);
             }
             else
             {
                 origVector = new Vector2(-velocity, 0f);
             }
-
             return origVector;
         }
 
+        [MonoModIgnore]
+        private float dash_timer;
+
+        [MonoModIgnore]
+        private extern void FinishedDashing();
+
+        [MonoModIgnore]
+        private Rigidbody2D rb2d;
+
+        [MonoModReplace]
         private void Dash()
         {
             AffectedByGravity(false);
@@ -903,27 +122,199 @@ namespace Modding.Patches
         }
 
         #endregion
+    }
 
-        #region CharmUpdate()
-
-        private extern void orig_CharmUpdate();
-
-        public void CharmUpdate()
+    public static partial class IlPatches
+    {
+        [MonoModIgnore]
+        public static void HeroController_Attack(ILContext il)
         {
-            orig_CharmUpdate();
-            ModHooks.OnCharmUpdate(playerData, this);
-            playerData.UpdateBlueHealth();
+            // remove the `this.pd.betaEnd` check at the end of the method
+            ILCursor cursor = new ILCursor(il).Goto(0);
+
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate(global::Modding.ModHooks.OnAttack);
+
+            cursor.GotoNext
+            (
+                MoveType.AfterLabel,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<global::HeroController>("slashComponent"),
+                x => x.MatchCallOrCallvirt<global::NailSlash>(nameof(global::NailSlash.StartSlash))
+            );
+            var labelToJumpOverRet = cursor.DefineLabel();
+            labelToJumpOverRet.Target = cursor.Next;
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate(global::Modding.ModHooks.AfterAttack);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::HeroController), nameof(global::HeroController.cState)));
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::HeroControllerStates), nameof(global::HeroControllerStates.attacking)));
+            cursor.Emit(OpCodes.Brtrue_S, labelToJumpOverRet);
+            cursor.Emit(OpCodes.Ret);
         }
 
-        #endregion
+        [MonoModIgnore]
+        public static void HeroController_SoulGain(ILContext il)
+        {
+            // add a `num = Modding.ModHooks.OnSoulGain(num);` near the end of the method
+            ILCursor cursor = new ILCursor(il);
+
+            cursor.GotoNext
+            (
+                MoveType.AfterLabel,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<global::HeroController>(nameof(global::HeroController.playerData)),
+                x => x.MatchLdloc(0),
+                x => x.MatchCallOrCallvirt<global::PlayerData>(nameof(global::PlayerData.AddMPCharge))
+            );
+            cursor.Emit(OpCodes.Ldloc_0);
+            cursor.EmitDelegate(global::Modding.ModHooks.OnSoulGain);
+            cursor.Emit(OpCodes.Stloc_0);
+        }
 
         [MonoModIgnore]
-        private extern void orig_DoAttack();
-
-        public void DoAttack()
+        public static void HeroController_LookForQueueInput(ILContext il)
         {
-            ModHooks.OnDoAttack();
-            orig_DoAttack();
+            // add a `&& !Modding.ModHooks.OnDashPressed()` to two if (...)
+            ILCursor cursor = new ILCursor(il);
+
+            ILLabel labelForFirstIf = cursor.DefineLabel();
+            cursor.GotoNext
+            (
+                MoveType.After,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<global::HeroController>("inputHandler"),
+                x => x.MatchLdfld<global::InputHandler>(nameof(global::InputHandler.inputActions)),
+                x => x.MatchLdfld<global::HeroActions>(nameof(global::HeroActions.dash)),
+                x => x.MatchCallOrCallvirt<global::InControl.OneAxisInputControl>("get_WasPressed"),
+                x => x.MatchBrfalse(out labelForFirstIf)
+            );
+            cursor.EmitDelegate(global::Modding.ModHooks.OnDashPressed);
+            cursor.Emit(OpCodes.Brtrue_S, labelForFirstIf);
+
+            ILLabel labelForSecondIf = cursor.DefineLabel();
+            cursor.GotoNext
+            (
+                MoveType.After,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<global::HeroController>("inputHandler"),
+                x => x.MatchLdfld<global::InputHandler>(nameof(global::InputHandler.inputActions)),
+                x => x.MatchLdfld<global::HeroActions>(nameof(global::HeroActions.dash)),
+                x => x.MatchCallOrCallvirt<global::InControl.OneAxisInputControl>("get_IsPressed"),
+                x => x.MatchBrfalse(out labelForSecondIf)
+            );
+            cursor.EmitDelegate(global::Modding.ModHooks.OnDashPressed);
+            cursor.Emit(OpCodes.Brtrue_S, labelForSecondIf);
+        }
+
+        [MonoModIgnore]
+        public static void HeroController_TakeDamage(ILContext il)
+        {
+            // add a `damageAmount = Modding.ModHooks.OnTakeDamage(ref hazardType, damageAmount);` at the start and a `damageAmount = Modding.ModHooks.AfterTakeDamage(hazardType, damageAmount);` somewhere in the middle
+            ILCursor cursor = new ILCursor(il).Goto(0);
+
+            cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[3]); // ref hazardType
+            cursor.Emit(OpCodes.Ldarg_3); // damageAmount
+            cursor.EmitDelegate(global::Modding.ModHooks.OnTakeDamage);
+            cursor.Emit(OpCodes.Starg_S, il.Method.Parameters[2]); // damageAmount
+
+            cursor.GotoNext
+            (
+                MoveType.AfterLabel,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<global::HeroController>(nameof(global::HeroController.takeNoDamage)),
+                x => x.MatchBrtrue(out var _)
+            );
+            cursor.Emit(OpCodes.Ldarg_S, il.Method.Parameters[3]); // hazardType
+            cursor.Emit(OpCodes.Ldarg_S, il.Method.Parameters[2]); // damageAmount
+            cursor.EmitDelegate(global::Modding.ModHooks.AfterTakeDamage);
+            cursor.Emit(OpCodes.Starg_S, il.Method.Parameters[2]); // damageAmount
+
+            cursor.GotoNext
+            (
+                MoveType.After,
+                x => x.MatchLdcI4(3),
+                x => x.MatchBneUn(out var _)
+            );  // to skip over some parts
+            cursor.GotoNext
+            (
+                MoveType.After,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<global::HeroController>(nameof(global::HeroController.takeNoDamage)),
+                x => x.MatchBrtrue(out var _)
+            );
+            cursor.Emit(OpCodes.Ldarg_S, il.Method.Parameters[3]); // hazardType
+            cursor.Emit(OpCodes.Ldarg_S, il.Method.Parameters[2]); // damageAmount
+            cursor.EmitDelegate(global::Modding.ModHooks.AfterTakeDamage);
+            cursor.Emit(OpCodes.Starg_S, il.Method.Parameters[2]); // damageAmount
+
+            cursor.GotoNext
+            (
+                MoveType.After,
+                x => x.MatchLdcI4(3),
+                x => x.MatchBneUn(out var _)
+            );
+            cursor.Emit(OpCodes.Ldarg_S, il.Method.Parameters[3]); // hazardType
+            cursor.Emit(OpCodes.Ldarg_S, il.Method.Parameters[2]); // damageAmount
+            cursor.EmitDelegate(global::Modding.ModHooks.AfterTakeDamage);
+            cursor.Emit(OpCodes.Starg_S, il.Method.Parameters[2]); // damageAmount
+        }
+
+        [MonoModIgnore]
+        public static void HeroController_StartMPDrain(ILContext il)
+        {
+            // add a `this.focusMP_amount *= Modding.ModHooks.OnFocusCost();` at the end
+            ILCursor cursor = new ILCursor(il);
+
+            cursor.GotoNext
+            (
+                MoveType.AfterLabel,
+                x => x.MatchRet()
+            );
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::HeroController), "focusMP_amount"));
+            cursor.EmitDelegate(global::Modding.ModHooks.OnFocusCost);
+            cursor.Emit(OpCodes.Mul);
+            cursor.Emit(OpCodes.Stfld, ReflectionHelper.GetFieldInfo(typeof(global::HeroController), "focusMP_amount"));
+        }
+
+        [MonoModIgnore]
+        public static void HeroController_Update(ILContext il)
+        {
+            // add a `ModHooks.OnHeroUpdate();` at the start
+            ILCursor cursor = new ILCursor(il).Goto(0);
+
+            cursor.EmitDelegate(global::Modding.ModHooks.OnHeroUpdate);
+        }
+
+        [MonoModIgnore]
+        public static void HeroController_CharmUpdate(ILContext il)
+        {
+            // add a `ModHooks.OnCharmUpdate(playerData, this); playerData.UpdateBlueHealth();` at the end
+            ILCursor cursor = new ILCursor(il);
+
+            cursor.GotoNext
+            (
+                MoveType.AfterLabel,
+                x => x.MatchRet()
+            );
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::HeroController), nameof(global::HeroController.playerData)));
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate(global::Modding.ModHooks.OnCharmUpdate);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::HeroController), nameof(global::HeroController.playerData)));
+            cursor.Emit(OpCodes.Callvirt, ReflectionHelper.GetMethodInfo(typeof(global::PlayerData), nameof(global::PlayerData.UpdateBlueHealth), true));
+        }
+
+        [MonoModIgnore]
+        public static void HeroController_DoAttack(ILContext il)
+        {
+            // add a `ModHooks.OnDoAttack();` at the start
+            ILCursor cursor = new ILCursor(il).Goto(0);
+
+            cursor.EmitDelegate(global::Modding.ModHooks.OnDoAttack);
         }
     }
 }
