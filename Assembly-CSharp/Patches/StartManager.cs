@@ -78,15 +78,13 @@ namespace Modding.Patches
                 loadOperation.allowSceneActivation = false;
             }
             Platform.Current.SetSceneLoadState(true, false);
-            bool showLanguageSelect = !this.CheckIsLanguageSet();
-            if (showLanguageSelect && Platform.Current.ShowLanguageSelect)
+            if (!this.CheckIsLanguageSet() && Platform.Current.ShowLanguageSelect)
             {
                 yield return base.StartCoroutine(this.ShowLanguageSelect());
                 while (!this.confirmedLanguage)
                 {
                     yield return null;
                 }
-
                 yield return base.StartCoroutine(this.LanguageSettingDone());
             }
             TeamCherry.Localization.LanguageCode currentLanguage = (TeamCherry.Localization.LanguageCode) Lang.CurrentLanguage();
@@ -94,40 +92,44 @@ namespace Modding.Patches
             {
                 yield return null;
             }
-            bool flag = false;
+            bool savedLanguageDifferentFromDefault = false;
             string text;
             if (TeamCherry.Localization.LocalizationProjectSettings.TryGetSavedLanguageCode(out text))
             {
                 TeamCherry.Localization.LanguageCode languageEnum = TeamCherry.Localization.LocalizationSettings.GetLanguageEnum(text);
                 if (currentLanguage != languageEnum)
                 {
-                    flag = true;
+                    savedLanguageDifferentFromDefault = true;
                 }
             }
-            if (flag)
+            if (savedLanguageDifferentFromDefault)
             {
                 Lang.LoadLanguage();
-                ChangeFontByLanguage[] array = UObject.FindObjectsByType<ChangeFontByLanguage>(FindObjectsSortMode.None);
-                for (int i = 0; i < array.Length; i++)
+                ChangeFontByLanguage[] changeFontByLanguages = UObject.FindObjectsByType<ChangeFontByLanguage>(FindObjectsSortMode.None);
+                for (int i = 0; i < changeFontByLanguages.Length; i++)
                 {
-                    array[i].SetFont();
+                    changeFontByLanguages[i].SetFont();
                 }
-                SetTextMeshProGameText[] componentsInChildren = base.GetComponentsInChildren<SetTextMeshProGameText>(true);
-                for (int i = 0; i < componentsInChildren.Length; i++)
+                SetTextMeshProGameText[] setTextMeshProGameTexts = base.GetComponentsInChildren<SetTextMeshProGameText>(true);
+                for (int i = 0; i < setTextMeshProGameTexts.Length; i++)
                 {
-                    componentsInChildren[i].UpdateText();
+                    setTextMeshProGameTexts[i].UpdateText();
                 }
-                LogoLanguage[] componentsInChildren2 = base.GetComponentsInChildren<LogoLanguage>(true);
-                for (int i = 0; i < componentsInChildren2.Length; i++)
+                LogoLanguage[] logoLanguages = base.GetComponentsInChildren<LogoLanguage>(true);
+                for (int i = 0; i < logoLanguages.Length; i++)
                 {
-                    componentsInChildren2[i].SetSprite();
+                    logoLanguages[i].SetSprite();
                 }
             }
             this.startManagerAnimator.SetBool("WillShowControllerNotice", false);
             this.startManagerAnimator.SetBool("WillShowQuote", true);
-
-            StandaloneLoadingSpinner loadSpinner = UnityEngine.Object.Instantiate<StandaloneLoadingSpinner>(this.loadSpinnerPrefab);
-            loadSpinner.Setup(null);
+            // this.startManagerAnimator.SetTrigger("Start");
+            // int loadingIconNameHash = Animator.StringToHash("LoadingIcon");
+            // while (this.startManagerAnimator.GetCurrentAnimatorStateInfo(0).shortNameHash != loadingIconNameHash)
+            // {
+            //     yield return null;
+            // }
+            UnityEngine.Object.Instantiate<StandaloneLoadingSpinner>(this.loadSpinnerPrefab).Setup(null);
             bool didWaitForPlayerPrefs = false;
             while (!Platform.Current.IsPlayerPrefsLoaded)
             {

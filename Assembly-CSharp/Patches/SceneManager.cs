@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Mono.Cecil.Cil;
 using UnityEngine;
 using MonoMod;
+using MonoMod.Cil;
 
 // ReSharper disable All
 #pragma warning disable 1591, 0108, 0169, 0649, 0414, CS0626
@@ -12,55 +14,20 @@ namespace Modding.Patches
     public class SceneManager : global::SceneManager
     {
         [MonoModIgnore]
-        private bool gameplayScene;
-
-        [MonoModIgnore]
-        private HeroController heroCtrl;
-
-        [MonoModIgnore]
-        private bool heroInfoSent;
-
-        // [MonoModIgnore]
-        private extern void orig_Update();
-
-        [MonoModIgnore]
-        private GameManager gm;
-
-        // todo: make IL hook: seems trivial enough?
-        //Added checks for null and an attempt to fix any missing references
-        // [MonoModReplace]
-        private void Update()
-        {
-            if (this.gameplayScene)
-            {
-                if (!this.heroInfoSent && this.heroCtrl != null && (this.heroCtrl.heroLight == null || this.heroCtrl.heroLight.material == null))
-                {
-                    this.heroCtrl.SetDarkness(this.darknessLevel);
-                    this.heroInfoSent = true;
-                }
-            }
-
-            orig_Update();
-        }
+        [Attributes.RawIlPatch(nameof(IlPatches.SceneManager_Update))]
+        extern private void Update();
 
         [MonoModIgnore]
         private Transform borderLeft;
-
         [MonoModIgnore]
         private Transform borderRight;
-
         [MonoModIgnore]
         private Transform borderUp;
-
         [MonoModIgnore]
         private Transform borderDown;
 
-        // todo: make IL hook: seems trivial enough?
-        // [MonoModIgnore]
-        private extern void orig_OnCameraAspectChanged(float aspect);
-
         //add modhook to send the newly created borders to any mods that want them
-        // [MonoModReplace]
+        private extern void orig_OnCameraAspectChanged(float aspect);
         private void OnCameraAspectChanged(float aspect)
         {
             orig_OnCameraAspectChanged(aspect);
@@ -85,10 +52,7 @@ namespace Modding.Patches
             ModHooks.OnDrawBlackBorders(borders);
         }
 
-        // [MonoModIgnore]
         private extern void orig_Start();
-
-        // [MonoModReplace]
         private void Start()
         {
             try
@@ -97,6 +61,50 @@ namespace Modding.Patches
             }
             catch (NullReferenceException) when (!ModLoader.LoadState.HasFlag(ModLoader.ModLoadState.Preloaded))
             { }
+        }
+    }
+
+    public static partial class IlPatches
+    {
+        [MonoModIgnore]
+        public static void SceneManager_Update(ILContext il)
+        {
+            // add a branch around `this.heroCtrl.heroLight.material.SetColor("_Color", Color.white);`
+            ILCursor cursor = new ILCursor(il);
+
+            ILLabel forAfterChecks = cursor.DefineLabel();
+
+            cursor.GotoNext
+            (
+                MoveType.AfterLabel,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<global::SceneManager>("heroCtrl"),
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<global::SceneManager>(nameof(global::SceneManager.darknessLevel)),
+                x => x.MatchCallOrCallvirt<global::HeroController>(nameof(global::HeroController.SetDarkness))
+            );
+            forAfterChecks.Target = cursor.Next;
+
+            cursor.GotoPrev
+            (
+                MoveType.AfterLabel,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<global::SceneManager>("heroCtrl"),
+                x => x.MatchLdfld<global::HeroController>(nameof(global::HeroController.heroLight))
+            );
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::SceneManager), "heroCtrl"));
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::HeroController), nameof(global::HeroController.heroLight)));
+            cursor.Emit(OpCodes.Ldnull);
+            cursor.Emit(OpCodes.Call, ReflectionHelper.GetMethodInfo(typeof(global::UnityEngine.Object), "op_Equality", false));
+            cursor.Emit(OpCodes.Brtrue_S, forAfterChecks);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::SceneManager), "heroCtrl"));
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::HeroController), nameof(global::HeroController.heroLight)));
+            cursor.Emit(OpCodes.Callvirt, ReflectionHelper.GetMethodInfo(typeof(global::UnityEngine.SpriteRenderer), "get_material", true));
+            cursor.Emit(OpCodes.Ldnull);
+            cursor.Emit(OpCodes.Call, ReflectionHelper.GetMethodInfo(typeof(global::UnityEngine.Object), "op_Equality", false));
+            cursor.Emit(OpCodes.Brtrue_S, forAfterChecks);
         }
     }
 }
