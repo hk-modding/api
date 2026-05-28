@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -14,6 +15,18 @@ namespace Prepatcher
     {
         private static void Main(string[] args)
         {
+            // --mmhook mode: add type forwarders from one MMHOOK assembly into another
+            if (args.Length >= 1 && args[0] == "--mmhook")
+            {
+                if (args.Length < 3)
+                {
+                    Console.WriteLine("Usage: PrePatcher.exe --mmhook <target-mmhook.dll> <source-mmhook.dll>");
+                    return;
+                }
+                PatchMMHook(args[1], args[2]);
+                return;
+            }
+
             if (args.Length < 2)
             {
                 Console.WriteLine("Usage: PrePatcher.exe <Original> <Patched>");
@@ -132,6 +145,41 @@ namespace Prepatcher
                     // with short branches where possible for optimization
                     method.Body.OptimizeMacros();
                 }
+            }
+
+            // Add type forwarders for types that moved from Assembly-CSharp to TeamCherry.*.dll in Unity 6.
+            // This covers TeamCherry.TK2D (tk2d sprite system) and TeamCherry.Cinematics (video player).
+            // This allows mods compiled against the old API to load without TypeLoadException.
+            string baseDir = Path.GetDirectoryName(Path.GetFullPath(args[0]));
+            string[] teamCherryDlls = { "TeamCherry.TK2D.dll", "TeamCherry.Cinematics.dll" };
+            foreach (string dllName in teamCherryDlls)
+            {
+                string dllPath = Path.Combine(baseDir, dllName);
+                if (!File.Exists(dllPath))
+                {
+                    Console.WriteLine($"{dllName} not found, skipping type forwarders");
+                    continue;
+                }
+                using ModuleDefinition tcModule = ModuleDefinition.ReadModule(dllPath);
+                var tcRef = new AssemblyNameReference(
+                    tcModule.Assembly.Name.Name,
+                    tcModule.Assembly.Name.Version
+                );
+                module.AssemblyReferences.Add(tcRef);
+
+                int forwardersAdded = 0;
+                foreach (TypeDefinition type in tcModule.Types)
+                {
+                    if (!type.IsPublic) continue;
+                    if (module.GetType(type.Namespace, type.Name) != null) continue;
+                    if (module.ExportedTypes.Any(e => e.Namespace == type.Namespace && e.Name == type.Name)) continue;
+
+                    var exported = new ExportedType(type.Namespace, type.Name, module, tcRef);
+                    exported.Attributes = Mono.Cecil.TypeAttributes.Forwarder;
+                    module.ExportedTypes.Add(exported);
+                    forwardersAdded++;
+                }
+                Console.WriteLine($"Added {forwardersAdded} type forwarders to {dllName}");
             }
 
             module.Write(args[1]);
@@ -264,6 +312,71 @@ namespace Prepatcher
 
             instr.OpCode = ldstr.OpCode;
             instr.Operand = ldstr.Operand;
+        }
+
+        // Adds type forwarders into targetPath for all public types in sourcePath that don't already exist in target.
+        // Used to forward On.tk2dSprite etc. from MMHOOK_Assembly-CSharp → MMHOOK_TeamCherry.TK2D.
+        private static void PatchMMHook(string targetPath, string sourcePath)
+        {
+            try
+            {
+                string targetFull = Path.GetFullPath(targetPath);
+                string sourceFull = Path.GetFullPath(sourcePath);
+
+                if (!File.Exists(sourceFull))
+                {
+                    Console.WriteLine($"Source MMHOOK not found: {sourceFull}, skipping.");
+                    return;
+                }
+                if (!File.Exists(targetFull))
+                {
+                    Console.WriteLine($"Target MMHOOK not found: {targetFull}, skipping.");
+                    return;
+                }
+
+                var resolver = new DefaultAssemblyResolver();
+                resolver.AddSearchDirectory(Path.GetDirectoryName(targetFull));
+                var readerParams = new ReaderParameters { AssemblyResolver = resolver };
+
+                string tempPath = targetFull + ".tmp";
+                int added = 0;
+
+                // Scope the using blocks so files are released before we rename
+                using (ModuleDefinition target = ModuleDefinition.ReadModule(targetFull, readerParams))
+                using (ModuleDefinition source = ModuleDefinition.ReadModule(sourceFull, readerParams))
+                {
+                    var sourceRef = new AssemblyNameReference(
+                        source.Assembly.Name.Name,
+                        source.Assembly.Name.Version
+                    );
+                    if (!target.AssemblyReferences.Any(r => r.Name == sourceRef.Name))
+                        target.AssemblyReferences.Add(sourceRef);
+
+                    foreach (TypeDefinition type in source.Types)
+                    {
+                        if (!type.IsPublic) continue;
+                        if (target.GetType(type.Namespace, type.Name) != null) continue;
+                        if (target.ExportedTypes.Any(e => e.Namespace == type.Namespace && e.Name == type.Name)) continue;
+
+                        var exported = new ExportedType(type.Namespace, type.Name, target, sourceRef);
+                        exported.Attributes = Mono.Cecil.TypeAttributes.Forwarder;
+                        target.ExportedTypes.Add(exported);
+                        added++;
+                    }
+
+                    target.Write(tempPath);
+                }
+
+                // Both modules are now closed; safely replace the target
+                File.Delete(targetFull);
+                File.Move(tempPath, targetFull);
+                Console.WriteLine($"Added {added} type forwarders from {Path.GetFileName(sourceFull)} into {Path.GetFileName(targetFull)}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"PatchMMHook failed: {ex}");
+                Environment.Exit(1);
+            }
         }
 
         private static MethodDefinition GenerateSwappedMethod(TypeDefinition methodParent, MethodReference oldMethod)
