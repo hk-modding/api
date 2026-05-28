@@ -7,6 +7,7 @@ using HutongGames.PlayMaker;
 using JetBrains.Annotations;
 using Modding.Patches;
 using MonoMod;
+using MonoMod.RuntimeDetour;
 using Newtonsoft.Json;
 using UnityEngine;
 using System.Linq;
@@ -219,20 +220,36 @@ namespace Modding
         /// <remarks>N/A</remarks>
         public static event LanguageGetProxy LanguageGetHook;
 
+        private static Hook _languageGetHook;
+
+        internal static void InitLanguageHook()
+        {
+            var method = typeof(TeamCherry.Localization.Language).GetMethod(
+                "Get",
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static,
+                null,
+                new[] { typeof(string), typeof(string) },
+                null
+            );
+            if (method == null) return;
+            _languageGetHook = new Hook(method,
+                new Func<Func<string, string, string>, string, string, string>(
+                    (orig, key, sheet) => LanguageGet(key, sheet, orig)
+                ));
+        }
+
         /// <summary>
         ///     Called whenever localization specific strings are requested
         /// </summary>
         /// <remarks>N/A</remarks>
-        internal static string LanguageGet(string key, string sheet)
+        internal static string LanguageGet(string key, string sheet, Func<string, string, string> orig)
         {
-            string res = Patches.Language.GetInternal(key, sheet);
+            string res = orig(key, sheet);
 
             if (LanguageGetHook == null)
                 return res;
 
-            Delegate[] invocationList = LanguageGetHook.GetInvocationList();
-
-            foreach (LanguageGetProxy toInvoke in invocationList)
+            foreach (LanguageGetProxy toInvoke in LanguageGetHook.GetInvocationList())
             {
                 try
                 {
