@@ -2,6 +2,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net472</TargetFramework>
+        <!--<TargetFramework>netstandard2.1</TargetFramework>-->
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <AssemblyTitle>PostPatcher</AssemblyTitle>
         <Product>PostPatcher</Product>
@@ -19,7 +20,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <TargetDirFiles Include="$(TargetDir)\**" />
+        <TargetDirFiles Include="$(TargetDir)/**" />
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
@@ -37,5 +38,22 @@
         <PackageReference Include="Mono.Cecil" Version="0.11.3">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="../Vanilla/Assembly-CSharp.dll"/>
+        <Reference Include="../Vanilla/TeamCherry.*.dll"/>
+        <!--<Reference Include="../Vanilla/mscorlib.dll"/>-->
+        <Reference Include="../override/mscorlib.dll"/>
+        <Reference Include="../Vanilla/netstandard.dll"/>
+        <Reference Include="../Vanilla/Newtonsoft.Json.dll"/>
+        <Reference Include="../Vanilla/PlayMaker.dll"/>
+        <Reference Include="../Vanilla/UnityEngine.dll"/>
+        <Reference Include="../Vanilla/UnityEngine.*.dll"/>
+
+        <!--<Reference Include="../Vanilla/Unity.*.dll"/>-->
+        <!--<Reference Include="../Vanilla/Mono.*.dll"/>-->
+        <!--<Reference Include="../Vanilla/System.dll"/>-->
+        <!--<Reference Include="../Vanilla/System.*.dll"/>-->
     </ItemGroup>
 </Project>
