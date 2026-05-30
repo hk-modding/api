@@ -20,55 +20,60 @@ namespace Postpatcher
                 return;
             }
 
-            int changes = 0;
+            int forwarders = 0;
 
             using AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly(args[0]);
 
-            ForwardTk2dTypes(assembly);
+            // forwarders += ForwardTypes(assembly, "TeamCherry.BuildBot.dll", "TeamCherry.BuildBot", "");
+            forwarders += ForwardTypes(assembly, "TeamCherry.Cinematics.dll", "TeamCherry.Cinematics", "");
+            forwarders += ForwardTypes(assembly, "TeamCherry.Localization.dll", "HutongGames.PlayMaker.Actions", "HutongGames.PlayMaker.Actions");
+            forwarders += ForwardTypes(assembly, "TeamCherry.Localization.dll", "TeamCherry.Localization", "");
+            forwarders += ForwardTypes(assembly, "TeamCherry.NestedFadeGroup.dll", "HutongGames.PlayMaker.Actions", "HutongGames.PlayMaker.Actions");
+            forwarders += ForwardTypes(assembly, "TeamCherry.NestedFadeGroup.dll", "TeamCherry.NestedFadeGroup", "");
+            forwarders += ForwardTypes(assembly, "TeamCherry.SharedUtils.dll", "TeamCherry.SharedUtils", "");
+            forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "", "");
+            forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "tk2dRuntime", "");
+            forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "tk2dRuntime.TileMap", "");
 
             assembly.Write(args[1]);
 
-            Console.WriteLine("Changed " + changes + " get/set calls");
+            Console.WriteLine("Added " + forwarders + " type forwarders");
         }
 
-        private static void ForwardTk2dTypes(AssemblyDefinition assembly)
+        private static int ForwardTypes(AssemblyDefinition outAssembly, string sourcePath, string fromNameSpace, string toNameSpace)
         {
-            AssemblyNameReference assemblyNameReference = new AssemblyNameReference("TeamCherry.TK2D", null);
-            foreach (var typeName in new string[]
-                     {
-                         "tk2dAnimatedSprite", "tk2dAssetPlatform", "tk2dBaseSprite", "tk2dBatchedSprite", "tk2dButton", "tk2dCamera", "tk2dCameraAnchor",
-                         "tk2dCameraResolutionOverride", "tk2dCameraSettings", "tk2dClippedSprite", "tk2dCollider2DData", "tk2dEditorSpriteDataUnloader",
-                         "tk2dFont", "tk2dFontChar", "tk2dFontData", "tk2dFontKerning", "Tk2dGlobalEvents", "tk2dLinkedSpriteCollection",
-                         "tk2dPixelPerfectHelper", "tk2dResource", "tk2dResourceTocEntry", "tk2dSlicedSprite", "tk2dSprite", "tk2dSpriteAnimation",
-                         "tk2dSpriteAnimationClip", "tk2dSpriteAnimationFrame", "tk2dSpriteAnimator", "tk2dSpriteAttachPoint", "tk2dSpriteCollection",
-                         "tk2dSpriteCollectionData", "tk2dSpriteCollectionDefault", "tk2dSpriteCollectionDefinition", "tk2dSpriteCollectionFont",
-                         "tk2dSpriteCollectionPlatform", "tk2dSpriteCollectionSize", "tk2dSpriteColliderDefinition", "tk2dSpriteColliderIsland",
-                         "tk2dSpriteDefinition", "tk2dSpriteFromTexture", "tk2dSpriteGeomGen", "Tk2dSpriteSetKeywords", "tk2dSpriteSheetSource",
-                         "tk2dStaticSpriteBatcher", "tk2dSystem", "tk2dTextGeomGen", "tk2dTextMesh", "tk2dTextMeshData", "tk2dTiledSprite", "tk2dTileFlags",
-                         "tk2dTileMap", "tk2dTileMapData", "tk2dUpdateManager", "tk2dUtil"
-                     })
+            int forwarders = 0;
+            using AssemblyDefinition sourceAssembly = AssemblyDefinition.ReadAssembly(sourcePath);
+            AssemblyNameReference nameReference = new AssemblyNameReference(sourceAssembly.Name.Name, sourceAssembly.Name.Version);
+            if (outAssembly.MainModule.AssemblyReferences.All(x => x.Name != sourceAssembly.Name.Name))
             {
-                var forwardedType = assembly.MainModule.ImportReference
-                (
-                    assembly.MainModule.AssemblyResolver
-                            .Resolve(assemblyNameReference)
-                            .MainModule.GetType(typeName)
-                );
-                assembly.MainModule.ExportedTypes.Add
+                outAssembly.MainModule.AssemblyReferences.Add(nameReference);
+            }
+            foreach (TypeDefinition type in sourceAssembly.MainModule.Types)
+            {
+                if (!type.IsPublic) continue;
+                if (type.Namespace != fromNameSpace) continue;
+                if (outAssembly.MainModule.GetType(type.Namespace, type.Name) != null) continue;
+                if (outAssembly.MainModule.ExportedTypes.Any(e => e.Namespace == type.Namespace && e.Name == type.Name)) continue;
+                var forwardedType = outAssembly.MainModule.ImportReference(type);
+                outAssembly.MainModule.ExportedTypes.Add
                 (
                     new ExportedType
                     (
-                        "",
-                        typeName,
-                        assembly.MainModule,
-                        assembly.Name
+                        toNameSpace,
+                        type.Name,
+                        outAssembly.MainModule,
+                        outAssembly.Name
                     )
                     {
                         Attributes = TypeAttributes.Public | TypeAttributes.Forwarder,
                         Scope = forwardedType.Scope
                     }
                 );
+                forwarders++;
             }
+
+            return forwarders;
         }
     }
 }
