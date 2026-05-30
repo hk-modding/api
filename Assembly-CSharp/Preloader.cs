@@ -87,7 +87,10 @@ internal class Preloader : MonoBehaviour
                 break;
         }
 
-        yield return CleanUpPreloading();
+        if (toPreload.Count > 0 || sceneHooks.Count > 0)
+        {
+            yield return CleanUpPreloading();
+        }
 
         UnmuteAllAudio();
         Logger.APILogger.LogError($"Finished preloading in {stopwatch.ElapsedMilliseconds / 1000:F2}s");
@@ -105,6 +108,11 @@ internal class Preloader : MonoBehaviour
         Dictionary<string, List<Func<IEnumerator>>> sceneHooks
     )
     {
+        if (toPreload.Count <= 0 && sceneHooks.Count <= 0)
+        {
+            yield break;
+        }
+
         const string PreloadBundleName = "modding_api_asset_bundle";
 
         string preloadJson = JsonConvert.SerializeObject
@@ -226,6 +234,11 @@ internal class Preloader : MonoBehaviour
         Dictionary<string, List<Func<IEnumerator>>> sceneHooks
     )
     {
+        if (toPreload.Count <= 0 && sceneHooks.Count <= 0)
+        {
+            yield break;
+        }
+
         const string PreloadBundleName = "modding_api_scene_bundle";
 
         string preloadJson = JsonConvert.SerializeObject(toPreload.ToDictionary(k => k.Key, v => v.Value.SelectMany(x => x.Preloads).Distinct()));
@@ -297,6 +310,11 @@ internal class Preloader : MonoBehaviour
         float progressBeta = 0
     )
     {
+        if (toPreload.Count <= 0 && sceneHooks.Count <= 0)
+        {
+            yield break;
+        }
+
         List<string> sceneNames = toPreload.Keys.Union(sceneHooks.Keys).ToList();
         Dictionary<string, int> scenePriority = new();
         Dictionary<string, (AsyncOperation load, AsyncOperation unload)> sceneAsyncOperationHolder = new();

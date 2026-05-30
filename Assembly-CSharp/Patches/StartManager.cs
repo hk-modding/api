@@ -16,19 +16,19 @@ namespace Modding.Patches
     [MonoModPatch("global::StartManager")]
     public class StartManager : global::StartManager
     {
-        private bool startedPreloading = false;
         private MonoBehaviour modLoaderObj = null;
 
         private extern void orig_Awake();
-
         private void Awake()
         {
             // i love working with self-contained libraries where one has to work around cyclic dependencies
             ReflectionHelper.SetField(typeof(TeamCherry.Localization.Language), "LanguageGet", ModHooks.LanguageGet);
+
+            orig_Awake();
+
             if (ModLoader.LoadState == ModLoader.ModLoadState.NotStarted)
             {
                 Logger.APILogger.Log("Main menu loading");
-                startedPreloading = true;
                 ModLoader.LoadState = ModLoader.ModLoadState.Started;
 
                 GameObject obj = new GameObject();
@@ -45,8 +45,6 @@ namespace Modding.Patches
                 // Debug log because this is the expected code path
                 Logger.APILogger.LogDebug($"StartManager: Already begun mod loading (state {ModLoader.LoadState})");
             }
-
-            orig_Awake();
         }
 
         [MonoModIgnore]
@@ -72,13 +70,9 @@ namespace Modding.Patches
         private IEnumerator Start()
         {
             this.controllerImage.sprite = this.GetControllerSpriteForPlatform(this.platform);
-
-            AsyncOperation loadOperation = null;
-            if (!startedPreloading)
-            {
-                loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Menu_Title");
-                loadOperation.allowSceneActivation = false;
-            }
+            // AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Menu_Title");
+            AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Quit_To_Menu");
+            loadOperation.allowSceneActivation = false;
             Platform.Current.SetSceneLoadState(true, false);
             if (!this.CheckIsLanguageSet() && Platform.Current.ShowLanguageSelect)
             {
@@ -125,12 +119,14 @@ namespace Modding.Patches
             }
             this.startManagerAnimator.SetBool("WillShowControllerNotice", false);
             this.startManagerAnimator.SetBool("WillShowQuote", true);
+            /* ################################################################################################################################## */
             // this.startManagerAnimator.SetTrigger("Start");
             // int loadingIconNameHash = Animator.StringToHash("LoadingIcon");
             // while (this.startManagerAnimator.GetCurrentAnimatorStateInfo(0).shortNameHash != loadingIconNameHash)
             // {
             //     yield return null;
             // }
+            /* ################################################################################################################################## */
             UnityEngine.Object.Instantiate<StandaloneLoadingSpinner>(this.loadSpinnerPrefab).Setup(null);
             bool didWaitForPlayerPrefs = false;
             while (!Platform.Current.IsPlayerPrefsLoaded)
@@ -150,16 +146,13 @@ namespace Modding.Patches
             {
                 Debug.LogFormat("Finished waiting for PlayerPrefs load.", Array.Empty<object>());
             }
+
+            //modLoaderObj.StartCoroutine(ModLoader.LoadModsInit(modLoaderObj.gameObject));
+            yield return ModLoader.LoadModsInit(modLoaderObj.gameObject);
+
             Platform.Current.SetSceneLoadState(true, true);
-            if (!startedPreloading)
-            {
-                loadOperation.allowSceneActivation = true;
-                yield return loadOperation;
-            }
-            else
-            {
-                modLoaderObj.StartCoroutine(ModLoader.LoadModsInit(modLoaderObj.gameObject));
-            }
+            loadOperation.allowSceneActivation = true;
+            yield return loadOperation;
             yield break;
         }
     }
