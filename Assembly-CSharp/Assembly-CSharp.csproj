@@ -10,7 +10,6 @@
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <RestorePackagesPath>packages</RestorePackagesPath>
         <LangVersion>latest</LangVersion>
-        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     </PropertyGroup>
 
     <ItemGroup>
