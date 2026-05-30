@@ -1,6 +1,0 @@
-﻿<Solution>
-  <Project Path="Assembly-CSharp/Assembly-CSharp.csproj" />
-  <Project Path="TeamCherry.Localization/TeamCherry.Localization.csproj" />
-  <Project Path="PrePatcher/PrePatcher.csproj" />
-  <Project Path="PostPatcher/PostPatcher.csproj" />
-</Solution>
