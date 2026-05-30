@@ -4,6 +4,9 @@ using System.Reflection;
 using UObject = UnityEngine.Object;
 using USystemLanguage = UnityEngine.SystemLanguage;
 
+// ReSharper disable All
+#pragma warning disable 1591, 0108, 0169, 0649, 0626
+
 namespace Language;
 
 [Obsolete("Use `TeamCherry.Localization.Language` instead.")]
@@ -17,15 +20,14 @@ public static class Language
     public static UObject GetAsset(string name) => COMPAT_GetAsset(name);
     public static LanguageCode CurrentLanguage() => (LanguageCode) COMPAT_CurrentLanguage();
     public static string Get(string key) => COMPAT_Get(key);
+    public static string GetInternal(string key, string sheetTitle) => COMPAT_GetInternal(key, sheetTitle);
+    public static string Get(string key, string sheetTitle) => COMPAT_Get(key, sheetTitle);
     public static IEnumerable<string> GetSheets() => COMPAT_GetSheets();
     public static IEnumerable<string> GetKeys(string sheetTitle) => COMPAT_GetKeys(sheetTitle);
     public static bool Has(string key) => COMPAT_Has(key);
     public static bool Has(string key, string sheet) => COMPAT_Has(key, sheet);
     public static bool HasSheet(string sheet) => COMPAT_HasSheet(sheet);
     public static LanguageCode LanguageNameToCode(USystemLanguage name) => (LanguageCode) COMPAT_LanguageNameToCode(name);
-    public static string GetInternal(string key, string sheetTitle) => COMPAT_Get(key, sheetTitle);
-    [MonoMod.MonoModLinkFrom("System.String TeamCherry.Localization.Language::Get(System.String,System.String)")]
-    public static string Get(string key, string sheetTitle) => Modding.ModHooks.LanguageGet(key, sheetTitle);
 
     private static void DoSwitch(LanguageCode newLang) => COMPAT_DoSwitch((TeamCherry.Localization.LanguageCode) newLang);
     private static bool HasLanguageFile(string lang, string sheetTitle) => COMPAT_HasLanguageFile(lang, sheetTitle);
@@ -58,6 +60,9 @@ public static class Language
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.String Get(System.String)")]
     [MonoMod.MonoModRemove]
     extern private static string COMPAT_Get(string key);
+    [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.String GetInternal(System.String,System.String)")]
+    [MonoMod.MonoModRemove]
+    extern private static string COMPAT_GetInternal(string key, string sheetTitle);
     [MonoMod.MonoModLinkTo("TeamCherry.Localization.Language", "System.String Get(System.String,System.String)")]
     [MonoMod.MonoModRemove]
     extern private static string COMPAT_Get(string key, string sheetTitle);

@@ -12,7 +12,6 @@ using UnityEngine;
 using System.Linq;
 using Modding.Delegates;
 using Object = UnityEngine.Object;
-using Lang = Language.Language;
 
 // ReSharper disable PossibleInvalidCastExceptionInForeachLoop
 // ReSharper disable SuggestVarOrType_SimpleTypes
@@ -26,7 +25,7 @@ namespace Modding
     public class ModHooks
     {
         // Make sure this is in sync with `/moddingapi.version`.
-        private const int _modVersion = 77;
+        private const int _modVersion = 78;
 
         private static readonly string SettingsPath = Path.Combine(Application.persistentDataPath, "ModdingApi.GlobalSettings.json");
 
@@ -226,7 +225,7 @@ namespace Modding
         /// <remarks>N/A</remarks>
         internal static string LanguageGet(string key, string sheet)
         {
-            string res = Lang.GetInternal(key, sheet);
+            string res = Language.Language.GetInternal(key, sheet);
 
             if (LanguageGetHook == null)
                 return res;

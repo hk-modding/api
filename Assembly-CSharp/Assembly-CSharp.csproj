@@ -50,6 +50,11 @@
         <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(MSBuildProjectDirectory)/../PrePatcher/Output/PrePatcher.exe&quot; Assembly-CSharp.dll Assembly-CSharp-patched.dll" />
         <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)Assembly-CSharp-patched.dll" DestinationFiles="$(TargetDir)Assembly-CSharp.dll" />
 
+        <Delete Condition="Exists('MONOMODDED_TeamCherry.Localization.dll')" Files="MONOMODDED_TeamCherry.Localization.dll" />
+        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(TargetDir)MonoMod.exe&quot; TeamCherry.Localization.dll" />
+        <!-- because we patch in a value we'll reference in assembly-csharp -->
+        <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)MONOMODDED_TeamCherry.Localization.dll" DestinationFiles="$(TargetDir)TeamCherry.Localization.dll" />
+
         <Delete Condition="Exists('MONOMODDED_Assembly-CSharp.dll')" Files="MONOMODDED_Assembly-CSharp.dll" />
         <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(TargetDir)MonoMod.exe&quot; Assembly-CSharp.dll" />
 
@@ -73,8 +78,10 @@
         <!-- Copy the vanilla files. -->
         <Copy SourceFiles="@(Files)" DestinationFolder="../Examples/HollowKnightManaged/" />
         <!-- Copy the API and the documentation -->
-        <Copy SourceFiles="$(TargetDir)Assembly-CSharp-postpatched.dll" DestinationFiles="../Examples/HollowKnightManaged/Assembly-CSharp.dll" />
+        <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="../Examples/HollowKnightManaged/Assembly-CSharp.dll" />
         <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="../Examples/HollowKnightManaged/Assembly-CSharp.xml" />
+        <Copy SourceFiles="$(TargetDir)MONOMODDED_TeamCherry.Localization.dll" DestinationFiles="../Examples/HollowKnightManaged/TeamCherry.Localization.dll" />
+        <Copy SourceFiles="$(TargetDir)TeamCherry.Localization.mm.xml" DestinationFiles="../Examples/HollowKnightManaged/TeamCherry.Localization.xml" />
 
         <!-- Copy the dependencies for the API and hooks for mods -->
         <Copy SourceFiles="@(Dependencies)" DestinationFolder="../Examples/HollowKnightManaged/" />
@@ -89,8 +96,10 @@
 
         <!-- Copy the API, the documentation, and the README. -->
         <Copy SourceFiles="../README.ModdingApi.md" DestinationFiles="$(OutputDir)/README.md" />
-        <Copy SourceFiles="$(TargetDir)Assembly-CSharp-postpatched.dll" DestinationFiles="$(OutputDir)/Assembly-CSharp.dll" />
+        <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(OutputDir)/Assembly-CSharp.dll" />
         <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(OutputDir)/Assembly-CSharp.xml" />
+        <Copy SourceFiles="$(TargetDir)MONOMODDED_TeamCherry.Localization.dll" DestinationFiles="$(OutputDir)/TeamCherry.Localization.dll" />
+        <Copy SourceFiles="$(TargetDir)TeamCherry.Localization.mm.xml" DestinationFiles="$(OutputDir)/TeamCherry.Localization.xml" />
 
         <!-- Copy the dependencies for the API and hooks for mods -->
         <Copy SourceFiles="@(Dependencies)" DestinationFolder="$(OutputDir)" />
@@ -142,6 +151,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="../TeamCherry.Localization/TeamCherry.Localization.csproj">
+            <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+        </ProjectReference>
         <ProjectReference Include="../PrePatcher/PrePatcher.csproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
         </ProjectReference>

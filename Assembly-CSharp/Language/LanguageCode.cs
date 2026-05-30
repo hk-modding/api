@@ -1,3 +1,6 @@
+// ReSharper disable All
+#pragma warning disable 1591, 0108, 0169, 0649, 0626
+
 namespace Language;
 
 // for backwards compatibility

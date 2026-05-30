@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>Modding</RootNamespace>
+        <AssemblyName>TeamCherry.Localization.mm</AssemblyName>
+        <TargetFramework>net472</TargetFramework>
+        <AssemblyTitle>Hollow Knight - Mod API Enabled</AssemblyTitle>
+        <Product>Modding API</Product>
+        <Copyright>Copyright © 2017</Copyright>
+        <OutputPath>bin\$(Configuration)\</OutputPath>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <RestorePackagesPath>packages</RestorePackagesPath>
+        <LangVersion>latest</LangVersion>
+        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <DebugType>full</DebugType>
+        <DocumentationFile>bin\$(Configuration)\TeamCherry.Localization.mm.xml</DocumentationFile>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <DebugType>pdbonly</DebugType>
+        <DocumentationFile>bin\$(Configuration)\TeamCherry.Localization.mm.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MonoMod" Version="21.4.29.1">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="21.4.29.1">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+
+        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="21.4.29.1">
+            <IncludeAssets>all</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../PrePatcher/PrePatcher.csproj">
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+        <ProjectReference Include="../PostPatcher/PostPatcher.csproj">
+            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+        </ProjectReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="../Vanilla/Assembly-CSharp.dll"/>
+        <Reference Include="../Vanilla/mscorlib.dll"/>
+        <!--<Reference Include="../override/mscorlib.dll"/>-->
+        <Reference Include="../Vanilla/netstandard.dll"/>
+        <Reference Include="../Vanilla/Newtonsoft.Json.dll"/>
+        <Reference Include="../Vanilla/PlayMaker.dll"/>
+        <Reference Include="../Vanilla/UnityEngine.dll"/>
+        <Reference Include="../Vanilla/UnityEngine.*.dll"/>
+        <Reference Include="../Vanilla/TeamCherry.*.dll"/>
+        <Reference Include="../Vanilla/System.dll"/>
+        <Reference Include="../Vanilla/System.*.dll"/>
+    </ItemGroup>
+</Project>

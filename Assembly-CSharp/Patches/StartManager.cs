@@ -4,7 +4,7 @@ using System.Threading;
 using MonoMod;
 using UnityEngine;
 using UObject = UnityEngine.Object;
-using Lang = Language.Language;
+using Lang = TeamCherry.Localization.Language;
 
 // ReSharper disable All
 #pragma warning disable 1591, CS0649
@@ -23,6 +23,8 @@ namespace Modding.Patches
 
         private void Awake()
         {
+            // i love working with self-contained libraries where one has to work around cyclic dependencies
+            ReflectionHelper.SetField(typeof(TeamCherry.Localization.Language), "LanguageGet", ModHooks.LanguageGet);
             if (ModLoader.LoadState == ModLoader.ModLoadState.NotStarted)
             {
                 Logger.APILogger.Log("Main menu loading");

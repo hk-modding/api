@@ -3,14 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp\Assembly-CSharp.csproj", "{1CACEA6A-D114-46B1-8C47-F2F92062B844}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp/Assembly-CSharp.csproj", "{1CACEA6A-D114-46B1-8C47-F2F92062B844}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E06FBDDA-0A27-45EC-AC28-259C23715C50} = {E06FBDDA-0A27-45EC-AC28-259C23715C50}
+		{CE61CBC8-9373-4C5B-BA15-DED48888DB73} = {CE61CBC8-9373-4C5B-BA15-DED48888DB73}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrePatcher", "PrePatcher\PrePatcher.csproj", "{E06FBDDA-0A27-45EC-AC28-259C23715C50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamCherry.Localization", "TeamCherry.Localization/TeamCherry.Localization.csproj", "{E06FBDDA-0A27-45EC-AC28-259C23715707}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostPatcher", "PostPatcher\PostPatcher.csproj", "{CE61CBC8-9373-4C5B-BA15-DED48888DB73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrePatcher", "PrePatcher/PrePatcher.csproj", "{E06FBDDA-0A27-45EC-AC28-259C23715C50}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostPatcher", "PostPatcher/PostPatcher.csproj", "{CE61CBC8-9373-4C5B-BA15-DED48888DB73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
