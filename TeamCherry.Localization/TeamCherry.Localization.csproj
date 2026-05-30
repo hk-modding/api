@@ -13,11 +13,11 @@
         <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <DebugType>full</DebugType>
         <DocumentationFile>bin\$(Configuration)\TeamCherry.Localization.mm.xml</DocumentationFile>
     </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <DebugType>pdbonly</DebugType>
         <DocumentationFile>bin\$(Configuration)\TeamCherry.Localization.mm.xml</DocumentationFile>
     </PropertyGroup>
@@ -26,23 +26,6 @@
         <PackageReference Include="MonoMod" Version="21.4.29.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
-
-        <PackageReference Include="MonoMod.RuntimeDetour" Version="21.4.29.1">
-            <IncludeAssets>all</IncludeAssets>
-        </PackageReference>
-
-        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="21.4.29.1">
-            <IncludeAssets>all</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="../PrePatcher/PrePatcher.csproj">
-            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-        </ProjectReference>
-        <ProjectReference Include="../PostPatcher/PostPatcher.csproj">
-            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-        </ProjectReference>
     </ItemGroup>
 
     <ItemGroup>
