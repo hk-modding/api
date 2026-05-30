@@ -11,20 +11,20 @@ namespace Modding.Patches
     public static class Language
     {
         [MonoModIgnore]
-        private static Dictionary<string, Dictionary<string, string>> currentEntrySheets;
+        private static Dictionary<string, Dictionary<string, string>> _currentEntrySheets;
 
         [MonoModAdded]
         public static string GetInternal(string key, string sheetTitle)
         {
-            if (currentEntrySheets == null || !currentEntrySheets.ContainsKey(sheetTitle))
+            if (_currentEntrySheets == null || !_currentEntrySheets.ContainsKey(sheetTitle))
             {
                 Debug.LogError($"The sheet with title \"{sheetTitle}\" does not exist!");
                 return string.Empty;
             }
 
-            if (currentEntrySheets[sheetTitle].ContainsKey(key))
+            if (_currentEntrySheets[sheetTitle].ContainsKey(key))
             {
-                return currentEntrySheets[sheetTitle][key];
+                return _currentEntrySheets[sheetTitle][key];
             }
 
             return "#!#" + key + "#!#";
