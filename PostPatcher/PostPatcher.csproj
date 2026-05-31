@@ -6,33 +6,24 @@
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <AssemblyTitle>PostPatcher</AssemblyTitle>
         <Product>PostPatcher</Product>
-        <Copyright>Copyright © 2019</Copyright>
-        <OutputPath>bin\$(Configuration)\</OutputPath>
-        <LangVersion>9</LangVersion>
+        <Copyright>Copyright © 2026</Copyright>
+        <OutputPath>bin/$(Configuration)/</OutputPath>
+        <LangVersion>latest</LangVersion>
+        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
     </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <DebugType>full</DebugType>
-    </PropertyGroup>
-
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <DebugType>pdbonly</DebugType>
+    <PropertyGroup>
+        <DebugType Condition=" '$(Configuration)' == 'Debug' ">full</DebugType>
+        <DebugType Condition=" '$(Configuration)' == 'Release' ">pdbonly</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
         <TargetDirFiles Include="$(TargetDir)/**" />
     </ItemGroup>
-
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
         <MakeDir Directories="$(ProjectDir)Output" />
         <Copy SourceFiles="@(TargetDirFiles)" DestinationFolder="$(ProjectDir)Output" />
     </Target>
-
-    <ItemGroup>
-        <Reference Include="System.Data.DataSetExtensions" />
-        <Reference Include="Microsoft.CSharp" />
-        <Reference Include="System.Net.Http" />
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Mono.Cecil" Version="0.11.3">
@@ -51,9 +42,9 @@
         <Reference Include="../Vanilla/UnityEngine.dll"/>
         <Reference Include="../Vanilla/UnityEngine.*.dll"/>
 
-        <!--<Reference Include="../Vanilla/Unity.*.dll"/>-->
-        <!--<Reference Include="../Vanilla/Mono.*.dll"/>-->
-        <!--<Reference Include="../Vanilla/System.dll"/>-->
-        <!--<Reference Include="../Vanilla/System.*.dll"/>-->
+        <Reference Include="../Vanilla/Unity.*.dll"/>
+        <Reference Include="../Vanilla/Mono.*.dll"/>
+        <Reference Include="../Vanilla/System.dll"/>
+        <Reference Include="../Vanilla/System.*.dll"/>
     </ItemGroup>
 </Project>
