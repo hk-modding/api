@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <RootNamespace>Modding</RootNamespace>
         <AssemblyName>Assembly-CSharp.mm</AssemblyName>
@@ -98,8 +98,6 @@
 
         <!-- Copy the API, the documentation, and the README. -->
         <Copy SourceFiles="../README.ModdingApi.md" DestinationFiles="$(OutputDir)/README.md" />
-        <Copy SourceFiles="../override/mscorlib.dll" DestinationFiles="$(OutputDir)/mscorlib.dll" />
-        <Copy SourceFiles="../override/mscorlib.xml" DestinationFiles="$(OutputDir)/mscorlib.xml" />
         <Copy SourceFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" DestinationFiles="$(OutputDir)/Assembly-CSharp.dll" />
         <Copy SourceFiles="$(TargetDir)Assembly-CSharp.mm.xml" DestinationFiles="$(OutputDir)/Assembly-CSharp.xml" />
         <Copy SourceFiles="$(TargetDir)MONOMODDED_TeamCherry.Localization.dll" DestinationFiles="$(OutputDir)/TeamCherry.Localization.dll" />

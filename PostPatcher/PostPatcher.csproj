@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net472</TargetFramework>
@@ -34,8 +34,7 @@
     <ItemGroup>
         <Reference Include="../Vanilla/Assembly-CSharp.dll"/>
         <Reference Include="../Vanilla/TeamCherry.*.dll"/>
-        <!--<Reference Include="../Vanilla/mscorlib.dll"/>-->
-        <Reference Include="../override/mscorlib.dll"/>
+        <Reference Include="../Vanilla/mscorlib.dll"/>
         <Reference Include="../Vanilla/netstandard.dll"/>
         <Reference Include="../Vanilla/Newtonsoft.Json.dll"/>
         <Reference Include="../Vanilla/PlayMaker.dll"/>
