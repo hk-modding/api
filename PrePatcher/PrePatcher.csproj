@@ -10,6 +10,7 @@
         <OutputPath>bin/$(Configuration)/</OutputPath>
         <LangVersion>latest</LangVersion>
         <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+        <FrameworkPathOverride>$(MSBuildProjectDirectory)/../Vanilla</FrameworkPathOverride>
     </PropertyGroup>
 
     <PropertyGroup>
