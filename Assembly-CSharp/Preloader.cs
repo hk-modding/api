@@ -55,6 +55,7 @@ internal class Preloader : MonoBehaviour
             catch (DllNotFoundException)
             {
                 Logger.APILogger.LogWarn("Unable to load UnitySceneRepacker, falling back to full scene loads.");
+                Logger.APILogger.LogWarn(DllNotFoundException);
                 // Fall back to actually just loading the scene
                 preloadMode = PreloadMode.FullScene;
             }
