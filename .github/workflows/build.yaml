@@ -60,7 +60,9 @@ jobs:
             macos) echo "RID=osx-x64" >> $GITHUB_ENV ;;
           esac
       
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.x
       - name: Setup MSBuild
         run: |
           sudo apt-get update -y
@@ -68,9 +70,13 @@ jobs:
       - name: Restore Dependencies
         run: |
           dotnet restore
-      - name: Build PrePatcher
+      - name: Build PrePatcher & PostPatcher
         run: |
           dotnet build PrePatcher -o PrePatcher/Output -p:Configuration=Release
+          dotnet build PostPatcher -o PostPatcher/Output -p:Configuration=Release
+      - name: Build TC assembly patches
+        run: |
+          dotnet build TeamCherry.Localization --runtime $RID -p:Configuration=Release
       - name: Build Assembly-CSharp
         run: |
           dotnet build Assembly-CSharp --runtime $RID -p:Configuration=Release

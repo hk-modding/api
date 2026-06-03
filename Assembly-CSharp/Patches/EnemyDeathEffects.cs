@@ -1,4 +1,6 @@
-﻿using MonoMod;
+﻿using Mono.Cecil.Cil;
+using MonoMod;
+using MonoMod.Cil;
 
 // ReSharper disable All
 #pragma warning disable 1591, 0108, 0169, 0649, 0414
@@ -10,32 +12,52 @@ namespace Modding.Patches
     public class EnemyDeathEffects : global::EnemyDeathEffects
     {
         [MonoModIgnore]
-        private bool didFire;
+        [Attributes.RawIlPatch(nameof(IlPatches.EnemyDeathEffects_RecieveDeathEvent))]
+        extern public void RecieveDeathEvent(float? attackDirection, bool resetDeathEvent = false, bool spellBurn = false, bool isWatery = false);
 
-        public extern void orig_RecieveDeathEvent(float? attackDirection, bool resetDeathEvent = false, bool spellBurn = false, bool isWatery = false);
+        [MonoModIgnore]
+        [Attributes.RawIlPatch(nameof(IlPatches.EnemyDeathEffects_RecordKillForJournal))]
+        extern public static void RecordKillForJournal(string playerDataName);
+    }
 
-        //Use this to hook into when an enemy dies. Check EnemyDeathEffects.didFire to prevent doing any actions on redundant invokes.
-        public void RecieveDeathEvent(float? attackDirection, bool resetDeathEvent = false, bool spellBurn = false, bool isWatery = false)
+    [MonoModIgnore]
+    public static partial class IlPatches
+    {
+        [MonoModIgnore]
+        public static void EnemyDeathEffects_RecieveDeathEvent(ILContext il)
         {
-            ModHooks.OnRecieveDeathEvent(this, didFire, ref attackDirection, ref resetDeathEvent, ref spellBurn, ref isWatery);
-            
-            orig_RecieveDeathEvent(attackDirection, resetDeathEvent, spellBurn, isWatery);
+            // add a `ModHooks.OnRecieveDeathEvent(this, didFire, ref attackDirection, ref resetDeathEvent, ref spellBurn, ref isWatery);` at the start of the method
+            ILCursor cursor = new ILCursor(il);
+
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdarg(0));
+
+            // Insert a call to your custom method
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::EnemyDeathEffects), "didFire", true));
+            cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[0]); // attackDirection
+            cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[1]); // resetDeathEvent
+            cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[2]); // spellBurn
+            cursor.Emit(OpCodes.Ldarga_S, il.Method.Parameters[3]); // isWatery
+            cursor.EmitDelegate(global::Modding.ModHooks.OnRecieveDeathEvent);
         }
 
         [MonoModIgnore]
-        private string playerDataName;
-
-        private extern void orig_RecordKillForJournal();
-
-        private void RecordKillForJournal()
+        public static void EnemyDeathEffects_RecordKillForJournal(ILContext il)
         {
-            string boolName = "killed" + this.playerDataName;
-            string intName = "kills" + this.playerDataName;
-            string boolName2 = "newData" + this.playerDataName;
-            
-            ModHooks.OnRecordKillForJournal(this, playerDataName, boolName, intName, boolName2);
-            
-            orig_RecordKillForJournal();
+            // add a `ModHooks.OnRecordKillForJournal(this, this.playerDataName, $"killed{this.playerDataName}", $"kills{this.playerDataName}", $"newData{this.playerDataName}");` at the start of the method
+            ILCursor cursor = new ILCursor(il);
+
+            cursor.GotoNext(MoveType.AfterLabel, x => x.MatchLdcI4(0));
+
+            // Insert a call to your custom method
+            cursor.Emit(OpCodes.Ldarg_0);                                                                                         // this
+            cursor.Emit(OpCodes.Ldarg_0);                                                                                         // this
+            cursor.Emit(OpCodes.Ldfld, ReflectionHelper.GetFieldInfo(typeof(global::EnemyDeathEffects), "playerDataName", true)); // .playerDataName
+            cursor.Emit(OpCodes.Ldloc_1);                                                                                         // killed text
+            cursor.Emit(OpCodes.Ldloc_2);                                                                                         // kills text
+            cursor.Emit(OpCodes.Ldloc_3);                                                                                         // newData text
+            cursor.EmitDelegate(global::Modding.ModHooks.OnRecordKillForJournal);
         }
     }
 }

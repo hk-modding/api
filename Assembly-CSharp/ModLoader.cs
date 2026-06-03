@@ -241,12 +241,14 @@ namespace Modding
             
             // Setup dict of scene preloads
             GetPreloads(orderedMods, scenes, toPreload, sceneHooks);
-            
-            if (toPreload.Count > 0 || sceneHooks.Count > 0)
+
+            /*if (toPreload.Count > 0 || sceneHooks.Count > 0)
             {
                 Preloader pld = coroutineHolder.GetOrAddComponent<Preloader>();
                 yield return pld.Preload(toPreload, preloadedObjects, sceneHooks);
-            }
+            }*/
+            Preloader pld = coroutineHolder.GetOrAddComponent<Preloader>();
+            yield return pld.Preload(toPreload, preloadedObjects, sceneHooks);
 
             foreach (ModInstance mod in orderedMods)
             {

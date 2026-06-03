@@ -76,7 +76,8 @@ namespace Modding
                 string.Join(string.Empty, _messages.ToArray()),
                 _fontSize,
                 TextAnchor.LowerLeft,
-                new CanvasUtil.RectData(new Vector2(-5, -5), Vector2.zero, Vector2.zero, Vector2.one),
+                //new CanvasUtil.RectData(new Vector2(-5, -5), Vector2.zero, Vector2.zero, Vector2.one),
+                new CanvasUtil.RectData(Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one),
                 _font
             );
 
