@@ -71,8 +71,8 @@ namespace Modding.Patches
         {
             this.controllerImage.sprite = this.GetControllerSpriteForPlatform(this.platform);
             // AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Menu_Title");
-            AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Quit_To_Menu");
-            loadOperation.allowSceneActivation = false;
+            // AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Quit_To_Menu");
+            // loadOperation.allowSceneActivation = false;
             Platform.Current.SetSceneLoadState(true, false);
             if (!this.CheckIsLanguageSet() && Platform.Current.ShowLanguageSelect)
             {
@@ -83,17 +83,16 @@ namespace Modding.Patches
                 }
                 yield return base.StartCoroutine(this.LanguageSettingDone());
             }
-            TeamCherry.Localization.LanguageCode currentLanguage = (TeamCherry.Localization.LanguageCode) Lang.CurrentLanguage();
             while (!Platform.Current.IsSharedDataMounted)
             {
                 yield return null;
             }
             bool savedLanguageDifferentFromDefault = false;
-            string text;
-            if (TeamCherry.Localization.LocalizationProjectSettings.TryGetSavedLanguageCode(out text))
+            string savedSelectedLanguageCode;
+            if (TeamCherry.Localization.LocalizationProjectSettings.TryGetSavedLanguageCode(out savedSelectedLanguageCode))
             {
-                TeamCherry.Localization.LanguageCode languageEnum = TeamCherry.Localization.LocalizationSettings.GetLanguageEnum(text);
-                if (currentLanguage != languageEnum)
+                TeamCherry.Localization.LanguageCode languageEnum = TeamCherry.Localization.LocalizationSettings.GetLanguageEnum(savedSelectedLanguageCode);
+                if (((TeamCherry.Localization.LanguageCode) Lang.CurrentLanguage()) != languageEnum)
                 {
                     savedLanguageDifferentFromDefault = true;
                 }
@@ -150,6 +149,8 @@ namespace Modding.Patches
             //modLoaderObj.StartCoroutine(ModLoader.LoadModsInit(modLoaderObj.gameObject));
             yield return ModLoader.LoadModsInit(modLoaderObj.gameObject);
 
+            AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Quit_To_Menu");
+            loadOperation.allowSceneActivation = false;
             Platform.Current.SetSceneLoadState(true, true);
             loadOperation.allowSceneActivation = true;
             yield return loadOperation;
