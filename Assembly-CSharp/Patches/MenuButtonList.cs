@@ -13,7 +13,7 @@ namespace Modding.Patches
     public class MenuButtonList : global::MenuButtonList
     {
         [MonoModIgnore]
-        private static List<MenuButtonList> menuButtonLists;
+        private static readonly HashSet<MenuButtonList> _menuButtonLists;
 
         [MonoModIgnore]
         private Entry[] entries;
@@ -65,7 +65,7 @@ namespace Modding.Patches
 
         public void RecalculateNavigation()
         {
-            menuButtonLists.Remove(this);
+            _menuButtonLists.Remove(this);
             Start();
         }
 

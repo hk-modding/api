@@ -291,7 +291,7 @@ namespace Modding
             ModHooks.OnFinishedLoadingMods();
             LoadState |= ModLoadState.Loaded;
 
-            // new ModListMenu().InitMenuCreation();
+            new ModListMenu().InitMenuCreation();
 
             UObject.Destroy(coroutineHolder.gameObject);
         }
