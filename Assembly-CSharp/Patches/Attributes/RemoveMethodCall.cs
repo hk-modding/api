@@ -7,7 +7,7 @@ using Mono.Cecil;
 using MonoMod;
 using MonoMod.Cil;
 
-namespace Modding.Patches
+namespace Modding.Patches.Attributes
 {
     /// <inheritdoc />
     /// <summary>

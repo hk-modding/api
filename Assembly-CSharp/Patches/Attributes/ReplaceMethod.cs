@@ -7,7 +7,7 @@ using Mono.Cecil.Cil;
 using MonoMod;
 using MonoMod.Cil;
 
-namespace Modding.Patches
+namespace Modding.Patches.Attributes
 {
     /// <inheritdoc />
     /// <summary>
@@ -15,13 +15,13 @@ namespace Modding.Patches
     /// </summary>
     [MonoModCustomAttribute("ReplaceMethod")]
     [UsedImplicitly]
-    internal class ReplaceMethodAttribute : Attribute
+    internal class ReplaceMethod : Attribute
     {
         /// <inheritdoc />
         /// <summary>
         /// Replace method call with alternate method call
         /// </summary>
-        public ReplaceMethodAttribute(string type1, string method1, string[] params1, string type2, string method2, string[] params2) { }
+        public ReplaceMethod(string type1, string method1, string[] params1, string type2, string method2, string[] params2) { }
     }
 }
 

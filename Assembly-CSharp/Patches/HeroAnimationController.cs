@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using GlobalEnums;
+using Mono.Cecil.Cil;
 using MonoMod;
+using MonoMod.Cil;
 using UnityEngine;
 
 // ReSharper disable All
@@ -12,29 +14,33 @@ namespace Modding.Patches
     public class HeroAnimationController : global::HeroAnimationController
     {
         [MonoModIgnore]
-        private HeroControllerStates cState;
+        [Attributes.RawIlPatch(nameof(IlPatches.HeroAnimationController_Update))]
+        extern private void Update();
+    }
 
+    public static partial class IlPatches
+    {
         [MonoModIgnore]
-        private bool wasFacingRight;
-
-        [MonoModIgnore]
-        private extern void UpdateAnimation();
-
-        [MonoModReplace]
-        private void Update()
+        public static void HeroAnimationController_Update(ILContext il)
         {
-            if (this.controlEnabled)
+            // remove the `this.pd.betaEnd` check at the end of the method
+            ILCursor cursor = new ILCursor(il);
+
+            cursor.GotoNext
+            (
+                MoveType.AfterLabel,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld<global::HeroAnimationController>("pd"),
+                x => x.MatchLdstr(nameof(global::PlayerData.betaEnd)),
+                x => x.MatchCallOrCallvirt<global::PlayerData>(nameof(global::PlayerData.GetBool)),
+                x => x.MatchBrfalse(out ILLabel retLabel)
+            );
+            cursor.Emit(OpCodes.Ret);
+            while (cursor.Next.OpCode != OpCodes.Ret)
             {
-                this.UpdateAnimation();
+                cursor.Remove();
             }
-            else if (this.cState.facingRight)
-            {
-                this.wasFacingRight = true;
-            }
-            else
-            {
-                this.wasFacingRight = false;
-            }
+            cursor.Remove();
         }
     }
 }

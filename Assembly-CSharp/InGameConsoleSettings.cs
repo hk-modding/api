@@ -49,7 +49,7 @@ namespace Modding
         ///     Determines the key used for toggling console
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
-        public KeyCode ToggleHotkey = KeyCode.F10;
+        public KeyCode ToggleHotkey = KeyCode.C;
 
         /// <summary>
         ///     Determines the maximum messages to be diaplayed in console

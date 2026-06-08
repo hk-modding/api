@@ -13,14 +13,35 @@ namespace Modding.Patches
     [MonoModPatch("global::UIManager")]
     public class UIManager : global::UIManager
     {
+
+        private bool hasCalledEditMenus = false;
+
+        public MenuScreen currentDynamicMenu { get; set; }
+
+        private static Action _editMenus;
+
+        public static event Action EditMenus
+        {
+            add
+            {
+                _editMenus += value;
+                if (_instance != null && _instance.hasCalledEditMenus) value();
+            }
+            remove => _editMenus -= value;
+        }
+
+        private Sprite LoadImage() => Assembly.GetExecutingAssembly().LoadEmbeddedSprite("Modding.logo.png", pixelsPerUnit: 100f);
+
+        public static event Action BeforeHideDynamicMenu;
+
         [MonoModIgnore]
         private static UIManager _instance;
 
         [MonoModIgnore]
         private InputHandler ih;
 
-        public MenuScreen currentDynamicMenu { get; set; }
-
+        // todo: make IL hook: Debug.LogError
+        [MonoModReplace]
         public static UIManager get_instance()
         {
             if (UIManager._instance == null)
@@ -41,21 +62,7 @@ namespace Modding.Patches
             return UIManager._instance;
         }
 
-        public static event Action EditMenus
-        {
-            add
-            {
-                _editMenus += value;
-                if (_instance != null && _instance.hasCalledEditMenus) value();
-            }
-            remove => _editMenus -= value;
-        }
-
-        private static Action _editMenus;
-
         public extern void orig_Awake();
-
-        private Sprite LoadImage() => Assembly.GetExecutingAssembly().LoadEmbeddedSprite("Modding.logo.png", pixelsPerUnit: 100f);
 
         public void Awake()
         {
@@ -91,12 +98,9 @@ namespace Modding.Patches
             var sr = clone.GetComponent<SpriteRenderer>();
             sr.sprite = LoadImage();
         }
-        
-        private bool hasCalledEditMenus = false;
 
         public extern IEnumerator orig_HideCurrentMenu();
-        
-        public static event Action BeforeHideDynamicMenu;
+
         public IEnumerator HideCurrentMenu()
         {
             if (((MainMenuState) this.menuState) == MainMenuState.DYNAMIC_MENU)
@@ -187,17 +191,19 @@ namespace Modding.Patches
         }
     }
 
-    [MonoModPatch("GlobalEnums.MainMenuState")]
+    [MonoModPatch("global::GlobalEnums.MainMenuState")]
     public enum MainMenuState
     {
         LOGO,
         MAIN_MENU,
         OPTIONS_MENU,
         GAMEPAD_MENU,
+        ADVANCED_GAMEPAD_MENU,
         KEYBOARD_MENU,
         SAVE_PROFILES,
         AUDIO_MENU,
         VIDEO_MENU,
+        ADVANCED_VIDEO_MENU,
         EXIT_PROMPT,
         OVERSCAN_MENU,
         GAME_OPTIONS_MENU,

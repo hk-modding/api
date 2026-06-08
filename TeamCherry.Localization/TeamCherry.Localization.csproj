@@ -1,33 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <RootNamespace>Modding</RootNamespace>
+        <AssemblyName>TeamCherry.Localization.mm</AssemblyName>
         <TargetFramework>net472</TargetFramework>
         <!--<TargetFramework>netstandard2.1</TargetFramework>-->
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-        <AssemblyTitle>PrePatcher</AssemblyTitle>
-        <Product>PrePatcher</Product>
+        <AssemblyTitle>Hollow Knight - Mod API Enabled</AssemblyTitle>
+        <Product>Modding API</Product>
         <Copyright>Copyright © 2026</Copyright>
         <OutputPath>bin/$(Configuration)/</OutputPath>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <RestorePackagesPath>packages</RestorePackagesPath>
         <LangVersion>latest</LangVersion>
         <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
         <FrameworkPathOverride>$(MSBuildProjectDirectory)/../Vanilla</FrameworkPathOverride>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <DebugType Condition=" '$(Configuration)' == 'Debug' ">full</DebugType>
-        <DebugType Condition=" '$(Configuration)' == 'Release' ">pdbonly</DebugType>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <DebugType>full</DebugType>
+        <DocumentationFile>bin\$(Configuration)\TeamCherry.Localization.mm.xml</DocumentationFile>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>pdbonly</DebugType>
+        <DocumentationFile>bin\$(Configuration)\TeamCherry.Localization.mm.xml</DocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <TargetDirFiles Include="$(TargetDir)/**" />
-    </ItemGroup>
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <MakeDir Directories="$(ProjectDir)Output" />
-        <Copy SourceFiles="@(TargetDirFiles)" DestinationFolder="$(ProjectDir)Output" />
-    </Target>
-
-    <ItemGroup>
-        <PackageReference Include="Mono.Cecil" Version="0.11.3">
+        <PackageReference Include="MonoMod" Version="21.4.29.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
     </ItemGroup>

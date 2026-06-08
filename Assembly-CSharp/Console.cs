@@ -16,7 +16,7 @@ namespace Modding
         
         private readonly List<string> _messages = new(25);
         
-        private KeyCode _toggleKey = KeyCode.F10;
+        private KeyCode _toggleKey = KeyCode.C;
         private int _maxMessageCount = 25;
         private int _fontSize = 12;
 
@@ -76,7 +76,8 @@ namespace Modding
                 string.Join(string.Empty, _messages.ToArray()),
                 _fontSize,
                 TextAnchor.LowerLeft,
-                new CanvasUtil.RectData(new Vector2(-5, -5), Vector2.zero, Vector2.zero, Vector2.one),
+                //new CanvasUtil.RectData(new Vector2(-5, -5), Vector2.zero, Vector2.zero, Vector2.one),
+                new CanvasUtil.RectData(Vector2.zero, Vector2.zero, Vector2.zero, Vector2.one),
                 _font
             );
 
@@ -128,7 +129,7 @@ namespace Modding
         [PublicAPI]
         public void Update()
         {
-            if (!Input.GetKeyDown(_toggleKey))
+            if (!(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftCommand)) || !Input.GetKeyDown(_toggleKey))
             {
                 return;
             }
