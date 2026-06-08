@@ -83,6 +83,14 @@ namespace Modding
                 Logger.APILogger.LogError(e);
             }
 
+            // Load main menu first for potential safety of other parts of the game
+            AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(Constants.MENU_SCENE);
+            loadOperation.allowSceneActivation = false;
+            Platform.Current.SetSceneLoadState(true, true);
+            loadOperation.allowSceneActivation = true;
+            yield return loadOperation;
+            yield return null;
+
             Logger.APILogger.Log("Starting mod loading");
 
             string managed_path = SystemInfo.operatingSystemFamily switch
@@ -242,11 +250,6 @@ namespace Modding
             // Setup dict of scene preloads
             GetPreloads(orderedMods, scenes, toPreload, sceneHooks);
 
-            /*if (toPreload.Count > 0 || sceneHooks.Count > 0)
-            {
-                Preloader pld = coroutineHolder.GetOrAddComponent<Preloader>();
-                yield return pld.Preload(toPreload, preloadedObjects, sceneHooks);
-            }*/
             Preloader pld = coroutineHolder.GetOrAddComponent<Preloader>();
             yield return pld.Preload(toPreload, preloadedObjects, sceneHooks);
 

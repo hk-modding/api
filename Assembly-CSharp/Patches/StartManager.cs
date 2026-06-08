@@ -146,14 +146,8 @@ namespace Modding.Patches
                 Debug.LogFormat("Finished waiting for PlayerPrefs load.", Array.Empty<object>());
             }
 
-            //modLoaderObj.StartCoroutine(ModLoader.LoadModsInit(modLoaderObj.gameObject));
-            yield return ModLoader.LoadModsInit(modLoaderObj.gameObject);
-
-            AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Quit_To_Menu");
-            loadOperation.allowSceneActivation = false;
-            Platform.Current.SetSceneLoadState(true, true);
-            loadOperation.allowSceneActivation = true;
-            yield return loadOperation;
+            modLoaderObj.StartCoroutine(ModLoader.LoadModsInit(modLoaderObj.gameObject));
+            //yield return ModLoader.LoadModsInit(modLoaderObj.gameObject);
             yield break;
         }
     }

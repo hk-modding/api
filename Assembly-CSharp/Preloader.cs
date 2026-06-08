@@ -87,10 +87,7 @@ internal class Preloader : MonoBehaviour
                 break;
         }
 
-        if (toPreload.Count > 0 || sceneHooks.Count > 0)
-        {
-            yield return CleanUpPreloading();
-        }
+        yield return CleanUpPreloading();
 
         UnmuteAllAudio();
         Logger.APILogger.LogError($"Finished preloading in {stopwatch.ElapsedMilliseconds / 1000:F2}s");
@@ -491,14 +488,19 @@ internal class Preloader : MonoBehaviour
 
         ModLoader.LoadState |= ModLoader.ModLoadState.Preloaded;
 
-        // yield return USceneManager.LoadSceneAsync("Quit_To_Menu");
-
-        // while (USceneManager.GetActiveScene().name != Constants.MENU_SCENE)
-        // {
-        //     yield return new WaitForEndOfFrame();
-        // }
+        // adapted main menu loading from StartManager
+        AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Quit_To_Menu");
+        loadOperation.allowSceneActivation = false;
+        Platform.Current.SetSceneLoadState(true, true);
+        loadOperation.allowSceneActivation = true;
+        yield return loadOperation;
+        while (USceneManager.GetActiveScene().name != Constants.MENU_SCENE)
+        {
+            yield return new WaitForEndOfFrame();
+        }
 
         Destroy(progressBar);
+        yield return null;
         yield break;
     }
 
