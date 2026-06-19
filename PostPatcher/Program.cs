@@ -25,7 +25,7 @@ namespace Postpatcher
             forwarders += ForwardTypes(assembly, "TeamCherry.Localization.dll", "TeamCherry.Localization", "");
             forwarders += ForwardTypes(assembly, "TeamCherry.NestedFadeGroup.dll", "HutongGames.PlayMaker.Actions", "HutongGames.PlayMaker.Actions");
             forwarders += ForwardTypes(assembly, "TeamCherry.NestedFadeGroup.dll", "TeamCherry.NestedFadeGroup", "");
-            forwarders += ForwardTypes(assembly, "TeamCherry.SharedUtils.dll", "TeamCherry.SharedUtils", "");
+            // forwarders += ForwardTypes(assembly, "TeamCherry.SharedUtils.dll", "TeamCherry.SharedUtils", "");
             forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "", "");
             forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "tk2dRuntime", "");
             forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "tk2dRuntime.TileMap", "");
