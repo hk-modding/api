@@ -65,7 +65,7 @@ namespace Modding.Patches
 
         public void RecalculateNavigation()
         {
-            menuButtonLists.Remove(this);
+            menuButtonLists?.Remove(this);
             Start();
         }
 

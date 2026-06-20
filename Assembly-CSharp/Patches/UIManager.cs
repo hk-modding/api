@@ -25,7 +25,7 @@ namespace Modding.Patches
         {
             if (UIManager._instance == null)
             {
-                UIManager._instance = UnityEngine.Object.FindObjectOfType<UIManager>();
+                UIManager._instance = UnityEngine.Object.FindFirstObjectByType<UIManager>();
 
                 if (UIManager._instance == null)
                 {

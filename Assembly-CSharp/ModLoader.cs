@@ -84,6 +84,7 @@ namespace Modding
             }
 
             Logger.APILogger.Log("Starting mod loading");
+            ModHooks.InitLanguageHook();
 
             string managed_path = SystemInfo.operatingSystemFamily switch
             {

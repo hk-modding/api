@@ -638,7 +638,6 @@ namespace Modding.Patches
                     if (this.cState.wallSliding)
                     {
                         this.cState.wallSliding = false;
-                        this.wallSlideVibrationPlayer.Stop();
                     }
 
                     if (this.cState.touchingWall)
@@ -654,13 +653,13 @@ namespace Modding.Patches
                     if (this.cState.bouncing)
                     {
                         this.CancelBounce();
-                        this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
+                        this.rb2d.linearVelocity = new Vector2(this.rb2d.linearVelocity.x, 0f);
                     }
 
                     if (this.cState.shroomBouncing)
                     {
                         this.CancelBounce();
-                        this.rb2d.velocity = new Vector2(this.rb2d.velocity.x, 0f);
+                        this.rb2d.linearVelocity = new Vector2(this.rb2d.linearVelocity.x, 0f);
                     }
 
                     if (!flag)
@@ -879,7 +878,7 @@ namespace Modding.Patches
             Vector2 vector = OrigDashVector();
             vector = ModHooks.DashVelocityChange(vector);
 
-            rb2d.velocity = vector;
+            rb2d.linearVelocity = vector;
             dash_timer += Time.deltaTime;
         }
 

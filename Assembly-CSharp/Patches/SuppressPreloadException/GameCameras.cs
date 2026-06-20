@@ -18,7 +18,7 @@ namespace Modding.Patches.SuppressPreloadException
             {
                 if (GameCameras._instance == null)
                 {
-                    GameCameras._instance = UnityEngine.Object.FindObjectOfType<GameCameras>();
+                    GameCameras._instance = UnityEngine.Object.FindFirstObjectByType<GameCameras>();
                     if (GameCameras._instance == null)
                     {
                         Debug.LogError("Couldn't find GameCameras, make sure one exists in the scene.");
