@@ -188,7 +188,7 @@ namespace Modding
         ///     change the text of the button to jump to this mod's menu.
         /// </summary>
         /// <returns></returns>
-        public virtual string GetMenuButtonText() => $"{GetName()} {Language.Language.Get("MAIN_OPTIONS", "MainMenu")}";
+        public virtual string GetMenuButtonText() => $"{GetName()} {TeamCherry.Localization.Language.Get("MAIN_OPTIONS", "MainMenu")}";
 
         private void HookSaveMethods()
         {

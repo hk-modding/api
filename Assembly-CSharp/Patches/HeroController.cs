@@ -488,6 +488,9 @@ namespace Modding.Patches
         private float nailChargeTimer;
 
         [MonoModIgnore]
+        private HeroVibrationController vibrationCtrl;  
+
+        [MonoModIgnore]
         private extern IEnumerator Die();
 
         [MonoModIgnore]
@@ -638,7 +641,7 @@ namespace Modding.Patches
                     if (this.cState.wallSliding)
                     {
                         this.cState.wallSliding = false;
-                        this.wallSlideVibrationPlayer.Stop();
+                        this.vibrationCtrl.StopWallSlide();
                     }
 
                     if (this.cState.touchingWall)

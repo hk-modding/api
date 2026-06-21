@@ -148,7 +148,7 @@
         <Reference Include="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <HintPath>..\override\mscorlib.dll</HintPath>
         </Reference>
-        <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+        <Reference Include="netstandard">
           <HintPath>../Vanilla/netstandard.dll</HintPath>
         </Reference>
         <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=null">
@@ -157,6 +157,15 @@
         <Reference Include="PlayMaker, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
             <HintPath>../Vanilla/PlayMaker.dll</HintPath>
             <SpecificVersion>False</SpecificVersion>
+        </Reference>
+        <Reference Include="TeamCherry.Localization">
+          <HintPath>../Vanilla/TeamCherry.Localization.dll</HintPath>
+        </Reference>
+        <Reference Include="TeamCherry.SharedUtils">
+          <HintPath>..\Vanilla\TeamCherry.SharedUtils.dll</HintPath>
+        </Reference>
+        <Reference Include="TeamCherry.TK2D">
+          <HintPath>..\Vanilla\TeamCherry.TK2D.dll</HintPath>
         </Reference>
         <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
             <HintPath>../Vanilla/UnityEngine.dll</HintPath>
