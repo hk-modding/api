@@ -25,7 +25,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MonoMod" Version="21.4.29.1">
+        <PackageReference Include="MonoMod" Version="22.7.31.1">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
     </ItemGroup>
