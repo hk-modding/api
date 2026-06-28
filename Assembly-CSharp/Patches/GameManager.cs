@@ -19,10 +19,26 @@ using Encryption = TeamCherry.SharedUtils.Encryption;
 
 namespace Modding.Patches
 {
+    internal static class GameManagerHelper
+    {
+        public static void ClearModLocalSettings(int saveSlot)
+        {
+            string path = global::Modding.Patches.GameManager.ModdedSavePath(saveSlot);
+            try
+            {
+                File.Delete(path);
+            }
+            catch (Exception message)
+            {
+                Modding.Logger.APILogger.LogError(message);
+            }
+        }
+    }
+
     [MonoModPatch("global::GameManager")]
     public class GameManager : global::GameManager
     {
-        private static string ModdedSavePath(int slot) =>
+        internal static string ModdedSavePath(int slot) =>
             Path.Combine
             (
                 Application.persistentDataPath,
@@ -622,6 +638,8 @@ namespace Modding.Patches
             {
                 cursor.Emit(OpCodes.Ldarg_1);
                 cursor.EmitDelegate(global::Modding.ModHooks.OnAfterSaveGameClear);
+                cursor.Emit(OpCodes.Ldarg_1);
+                cursor.EmitDelegate<Action<int>>(global::Modding.Patches.GameManagerHelper.ClearModLocalSettings);
                 cursor.GotoNext();
             }
         }
