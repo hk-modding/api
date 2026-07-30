@@ -24,7 +24,14 @@
         <Dependencies Include="$(TargetDir)MMHOOK_PlayMaker.dll" />
         <Dependencies Include="$(TargetDir)MonoMod.Utils.dll" />
         <Dependencies Include="$(TargetDir)Mono.Cecil.dll" />
+        <Dependencies Include="$(TargetDir)Mono.Cecil.Rocks.dll" />
+        <Dependencies Include="$(TargetDir)Mono.Cecil.Pdb.dll" />
         <Dependencies Include="$(TargetDir)MonoMod.RuntimeDetour.dll" />
+        <Dependencies Include="$(TargetDir)MonoMod.Backports.dll" />
+        <Dependencies Include="$(TargetDir)MonoMod.Core.dll" />
+        <Dependencies Include="$(TargetDir)MonoMod.ILHelpers.dll" />
+        <Dependencies Include="$(TargetDir)MonoMod.Iced.dll" />
+        <Dependencies Include="$(TargetDir)System.ValueTuple.dll" />
         <Dependencies Include="$(TargetDir)MMHOOK_TeamCherry.BuildBot.dll" />
         <Dependencies Include="$(TargetDir)MMHOOK_TeamCherry.Cinematics.dll" />
         <Dependencies Include="$(TargetDir)MMHOOK_TeamCherry.Localization.dll" />
@@ -53,12 +60,12 @@
         <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)Assembly-CSharp-patched.dll" DestinationFiles="$(TargetDir)Assembly-CSharp.dll" />
 
         <Delete Condition="Exists('MONOMODDED_TeamCherry.Localization.dll')" Files="MONOMODDED_TeamCherry.Localization.dll" />
-        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(TargetDir)MonoMod.exe&quot; TeamCherry.Localization.dll" />
+        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(TargetDir)MonoMod.Patcher.exe&quot; TeamCherry.Localization.dll" />
         <!-- because we patch in a value we'll reference in assembly-csharp -->
         <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)MONOMODDED_TeamCherry.Localization.dll" DestinationFiles="$(TargetDir)TeamCherry.Localization.dll" />
 
         <Delete Condition="Exists('MONOMODDED_Assembly-CSharp.dll')" Files="MONOMODDED_Assembly-CSharp.dll" />
-        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(TargetDir)MonoMod.exe&quot; Assembly-CSharp.dll" />
+        <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(TargetDir)MonoMod.Patcher.exe&quot; Assembly-CSharp.dll" />
 
         <Exec WorkingDirectory="@(BuildDir)" Command="$(Mono) &quot;$(MSBuildProjectDirectory)/../PostPatcher/Output/PostPatcher.exe&quot; MONOMODDED_Assembly-CSharp.dll Assembly-CSharp-postpatched.dll" />
         <Copy SkipUnchangedFiles="true" SourceFiles="$(TargetDir)Assembly-CSharp-postpatched.dll" DestinationFiles="$(TargetDir)MONOMODDED_Assembly-CSharp.dll" />
@@ -137,15 +144,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MonoMod" Version="22.7.31.1">
-            <IncludeAssets>all</IncludeAssets>
-        </PackageReference>
-
-        <PackageReference Include="MonoMod.RuntimeDetour" Version="22.7.31.1">
-            <IncludeAssets>all</IncludeAssets>
-        </PackageReference>
-
-        <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="22.7.31.1">
+        <PackageReference Include="MonoMod.RuntimeDetour" Version="25.3.6">
             <IncludeAssets>all</IncludeAssets>
         </PackageReference>
 
@@ -162,28 +161,30 @@
         <ProjectReference Include="../PostPatcher/PostPatcher.csproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
         </ProjectReference>
+        <ProjectReference Include="..\MonoMod.Patcher\MonoMod.Patcher.csproj" />
+        <ProjectReference Include="..\MonoMod.RuntimeDetour.HookGen\MonoMod.RuntimeDetour.HookGen.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="logo.png"/>
+        <EmbeddedResource Include="logo.png" />
         <!-- generated using https://github.com/jakobhellermann/unity-scene-repacker/blob/main/examples/export_monobehaviour_typetrees.rs -->
         <EmbeddedResource Include="monobehaviour-typetree-dump.lz4" />
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="../Vanilla/Assembly-CSharp.dll"/>
-        <Reference Include="../Vanilla/TeamCherry.*.dll"/>
+        <Reference Include="../Vanilla/Assembly-CSharp.dll" />
+        <Reference Include="../Vanilla/TeamCherry.*.dll" />
         <!--<Reference Include="../Vanilla/mscorlib.dll"/>-->
-        <Reference Include="../override/mscorlib.dll"/>
-        <Reference Include="../Vanilla/netstandard.dll"/>
-        <Reference Include="../Vanilla/Newtonsoft.Json.dll"/>
-        <Reference Include="../Vanilla/PlayMaker.dll"/>
-        <Reference Include="../Vanilla/UnityEngine.dll"/>
-        <Reference Include="../Vanilla/UnityEngine.*.dll"/>
+        <Reference Include="../override/mscorlib.dll" />
+        <Reference Include="../Vanilla/netstandard.dll" />
+        <Reference Include="../Vanilla/Newtonsoft.Json.dll" />
+        <Reference Include="../Vanilla/PlayMaker.dll" />
+        <Reference Include="../Vanilla/UnityEngine.dll" />
+        <Reference Include="../Vanilla/UnityEngine.*.dll" />
 
-        <Reference Include="../Vanilla/Unity.*.dll"/>
-        <Reference Include="../Vanilla/Mono.*.dll"/>
-        <Reference Include="../Vanilla/System.dll"/>
-        <Reference Include="../Vanilla/System.*.dll"/>
+        <Reference Include="../Vanilla/Unity.*.dll" />
+        <Reference Include="../Vanilla/Mono.*.dll" />
+        <Reference Include="../Vanilla/System.dll" />
+        <Reference Include="../Vanilla/System.*.dll" />
     </ItemGroup>
 </Project>

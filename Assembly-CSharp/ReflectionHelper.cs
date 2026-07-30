@@ -23,7 +23,7 @@ namespace Modding
         private static readonly ConcurrentDictionary<PropertyInfo, Delegate> PropertySetters = new();
 
         private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, MethodInfo>> Methods = new();
-        private static readonly ConcurrentDictionary<MethodInfo, FastReflectionDelegate> MethodsDelegates = new();
+        private static readonly ConcurrentDictionary<MethodInfo, FastReflectionHelper.FastInvoker> MethodsDelegates = new();
 
         private static bool _preloaded;
 
@@ -718,14 +718,14 @@ namespace Modding
             return mi;
         }
 
-        private static FastReflectionDelegate GetFastReflectionDelegate(MethodInfo mi)
+        private static FastReflectionHelper.FastInvoker GetFastReflectionDelegate(MethodInfo mi)
         {
-            if (MethodsDelegates.TryGetValue(mi, out FastReflectionDelegate d))
+            if (MethodsDelegates.TryGetValue(mi, out FastReflectionHelper.FastInvoker d))
             {
                 return d;
             }
 
-            d = mi.GetFastDelegate();
+            d = mi.GetFastInvoker();
 
             MethodsDelegates[mi] = d;
 

@@ -25,24 +25,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MonoMod" Version="22.7.31.1">
-            <IncludeAssets>all</IncludeAssets>
-        </PackageReference>
+        <Reference Include="../Vanilla/Assembly-CSharp.dll" />
+        <Reference Include="../Vanilla/TeamCherry.*.dll" />
+        <Reference Include="../Vanilla/mscorlib.dll" />
+        <Reference Include="../Vanilla/netstandard.dll" />
+        <Reference Include="../Vanilla/Newtonsoft.Json.dll" />
+        <Reference Include="../Vanilla/PlayMaker.dll" />
+        <Reference Include="../Vanilla/UnityEngine.dll" />
+        <Reference Include="../Vanilla/UnityEngine.*.dll" />
+
+        <Reference Include="../Vanilla/Unity.*.dll" />
+        <Reference Include="../Vanilla/Mono.*.dll" />
+        <Reference Include="../Vanilla/System.dll" />
+        <Reference Include="../Vanilla/System.*.dll" />
     </ItemGroup>
-
     <ItemGroup>
-        <Reference Include="../Vanilla/Assembly-CSharp.dll"/>
-        <Reference Include="../Vanilla/TeamCherry.*.dll"/>
-        <Reference Include="../Vanilla/mscorlib.dll"/>
-        <Reference Include="../Vanilla/netstandard.dll"/>
-        <Reference Include="../Vanilla/Newtonsoft.Json.dll"/>
-        <Reference Include="../Vanilla/PlayMaker.dll"/>
-        <Reference Include="../Vanilla/UnityEngine.dll"/>
-        <Reference Include="../Vanilla/UnityEngine.*.dll"/>
-
-        <Reference Include="../Vanilla/Unity.*.dll"/>
-        <Reference Include="../Vanilla/Mono.*.dll"/>
-        <Reference Include="../Vanilla/System.dll"/>
-        <Reference Include="../Vanilla/System.*.dll"/>
+      <ProjectReference Include="..\MonoMod.Patcher\MonoMod.Patcher.csproj" />
     </ItemGroup>
 </Project>
