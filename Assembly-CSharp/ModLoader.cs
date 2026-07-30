@@ -120,6 +120,11 @@ namespace Modding
 
             string mods = Path.Combine(managed_path, "Mods");
 
+            if(!Directory.Exists(mods))
+            {
+                Directory.CreateDirectory(mods);
+            }
+
             string[] files = Directory.GetDirectories(mods)
                 .Except(new string[] { Path.Combine(mods, "Disabled") })
                 .SelectMany(d => Directory.GetFiles(d, "*.dll"))
