@@ -19,23 +19,23 @@ namespace Postpatcher
 
             using AssemblyDefinition assembly = AssemblyDefinition.ReadAssembly(args[0]);
 
-            // forwarders += ForwardTypes(assembly, "TeamCherry.BuildBot.dll", "TeamCherry.BuildBot", "");
-            forwarders += ForwardTypes(assembly, "TeamCherry.Cinematics.dll", "TeamCherry.Cinematics", "");
-            forwarders += ForwardTypes(assembly, "TeamCherry.Localization.dll", "HutongGames.PlayMaker.Actions", "HutongGames.PlayMaker.Actions");
-            forwarders += ForwardTypes(assembly, "TeamCherry.Localization.dll", "TeamCherry.Localization", "");
-            forwarders += ForwardTypes(assembly, "TeamCherry.NestedFadeGroup.dll", "HutongGames.PlayMaker.Actions", "HutongGames.PlayMaker.Actions");
-            forwarders += ForwardTypes(assembly, "TeamCherry.NestedFadeGroup.dll", "TeamCherry.NestedFadeGroup", "");
-            // forwarders += ForwardTypes(assembly, "TeamCherry.SharedUtils.dll", "TeamCherry.SharedUtils", "");
-            forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "", "");
-            forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "tk2dRuntime", "");
-            forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "tk2dRuntime.TileMap", "");
+            forwarders += ForwardTypes(assembly, "TeamCherry.BuildBot.dll", "TeamCherry.BuildBot");
+            forwarders += ForwardTypes(assembly, "TeamCherry.Cinematics.dll", "TeamCherry.Cinematics");
+            forwarders += ForwardTypes(assembly, "TeamCherry.Localization.dll", "HutongGames.PlayMaker.Actions");
+            forwarders += ForwardTypes(assembly, "TeamCherry.Localization.dll", "TeamCherry.Localization");
+            forwarders += ForwardTypes(assembly, "TeamCherry.NestedFadeGroup.dll", "HutongGames.PlayMaker.Actions");
+            forwarders += ForwardTypes(assembly, "TeamCherry.NestedFadeGroup.dll", "TeamCherry.NestedFadeGroup");
+            forwarders += ForwardTypes(assembly, "TeamCherry.SharedUtils.dll", "TeamCherry.SharedUtils");
+            forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "");
+            forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "tk2dRuntime");
+            forwarders += ForwardTypes(assembly, "TeamCherry.TK2D.dll", "tk2dRuntime.TileMap");
 
             assembly.Write(args[1]);
 
             Console.WriteLine("Added " + forwarders + " type forwarders");
         }
 
-        private static int ForwardTypes(AssemblyDefinition outAssembly, string sourcePath, string fromNameSpace, string toNameSpace)
+        private static int ForwardTypes(AssemblyDefinition outAssembly, string sourcePath, string fromNameSpace)
         {
             int forwarders = 0;
             using AssemblyDefinition sourceAssembly = AssemblyDefinition.ReadAssembly(sourcePath);
@@ -55,7 +55,7 @@ namespace Postpatcher
                 (
                     new ExportedType
                     (
-                        toNameSpace,
+                        type.Namespace,
                         type.Name,
                         outAssembly.MainModule,
                         outAssembly.Name
@@ -67,7 +67,6 @@ namespace Postpatcher
                 );
                 forwarders++;
             }
-
             return forwarders;
         }
     }

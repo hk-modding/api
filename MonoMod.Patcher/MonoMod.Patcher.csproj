@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Metadata -->
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>10</LangVersion>
+    <AssemblyName>MonoMod.Patcher</AssemblyName>
+    <PackageId>MonoMod.Patcher</PackageId>
+    <Description>General purpose .NET assembly modding "basework". This package contains the core IL patcher and relinker.</Description>
+    <PackageTags>$(PackageTags)</PackageTags>
+    <Nullable>annotations</Nullable>
+    <MMUseCodeAnalyzers>false</MMUseCodeAnalyzers>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild> <!-- Remove after / during rework -->
+    
+    <OutputType>Exe</OutputType>
+    <!-- If we don't set this to false, NuGetizer tries to pack using the publish output. Normally, that would be a good idea for
+         a package like this one, except that we pack several TFMs together under lib/, which means that we end up with duplicate
+         (but different!) files with the same package path, which results in a pack error. -->
+    <PackAsPublish>false</PackAsPublish>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- Dependencies -->
+  <ItemGroup>
+      <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+      <PackageReference Include="MonoMod.RuntimeDetour" Version="25.3.6">
+          <IncludeAssets>all</IncludeAssets>
+      </PackageReference>
+  </ItemGroup>
+  
+</Project>

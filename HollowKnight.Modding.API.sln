@@ -1,19 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.12023.21
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp/Assembly-CSharp.csproj", "{1CACEA6A-D114-46B1-8C47-F2F92062B844}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp\Assembly-CSharp.csproj", "{1CACEA6A-D114-46B1-8C47-F2F92062B844}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E06FBDDA-0A27-45EC-AC28-259C23715C50} = {E06FBDDA-0A27-45EC-AC28-259C23715C50}
 		{CE61CBC8-9373-4C5B-BA15-DED48888DB73} = {CE61CBC8-9373-4C5B-BA15-DED48888DB73}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamCherry.Localization", "TeamCherry.Localization/TeamCherry.Localization.csproj", "{01234567-89AB-CDEF-0123-456789ABCDEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TeamCherry.Localization", "TeamCherry.Localization\TeamCherry.Localization.csproj", "{01234567-89AB-CDEF-0123-456789ABCDEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrePatcher", "PrePatcher/PrePatcher.csproj", "{E06FBDDA-0A27-45EC-AC28-259C23715C50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrePatcher", "PrePatcher\PrePatcher.csproj", "{E06FBDDA-0A27-45EC-AC28-259C23715C50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostPatcher", "PostPatcher/PostPatcher.csproj", "{CE61CBC8-9373-4C5B-BA15-DED48888DB73}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostPatcher", "PostPatcher\PostPatcher.csproj", "{CE61CBC8-9373-4C5B-BA15-DED48888DB73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoMod.RuntimeDetour.HookGen", "MonoMod.RuntimeDetour.HookGen\MonoMod.RuntimeDetour.HookGen.csproj", "{56B5DB1E-A732-E066-24FB-64A7D76B4378}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoMod.Patcher", "MonoMod.Patcher\MonoMod.Patcher.csproj", "{D068F1C0-B8C1-C8D2-F01C-79FB11034B9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +29,10 @@ Global
 		{1CACEA6A-D114-46B1-8C47-F2F92062B844}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CACEA6A-D114-46B1-8C47-F2F92062B844}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CACEA6A-D114-46B1-8C47-F2F92062B844}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01234567-89AB-CDEF-0123-456789ABCDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01234567-89AB-CDEF-0123-456789ABCDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01234567-89AB-CDEF-0123-456789ABCDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01234567-89AB-CDEF-0123-456789ABCDEF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E06FBDDA-0A27-45EC-AC28-259C23715C50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E06FBDDA-0A27-45EC-AC28-259C23715C50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E06FBDDA-0A27-45EC-AC28-259C23715C50}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,17 +41,19 @@ Global
 		{CE61CBC8-9373-4C5B-BA15-DED48888DB73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE61CBC8-9373-4C5B-BA15-DED48888DB73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE61CBC8-9373-4C5B-BA15-DED48888DB73}.Release|Any CPU.Build.0 = Release|Any CPU
-		{01234567-89AB-CDEF-0123-456789ABCDEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{01234567-89AB-CDEF-0123-456789ABCDEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{01234567-89AB-CDEF-0123-456789ABCDEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{01234567-89AB-CDEF-0123-456789ABCDEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56B5DB1E-A732-E066-24FB-64A7D76B4378}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56B5DB1E-A732-E066-24FB-64A7D76B4378}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56B5DB1E-A732-E066-24FB-64A7D76B4378}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56B5DB1E-A732-E066-24FB-64A7D76B4378}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D068F1C0-B8C1-C8D2-F01C-79FB11034B9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D068F1C0-B8C1-C8D2-F01C-79FB11034B9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D068F1C0-B8C1-C8D2-F01C-79FB11034B9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D068F1C0-B8C1-C8D2-F01C-79FB11034B9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {302E6FBA-6F4E-4F15-948A-E61E409A3B45}
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal
