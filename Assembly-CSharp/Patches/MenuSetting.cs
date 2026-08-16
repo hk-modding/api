@@ -55,16 +55,23 @@ namespace Modding.Patches
             VSync,
             // where did 13 go
             MonitorSelect = 14,
-            FrameCap,
+            SwitchFrameCap,
             ParticleLevel,
             ShaderQuality,
+            Dithering,
+            Noise,
             // HUH????
             GameLanguage = 33,
             GameBackerCredits,
             NativeAchievements,
+            ControllerRumble = 37,
+            HudVisibility = 39,
+            CameraShake,
             NativeInput,
-            ControllerRumble,
-            // peepoHappy
+            XInput,
+            MFi,
+
+            // Added for the dynamic menu API
             CustomSetting
         }
     }

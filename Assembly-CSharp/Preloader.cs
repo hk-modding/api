@@ -105,6 +105,11 @@ internal class Preloader : MonoBehaviour
         Dictionary<string, List<Func<IEnumerator>>> sceneHooks
     )
     {
+        if (toPreload.Count <= 0 && sceneHooks.Count <= 0)
+        {
+            yield break;
+        }
+
         const string PreloadBundleName = "modding_api_asset_bundle";
 
         string preloadJson = JsonConvert.SerializeObject
@@ -226,6 +231,11 @@ internal class Preloader : MonoBehaviour
         Dictionary<string, List<Func<IEnumerator>>> sceneHooks
     )
     {
+        if (toPreload.Count <= 0 && sceneHooks.Count <= 0)
+        {
+            yield break;
+        }
+
         const string PreloadBundleName = "modding_api_scene_bundle";
 
         string preloadJson = JsonConvert.SerializeObject(toPreload.ToDictionary(k => k.Key, v => v.Value.SelectMany(x => x.Preloads).Distinct()));
@@ -239,7 +249,7 @@ internal class Preloader : MonoBehaviour
                     preloadJson,
                     UnitySceneRepacker.Mode.SceneBundle
                 );
-                
+
                 Logger.APILogger.Log
                 (
                     $"Repacked {toPreload.Count} preload scenes from {repackStats.ObjectsBefore} to {repackStats.ObjectsAfter} objects ({bundleData.Length / 1024f / 1024f:F2}MB)"
@@ -253,6 +263,7 @@ internal class Preloader : MonoBehaviour
         yield return new WaitUntil(() => task.IsCompleted);
         if (bundleData == null)
         {
+            Logger.APILogger.LogWarn($"Scene repacking during preloading produced unloadable bundle data");
             yield return DoPreloadScenes(toPreload, preloadedObjects, sceneHooks);
             yield break;
         }
@@ -268,7 +279,7 @@ internal class Preloader : MonoBehaviour
         const string scenePrefix = $"{PreloadBundleName}_";
 
         // NOTE: no ToHashSet since we're on netstandard2, but we need net472 to build for w/e reason.
-        var scenes = new HashSet<string>(sceneHooks.Select(x => x.Key));
+        var sceneHooksScenes = new HashSet<string>(sceneHooks.Select(x => x.Key));
 
         // I'd kill for inference here tbh
         // This lets us avoid double loading any scene used by objects _and_ hooks.
@@ -276,8 +287,8 @@ internal class Preloader : MonoBehaviour
         var unshared = new Dictionary<string, List<(ModLoader.ModInstance, List<string>)>>();
 
         foreach ((string key, var preload) in toPreload)
-            (scenes.Contains(key) ? shared : unshared)[key] = preload;
-        
+            (sceneHooksScenes.Contains(key) ? shared : unshared)[key] = preload;
+
         yield return DoPreloadScenes(unshared, preloadedObjects, sceneHooks: [], scenePrefix, progressAlpha: 0.5f, progressBeta: 0f);
         yield return DoPreloadScenes(shared, preloadedObjects, sceneHooks, scenePrefix: "", progressAlpha: 0.5f, progressBeta: 0.5f);
         
@@ -297,6 +308,11 @@ internal class Preloader : MonoBehaviour
         float progressBeta = 0
     )
     {
+        if (toPreload.Count <= 0 && sceneHooks.Count <= 0)
+        {
+            yield break;
+        }
+
         List<string> sceneNames = toPreload.Keys.Union(sceneHooks.Keys).ToList();
         Dictionary<string, int> scenePriority = new();
         Dictionary<string, (AsyncOperation load, AsyncOperation unload)> sceneAsyncOperationHolder = new();
@@ -472,14 +488,20 @@ internal class Preloader : MonoBehaviour
 
         ModLoader.LoadState |= ModLoader.ModLoadState.Preloaded;
 
-        yield return USceneManager.LoadSceneAsync("Quit_To_Menu");
-
+        // adapted main menu loading from StartManager
+        AsyncOperation loadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Quit_To_Menu");
+        loadOperation.allowSceneActivation = false;
+        Platform.Current.SetSceneLoadState(true, true);
+        loadOperation.allowSceneActivation = true;
+        yield return loadOperation;
         while (USceneManager.GetActiveScene().name != Constants.MENU_SCENE)
         {
             yield return new WaitForEndOfFrame();
         }
 
         Destroy(progressBar);
+        yield return null;
+        yield break;
     }
 
     /// <summary>

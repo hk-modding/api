@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>Modding</RootNamespace>
+        <AssemblyName>TeamCherry.Localization.mm</AssemblyName>
+        <TargetFramework>net472</TargetFramework>
+        <!--<TargetFramework>netstandard2.1</TargetFramework>-->
+        <AssemblyTitle>Hollow Knight - Mod API Enabled</AssemblyTitle>
+        <Product>Modding API</Product>
+        <Copyright>Copyright © 2026</Copyright>
+        <OutputPath>bin/$(Configuration)/</OutputPath>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <RestorePackagesPath>packages</RestorePackagesPath>
+        <LangVersion>latest</LangVersion>
+        <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+        <FrameworkPathOverride>$(MSBuildProjectDirectory)/../Vanilla</FrameworkPathOverride>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <DebugType>full</DebugType>
+        <DocumentationFile>bin\$(Configuration)\TeamCherry.Localization.mm.xml</DocumentationFile>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>pdbonly</DebugType>
+        <DocumentationFile>bin\$(Configuration)\TeamCherry.Localization.mm.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="../Vanilla/Assembly-CSharp.dll" />
+        <Reference Include="../Vanilla/TeamCherry.*.dll" />
+        <Reference Include="../Vanilla/mscorlib.dll" />
+        <Reference Include="../Vanilla/netstandard.dll" />
+        <Reference Include="../Vanilla/Newtonsoft.Json.dll" />
+        <Reference Include="../Vanilla/PlayMaker.dll" />
+        <Reference Include="../Vanilla/UnityEngine.dll" />
+        <Reference Include="../Vanilla/UnityEngine.*.dll" />
+
+        <Reference Include="../Vanilla/Unity.*.dll" />
+        <Reference Include="../Vanilla/Mono.*.dll" />
+        <Reference Include="../Vanilla/System.dll" />
+        <Reference Include="../Vanilla/System.*.dll" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\MonoMod.Patcher\MonoMod.Patcher.csproj" />
+    </ItemGroup>
+</Project>

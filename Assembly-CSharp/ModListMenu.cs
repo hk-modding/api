@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static Modding.ModLoader;
 using Patch = Modding.Patches;
-using Lang = Language.Language;
+using Lang = TeamCherry.Localization.Language;
 
 namespace Modding
 {

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  
+  <!-- Metadata -->
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+      <LangVersion>10</LangVersion>
+    <AssemblyName>MonoMod.RuntimeDetour.HookGen</AssemblyName>
+    <PackageId>MonoMod.RuntimeDetour.HookGen</PackageId>
+    <Description>Auto-generate hook helper .dlls, hook arbitrary methods via events: On.Namespace.Type.Method += YourHandlerHere;</Description>
+    <PackageTags>RuntimeDetour;detour;detours;$(PackageTags)</PackageTags>
+    <Nullable>annotations</Nullable>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild> <!-- Remove after / during rework -->
+
+    <OutputType>Exe</OutputType>
+    <NoWarn>$(NoWarn);CA1062</NoWarn>
+
+    <IsPackable>false</IsPackable> <!-- TODO: update this to not need HookEndpointManager in RuntimeDetour -->
+    <VersionPrefix>24.0.0</VersionPrefix>
+    <PackageValidationBaselineVersion>22.7.31.1</PackageValidationBaselineVersion>
+  </PropertyGroup>
+
+  <!-- Dependencies -->
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+      <PackageReference Include="MonoMod.RuntimeDetour" Version="25.3.6">
+          <IncludeAssets>all</IncludeAssets>
+      </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MonoMod.Patcher\MonoMod.Patcher.csproj" />
+  </ItemGroup>
+  
+</Project>
