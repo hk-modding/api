@@ -13,9 +13,9 @@ jobs:
         archive-ref: [main]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Checkout `docs` branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: docs
           path: docs
@@ -25,7 +25,7 @@ jobs:
           HKV=$(cat ./hollowknight.version)
           echo "HK_VERSION=$HKV" >> $GITHUB_ENV
       - name: Checkout Binaries
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: hk-modding/hk-binary-archives
           ref: ${{ matrix.archive-ref }}
@@ -42,7 +42,7 @@ jobs:
           tar -xzf ../hk-binary-archives/${{ env.HK_VERSION }}/managed.${{ matrix.platform }}.tar.gz
 
       - name: Build docs
-        uses: nunit/docfx-action@v3.4.2
+        uses: nunit/docfx-action@v4.1.0
         with:
           args: docs/docfx.json
       - name: Publish

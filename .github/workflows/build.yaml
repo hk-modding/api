@@ -24,7 +24,7 @@ jobs:
         platform: [windows, macos, linux]
         archive-ref: [main]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref }}
           persist-credentials: false
@@ -35,7 +35,7 @@ jobs:
           echo "HK_VERSION=$HKV" >> $GITHUB_ENV
       
       - name: Checkout Binaries
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: hk-modding/hk-binary-archives
           ref: ${{ matrix.archive-ref }}
@@ -60,7 +60,7 @@ jobs:
             macos) echo "RID=osx-x64" >> $GITHUB_ENV ;;
           esac
       
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.x
       - name: Setup MSBuild
@@ -89,7 +89,7 @@ jobs:
           mv libunityscenerepacker.dylib OutputFinal/
       - name: Upload Binary
         if: inputs.upload-artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build.${{ matrix.platform }}
           path: ./OutputFinal/

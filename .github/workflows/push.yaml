@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags')
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         
       - name: Read Versions
         run: |
@@ -26,7 +26,7 @@ jobs:
           APIV=$(cat ./moddingapi.version)
           echo "API_VERSION=$APIV" >> $GITHUB_ENV
         
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: ./artifacts
       - name: Zip Artifacts
@@ -35,7 +35,7 @@ jobs:
             zip -jr moddingapi.${{ env.API_VERSION }}.macos.zip ./artifacts/build.macos/*
             zip -jr moddingapi.${{ env.API_VERSION }}.linux.zip ./artifacts/build.linux/*
       
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '20.x'
       - name: Install Node Dependencies
@@ -43,7 +43,7 @@ jobs:
           npm install handlebars
       - name: Create Release Notes
         id: create-relnotes
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           CHANGELOG: ${{ github.event.head_commit.message }}
         with:
@@ -53,7 +53,7 @@ jobs:
             return await script();
       
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body: ${{ steps.create-relnotes.outputs.result }}
           files: |
