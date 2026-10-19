@@ -76,5 +76,10 @@ namespace Modding
         ///     Maximum number of days to preserve modlogs for.
         /// </summary>
         public int ModlogMaxAge = 7;
+ 
+        /// <summary>
+        ///     Path to load mods from, or null for default ([game folder]/Managed/Mods).
+        /// </summary>
+        public string ModsFolder = null;
     }
 }

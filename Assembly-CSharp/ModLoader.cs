@@ -85,18 +85,14 @@ namespace Modding
 
             Logger.APILogger.Log("Starting mod loading");
 
-            string managed_path = SystemInfo.operatingSystemFamily switch
-            {
-                OperatingSystemFamily.Windows => Path.Combine(Application.dataPath, "Managed"),
-                OperatingSystemFamily.MacOSX => Path.Combine(Application.dataPath, "Resources", "Data", "Managed"),
-                OperatingSystemFamily.Linux => Path.Combine(Application.dataPath, "Managed"),
+            ModHooks.LoadGlobalSettings();
+            Logger.ClearOldModlogs();
 
-                OperatingSystemFamily.Other => null,
+            Logger.APILogger.LogDebug($"Loading assemblies and constructing mods");
 
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            string mods = ModHooks.GlobalSettings.ModsFolder ?? GetDefaultModsFolder();
 
-            if (managed_path is null)
+            if (mods is null)
             {
                 LoadState |= ModLoadState.Loaded;
 
@@ -104,13 +100,6 @@ namespace Modding
 
                 yield break;
             }
-
-            ModHooks.LoadGlobalSettings();
-            Logger.ClearOldModlogs();
-
-            Logger.APILogger.LogDebug($"Loading assemblies and constructing mods");
-
-            string mods = Path.Combine(managed_path, "Mods");
 
             string[] files = Directory.GetDirectories(mods)
                 .Except(new string[] { Path.Combine(mods, "Disabled") })
@@ -292,6 +281,22 @@ namespace Modding
             new ModListMenu().InitMenuCreation();
 
             UObject.Destroy(coroutineHolder.gameObject);
+        }
+
+        private static string GetDefaultModsFolder()
+        {
+            string managed_path = SystemInfo.operatingSystemFamily switch
+            {
+                OperatingSystemFamily.Windows => Path.Combine(Application.dataPath, "Managed"),
+                OperatingSystemFamily.MacOSX => Path.Combine(Application.dataPath, "Resources", "Data", "Managed"),
+                OperatingSystemFamily.Linux => Path.Combine(Application.dataPath, "Managed"),
+
+                OperatingSystemFamily.Other => null,
+
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            return Path.Combine(managed_path, "Mods");
         }
 
         private static void GetPreloads
